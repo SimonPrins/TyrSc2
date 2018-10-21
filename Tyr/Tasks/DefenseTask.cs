@@ -8,10 +8,12 @@ namespace Tyr.Tasks
 {
     class DefenseTask : Task
     {
-        public static DefenseTask Task = new DefenseTask();
+        public static DefenseTask GroundDefenseTask = new DefenseTask();
+        public static DefenseTask AirDefenseTask = new DefenseTask() { Air = true };
         public int MaxDefenseRadius = 40;
         public int MainDefenseRadius = 30;
         public int ExpandDefenseRadius = 20;
+        public bool Air = false;
 
         public HashSet<uint> IgnoreEnemyTypes = new HashSet<uint>();
 
@@ -20,13 +22,21 @@ namespace Tyr.Tasks
 
         public static void Enable()
         {
-            Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            GroundDefenseTask.Stopped = false;
+            Tyr.Bot.TaskManager.Add(GroundDefenseTask);
+            AirDefenseTask.Stopped = false;
+            Tyr.Bot.TaskManager.Add(AirDefenseTask);
         }
 
         public override bool DoWant(Agent agent)
         {
-            return agent.IsCombatUnit && SC2Util.DistanceSq(agent.Unit.Pos, SC2Util.To2D(Tyr.Bot. MapAnalyzer.StartLocation)) <= MaxDefenseRadius * MaxDefenseRadius;
+            if (!agent.IsCombatUnit)
+                return false;
+            if (!agent.CanAttackAir() && Air)
+                return false;
+            if (!agent.CanAttackGround() && !Air)
+                return false;
+            return SC2Util.DistanceSq(agent.Unit.Pos, SC2Util.To2D(Tyr.Bot. MapAnalyzer.StartLocation)) <= MaxDefenseRadius * MaxDefenseRadius;
         }
 
         public override bool IsNeeded()
@@ -45,6 +55,10 @@ namespace Tyr.Tasks
                     && unit.UnitType != UnitTypes.CHANGELING_ZERGLING
                     && unit.UnitType != UnitTypes.CHANGELING_ZERGLING_WINGS)
                 {
+                    if (unit.IsFlying && !Air)
+                        continue;
+                    if (!unit.IsFlying && Air)
+                        continue;
                     if (SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation)) <= MainDefenseRadius * MainDefenseRadius)
                         return true;
                     if (SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation)) >= MaxDefenseRadius * MaxDefenseRadius)
@@ -75,6 +89,10 @@ namespace Tyr.Tasks
                     && unit.UnitType != UnitTypes.CHANGELING_ZERGLING
                     && unit.UnitType != UnitTypes.CHANGELING_ZERGLING_WINGS)
                 {
+                    if (unit.IsFlying && !Air)
+                        continue;
+                    if (!unit.IsFlying && Air)
+                        continue;
                     float newDist = SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Tyr.Bot. MapAnalyzer.StartLocation));
                     if (newDist >= MaxDefenseRadius * MaxDefenseRadius)
                         continue;

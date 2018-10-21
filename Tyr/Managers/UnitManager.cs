@@ -52,7 +52,7 @@ namespace Tyr.Managers
                     if (unit.Orders != null && unit.Orders.Count > 0 && Abilities.Creates.ContainsKey(unit.Orders[0].AbilityId))
                         CollectionUtil.Increment(Counts, Abilities.Creates[unit.Orders[0].AbilityId]);
 
-                    if (unit.BuildProgress < 1 && unit.UnitType == UnitTypes.PYLON)
+                    if (unit.BuildProgress < 1 && (unit.UnitType == UnitTypes.PYLON || unit.UnitType == UnitTypes.SUPPLY_DEPOT))
                         FoodExpected += 8;
                     if (unit.Orders != null && unit.Orders.Count > 0 && unit.Orders[0].AbilityId == 1344)
                         FoodExpected += 8;
@@ -109,6 +109,8 @@ namespace Tyr.Managers
                 // Count how many of each unitType we intend to build.
                 CollectionUtil.Increment(Counts, request.Type);
                 if (request.Type == UnitTypes.PYLON)
+                    FoodExpected += 8;
+                if (request.Type == UnitTypes.SUPPLY_DEPOT)
                     FoodExpected += 8;
                 if (request.Base != null)
                     CollectionUtil.Increment(request.Base.BuildingCounts, request.Type);

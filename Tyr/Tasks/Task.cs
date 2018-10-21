@@ -83,5 +83,11 @@ namespace Tyr.Tasks
             RemoveAt(k);
             return result;
         }
+
+        public static void Enable(Task task)
+        {
+            task.Stopped = false;
+            Tyr.Bot.TaskManager.Add(task);
+        }
     }
 }

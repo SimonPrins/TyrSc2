@@ -28,8 +28,17 @@ namespace Tyr.Tasks
         public override void OnFrame(Tyr tyr)
         {
             foreach (Agent agent in units)
+            {
                 if (agent.Unit.Orders.Count == 0)
                     tyr.Build.ProduceOverride(tyr, agent);
+                else if (agent.Unit.Orders.Count == 1
+                    && tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag)
+                    && (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.REACTOR
+                        || tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.BARRACKS_REACTOR
+                        || tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_REACTOR
+                        || tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_REACTOR))
+                    tyr.Build.ProduceOverride(tyr, agent);
+            }
         }
     }
 }

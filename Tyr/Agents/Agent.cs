@@ -50,6 +50,24 @@ namespace Tyr.Agents
             Command.UnitTags.Add(Unit.Tag);
         }
 
+        public bool CanAttackAir()
+        {
+            foreach (Weapon weapon in UnitTypes.LookUp[Unit.UnitType].Weapons)
+                if (weapon.Type == Weapon.Types.TargetType.Any
+                    || (weapon.Type == Weapon.Types.TargetType.Air))
+                    return true;
+            return false;
+        }
+
+        public bool CanAttackGround()
+        {
+            foreach (Weapon weapon in UnitTypes.LookUp[Unit.UnitType].Weapons)
+                if (weapon.Type == Weapon.Types.TargetType.Any
+                    || (weapon.Type == Weapon.Types.TargetType.Ground))
+                    return true;
+            return false;
+        }
+
         internal void ArchonMerge(Agent agent)
         {
             // Short delay between orders to prevent order spam.

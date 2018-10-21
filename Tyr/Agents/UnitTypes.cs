@@ -354,7 +354,8 @@ namespace Tyr.Agents
                 RAVAGER,
                 RAVAGER_BURROWED,
                 LURKER,
-                LURKER_BURROWED
+                LURKER_BURROWED,
+                HELLBAT
             };
         public static HashSet<uint> AirAttackTypes = new HashSet<uint>
             {
@@ -433,7 +434,10 @@ namespace Tyr.Agents
             { LURKER_BURROWED, new List<uint>() { LURKER } },
             { GREATER_SPIRE, new List<uint>() { SPIRE }},
             { HIVE, new List<uint>() { LAIR, HATCHERY}},
-            { LAIR, new List<uint>() { HATCHERY }}
+            { LAIR, new List<uint>() { HATCHERY }},
+            { SUPPLY_DEPOT_LOWERED, new List<uint>() { SUPPLY_DEPOT }},
+            { ORBITAL_COMMAND, new List<uint>() { COMMAND_CENTER }},
+            { PLANETARY_FORTRESS, new List<uint>() { COMMAND_CENTER }}
         };
     }
 }

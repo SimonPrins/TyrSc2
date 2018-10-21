@@ -45,6 +45,16 @@ namespace Tyr.Tasks
                     agent.Order(Abilities.BURROW_DOWN);
                     continue;
                 }
+                if (agent.Unit.UnitType == UnitTypes.SIEGE_TANK && SC2Util.DistanceSq(agent.Unit.Pos, Target) < 3 * 3)
+                {
+                    agent.Order(Abilities.SIEGE);
+                    continue;
+                }
+                if (agent.Unit.UnitType == UnitTypes.SIEGE_TANK_SIEGED && SC2Util.DistanceSq(agent.Unit.Pos, Target) > 3 * 3)
+                {
+                    agent.Order(Abilities.UNSIEGE);
+                    continue;
+                }
                 if (FearEnemies && (agent.IsCombatUnit || agent.Unit.UnitType == UnitTypes.OVERSEER))
                 {
                     Unit fleeEnemy = null;

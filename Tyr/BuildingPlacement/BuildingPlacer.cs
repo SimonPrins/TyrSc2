@@ -105,6 +105,18 @@ namespace Tyr.BuildingPlacement
                     if (!SC2Util.GetTilePlacable((int)Math.Round(location.X + x), (int)Math.Round(location.Y + y)))
                         return false;
 
+            if (CanHaveAddOn(type))
+            {
+                if (!SC2Util.GetTilePlacable((int)Math.Round(location.X + 2f), (int)Math.Round(location.Y - 1)))
+                    return false;
+                if (!SC2Util.GetTilePlacable((int)Math.Round(location.X + 2f), (int)Math.Round(location.Y)))
+                    return false;
+                if (!SC2Util.GetTilePlacable((int)Math.Round(location.X + 3f), (int)Math.Round(location.Y - 1)))
+                    return false;
+                if (!SC2Util.GetTilePlacable((int)Math.Round(location.X + 3f), (int)Math.Round(location.Y)))
+                    return false;
+            }
+
             if (BuildInsideMainOnly)
                 for (float x = -size.X / 2f; x < size.X / 2f + 0.1f; x++)
                     for (float y = -size.Y / 2f; y < size.Y / 2f + 0.1f; y++)
@@ -174,12 +186,27 @@ namespace Tyr.BuildingPlacement
             if (BuildCompact)
                 return CheckDistanceClose(location, buildingType, unitPos, unitType);
             if ((buildingType == UnitTypes.PHOTON_CANNON && (unitType != UnitTypes.PHOTON_CANNON || !SpreadCannons))
-                || buildingType == UnitTypes.SHIELD_BATTERY 
-                || buildingType == UnitTypes.DARK_SHRINE 
+                || buildingType == UnitTypes.SHIELD_BATTERY
+                || buildingType == UnitTypes.DARK_SHRINE
                 || buildingType == UnitTypes.SPINE_CRAWLER
                 || buildingType == UnitTypes.SPORE_CRAWLER
+                || buildingType == UnitTypes.SUPPLY_DEPOT
+                || unitType == UnitTypes.SUPPLY_DEPOT
+                || unitType == UnitTypes.SUPPLY_DEPOT_LOWERED
                 || buildingType == UnitTypes.CREEP_TUMOR)
+            {
+                if (CanHaveAddOn(buildingType))
+                {
+                    if (!CheckDistanceClose(SC2Util.Point(location.X + 2.5f, location.Y - 0.5f), UnitTypes.REACTOR, unitPos, unitType))
+                        return false;
+                }
+                if (CanHaveAddOn(unitType))
+                {
+                    if (!CheckDistanceClose(location, buildingType, SC2Util.Point(unitPos.X + 2.5f, unitPos.Y - 0.5f), UnitTypes.REACTOR))
+                        return false;
+                }
                 return CheckDistanceClose(location, buildingType, unitPos, unitType);
+            }
             int minDist = 5;
             if (buildingType == UnitTypes.PYLON && !PylonsFilled)
                 minDist = 7;
@@ -195,8 +222,12 @@ namespace Tyr.BuildingPlacement
             float dx = BuildingType.LookUp[buildingType].Size.X / 2f + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.X / 2f: 1f) - 0.1f;
             float dy = BuildingType.LookUp[buildingType].Size.Y / 2f + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.Y / 2f : 1f) - 0.1f;
             
-
             return Math.Abs(location.X - unitPos.X) >= dx || Math.Abs(location.Y - unitPos.Y) >= dy;
+        }
+
+        public bool CanHaveAddOn(uint type)
+        {
+            return type == UnitTypes.BARRACKS || type == UnitTypes.FACTORY || type == UnitTypes.STARPORT;
         }
     }
 }

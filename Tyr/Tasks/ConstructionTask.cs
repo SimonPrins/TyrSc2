@@ -39,7 +39,7 @@ namespace Tyr.Tasks
                 return false;
             if (OnlyWorkersFromMain && !Tyr.Bot.MapAnalyzer.StartArea[SC2Util.To2D(agent.Unit.Pos)])
                 return false;
-            if (Tyr.Bot.MyRace == Race.Zerg && agent.Unit.Orders != null && agent.Unit.Orders.Count > 0 && Abilities.Creates.ContainsKey(agent.Unit.Orders[0].AbilityId))
+            if ((Tyr.Bot.MyRace == Race.Zerg || Tyr.Bot.MyRace == Race.Terran) && agent.Unit.Orders != null && agent.Unit.Orders.Count > 0 && Abilities.Creates.ContainsKey(agent.Unit.Orders[0].AbilityId))
                 return false;
             return units.Count < UnassignedRequests.Count + BuildRequests.Count;
         }

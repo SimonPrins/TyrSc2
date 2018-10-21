@@ -7,6 +7,7 @@ using Tyr.Agents;
 using Tyr.BuildingPlacement;
 using Tyr.Builds;
 using Tyr.Builds.Protoss;
+using Tyr.Builds.Terran;
 using Tyr.Builds.Zerg;
 using Tyr.Managers;
 using Tyr.MapAnalysis;
@@ -54,6 +55,7 @@ namespace Tyr
 
         public BaseManager BaseManager = new BaseManager();
         public NexusAbilityManager NexusAbilityManager = new NexusAbilityManager();
+        public OrbitalAbilityManager OrbitalAbilityManager = new OrbitalAbilityManager();
 
 
         public static Tyr Bot { get; internal set; }
@@ -70,12 +72,12 @@ namespace Tyr
         private long maxExecutionTime;
 
         private string ResultsFile;
-        public Build FixedBuild;
+        public Build FixedBuild = new TankPush();
         public static bool AllowWritingFiles = true;
 
         private Request DrawRequest;
 
-        public static bool Debug = false;
+        public static bool Debug = true;
 
         private int TextLine = 0;
 
@@ -375,6 +377,9 @@ namespace Tyr
 
             if (GameInfo.PlayerInfo[(int)Observation.Observation.PlayerCommon.PlayerId - 1].RaceActual == Race.Protoss)
                 Managers.Add(NexusAbilityManager);
+
+            if (GameInfo.PlayerInfo[(int)Observation.Observation.PlayerCommon.PlayerId - 1].RaceActual == Race.Terran)
+                Managers.Add(OrbitalAbilityManager);
         }
 
         private Build DetermineBuild()

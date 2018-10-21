@@ -10,7 +10,7 @@ namespace Tyr
 {
     class Program
     {
-        private static Race MyRace = Race.Protoss;
+        private static Race MyRace = Race.Terran;
         static void Main(string[] args)
         {
             Tyr tyr = new Tyr();

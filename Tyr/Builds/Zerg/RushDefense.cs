@@ -141,19 +141,25 @@ namespace Tyr.Builds.Zerg
             if (tyr.EnemyStrategyAnalyzer.WorkerRushDetected)
                 foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                     task.DefenseRadius = 6;
-            
-            DefenseTask.Task.Stopped = tyr.EnemyStrategyAnalyzer.ReaperRushDetected && Completed(UnitTypes.HYDRALISK) + Completed(UnitTypes.ROACH) >= 25;
-            if (DefenseTask.Task.Stopped)
-                DefenseTask.Task.Clear();
+
+            DefenseTask.GroundDefenseTask.Stopped = tyr.EnemyStrategyAnalyzer.ReaperRushDetected && Completed(UnitTypes.HYDRALISK) + Completed(UnitTypes.ROACH) >= 25;
+            if (DefenseTask.GroundDefenseTask.Stopped)
+                DefenseTask.GroundDefenseTask.Clear();
+            DefenseTask.AirDefenseTask.Stopped = tyr.EnemyStrategyAnalyzer.ReaperRushDetected && Completed(UnitTypes.HYDRALISK) + Completed(UnitTypes.ROACH) >= 25;
+            if (DefenseTask.AirDefenseTask.Stopped)
+                DefenseTask.AirDefenseTask.Clear();
 
             TimingAttackTask.Task.RetreatSize = 5;
             TimingAttackTask.Task.RequiredSize = tyr.EnemyStrategyAnalyzer.ReaperRushDetected && !TimingAttackTask.Task.AttackSent ? 15 : 25;
             TimingAttackTask.Task.DefendOtherAgents = false;
 
-            DefenseTask.Task.MainDefenseRadius = 20;
-            DefenseTask.Task.ExpandDefenseRadius = 20;
-            DefenseTask.Task.MaxDefenseRadius = 55;
-            
+            DefenseTask.GroundDefenseTask.MainDefenseRadius = 20;
+            DefenseTask.GroundDefenseTask.ExpandDefenseRadius = 20;
+            DefenseTask.GroundDefenseTask.MaxDefenseRadius = 55;
+            DefenseTask.AirDefenseTask.MainDefenseRadius = 20;
+            DefenseTask.AirDefenseTask.ExpandDefenseRadius = 20;
+            DefenseTask.AirDefenseTask.MaxDefenseRadius = 55;
+
             BaseWorkers.WorkersPerGas = 3;
 
             if (!TakeExpand)

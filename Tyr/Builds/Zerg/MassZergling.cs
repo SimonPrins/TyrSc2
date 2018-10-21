@@ -135,9 +135,12 @@ namespace Tyr.Builds.Zerg
             //    TimingAttackTask.Task.RequiredSize = Math.Max(25, TimingAttackTask.Task.RequiredSize);
             TimingAttackTask.Task.RetreatSize = 10;
 
-            DefenseTask.Task.MainDefenseRadius = 20;
-            DefenseTask.Task.ExpandDefenseRadius = 18;
-            DefenseTask.Task.MaxDefenseRadius = 55;
+            DefenseTask.GroundDefenseTask.MainDefenseRadius = 20;
+            DefenseTask.GroundDefenseTask.ExpandDefenseRadius = 18;
+            DefenseTask.GroundDefenseTask.MaxDefenseRadius = 55;
+            DefenseTask.AirDefenseTask.MainDefenseRadius = 20;
+            DefenseTask.AirDefenseTask.ExpandDefenseRadius = 18;
+            DefenseTask.AirDefenseTask.MaxDefenseRadius = 55;
         }
 
         public override void Produce(Tyr tyr, Agent agent)

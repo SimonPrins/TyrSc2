@@ -101,9 +101,12 @@ namespace Tyr.Builds.Zerg
             TimingAttackTask.Task.RequiredSize = 32;
             TimingAttackTask.Task.RetreatSize = 10;
 
-            DefenseTask.Task.MainDefenseRadius = 20;
-            DefenseTask.Task.ExpandDefenseRadius = 20;
-            DefenseTask.Task.MaxDefenseRadius = 55;
+            DefenseTask.GroundDefenseTask.MainDefenseRadius = 20;
+            DefenseTask.GroundDefenseTask.ExpandDefenseRadius = 20;
+            DefenseTask.GroundDefenseTask.MaxDefenseRadius = 55;
+            DefenseTask.AirDefenseTask.MainDefenseRadius = 20;
+            DefenseTask.AirDefenseTask.ExpandDefenseRadius = 20;
+            DefenseTask.AirDefenseTask.MaxDefenseRadius = 55;
             /*
             if ((!SmellCheese && tyr.Frame >= 22.4 * 60 * 1.5
                 && !tyr.EnemyStrategyAnalyzer.NoProxyGatewayConfirmed)
@@ -123,7 +126,8 @@ namespace Tyr.Builds.Zerg
                 && tyr.EnemyStrategyAnalyzer.ThreeGateDetected)
             {
                 StalkerDefense = true;
-                DefenseTask.Task.ExpandDefenseRadius = 13;
+                DefenseTask.GroundDefenseTask.ExpandDefenseRadius = 13;
+                DefenseTask.AirDefenseTask.ExpandDefenseRadius = 13;
             }
 
             //if (SmellCheese && CannonRush)
