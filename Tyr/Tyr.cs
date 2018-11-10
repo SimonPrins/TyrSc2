@@ -70,8 +70,8 @@ namespace Tyr
         private long maxExecutionTime;
 
         private string ResultsFile;
-        public Build FixedBuild;
-        public static bool AllowWritingFiles = true;
+        public Build FixedBuild = new MicroBuild();
+        public static bool AllowWritingFiles = false;
 
         private Request DrawRequest;
 
@@ -122,22 +122,6 @@ namespace Tyr
                 time3 = stopWatch.ElapsedMilliseconds;
 
                 UnitManager.AddActions(actions);
-
-                if (!Surrendered)
-                {
-                    Surrendered = CheckSurrender();
-                    if (Surrendered)
-                    {
-                        Chat("gg");
-                        SurrenderedFrame = Frame;
-                        Register("result " + EnemyRace + " " + Build.Name() + " Defeat");
-                    }
-                }
-
-                if (Surrendered && Frame - SurrenderedFrame >= 118)
-                    GameConnection.RequestLeaveGame().Wait();
-
-                TrySenDay9();
             }
             catch (System.Exception e)
             {
@@ -222,72 +206,6 @@ namespace Tyr
                 debugCommand.Draw = new DebugDraw();
                 DrawRequest.Debug.Debug.Add(debugCommand);
             }
-        }
-
-        private void TrySenDay9()
-        {
-            if (!Monday || Day9Sent)
-                return;
-            
-
-            foreach (Unit unit in EnemyBases)
-            {
-                bool removed = false;
-                if (Observation.Observation.RawData.Event != null
-                    && Observation.Observation.RawData.Event.DeadUnits != null)
-                    foreach (ulong tag in Observation.Observation.RawData.Event.DeadUnits)
-                        if (unit.Tag == tag)
-                            removed = true;
-
-                if (!removed)
-                    continue;
-                
-                Chat("Day[9] made me do it!");
-                Day9Sent = true;
-            }
-
-            EnemyBases = new List<Unit>();
-            foreach (Unit unit in Observation.Observation.RawData.Units)
-                if (unit.Alliance == Alliance.Enemy && UnitTypes.ResourceCenters.Contains(unit.UnitType))
-                    EnemyBases.Add(unit);
-        }
-
-        private bool CheckSurrender()
-        {
-            int buildings = 0;
-            int health = 0;
-            int shield = 0;
-            foreach (Agent agent in UnitManager.Agents.Values)
-            {
-                if (agent.IsBuilding)
-                {
-                    buildings++;
-                    health = (int)System.Math.Max(health, agent.Unit.Health);
-                    shield = (int)System.Math.Max(shield, agent.Unit.Shield);
-                }
-            }
-            if (buildings <= 1
-                && shield == 0
-                && health <= 150)
-                return true;
-
-            int bases = UnitManager.Count(UnitTypes.NEXUS) + UnitManager.Count(UnitTypes.COMMAND_CENTER) + UnitManager.Count(UnitTypes.COMMAND_CENTER_FLYING) + UnitManager.Count(UnitTypes.ORBITAL_COMMAND) + UnitManager.Count(UnitTypes.ORBITAL_COMMAND_FLYING) + UnitManager.Count(UnitTypes.PLANETARY_FORTRESS) + UnitManager.Count(UnitTypes.HATCHERY) + UnitManager.Count(UnitTypes.LAIR) + UnitManager.Count(UnitTypes.HIVE);
-            int workers = UnitManager.Count(UnitTypes.SCV) + UnitManager.Count(UnitTypes.PROBE) + UnitManager.Count(UnitTypes.DRONE);
-            int minerals = (int)Observation.Observation.PlayerCommon.Minerals - ReservedMinerals;
-            if (bases > 0 && workers > 0)
-                return false;
-
-            if (workers > 0 && minerals >= 400)
-                return false;
-
-            if (bases > 0 && minerals >= 50)
-                return false;
-
-            foreach (Agent agent in UnitManager.Agents.Values)
-                if (agent.IsCombatUnit)
-                    return false;
-
-            return true;
         }
 
         public void Chat(string message)
