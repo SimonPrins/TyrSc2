@@ -15,10 +15,7 @@ namespace Tyr.Agents
         }
 
         public ActionRawUnitCommand Command;
-
-        // For a building, indicates to which base it belongs.
-        public Base Base;
-
+        
         public void Order(int ability)
         {
             Order(ability, null);

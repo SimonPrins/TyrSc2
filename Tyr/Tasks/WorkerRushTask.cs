@@ -59,9 +59,6 @@ namespace Tyr.Tasks
         public override void OnFrame(Tyr tyr)
         {
             ulong mineral = 0;
-            if (tyr.BaseManager.Main.BaseLocation.MineralFields.Count > 0)
-                mineral = tyr.BaseManager.Main.BaseLocation.MineralFields[0].Tag;
-
             foreach (Agent agent in units)
             {
                 if (!regenerating.Contains(agent.Unit.Tag) && agent.Unit.Shield <= 3 && agent.Unit.UnitType == UnitTypes.PROBE)

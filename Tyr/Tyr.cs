@@ -4,7 +4,6 @@ using System.IO;
 using SC2API_CSharp;
 using SC2APIProtocol;
 using Tyr.Agents;
-using Tyr.BuildingPlacement;
 using Tyr.Builds;
 using Tyr.Managers;
 using Tyr.MapAnalysis;
@@ -27,8 +26,7 @@ namespace Tyr
         public uint PlayerId;
 
         List<Action> actions = new List<Action>();
-
-        public BuildingPlacer buildingPlacer;
+        
         public int Frame { get; internal set; }
         public MapAnalyzer MapAnalyzer { get; internal set; } = new MapAnalyzer();
         public EnemyStrategyAnalyzer EnemyStrategyAnalyzer = new EnemyStrategyAnalyzer();
@@ -39,9 +37,6 @@ namespace Tyr
 
         public MicroController MicroController = new MicroController();
 
-        private bool Surrendered = false;
-        private int SurrenderedFrame = 0;
-
         // Managers
         public List<Manager> Managers = new List<Manager>();
         public UnitManager UnitManager = new UnitManager();
@@ -49,17 +44,12 @@ namespace Tyr
         public TargetManager TargetManager = new TargetManager();
         public TaskManager TaskManager = new TaskManager();
         public EffectManager EffectManager = new EffectManager();
-
-        public BaseManager BaseManager = new BaseManager();
-        public NexusAbilityManager NexusAbilityManager = new NexusAbilityManager();
-
-
+        
         public static Tyr Bot { get; internal set; }
 
         public Build Build = new MicroBuild();
 
         public bool Monday { get; set; }
-        private bool Day9Sent = false;
         private List<Unit> EnemyBases = new List<Unit>();
 
         private bool loggedError = false;
@@ -78,7 +68,6 @@ namespace Tyr
 
         public Tyr()
         {
-            buildingPlacer = new BuildingPlacer(this);
             Bot = this;
         }
 
@@ -272,7 +261,6 @@ namespace Tyr
 
             MapAnalyzer.Analyze(this);
             TargetManager.OnStart(this);
-            BaseManager.OnStart(this);
             
             Build.InitializeTasks();
             Build.OnStart(this);
@@ -282,13 +270,9 @@ namespace Tyr
 
             Managers.Add(UnitManager);
             Managers.Add(EnemyManager);
-            Managers.Add(BaseManager);
             Managers.Add(TargetManager);
             Managers.Add(TaskManager);
             Managers.Add(EffectManager);
-
-            if (GameInfo.PlayerInfo[(int)Observation.Observation.PlayerCommon.PlayerId - 1].RaceActual == Race.Protoss)
-                Managers.Add(NexusAbilityManager);
         }
 
         public List<Unit> Enemies()

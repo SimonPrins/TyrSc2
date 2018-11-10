@@ -80,21 +80,11 @@ namespace Tyr.Tasks
                     dist = newDist;
                 }
             }
-
-            int bases = 0;
-            foreach (Base b in tyr.BaseManager.Bases)
-                if (b.ResourceCenter != null)
-                    bases++;
-
-            Point2D defenseLocation;
-            if (bases >= 2)
-                defenseLocation = tyr.BaseManager.NaturalDefensePos;
-            else defenseLocation = tyr.BaseManager.MainDefensePos;
-
+            
             foreach (Agent agent in units)
             {
                 if (closest == null)
-                    agent.Order(Abilities.MOVE, defenseLocation);
+                    agent.Order(Abilities.MOVE, SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
                 else
                     agent.Order(Abilities.MOVE, SC2Util.To2D(closest.Unit.Pos));
             }

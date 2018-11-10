@@ -34,9 +34,7 @@ namespace Tyr.Tasks
         {
             if (OverrideTarget != null)
                 Target = OverrideTarget;
-            else if (tyr.BaseManager.Natural.Owner == tyr.PlayerId)
-                Target = tyr.BaseManager.NaturalDefensePos;
-            else Target = tyr.BaseManager.MainDefensePos;
+            else Target = SC2Util.To2D(tyr.MapAnalyzer.StartLocation);
 
             foreach (Agent agent in units)
             {

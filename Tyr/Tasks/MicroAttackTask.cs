@@ -24,9 +24,13 @@ namespace Tyr.Tasks
         {
             return true;
         }
-
+        
         public override void OnFrame(Tyr tyr)
         {
+            if (tyr.Frame == 20)
+            {
+                System.Console.WriteLine("Target: " + tyr.TargetManager.AttackTarget);
+            }
             foreach (Agent agent in units)
                 agent.Order(Abilities.ATTACK, tyr.TargetManager.AttackTarget);
         }

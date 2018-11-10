@@ -40,13 +40,13 @@ namespace Tyr.Tasks
                         && (UnitTypes.CombatUnitTypes.Contains(unit.UnitType) || unit.UnitType == UnitTypes.SPINE_CRAWLER || unit.UnitType == UnitTypes.PHOTON_CANNON || unit.UnitType == UnitTypes.BUNKER))
                         underAttack = true;
                 }
-                foreach (BuildingLocation building in Tyr.Bot.EnemyManager.EnemyBuildings.Values)
+                foreach (Unit building in Tyr.Bot.Enemies())
                 {
                     if (SC2Util.DistanceSq(building.Pos, agent.Unit.Pos) <= 12 * 12
-                        && (building.Type == UnitTypes.MISSILE_TURRET || building.Type == UnitTypes.PHOTON_CANNON || building.Type == UnitTypes.SPORE_CRAWLER))
+                        && (building.UnitType == UnitTypes.MISSILE_TURRET || building.UnitType == UnitTypes.PHOTON_CANNON || building.UnitType == UnitTypes.SPORE_CRAWLER))
                         detected = true;
                     if (SC2Util.DistanceSq(building.Pos, agent.Unit.Pos) <= 9 * 9
-                        && (building.Type == UnitTypes.SPINE_CRAWLER || building.Type == UnitTypes.PHOTON_CANNON || building.Type == UnitTypes.BUNKER))
+                        && (building.UnitType == UnitTypes.SPINE_CRAWLER || building.UnitType == UnitTypes.PHOTON_CANNON || building.UnitType == UnitTypes.BUNKER))
                         underAttack = true;
                 }
                 bool retreat = detected && underAttack;

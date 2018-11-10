@@ -23,11 +23,6 @@ namespace Tyr.Managers
             Counts = new Dictionary<uint, int>();
             CompletedCounts = new Dictionary<uint, int>();
             HashSet<ulong> existingUnits = new HashSet<ulong>();
-            foreach (Base b in tyr.BaseManager.Bases)
-            {
-                b.BuildingCounts = new Dictionary<uint, int>();
-                b.BuildingsCompleted = new Dictionary<uint, int>();
-            }
             ActiveOrders = new HashSet<uint>();
 
             FoodExpected = 0;
@@ -77,12 +72,6 @@ namespace Tyr.Managers
                             CollectionUtil.Increment(Counts, Abilities.Creates[(uint)agent.LastAbility]);
                         }
                         agent.Command = null;
-                        if (agent.Base != null)
-                        {
-                            CollectionUtil.Increment(agent.Base.BuildingCounts, unit.UnitType);
-                            if (unit.BuildProgress >= 0.9999f)
-                                CollectionUtil.Increment(agent.Base.BuildingsCompleted, unit.UnitType);
-                        }
                     }
                     else
                     {
@@ -103,26 +92,7 @@ namespace Tyr.Managers
                         ActiveOrders.Add(unit.Orders[0].AbilityId);
                 }
             }
-
-            foreach (BuildRequest request in ConstructionTask.Task.BuildRequests)
-            {
-                // Count how many of each unitType we intend to build.
-                CollectionUtil.Increment(Counts, request.Type);
-                if (request.Type == UnitTypes.PYLON)
-                    FoodExpected += 8;
-                if (request.Base != null)
-                    CollectionUtil.Increment(request.Base.BuildingCounts, request.Type);
-            }
-
-            foreach (BuildRequest request in ConstructionTask.Task.UnassignedRequests)
-            {
-                // Count how many of each unitType we intend to build.
-                CollectionUtil.Increment(Counts, request.Type);
-                FoodExpected += 8;
-                if (request.Base != null)
-                    CollectionUtil.Increment(request.Base.BuildingCounts, request.Type);
-            }
-
+            
             // Remove dead units.
             if (tyr.Observation != null
                 && tyr.Observation.Observation != null
