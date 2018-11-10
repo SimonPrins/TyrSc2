@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using SC2API_CSharp;
 using SC2APIProtocol;
-using Tyr.Builds;
 
 namespace Tyr
 {
@@ -14,40 +12,6 @@ namespace Tyr
         static void Main(string[] args)
         {
             Tyr tyr = new Tyr();
-
-            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "build.txt"))
-            {
-                string[] lines = File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + "build.txt");
-                foreach (string line in lines)
-                {
-                    if (line.StartsWith("#"))
-                        continue;
-
-                    string[] words = line.Split(' ');
-                    if (words.Length < 2)
-                        continue;
-
-                    if (words[0] == "Protoss")
-                        MyRace = Race.Protoss;
-                    else if (words[0] == "Zerg")
-                        MyRace = Race.Zerg;
-                    else if (words[0] == "Terran")
-                        MyRace = Race.Terran;
-                    else if (words[0] == "Random")
-                        MyRace = Race.Random;
-
-                    foreach (Type buildType in typeof(Build).Assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(Build))))
-                    {
-                        Build build = (Build)Activator.CreateInstance(buildType);
-                        if (build.Name() == words[1])
-                        {
-                            Tyr.AllowWritingFiles = false;
-                            tyr.FixedBuild = build;
-                            break;
-                        }
-                    }
-                }
-            }
             if (Tyr.AllowWritingFiles && !File.Exists(Directory.GetCurrentDirectory() + "/data/Tyr/Tyr.log"))
             {
                 Directory.CreateDirectory(Directory.GetCurrentDirectory() + "/data/Tyr");

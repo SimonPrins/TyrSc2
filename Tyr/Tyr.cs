@@ -6,8 +6,6 @@ using SC2APIProtocol;
 using Tyr.Agents;
 using Tyr.BuildingPlacement;
 using Tyr.Builds;
-using Tyr.Builds.Protoss;
-using Tyr.Builds.Zerg;
 using Tyr.Managers;
 using Tyr.MapAnalysis;
 using Tyr.Micro;
@@ -58,7 +56,7 @@ namespace Tyr
 
         public static Tyr Bot { get; internal set; }
 
-        public Build Build { get; internal set; }
+        public Build Build = new MicroBuild();
 
         public bool Monday { get; set; }
         private bool Day9Sent = false;
@@ -70,7 +68,6 @@ namespace Tyr
         private long maxExecutionTime;
 
         private string ResultsFile;
-        public Build FixedBuild = new MicroBuild();
         public static bool AllowWritingFiles = false;
 
         private Request DrawRequest;
@@ -276,8 +273,7 @@ namespace Tyr
             MapAnalyzer.Analyze(this);
             TargetManager.OnStart(this);
             BaseManager.OnStart(this);
-
-            Build = DetermineBuild();
+            
             Build.InitializeTasks();
             Build.OnStart(this);
 
@@ -293,164 +289,6 @@ namespace Tyr
 
             if (GameInfo.PlayerInfo[(int)Observation.Observation.PlayerCommon.PlayerId - 1].RaceActual == Race.Protoss)
                 Managers.Add(NexusAbilityManager);
-        }
-
-        private Build DetermineBuild()
-        {
-            if (FixedBuild != null)
-                return FixedBuild;
-
-            string[] lines = File.ReadAllLines(ResultsFile);
-            PreviousEnemyStrategies.Load(lines);
-            Dictionary<string, int> defeats = new Dictionary<string, int>();
-            Dictionary<string, int> games = new Dictionary<string, int>();
-            foreach (string line in lines)
-            {
-                if (line.StartsWith("result "))
-                {
-                    string[] words = line.Split(' ');
-                    if (words[1] != EnemyRace.ToString())
-                        continue;
-                    if (words[3] == "Defeat")
-                    {
-                        if (!defeats.ContainsKey(words[2]))
-                            defeats.Add(words[2], 0);
-                        defeats[words[2]]++;
-
-                        if (!games.ContainsKey(words[2]))
-                            games.Add(words[2], 1);
-                        else if (games[words[2]] < defeats[words[2]])
-                            games[words[2]] = defeats[words[2]];
-                    }
-                } else if (line.StartsWith("started"))
-                {
-                    string[] words = line.Split(' ');
-                    if (words[1] != EnemyRace.ToString())
-                        continue;
-
-                    if (!games.ContainsKey(words[2]))
-                        games.Add(words[2], 0);
-                    games[words[2]]++;
-                }
-            }
-
-            List<Build> options;
-
-            if (MyRace == Race.Protoss)
-                options = ProtossBuilds();
-            else if (MyRace == Race.Zerg)
-                options = ZergBuilds();
-            else
-                options = null;
-
-
-            Build preffered = null;
-            int losses = int.MaxValue;
-            foreach (Build option in options)
-            {
-                if (!defeats.ContainsKey(option.Name()))
-                    defeats.Add(option.Name(), 0);
-                if (!games.ContainsKey(option.Name()))
-                    games.Add(option.Name(), 0);
-
-                System.Console.WriteLine(option.Name() + " wins: " + (games[option.Name()] - defeats[option.Name()]));
-                System.Console.WriteLine(option.Name() + " defeats: " + defeats[option.Name()]);
-
-                int newLosses = defeats[option.Name()] - (games[option.Name()] - defeats[option.Name()]) / 4;
-
-                if (newLosses < losses)
-                {
-                    losses = newLosses;
-                    preffered = option;
-                }
-            }
-            return preffered;
-        }
-
-        public List<Build> ZergBuilds()
-        {
-            List<Build> options = new List<Build>();
-
-            if (EnemyRace == Race.Protoss)
-            {
-                options.Add(new RushDefense());
-                options.Add(new TurtleLords());
-            }
-            else if (EnemyRace == Race.Terran)
-            {
-                options.Add(new RushDefense());
-                options.Add(new HydraLurker());
-            }
-            else if (EnemyRace == Race.Zerg)
-            {
-                options.Add(new MassZergling());
-                options.Add(new RoachRavager());
-            }
-            else
-            {
-                options.Add(new RushDefense());
-                options.Add(new MassZergling());
-                options.Add(new HydraLurker());
-                options.Add(new RoachRavager());
-                options.Add(new TurtleLords());
-            }
-
-            return options;
-        }
-
-        public List<Build> ProtossBuilds()
-        {
-            List<Build> options = new List<Build>();
-            if (EnemyRace == Race.Terran)
-                options.Add(new NinjaTurtleCarrier() { BuildCarriers = true, RequiredSize = 12 });
-            else if (EnemyRace == Race.Zerg)
-                options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 10 });
-            else
-            {
-                options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 8 });
-                if (PreviousEnemyStrategies.SkyToss)
-                    options.Add(new OneBaseStalker() { RequiredSize = 10 });
-            }
-            /*
-            if (EnemyRace == Race.Protoss)
-            {
-                options.Add(new TwoBaseRobo());
-                if (TargetManager.PotentialEnemyStartLocations.Count == 1)
-                    options.Add(new WorkerRush());
-                options.Add(new OneBaseStalker());
-            }
-            else if (EnemyRace == Race.Terran)
-            {
-                options.Add(new TwoBaseRoboPvT());
-                if (TargetManager.PotentialEnemyStartLocations.Count == 1)
-                    options.Add(new WorkerRush());
-                if (Bot.PreviousEnemyStrategies.FourRax && !PreviousEnemyStrategies.ReaperRush)
-                    options.Add(new NinjaTurtles());
-                if (!Bot.PreviousEnemyStrategies.FourRax && !PreviousEnemyStrategies.ReaperRush)
-                    options.Add(new ZealotRush() { RequiredSize = 20 });
-                if (!PreviousEnemyStrategies.ReaperRush)
-                    options.Add(new MassVoidray());
-            }
-            else if (EnemyRace == Race.Zerg)
-            {
-                options.Add(new OneBaseStalker() { ProxyPylon = true });
-                options.Add(new TwoBaseRobo());
-                if (TargetManager.PotentialEnemyStartLocations.Count == 1)
-                    options.Add(new WorkerRush());
-                if (!PreviousEnemyStrategies.MassRoach || PreviousEnemyStrategies.MassHydra)
-                    options.Add(new TwoBaseAdept());
-            }
-            else
-            {
-                options.Add(new TwoBaseRobo());
-                if (Bot.TargetManager.PotentialEnemyStartLocations.Count == 1)
-                    options.Add(new WorkerRush());
-                options.Add(new NinjaTurtles());
-                options.Add(new OneBaseStalker());
-            }
-            */
-
-            return options;
         }
 
         public List<Unit> Enemies()
