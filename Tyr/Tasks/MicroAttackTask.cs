@@ -2,11 +2,11 @@
 
 namespace Tyr.Tasks
 {
-    class AMoveTask : Task
+    class MicroAttackTask : Task
     {
-        public static AMoveTask Task = new AMoveTask();
+        public static MicroAttackTask Task = new MicroAttackTask();
         public int UnitType = -1;
-        public AMoveTask() : base(5)
+        public MicroAttackTask() : base(5)
         { }
 
         public static void Enable()
@@ -17,7 +17,7 @@ namespace Tyr.Tasks
 
         public override bool DoWant(Agent agent)
         {
-            return agent.IsCombatUnit && (UnitType == -1 || agent.Unit.UnitType == UnitType);
+            return agent.IsCombatUnit || agent.IsWorker;
         }
 
         public override bool IsNeeded()
