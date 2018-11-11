@@ -35,7 +35,7 @@ namespace Tyr.Managers
                 else if (tyr.MapAnalyzer.MainAndPocketArea[loc.Pos])
                 {
                     Pocket = newBase;
-                    System.Console.WriteLine("Found pocket base at: " + Pocket.BaseLocation.Pos);
+                    DebugUtil.WriteLine("Found pocket base at: " + Pocket.BaseLocation.Pos);
                 }
                 else if (distanceToMain < dist)
                 {
@@ -45,7 +45,7 @@ namespace Tyr.Managers
                 }
             }
 
-            System.Console.WriteLine("Mapname: " + tyr.GameInfo.MapName);
+            DebugUtil.WriteLine("Mapname: " + tyr.GameInfo.MapName);
 
             NaturalDefensePos = tyr.MapAnalyzer.Walk(natural.Pos, tyr.MapAnalyzer.EnemyDistances, 10);
             int distToEnemy = tyr.MapAnalyzer.EnemyDistances[(int)NaturalDefensePos.X, (int)NaturalDefensePos.Y];

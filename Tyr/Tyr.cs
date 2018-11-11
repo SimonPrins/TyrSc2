@@ -114,7 +114,7 @@ namespace Tyr
                         if (agent.Unit.UnitType == UnitTypes.BARRACKS)
                         {
                             PrintedBarracks = true;
-                            System.Console.WriteLine("Barracks location final: " + agent.Unit.Pos);
+                            DebugUtil.WriteLine("Barracks location final: " + agent.Unit.Pos);
                         }
                     }
                 }
@@ -162,7 +162,7 @@ namespace Tyr
                     FileUtil.Log("Error occured: " + e.ToString());
                     loggedError = true;
                 }
-                System.Console.WriteLine("Exception in OnFrame: " + e.ToString());
+                DebugUtil.WriteLine("Exception in OnFrame: " + e.ToString());
             }
 
             Frame++;
@@ -335,27 +335,27 @@ namespace Tyr
             {
                 try
                 {
-                    System.Console.WriteLine("New action performed:" + Observation.Actions[0].ActionRaw.UnitCommand);
-                    System.Console.WriteLine("Ability ID: " + Observation.Actions[0].ActionRaw.UnitCommand.AbilityId);
+                    DebugUtil.WriteLine("New action performed:" + Observation.Actions[0].ActionRaw.UnitCommand);
+                    DebugUtil.WriteLine("Ability ID: " + Observation.Actions[0].ActionRaw.UnitCommand.AbilityId);
                     if (Observation.Actions[0].ActionRaw.UnitCommand.TargetWorldSpacePos != null)
                     {
                         Point2D pos = Observation.Actions[0].ActionRaw.UnitCommand.TargetWorldSpacePos;
-                        System.Console.WriteLine("Position: " + pos);
+                        DebugUtil.WriteLine("Position: " + pos);
                     }
                     else if (Observation.Actions[0].ActionRaw.UnitCommand.TargetUnitTag > 0)
                     {
-                        System.Console.WriteLine("TargetUnit: " + Observation.Actions[0].ActionRaw.UnitCommand.TargetUnitTag);
+                        DebugUtil.WriteLine("TargetUnit: " + Observation.Actions[0].ActionRaw.UnitCommand.TargetUnitTag);
                         foreach (Unit unit in Observation.Observation.RawData.Units)
                             if (unit.Tag == Observation.Actions[0].ActionRaw.UnitCommand.TargetUnitTag)
                             {
-                                System.Console.WriteLine("TargetUnitType: " + unit.UnitType);
+                                DebugUtil.WriteLine("TargetUnitType: " + unit.UnitType);
                                 break;
                             }
                     }
                     foreach (Unit unit in Observation.Observation.RawData.Units)
                         if (unit.Tag == Observation.Actions[0].ActionRaw.UnitCommand.UnitTags[0])
-                            System.Console.WriteLine("By unit of type: " + unit.UnitType);
-                    System.Console.WriteLine();
+                            DebugUtil.WriteLine("By unit of type: " + unit.UnitType);
+                    DebugUtil.WriteLine();
                 }
                 catch (System.Exception) { }
             }
@@ -373,7 +373,7 @@ namespace Tyr
             
             MyRace = GameInfo.PlayerInfo[(int)Observation.Observation.PlayerCommon.PlayerId - 1].RaceActual;
             EnemyRace = GameInfo.PlayerInfo[2 - (int)Observation.Observation.PlayerCommon.PlayerId].RaceRequested;
-            System.Console.WriteLine("MyRace: " + MyRace);
+            DebugUtil.WriteLine("MyRace: " + MyRace);
 
             FileUtil.Log("Game started on map: " + GameInfo.MapName);
             FileUtil.Log("Enemy race: " + EnemyRace);
@@ -463,8 +463,8 @@ namespace Tyr
                 if (!games.ContainsKey(option.Name()))
                     games.Add(option.Name(), 0);
 
-                System.Console.WriteLine(option.Name() + " wins: " + (games[option.Name()] - defeats[option.Name()]));
-                System.Console.WriteLine(option.Name() + " defeats: " + defeats[option.Name()]);
+                DebugUtil.WriteLine(option.Name() + " wins: " + (games[option.Name()] - defeats[option.Name()]));
+                DebugUtil.WriteLine(option.Name() + " defeats: " + defeats[option.Name()]);
 
                 int newLosses = defeats[option.Name()] - (games[option.Name()] - defeats[option.Name()]) / 4;
 

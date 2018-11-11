@@ -69,7 +69,7 @@ namespace Tyr.Agents
             agent.Command = null;
 
             lastOrderFrame = Tyr.Bot.Frame;
-            System.Console.WriteLine("Merging archon.");
+            DebugUtil.WriteLine("Merging archon.");
             Command = new ActionRawUnitCommand();
             Command.AbilityId = 1766;
             Command.UnitTags.Add(Unit.Tag);

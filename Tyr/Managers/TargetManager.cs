@@ -127,7 +127,7 @@ namespace Tyr.Managers
             foreach (Point2D location in tyr.GameInfo.StartRaw.StartLocations)
                 if (SC2Util.DistanceGrid(tyr. MapAnalyzer.StartLocation, location) > 20)
                     PotentialEnemyStartLocations.Add(location);
-            Console.WriteLine("Enemy locations: " + PotentialEnemyStartLocations.Count);
+            DebugUtil.WriteLine("Enemy locations: " + PotentialEnemyStartLocations.Count);
         }
 
         public Point2D AttackTarget { get; internal set; }

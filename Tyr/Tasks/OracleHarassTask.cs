@@ -78,7 +78,7 @@ namespace Tyr.Tasks
                     if (!buffs.Contains(buff))
                     {
                         buffs.Add(buff);
-                        System.Console.WriteLine("Buff: " + buff);
+                        DebugUtil.WriteLine("Buff: " + buff);
                     }
                 
                 Unit target = targets[agent.Unit.Tag];

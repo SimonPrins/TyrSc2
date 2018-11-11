@@ -162,7 +162,7 @@ namespace Tyr.MapAnalysis
                 }
 
                 if (closestDist >= 999999)
-                    System.Console.WriteLine("Unable to find proper base placement: " + loc.Pos);
+                    DebugUtil.WriteLine("Unable to find proper base placement: " + loc.Pos);
             }
             
             if (tyr.GameInfo.MapName.Contains("Blueshift"))
@@ -171,11 +171,11 @@ namespace Tyr.MapAnalysis
                 {
                     if (SC2Util.DistanceSq(loc.Pos, SC2Util.Point(141.5f, 112.5f)) <= 5 * 5 && (loc.Pos.X != 141.5 || loc.Pos.Y != 112.5))
                     {
-                        System.Console.WriteLine("Incorrect base location, fixing: " + loc.Pos);
+                        DebugUtil.WriteLine("Incorrect base location, fixing: " + loc.Pos);
                         loc.Pos = SC2Util.Point(141.5f, 112.5f);
                     } else if (SC2Util.DistanceSq(loc.Pos, SC2Util.Point(34.5f, 63.5f)) <= 5 * 5 && (loc.Pos.X != 34.5 || loc.Pos.Y != 63.5))
                     {
-                        System.Console.WriteLine("Incorrect base location, fixing: " + loc.Pos);
+                        DebugUtil.WriteLine("Incorrect base location, fixing: " + loc.Pos);
                         loc.Pos = SC2Util.Point(34.5f, 63.5f);
                     }
                 }
@@ -233,7 +233,7 @@ namespace Tyr.MapAnalysis
             WallDistances = Distances(unPathable);
 
             stopWatch.Stop();
-            System.Console.WriteLine("Total time to find wall: " + stopWatch.ElapsedMilliseconds);
+            DebugUtil.WriteLine("Total time to find wall: " + stopWatch.ElapsedMilliseconds);
 
 
             /*
@@ -373,7 +373,7 @@ namespace Tyr.MapAnalysis
         
         private float checkPosition(Point2D pos, BaseLocation loc)
         {
-            //System.Console.WriteLine("Checking: " + pos);
+            //DebugUtil.WriteLine("Checking: " + pos);
             foreach (MineralField mineralField in loc.MineralFields)
                 if (SC2Util.DistanceGrid(mineralField.Pos, pos) <= 10
                     && System.Math.Abs(mineralField.Pos.X - pos.X) <= 5.5
