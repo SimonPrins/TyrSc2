@@ -130,9 +130,13 @@ namespace Tyr.Builds.Zerg
 
             tyr.DrawText("Extractors: " + Count(UnitTypes.EXTRACTOR));
 
-            DefenseTask.Task.MainDefenseRadius = 20;
-            DefenseTask.Task.ExpandDefenseRadius = 14;
-            DefenseTask.Task.MaxDefenseRadius = 55;
+            DefenseTask.AirDefenseTask.MainDefenseRadius = 20;
+            DefenseTask.AirDefenseTask.ExpandDefenseRadius = 14;
+            DefenseTask.AirDefenseTask.MaxDefenseRadius = 55;
+
+            DefenseTask.GroundDefenseTask.MainDefenseRadius = 20;
+            DefenseTask.GroundDefenseTask.ExpandDefenseRadius = 14;
+            DefenseTask.GroundDefenseTask.MaxDefenseRadius = 55;
 
             IdleTask.Task.FearEnemies = true;
 

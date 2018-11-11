@@ -262,7 +262,7 @@ namespace Tyr.Builds.Protoss
             FlyerAttackTask.Task.RequiredSize = RequiredSize;
             IdleTask.Task.FearEnemies = true;
 
-            DefenseTask.Task.IgnoreEnemyTypes.Add(UnitTypes.VIKING_FIGHTER);
+            DefenseTask.AirDefenseTask.IgnoreEnemyTypes.Add(UnitTypes.VIKING_FIGHTER);
 
             FlyerDestroyTask.Task.Stopped = !DefendReapers;
             FlyerAttackTask.Task.Stopped = DefendReapers;
@@ -337,7 +337,7 @@ namespace Tyr.Builds.Protoss
                 HideBaseTask.Task.BuildNexus = true;
 
                 IdleTask.Task.OverrideTarget = FarBase.BaseLocation.Pos;
-                DefenseTask.Task.Stopped = true;
+                DefenseTask.AirDefenseTask.Stopped = true;
                 RequiredSize = 8;
 
                 Set = new BuildSet();

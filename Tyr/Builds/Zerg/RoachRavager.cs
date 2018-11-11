@@ -100,9 +100,13 @@ namespace Tyr.Builds.Zerg
             TimingAttackTask.Task.RequiredSize = 45;
             TimingAttackTask.Task.RetreatSize = 20;
 
-            DefenseTask.Task.MainDefenseRadius = 20;
-            DefenseTask.Task.ExpandDefenseRadius = 20;
-            DefenseTask.Task.MaxDefenseRadius = 55;
+            DefenseTask.AirDefenseTask.MainDefenseRadius = 20;
+            DefenseTask.AirDefenseTask.ExpandDefenseRadius = 20;
+            DefenseTask.AirDefenseTask.MaxDefenseRadius = 55;
+
+            DefenseTask.GroundDefenseTask.MainDefenseRadius = 20;
+            DefenseTask.GroundDefenseTask.ExpandDefenseRadius = 20;
+            DefenseTask.GroundDefenseTask.MaxDefenseRadius = 55;
             /*
             SmellCheese = Tyr.Bot.EnemyStrategyAnalyzer.EarlyPool && !Tyr.Bot.EnemyStrategyAnalyzer.Expanded && Completed(UnitTypes.ROACH) < 2;
             if (SmellCheese)

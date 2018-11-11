@@ -178,7 +178,7 @@ namespace Tyr.Builds.Protoss
             FlyerDestroyTask.Task.RequiredSize = RequiredSize;
             IdleTask.Task.FearEnemies = true;
 
-            DefenseTask.Task.IgnoreEnemyTypes.Add(UnitTypes.VIKING_FIGHTER);
+            DefenseTask.AirDefenseTask.IgnoreEnemyTypes.Add(UnitTypes.VIKING_FIGHTER);
             
             if (Count(UnitTypes.PROBE) <= 6)
                 BaseWorkers.WorkersPerGas = 0;
