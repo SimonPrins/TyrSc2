@@ -490,7 +490,7 @@ namespace Tyr.Agents
 
         public static bool CanAttackGround(uint type)
         {
-            if (type == LIBERATOR)
+            if (type == LIBERATOR || type == CARRIER)
                 return true;
             foreach (Weapon weapon in LookUp[type].Weapons)
                 if (weapon.Type == Weapon.Types.TargetType.Any
@@ -501,6 +501,8 @@ namespace Tyr.Agents
 
         public static bool CanAttackAir(uint type)
         {
+            if (type == CARRIER)
+                return true;
             foreach (Weapon weapon in LookUp[type].Weapons)
                 if (weapon.Type == Weapon.Types.TargetType.Any
                     || (weapon.Type == Weapon.Types.TargetType.Air))
