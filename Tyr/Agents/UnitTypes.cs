@@ -168,6 +168,7 @@ namespace Tyr.Agents
         public static uint LIBERATOR = 689;
         public static uint RAVAGER_BURROWED = 690;
         public static uint CYCLONE = 692;
+        public static uint LIBERATOR_AG = 734;
         public static uint PURIFIER_RICH_MINERAL_FIELD = 796;
         public static uint PURIFIER_RICH_MINERAL_FIELD_750 = 797;
         public static uint ADEPT_PHASE_SHIFT = 801;
@@ -354,7 +355,10 @@ namespace Tyr.Agents
                 RAVAGER,
                 RAVAGER_BURROWED,
                 LURKER,
-                LURKER_BURROWED
+                LURKER_BURROWED,
+                HELLBAT,
+                LIBERATOR,
+                LIBERATOR_AG
             };
         public static HashSet<uint> AirAttackTypes = new HashSet<uint>
             {
@@ -380,8 +384,51 @@ namespace Tyr.Agents
                 PHOTON_CANNON,
                 MISSILE_TURRET,
                 SPORE_CRAWLER,
-                BUNKER
+                BUNKER,
+                LIBERATOR
             };
+        public static HashSet<uint> RangedTypes = new HashSet<uint>
+        {
+                ARCHON,
+                AUTO_TURRET,
+                BANSHEE,
+                BATTLECRUISER,
+                BROOD_LORD,
+                CARRIER,
+                COLLOSUS,
+                CORRUPTOR,
+                GHOST,
+                HELLION,
+                HIGH_TEMPLAR,
+                IMMORTAL,
+                INFESTOR_TERRAN,
+                MARAUDER,
+                MARINE,
+                MEDIVAC,
+                MOTHERSHIP,
+                MUTALISK,
+                PHOENIX,
+                QUEEN,
+                REAPER,
+                ROACH,
+                SENTRY,
+                SIEGE_TANK,
+                SIEGE_TANK_SIEGED,
+                STALKER,
+                THOR,
+                VIKING_ASSUALT,
+                VIKING_FIGHTER,
+                VOID_RAY,
+                ORACLE,
+                ADEPT,
+                RAVAGER,
+                LURKER_BURROWED,
+                HELLBAT,
+                LIBERATOR,
+                LIBERATOR_AG,
+                HYDRALISK
+        };
+
         public static HashSet<uint> ResourceCenters = new HashSet<uint>
             {
                 COMMAND_CENTER,
@@ -433,7 +480,32 @@ namespace Tyr.Agents
             { LURKER_BURROWED, new List<uint>() { LURKER } },
             { GREATER_SPIRE, new List<uint>() { SPIRE }},
             { HIVE, new List<uint>() { LAIR, HATCHERY}},
-            { LAIR, new List<uint>() { HATCHERY }}
+            { LAIR, new List<uint>() { HATCHERY }},
+            { SUPPLY_DEPOT_LOWERED, new List<uint>() { SUPPLY_DEPOT }},
+            { ORBITAL_COMMAND, new List<uint>() { COMMAND_CENTER }},
+            { PLANETARY_FORTRESS, new List<uint>() { COMMAND_CENTER }},
+            { LIBERATOR_AG, new List<uint>() { LIBERATOR }},
+            { SIEGE_TANK_SIEGED, new List<uint>() { SIEGE_TANK }}
         };
+
+        public static bool CanAttackGround(uint type)
+        {
+            if (type == LIBERATOR)
+                return true;
+            foreach (Weapon weapon in LookUp[type].Weapons)
+                if (weapon.Type == Weapon.Types.TargetType.Any
+                    || (weapon.Type == Weapon.Types.TargetType.Ground))
+                    return true;
+            return false;
+        }
+
+        public static bool CanAttackAir(uint type)
+        {
+            foreach (Weapon weapon in LookUp[type].Weapons)
+                if (weapon.Type == Weapon.Types.TargetType.Any
+                    || (weapon.Type == Weapon.Types.TargetType.Air))
+                    return true;
+            return false;
+        }
     }
 }

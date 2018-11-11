@@ -26,6 +26,13 @@ namespace Tyr.BuildingPlacement
 
         public Point2D FindPlacement(Point2D target, Point2D size, uint type)
         {
+            if (Tyr.Bot.MyRace == Race.Terran)
+            {
+                if (type != UnitTypes.REFINERY
+                    && type != UnitTypes.COMMAND_CENTER
+                    && type != UnitTypes.MISSILE_TURRET)
+                    return TerranBuildingPlacement.FindPlacement(target, size, type);
+            }
             Point2D result = findPlacementLocal(target, size, type, 20);
             if (type == UnitTypes.PYLON)
                 PylonsFilled = result == null;
@@ -178,8 +185,24 @@ namespace Tyr.BuildingPlacement
                 || buildingType == UnitTypes.DARK_SHRINE 
                 || buildingType == UnitTypes.SPINE_CRAWLER
                 || buildingType == UnitTypes.SPORE_CRAWLER
+                || buildingType == UnitTypes.SUPPLY_DEPOT
+                || buildingType == UnitTypes.MISSILE_TURRET
+                || unitType == UnitTypes.SUPPLY_DEPOT
+                || unitType == UnitTypes.SUPPLY_DEPOT_LOWERED
                 || buildingType == UnitTypes.CREEP_TUMOR)
+            {
+                if (CanHaveAddOn(buildingType))
+                {
+                    if (!CheckDistanceClose(SC2Util.Point(location.X + 2.5f, location.Y - 0.5f), UnitTypes.REACTOR, unitPos, unitType))
+                        return false;
+                }
+                if (CanHaveAddOn(unitType))
+                {
+                    if (!CheckDistanceClose(location, buildingType, SC2Util.Point(unitPos.X + 2.5f, unitPos.Y - 0.5f), UnitTypes.REACTOR))
+                        return false;
+                }
                 return CheckDistanceClose(location, buildingType, unitPos, unitType);
+            }
             int minDist = 5;
             if (buildingType == UnitTypes.PYLON && !PylonsFilled)
                 minDist = 7;
@@ -192,11 +215,28 @@ namespace Tyr.BuildingPlacement
 
         public bool CheckDistanceClose(Point2D location, uint buildingType, Point2D unitPos, uint unitType)
         {
-            float dx = BuildingType.LookUp[buildingType].Size.X / 2f + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.X / 2f: 1f) - 0.1f;
+            float dx = BuildingType.LookUp[buildingType].Size.X / 2f + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.X / 2f : 1f) - 0.1f;
             float dy = BuildingType.LookUp[buildingType].Size.Y / 2f + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.Y / 2f : 1f) - 0.1f;
             
-
             return Math.Abs(location.X - unitPos.X) >= dx || Math.Abs(location.Y - unitPos.Y) >= dy;
+        }
+
+        public static bool CheckDistClose(float x1, float y1, float x2, float y2, Point2D unitPos, uint unitType)
+        {
+            float midX = (x1 + x2) * 0.5f;
+            float radX = (x2 - x1) * 0.5f;
+            float midY = (y1 + y2) * 0.5f;
+            float radY = (y2 - y1) * 0.5f;
+
+            float dx = radX + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.X / 2f : 1f) - 0.1f;
+            float dy = radY + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.Y / 2f : 1f) - 0.1f;
+            return Math.Abs(midX - unitPos.X) >= dx || Math.Abs(midY - unitPos.Y) >= dy;
+
+        }
+
+        public static bool CanHaveAddOn(uint type)
+        {
+            return type == UnitTypes.BARRACKS || type == UnitTypes.FACTORY || type == UnitTypes.STARPORT;
         }
     }
 }

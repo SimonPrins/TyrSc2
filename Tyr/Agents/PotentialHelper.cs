@@ -39,6 +39,30 @@ namespace Tyr.Agents
             return this;
         }
 
+        public PotentialHelper To(Point to)
+        {
+            To(to, 1);
+            return this;
+        }
+
+        public PotentialHelper To(Unit to)
+        {
+            To(to, 1);
+            return this;
+        }
+
+        public PotentialHelper To(Point to, float magnitude)
+        {
+            To(SC2Util.To2D(to), magnitude);
+            return this;
+        }
+
+        public PotentialHelper To(Unit to, float magnitude)
+        {
+            To(to.Pos, magnitude);
+            return this;
+        }
+
         public PotentialHelper To(Point2D to, float magnitude)
         {
             Point2D delta = SC2Util.Point(to.X - Origin.X, to.Y - Origin.Y);

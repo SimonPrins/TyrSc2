@@ -7,6 +7,7 @@ using Tyr.Agents;
 using Tyr.BuildingPlacement;
 using Tyr.Builds;
 using Tyr.Builds.Protoss;
+using Tyr.Builds.Terran;
 using Tyr.Builds.Zerg;
 using Tyr.Managers;
 using Tyr.MapAnalysis;
@@ -85,12 +86,15 @@ namespace Tyr
             Bot = this;
         }
 
+        bool PrintedBarracks = false;
+
         public IEnumerable<Action> onFrame(ResponseObservation observation)
         {
             Stopwatch stopWatch = Stopwatch.StartNew();
             actions = new List<Action>();
             DrawRequest = null;
             TextLine = 0;
+            
 
             long time1 = 0;
             long time2 = 0;
@@ -102,6 +106,18 @@ namespace Tyr
 
                 if (Frame == 1)
                     Chat(Monday ? "Happy monday! :D" : "Good luck, have fun! :D");
+
+                if (!PrintedBarracks)
+                {
+                    foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+                    {
+                        if (agent.Unit.UnitType == UnitTypes.BARRACKS)
+                        {
+                            PrintedBarracks = true;
+                            System.Console.WriteLine("Barracks location final: " + agent.Unit.Pos);
+                        }
+                    }
+                }
 
                 Observation = observation;
 
@@ -184,6 +200,13 @@ namespace Tyr
         {
             DrawLine(p1.Unit.Pos, p2);
         }
+
+        public void DrawLine(Agent p1, Point2D p2)
+        {
+            Point pos3 = new Point { X = p2.X, Y = p2.Y, Z = MapAnalyzer.MapHeight((int)p2.X, (int)p2.Y) };
+            DrawLine(p1.Unit.Pos, pos3);
+        }
+
         public void DrawLine(Point p1, Point p2)
         {
             if (Debug)
@@ -208,6 +231,15 @@ namespace Tyr
             {
                 InitializeDebugCommand();
                 DrawRequest.Debug.Debug[0].Draw.Spheres.Add(new DebugSphere() { Color = new Color() { R = 255, G = 0, B = 0 }, R = 2, P = pos });
+            }
+        }
+
+        public void DrawSphere(Point pos, float radius, Color color)
+        {
+            if (Debug)
+            {
+                InitializeDebugCommand();
+                DrawRequest.Debug.Debug[0].Draw.Spheres.Add(new DebugSphere() { Color = color, R = radius, P = pos });
             }
         }
 
@@ -422,6 +454,8 @@ namespace Tyr
                 options = ProtossBuilds();
             else if (MyRace == Race.Zerg)
                 options = ZergBuilds();
+            else if (MyRace == Race.Terran)
+                options = TerranBuilds();
             else
                 options = null;
 
@@ -484,53 +518,31 @@ namespace Tyr
         {
             List<Build> options = new List<Build>();
             if (EnemyRace == Race.Terran)
+            {
+                options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 12 });
                 options.Add(new NinjaTurtleCarrier() { BuildCarriers = true, RequiredSize = 12 });
+            }
             else if (EnemyRace == Race.Zerg)
+            {
                 options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 10 });
+                options.Add(new NinjaTurtleCarrier() { BuildCarriers = true, RequiredSize = 10 });
+            }
             else
             {
                 options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 8 });
+                options.Add(new NinjaTurtleCarrier() { BuildCarriers = true, RequiredSize = 8 });
                 if (PreviousEnemyStrategies.SkyToss)
                     options.Add(new OneBaseStalker() { RequiredSize = 10 });
             }
-            /*
-            if (EnemyRace == Race.Protoss)
-            {
-                options.Add(new TwoBaseRobo());
-                if (TargetManager.PotentialEnemyStartLocations.Count == 1)
-                    options.Add(new WorkerRush());
-                options.Add(new OneBaseStalker());
-            }
-            else if (EnemyRace == Race.Terran)
-            {
-                options.Add(new TwoBaseRoboPvT());
-                if (TargetManager.PotentialEnemyStartLocations.Count == 1)
-                    options.Add(new WorkerRush());
-                if (Bot.PreviousEnemyStrategies.FourRax && !PreviousEnemyStrategies.ReaperRush)
-                    options.Add(new NinjaTurtles());
-                if (!Bot.PreviousEnemyStrategies.FourRax && !PreviousEnemyStrategies.ReaperRush)
-                    options.Add(new ZealotRush() { RequiredSize = 20 });
-                if (!PreviousEnemyStrategies.ReaperRush)
-                    options.Add(new MassVoidray());
-            }
-            else if (EnemyRace == Race.Zerg)
-            {
-                options.Add(new OneBaseStalker() { ProxyPylon = true });
-                options.Add(new TwoBaseRobo());
-                if (TargetManager.PotentialEnemyStartLocations.Count == 1)
-                    options.Add(new WorkerRush());
-                if (!PreviousEnemyStrategies.MassRoach || PreviousEnemyStrategies.MassHydra)
-                    options.Add(new TwoBaseAdept());
-            }
-            else
-            {
-                options.Add(new TwoBaseRobo());
-                if (Bot.TargetManager.PotentialEnemyStartLocations.Count == 1)
-                    options.Add(new WorkerRush());
-                options.Add(new NinjaTurtles());
-                options.Add(new OneBaseStalker());
-            }
-            */
+
+            return options;
+        }
+
+        public List<Build> TerranBuilds()
+        {
+            List<Build> options = new List<Build>();
+
+            options.Add(new MarineRush());
 
             return options;
         }

@@ -91,6 +91,11 @@ namespace Tyr.Util
             return Point(pos.X, pos.Y);
         }
 
+        public static Point To3D(Point2D pos)
+        {
+            return Point(pos.X, pos.Y, Tyr.Bot.MapAnalyzer.MapHeight((int)pos.X, (int)pos.Y));
+        }
+
         public static Point2D Normalize(Point2D point)
         {
             float length = (float)Math.Sqrt(point.X * point.X + point.Y * point.Y);

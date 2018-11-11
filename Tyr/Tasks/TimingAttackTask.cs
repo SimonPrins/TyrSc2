@@ -1,4 +1,5 @@
 ﻿using SC2APIProtocol;
+using System.Collections.Generic;
 using Tyr.Agents;
 using Tyr.Util;
 
@@ -11,6 +12,7 @@ namespace Tyr.Tasks
         public int RequiredSize { get; set; } = 14;
         public int RetreatSize { get; set; } = 0;
         public uint UnitType;
+        public HashSet<uint> ExcludeUnitTypes = new HashSet<uint>();
 
         public bool AttackSent = false;
         public bool DefendOtherAgents = true;
@@ -29,7 +31,7 @@ namespace Tyr.Tasks
             if (UnitType != 0)
                 return agent.Unit.UnitType == UnitType;
             else
-                return agent.IsCombatUnit;
+                return agent.IsCombatUnit && !ExcludeUnitTypes.Contains(agent.Unit.UnitType);
         }
 
         public override bool IsNeeded()
@@ -38,7 +40,9 @@ namespace Tyr.Tasks
                 return Tyr.Bot.UnitManager.Completed(UnitType) >= RequiredSize;
             int combatUnits = 0;
             foreach (uint combatType in UnitTypes.CombatUnitTypes)
-                combatUnits += Tyr.Bot.UnitManager.Completed(combatType);
+                if (!UnitTypes.EquivalentTypes.ContainsKey(combatType)
+                    && !ExcludeUnitTypes.Contains(combatType))
+                    combatUnits += Tyr.Bot.UnitManager.Completed(combatType);
             if (combatUnits >= RequiredSize)
             {
                 AttackSent = true;
@@ -54,6 +58,18 @@ namespace Tyr.Tasks
                 Clear();
                 return;
             }
+
+            bool canAttackGround = false;
+            foreach (Agent agent in Units)
+                if (agent.CanAttackGround())
+                    canAttackGround = true;
+
+            if (!canAttackGround)
+            {
+                Clear();
+                return;
+            }
+
             Agent defendAgent = null;
             if (DefendOtherAgents)
             {
@@ -77,7 +93,7 @@ namespace Tyr.Tasks
 
             foreach (Agent agent in units)
             {
-                if (defendAgent != null && SC2Util.DistanceSq(agent.Unit.Pos, defendAgent.Unit.Pos) >= 3 * 3 && SC2Util.DistanceSq(agent.Unit.Pos, defendAgent.Unit.Pos) <= 40 * 40)
+                if (defendAgent != null && agent.DistanceSq(defendAgent) >= 3 * 3 && agent.DistanceSq(defendAgent) <= 40 * 40)
                     tyr.MicroController.Attack(agent, SC2Util.To2D(defendAgent.Unit.Pos));
                 else
                     tyr.MicroController.Attack(agent, tyr.TargetManager.AttackTarget);

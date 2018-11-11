@@ -102,6 +102,7 @@
     <Compile Include="Agents\MorphingType.cs" />
     <Compile Include="Agents\BuildingType.cs" />
     <Compile Include="Agents\PotentialHelper.cs" />
+    <Compile Include="BuildingPlacement\TerranBuildingPlacement.cs" />
     <Compile Include="Builds\BuildLists\BuildingAtBase.cs" />
     <Compile Include="Builds\BuildLists\MorphStep.cs" />
     <Compile Include="Builds\BuildLists\GotoStep.cs" />
@@ -122,6 +123,7 @@
     <Compile Include="Builds\Protoss\TwoBaseAdept.cs" />
     <Compile Include="Builds\Protoss\OneBaseAdept.cs" />
     <Compile Include="Builds\Protoss\WorkerRush.cs" />
+    <Compile Include="Builds\Terran\MarineRush.cs" />
     <Compile Include="Builds\Zerg\ZergBuildUtil.cs" />
     <Compile Include="Builds\Zerg\RushDefense.cs" />
     <Compile Include="Builds\Zerg\RoachRavager.cs" />
@@ -135,6 +137,7 @@
     <Compile Include="Managers\Effect.cs" />
     <Compile Include="Managers\EffectManager.cs" />
     <Compile Include="Managers\RecentlyDeceased.cs" />
+    <Compile Include="Micro\LeashController.cs" />
     <Compile Include="Micro\FearVikingsController.cs" />
     <Compile Include="Micro\CarrierController.cs" />
     <Compile Include="Micro\ZerglingController.cs" />
@@ -182,6 +185,12 @@
     <Compile Include="Micro\VoidrayController.cs" />
     <Compile Include="Tasks\AdeptKillSquadTask.cs" />
     <Compile Include="Tasks\AdeptScoutTask.cs" />
+    <Compile Include="Tasks\DistributedDefenseTask.cs" />
+    <Compile Include="Tasks\DistributeOverBasesTask.cs" />
+    <Compile Include="Tasks\TransformTask.cs" />
+    <Compile Include="Tasks\ReplenishBuildingSCVTask.cs" />
+    <Compile Include="Tasks\RepairTask.cs" />
+    <Compile Include="Tasks\SupplyDepotTask.cs" />
     <Compile Include="Tasks\FlyerDestroyTask.cs" />
     <Compile Include="Tasks\MorphingTask.cs" />
     <Compile Include="Tasks\LurkerMorphTask.cs" />
@@ -201,6 +210,7 @@
     <Compile Include="Tasks\FlyerAttackTask.cs" />
     <Compile Include="Tasks\ClearOverlordsTask.cs" />
     <Compile Include="Tasks\HydraDefenseTask.cs" />
+    <Compile Include="Tasks\BunkerDefendersTask.cs" />
     <Compile Include="Tasks\WorkerSafetyTask.cs" />
     <Compile Include="Tasks\UnitDescriptor.cs" />
     <Compile Include="Tasks\WorkerRushDefenseTask.cs" />

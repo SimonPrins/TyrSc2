@@ -161,10 +161,35 @@ namespace Tyr.Tasks
 
         private bool Unbuildable(BuildRequest request)
         {
+            if (UnitTypes.ResourceCenters.Contains(request.Type))
+            {
+                if (request.Type != UnitTypes.HATCHERY)
+                {
+                    // Check for creep.
+                    BoolGrid creep = new ImageBoolGrid(Tyr.Bot.Observation.Observation.RawData.MapState.Creep, 1);
+                    for (float dx = -2.5f; dx <= 2.51f; dx++)
+                        for (float dy = -2.5f; dy <= 2.51f; dy++)
+                            if (creep[(int)(request.Pos.X + dx), (int)(request.Pos.Y + dy)])
+                                return true;
+                }
+                foreach (BuildingLocation loc in Tyr.Bot.EnemyManager.EnemyBuildings.Values)
+                    if (SC2Util.DistanceSq(request.Pos, loc.Pos) <= 6 * 6)
+                        return true;
+                foreach (Unit enemy in Tyr.Bot.Enemies())
+                    if (!enemy.IsFlying
+                        && SC2Util.DistanceSq(request.Pos, enemy.Pos) <= 6 * 6)
+                        return true;
+                return false;
+            }
+
             if (UnitTypes.GasGeysers.Contains(request.Type)
                 || UnitTypes.ResourceCenters.Contains(request.Type)
                 || UnitTypes.PYLON == request.Type)
                 return false;
+
+            if (Tyr.Bot.MyRace == Race.Terran && request.Type != UnitTypes.COMMAND_CENTER)
+                return false;
+
             return !Tyr.Bot.buildingPlacer.CheckPlacement(request.Pos, BuildingType.LookUp[request.Type].Size, request.Type, request, true);
         }
 

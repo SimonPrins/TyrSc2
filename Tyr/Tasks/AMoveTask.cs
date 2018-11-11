@@ -6,13 +6,13 @@ namespace Tyr.Tasks
     {
         public static AMoveTask Task = new AMoveTask();
         public int UnitType = -1;
+
         public AMoveTask() : base(5)
         { }
 
         public static void Enable()
         {
-            Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Enable(Task);
         }
 
         public override bool DoWant(Agent agent)

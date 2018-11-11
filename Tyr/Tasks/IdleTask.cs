@@ -45,7 +45,7 @@ namespace Tyr.Tasks
                     agent.Order(Abilities.BURROW_DOWN);
                     continue;
                 }
-                if (FearEnemies && (agent.IsCombatUnit || agent.Unit.UnitType == UnitTypes.OVERSEER))
+                if (FearEnemies && (agent.IsCombatUnit || agent.Unit.UnitType == UnitTypes.OVERSEER || agent.Unit.UnitType == UnitTypes.RAVEN))
                 {
                     Unit fleeEnemy = null;
                     float distance = 10 * 10;

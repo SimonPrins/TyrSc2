@@ -124,6 +124,11 @@ namespace Tyr.Builds
             return Tyr.Bot.Observation.Observation.PlayerCommon.FoodCap;
         }
 
+        public static uint FoodLeft()
+        {
+            return AvailableFood() - FoodUsed();
+        }
+
         public static uint ExpectedAvailableFood()
         {
             return Tyr.Bot.Observation.Observation.PlayerCommon.FoodCap + Tyr.Bot.UnitManager.FoodExpected;
@@ -166,7 +171,7 @@ namespace Tyr.Builds
 
         public static bool ConstructGas(uint unitType)
         {
-            if (Tyr.Bot.Minerals() < 75 || Tyr.Bot.BaseManager.AvailableGasses == 0 || Tyr.Bot.Frame - gasConstructingFrame < 5)
+            if (Tyr.Bot.Minerals() < BuildingType.LookUp[unitType].Minerals || Tyr.Bot.BaseManager.AvailableGasses == 0 || Tyr.Bot.Frame - gasConstructingFrame < 5)
                 return false;
             
             foreach (Base loc in Tyr.Bot.BaseManager.Bases)
@@ -212,10 +217,7 @@ namespace Tyr.Builds
             }
             Point2D buildLocation = Tyr.Bot.buildingPlacer.FindPlacement(b.BaseLocation.Pos, BuildingType.LookUp[type].Size, type);
             if (buildLocation == null)
-            {
-                Tyr.Bot.DrawText("No placement found for " + UnitTypes.LookUp[type].Name + ".");
                 return false;
-            }
             Tyr.Bot.DrawText("Building " + UnitTypes.LookUp[type].Name + ".");
             ConstructionTask.Task.Build(type, b, buildLocation);
             return true;
@@ -230,10 +232,7 @@ namespace Tyr.Builds
                 buildLocation = Tyr.Bot.buildingPlacer.FindPlacement(pos, BuildingType.LookUp[type].Size, type, type == UnitTypes.SPINE_CRAWLER ? 5 : 15);
 
             if (buildLocation == null)
-            {
-                Tyr.Bot.DrawText("No placement location found for " + UnitTypes.LookUp[type].Name + ".");
                 return false;
-            }
             ConstructionTask.Task.Build(type, b, buildLocation);
             return true;
         }
@@ -254,14 +253,10 @@ namespace Tyr.Builds
 
         public static bool ConstructResourceCenter(uint unitType)
         {
-            Tyr.Bot.DrawText("Constructing resource center.");
             // Check if there is already a Resource center constructing.
             foreach (Agent unit in Tyr.Bot.UnitManager.Agents.Values)
                 if (unit.IsWorker && unit.Unit.Orders != null && unit.Unit.Orders.Count > 0 && unit.Unit.Orders[0].AbilityId == BuildingType.LookUp[unitType].Ability)
-                {
-                    Tyr.Bot.DrawText("Resource center already under construction.");
                     return false;
-                }
 
             Base picked = null;
             float dist = 1000000000;
@@ -272,6 +267,29 @@ namespace Tyr.Builds
                 if (loc.Owner != -1)
                     continue;
                 bool blocked = false;
+                foreach (Unit enemy in Tyr.Bot.Enemies())
+                {
+                    if (SC2Util.DistanceSq(enemy.Pos, loc.BaseLocation.Pos) <= 6 * 6)
+                    {
+                        blocked = true;
+                        break;
+                    }
+                }
+                if (blocked)
+                    continue;
+
+                if (unitType != UnitTypes.HATCHERY)
+                {
+                    // Check for creep.
+                    BoolGrid creep = new ImageBoolGrid(Tyr.Bot.Observation.Observation.RawData.MapState.Creep, 1);
+                    for (float dx = -2.5f; !blocked && dx <= 2.51f; dx++)
+                        for (float dy = -2.5f; !blocked && dy <= 2.51f; dy++)
+                            if (creep[(int)(loc.BaseLocation.Pos.X + dx), (int)(loc.BaseLocation.Pos.Y + dy)])
+                                blocked = true;
+                    if (blocked)
+                        continue;
+                }
+
                 foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
                 {
                     if (!agent.IsBuilding)
@@ -281,26 +299,22 @@ namespace Tyr.Builds
                     if (blocked)
                         break;
                 }
-                if (!blocked)
+                if (blocked)
+                    continue;
+
+                // Ignore the pocket expand as a first base.
+                if (natural && Tyr.Bot.MapAnalyzer.EnemyDistances[(int)loc.BaseLocation.Pos.X, (int)loc.BaseLocation.Pos.Y] > Tyr.Bot.MapAnalyzer.EnemyDistances[(int)Tyr.Bot.MapAnalyzer.StartLocation.X, (int)Tyr.Bot.MapAnalyzer.StartLocation.Y])
+                    continue;
+                int newdist = loc.DistanceToMain;
+                if (newdist < dist)
                 {
-                    // Ignore the pocket expand as a first base.
-                    if (natural && Tyr.Bot.MapAnalyzer.EnemyDistances[(int)loc.BaseLocation.Pos.X, (int)loc.BaseLocation.Pos.Y] > Tyr.Bot.MapAnalyzer.EnemyDistances[(int)Tyr.Bot.MapAnalyzer.StartLocation.X, (int)Tyr.Bot.MapAnalyzer.StartLocation.Y])
-                        continue;
-                    int newdist = loc.DistanceToMain;
-                    if (newdist < dist)
-                    {
-                        dist = newdist;
-                        picked = loc;
-                    }
+                    dist = newdist;
+                    picked = loc;
                 }
             }
             if (picked == null)
-            {
-                Tyr.Bot.DrawText("No suitable base to take an expansion.");
                 return false;
-            }
 
-            Tyr.Bot.DrawText("Starting resource center.");
             ConstructionTask.Task.Build(unitType, picked, picked.BaseLocation.Pos);
             return true;
         }

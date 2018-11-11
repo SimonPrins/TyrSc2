@@ -11,6 +11,7 @@ namespace Tyr.Tasks
     {
         public static List<WorkerDefenseTask> Tasks = new List<WorkerDefenseTask>();
         public int DefenseRadius = 12;
+        public int PlanetaryDefenseRadius = 8;
         public int WorkerPullRadius = 20;
         public int CannonDefenseRadius = 40;
         public Base Base;
@@ -55,6 +56,11 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
+            if (Base.ResourceCenter != null && Base.ResourceCenter.Unit.UnitType == UnitTypes.PLANETARY_FORTRESS)
+            {
+                Clear();
+                return false;
+            }
             desiredDefenders = 0;
             target = null;
             int totalEnemies = 0;
@@ -64,6 +70,8 @@ namespace Tyr.Tasks
             bool mainDefense = Base == Tyr.Bot.BaseManager.Main;
             if (mainDefense)
                 distance = 1000 * 1000;
+            else if (Base.ResourceCenter != null && Base.ResourceCenter.Unit.UnitType == UnitTypes.PLANETARY_FORTRESS)
+                distance = PlanetaryDefenseRadius * PlanetaryDefenseRadius + 1;
 
             Dictionary<uint, int> enemyCounts = new Dictionary<uint, int>();
 
@@ -181,7 +189,7 @@ namespace Tyr.Tasks
                 }
             }
 
-            if (totalEnemies == 1 && UnitTypes.WorkerTypes.Contains(target.UnitType))
+            if (target != null && totalEnemies == 1 && UnitTypes.WorkerTypes.Contains(target.UnitType))
                 desiredDefenders = 1;
             else if (Tyr.Bot.EnemyStrategyAnalyzer.WorkerRushDetected)
                 desiredDefenders = totalEnemies;

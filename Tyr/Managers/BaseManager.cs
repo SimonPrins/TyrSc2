@@ -76,13 +76,8 @@ namespace Tyr.Managers
             {
                 if (b.ResourceCenter != null && !tyr.UnitManager.Agents.ContainsKey(b.ResourceCenter.Unit.Tag))
                 {
-                    if (tyr.UnitManager.Agents.ContainsKey(b.ResourceCenter.Unit.Tag))
-                        b.ResourceCenter = tyr.UnitManager.Agents[b.ResourceCenter.Unit.Tag];
-                    else
-                    {
-                        b.ResourceCenter = null;
-                        b.Owner = -1;
-                    }
+                    b.ResourceCenter = null;
+                    b.Owner = -1;
                 }
 
                 if (b.ResourceCenter == null)
@@ -96,6 +91,7 @@ namespace Tyr.Managers
                         {
                             b.ResourceCenter = agent;
                             b.Owner = b.ResourceCenter.Unit.Owner;
+                            agent.Base = b;
                             break;
                         }
                     }
@@ -103,6 +99,8 @@ namespace Tyr.Managers
                 
                 if (b.ResourceCenter == null)
                 {
+                    if (b.Owner == (int)tyr.PlayerId)
+                        b.Owner = -1;
                     foreach (BuildRequest request in ConstructionTask.Task.BuildRequests)
                         if (UnitTypes.ResourceCenters.Contains(request.Type) && SC2Util.DistanceSq(b.BaseLocation.Pos, request.Pos) <= 2 * 2)
                         {

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Tyr.Agents;
 using Tyr.Managers;
+using Tyr.MapAnalysis;
 using Tyr.Tasks;
 using Tyr.Util;
 using static Tyr.Builds.BuildLists.ConditionalStep;
@@ -124,9 +125,7 @@ namespace Tyr.Builds.BuildLists
                             Tyr.Bot.DrawText("Skipping list. Morph tech for " + UnitTypes.LookUp[morph.UnitType].Name + " not available: " + UnitTypes.LookUp[morph.UnitType].TechRequirement);
                             return true;
                         }
-
-                        if (morph.UnitType == UnitTypes.CORRUPTOR)
-                            Console.WriteLine("Morphing corruptor.");
+                        
                         Add(desired, morph.UnitType, morph.Number);
 
                         if (desired[morph.UnitType] > Tyr.Bot.UnitManager.Count(morph.UnitType))
@@ -243,6 +242,24 @@ namespace Tyr.Builds.BuildLists
                 {
                     Tyr.Bot.DrawText("Not enough resources for " + UnitTypes.LookUp[building.UnitType].Name + ".");
                     return false;
+                }
+
+                if (UnitTypes.GasGeysers.Contains(building.UnitType))
+                {
+                    if (Tyr.Bot.BaseManager.AvailableGasses == 0)
+                        return true;
+                    if (building.DesiredBase != null)
+                    {
+                        bool available = false;
+                        foreach (Gas gas in building.DesiredBase.BaseLocation.Gasses)
+                            if (gas.Available)
+                            {
+                                available = true;
+                                break;
+                            }
+                        if (!available)
+                            return true;
+                    }
                 }
 
                 if (building.DesiredPos == null && building.DesiredBase == null)

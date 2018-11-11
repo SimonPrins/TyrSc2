@@ -20,7 +20,8 @@ namespace Tyr.Micro
                 && agent.Unit.UnitType != UnitTypes.CORRUPTOR
                 && agent.Unit.UnitType != UnitTypes.BROOD_LORD
                 && agent.Unit.UnitType != UnitTypes.MUTALISK
-                && agent.Unit.UnitType != UnitTypes.RAVAGER)
+                && agent.Unit.UnitType != UnitTypes.RAVAGER
+                && agent.Unit.UnitType != UnitTypes.MARINE)
                 return false;
 
             if (agent.Unit.WeaponCooldown == 0)
