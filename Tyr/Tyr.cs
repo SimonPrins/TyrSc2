@@ -56,6 +56,7 @@ namespace Tyr
 
         public BaseManager BaseManager = new BaseManager();
         public NexusAbilityManager NexusAbilityManager = new NexusAbilityManager();
+        public OrbitalAbilityManager OrbitalAbilityManager = new OrbitalAbilityManager();
 
 
         public static Tyr Bot { get; internal set; }
@@ -397,6 +398,9 @@ namespace Tyr
 
             if (GameInfo.PlayerInfo[(int)Observation.Observation.PlayerCommon.PlayerId - 1].RaceActual == Race.Protoss)
                 Managers.Add(NexusAbilityManager);
+
+            if (GameInfo.PlayerInfo[(int)Observation.Observation.PlayerCommon.PlayerId - 1].RaceActual == Race.Terran)
+                Managers.Add(OrbitalAbilityManager);
         }
 
         private Build DetermineBuild()

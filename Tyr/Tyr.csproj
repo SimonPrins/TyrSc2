@@ -136,6 +136,7 @@
     <Compile Include="Builds\Zerg\ZerglingRush.cs" />
     <Compile Include="Managers\Effect.cs" />
     <Compile Include="Managers\EffectManager.cs" />
+    <Compile Include="Managers\OrbitalAbilityManager.cs" />
     <Compile Include="Managers\RecentlyDeceased.cs" />
     <Compile Include="Micro\LeashController.cs" />
     <Compile Include="Micro\FearVikingsController.cs" />
