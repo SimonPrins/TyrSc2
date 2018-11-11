@@ -1,5 +1,4 @@
-﻿using System;
-using Tyr.Agents;
+﻿using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Micro;
 using Tyr.Tasks;

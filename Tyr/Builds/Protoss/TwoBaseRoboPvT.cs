@@ -1,5 +1,4 @@
 ﻿using SC2APIProtocol;
-using System;
 using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Managers;

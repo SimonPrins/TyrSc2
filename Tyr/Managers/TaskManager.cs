@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using Tyr.Agents;
 using Tyr.Tasks;
 

@@ -1,5 +1,4 @@
 ﻿using SC2APIProtocol;
-using System;
 using System.Collections.Generic;
 using Tyr.Agents;
 using Tyr.Util;

@@ -1,6 +1,5 @@
 ﻿using SC2APIProtocol;
 using Tyr.Agents;
-using Tyr.Util;
 
 namespace Tyr.Micro
 {
