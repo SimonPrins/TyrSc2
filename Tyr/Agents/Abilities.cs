@@ -55,6 +55,8 @@ namespace Tyr.Agents
         public static int STRIKE_CANNON = 257;
         public static int CANCEL_STRIKE_CANNON = 258;
         public static int CANCEL = 314;
+        public static int SIEGE = 388;
+        public static int UNSIEGE = 390;
         public static int MORPH_DRONE = 1342;
         public static int MORPH_ZERGLING = 1343;
         public static int MORPH_OVERLORD = 1344;
