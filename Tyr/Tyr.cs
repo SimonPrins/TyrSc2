@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using SC2API_CSharp;
 using SC2APIProtocol;
 using Tyr.Agents;
@@ -12,6 +11,7 @@ using Tyr.Builds.Zerg;
 using Tyr.Managers;
 using Tyr.MapAnalysis;
 using Tyr.Micro;
+using Tyr.Util;
 
 namespace Tyr
 {
@@ -28,6 +28,7 @@ namespace Tyr
         public ResponseObservation Observation;
 
         public uint PlayerId;
+        public string OpponentID;
 
         List<Action> actions = new List<Action>();
 
@@ -70,9 +71,7 @@ namespace Tyr
         private long totalExecutionTime;
         private long maxExecutionTime;
 
-        private string ResultsFile;
         public Build FixedBuild;
-        public static bool AllowWritingFiles = true;
 
         private Request DrawRequest;
 
@@ -146,7 +145,7 @@ namespace Tyr
                     {
                         Chat("gg");
                         SurrenderedFrame = Frame;
-                        Register("result " + EnemyRace + " " + Build.Name() + " Defeat");
+                        FileUtil.Register("result " + EnemyRace + " " + Build.Name() + " Defeat");
                     }
                 }
 
@@ -157,9 +156,9 @@ namespace Tyr
             }
             catch (System.Exception e)
             {
-                if (!loggedError && AllowWritingFiles)
+                if (!loggedError)
                 {
-                    File.AppendAllLines(Directory.GetCurrentDirectory() + "/Data/Tyr/Tyr.log", new string[] { "Error occured: " + e.ToString() });
+                    FileUtil.Log("Error occured: " + e.ToString());
                     loggedError = true;
                 }
                 System.Console.WriteLine("Exception in OnFrame: " + e.ToString());
@@ -368,24 +367,15 @@ namespace Tyr
             PlayerId = playerId;
             Data = data;
             UnitTypes.LoadData(data);
+
+            OpponentID = opponentID;
             
             MyRace = GameInfo.PlayerInfo[(int)Observation.Observation.PlayerCommon.PlayerId - 1].RaceActual;
             EnemyRace = GameInfo.PlayerInfo[2 - (int)Observation.Observation.PlayerCommon.PlayerId].RaceRequested;
             System.Console.WriteLine("MyRace: " + MyRace);
 
-            if (AllowWritingFiles)
-            {
-                File.AppendAllLines(Directory.GetCurrentDirectory() + "/Data/Tyr/Tyr.log", new string[] { "Game started on map: " + GameInfo.MapName });
-                File.AppendAllLines(Directory.GetCurrentDirectory() + "/Data/Tyr/Tyr.log", new string[] { "Enemy race: " + EnemyRace });
-            }
-
-            if (opponentID == null)
-                ResultsFile = Directory.GetCurrentDirectory() + "/Data/Tyr/" + EnemyRace + ".txt";
-            else
-                ResultsFile = Directory.GetCurrentDirectory() + "/Data/Tyr/" + opponentID + ".txt";
-
-            if (AllowWritingFiles && !File.Exists(ResultsFile))
-                File.Create(ResultsFile).Close();
+            FileUtil.Log("Game started on map: " + GameInfo.MapName);
+            FileUtil.Log("Enemy race: " + EnemyRace);
 
             MapAnalyzer.Analyze(this);
             TargetManager.OnStart(this);
@@ -395,7 +385,7 @@ namespace Tyr
             Build.InitializeTasks();
             Build.OnStart(this);
 
-            Register("started " + EnemyRace + " " + Build.Name());
+            FileUtil.Register("started " + EnemyRace + " " + Build.Name());
 
 
             Managers.Add(UnitManager);
@@ -414,7 +404,7 @@ namespace Tyr
             if (FixedBuild != null)
                 return FixedBuild;
 
-            string[] lines = File.ReadAllLines(ResultsFile);
+            string[] lines = FileUtil.ReadResultsFile();
             PreviousEnemyStrategies.Load(lines);
             Dictionary<string, int> defeats = new Dictionary<string, int>();
             Dictionary<string, int> games = new Dictionary<string, int>();
@@ -554,8 +544,8 @@ namespace Tyr
 
         public void OnEnd(ResponseObservation observation, Result result)
         {
-            Register("Result: " + result);
-            Register("Average ms per frame: " + totalExecutionTime / Frame + " Max ms per frame: " + maxExecutionTime);
+            FileUtil.Register("Result: " + result);
+            FileUtil.Register("Average ms per frame: " + totalExecutionTime / Frame + " Max ms per frame: " + maxExecutionTime);
         }
 
 
@@ -567,12 +557,6 @@ namespace Tyr
         public int Gas()
         {
             return (int)Observation.Observation.PlayerCommon.Vespene - ReservedGas;
-        }
-
-        public void Register(string line)
-        {
-            if (AllowWritingFiles)
-                File.AppendAllLines(ResultsFile, new string[] { line });
         }
     }
 }

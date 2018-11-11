@@ -240,6 +240,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\CollectionUtil.cs" />
+    <Compile Include="Util\FileUtil.cs" />
     <Compile Include="Util\PrioritySettings.cs" />
     <Compile Include="Util\PriorityTargetting.cs" />
     <Compile Include="Util\SC2Util.cs" />

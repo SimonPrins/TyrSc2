@@ -1,4 +1,6 @@
-﻿namespace Tyr
+﻿using Tyr.Util;
+
+namespace Tyr
 {
     public class PreviousEnemyStrategies
     {
@@ -48,7 +50,7 @@
             if (!CannonRush)
             {
                 CannonRush = true;
-                Tyr.Bot.Register("CannonRush");
+                FileUtil.Register("CannonRush");
             }
         }
 
@@ -57,7 +59,7 @@
             if (!Lifting)
             {
                 Lifting = true;
-                Tyr.Bot.Register("Lifting");
+                FileUtil.Register("Lifting");
             }
         }
 
@@ -66,7 +68,7 @@
             if (!MassRoach)
             {
                 MassRoach = true;
-                Tyr.Bot.Register("MassRoach");
+                FileUtil.Register("MassRoach");
             }
         }
 
@@ -75,7 +77,7 @@
             if (!MassHydra)
             {
                 MassHydra = true;
-                Tyr.Bot.Register("MassHydra");
+                FileUtil.Register("MassHydra");
             }
         }
 
@@ -84,7 +86,7 @@
             if (!FourRax)
             {
                 FourRax = true;
-                Tyr.Bot.Register("FourRax");
+                FileUtil.Register("FourRax");
             }
         }
 
@@ -93,7 +95,7 @@
             if (!ReaperRush)
             {
                 ReaperRush = true;
-                Tyr.Bot.Register("ReaperRush");
+                FileUtil.Register("ReaperRush");
             }
         }
 
@@ -102,7 +104,7 @@
             if (!TerranTech)
             {
                 TerranTech = true;
-                Tyr.Bot.Register("TerranTech");
+                FileUtil.Register("TerranTech");
             }
         }
 
@@ -111,7 +113,7 @@
             if (!Mech)
             {
                 Mech = true;
-                Tyr.Bot.Register("Mech");
+                FileUtil.Register("Mech");
             }
         }
 
@@ -120,7 +122,7 @@
             if (!Bio)
             {
                 Bio = true;
-                Tyr.Bot.Register("Bio");
+                FileUtil.Register("Bio");
             }
         }
 
@@ -129,7 +131,7 @@
             if (!ThreeGate)
             {
                 ThreeGate = true;
-                Tyr.Bot.Register("ThreeGate");
+                FileUtil.Register("ThreeGate");
             }
         }
 
@@ -138,7 +140,7 @@
             if (!SkyToss)
             {
                 SkyToss = true;
-                Tyr.Bot.Register("SkyToss");
+                FileUtil.Register("SkyToss");
             }
         }
     }
