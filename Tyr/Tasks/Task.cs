@@ -1,12 +1,16 @@
-﻿using System;
+﻿using SC2APIProtocol;
 using System.Collections.Generic;
 using Tyr.Agents;
+using Tyr.Micro;
 
 namespace Tyr.Tasks
 {
     public abstract class Task
     {
         protected List<Agent> units = new List<Agent>();
+
+        private MicroController MicroController = new MicroController();
+        public List<CustomController> CustomControllers = new List<CustomController>();
 
         public bool AllowClaiming = true;
 
@@ -102,6 +106,12 @@ namespace Tyr.Tasks
         {
             task.Stopped = false;
             Tyr.Bot.TaskManager.Add(task);
+        }
+
+        public void Attack(Agent agent, Point2D point)
+        {
+            if (!MicroController.TryAttack(agent, point, CustomControllers))
+                Tyr.Bot.MicroController.Attack(agent, point);
         }
     }
 }
