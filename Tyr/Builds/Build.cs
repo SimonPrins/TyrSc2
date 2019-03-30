@@ -175,7 +175,7 @@ namespace Tyr.Builds
 
         public static bool ConstructGas(uint unitType)
         {
-            if (Tyr.Bot.Minerals() < 75 || Tyr.Bot.BaseManager.AvailableGasses == 0 || Tyr.Bot.Frame - gasConstructingFrame < 5)
+            if (Tyr.Bot.Minerals() < BuildingType.LookUp[unitType].Minerals || Tyr.Bot.BaseManager.AvailableGasses == 0 || Tyr.Bot.Frame - gasConstructingFrame < 5)
                 return false;
             
             foreach (Base loc in Tyr.Bot.BaseManager.Bases)
