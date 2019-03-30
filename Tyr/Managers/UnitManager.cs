@@ -54,8 +54,13 @@ namespace Tyr.Managers
                                 CollectionUtil.Increment(CompletedCounts, t);
                     }
 
-                    if (unit.Orders != null && unit.Orders.Count > 0 && Abilities.Creates.ContainsKey(unit.Orders[0].AbilityId))
+                    if (unit.Orders != null && unit.Orders.Count > 0 && Abilities.Creates.ContainsKey(unit.Orders[0].AbilityId)
+                        && unit.UnitType != UnitTypes.SCV)
+                    {
                         CollectionUtil.Increment(Counts, Abilities.Creates[unit.Orders[0].AbilityId]);
+                        if (unit.Orders.Count >= 2 && unit.Orders[1].Progress > 0 && Abilities.Creates.ContainsKey(unit.Orders[1].AbilityId))
+                            CollectionUtil.Increment(Counts, Abilities.Creates[unit.Orders[1].AbilityId]);
+                    }
 
                     if (unit.BuildProgress < 1 && (unit.UnitType == UnitTypes.PYLON || unit.UnitType == UnitTypes.SUPPLY_DEPOT))
                         FoodExpected += 8;
@@ -69,6 +74,15 @@ namespace Tyr.Managers
                     
 
                     existingUnits.Add(unit.Tag);
+
+                    if (unit.Passengers != null)
+                    {
+                        foreach (PassengerUnit passenger in unit.Passengers)
+                        {
+                            CollectionUtil.Increment(Counts, passenger.UnitType);
+                            CollectionUtil.Increment(CompletedCounts, passenger.UnitType);
+                        }
+                    }
 
                     if (Agents.ContainsKey(unit.Tag))
                     {
