@@ -16,7 +16,7 @@ namespace Tyr.Builds
         public abstract string Name();
         public abstract void OnStart(Tyr tyr);
         public abstract void OnFrame(Tyr tyr);
-        public abstract void Produce(Tyr tyr, Agent agent);
+        public virtual void Produce(Tyr tyr, Agent agent) { }
         private Build PreviousOverrideBuild = null;
 
         protected List<CustomController> MicroControllers = new List<CustomController>();
