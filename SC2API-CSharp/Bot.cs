@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using SC2APIProtocol;
 
 namespace SC2API_CSharp

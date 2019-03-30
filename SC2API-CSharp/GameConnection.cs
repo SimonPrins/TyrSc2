@@ -230,7 +230,6 @@ namespace SC2API_CSharp
             await Connect(gamePort);
             uint playerId = await JoinGameLadder(myRace, startPort);
             await Run(bot, playerId, opponentID);
-            await RequestLeaveGame();
         }
 
         public async Task RunLadder(Bot bot, Race myRace, string[] args)
