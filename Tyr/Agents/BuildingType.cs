@@ -66,5 +66,18 @@ namespace Tyr.Agents
 
             return lookUp;
         }
+        public static HashSet<int> BuildingAbilities = CreateBuildingAbilities();
+
+        private static HashSet<int> CreateBuildingAbilities()
+        {
+            HashSet<int> result = new HashSet<int>();
+
+            foreach (BuildingType building in LookUp.Values)
+                if (building.Ability != 0)
+                    result.Add(building.Ability);
+
+            return result;
+        }
+
     }
 }
