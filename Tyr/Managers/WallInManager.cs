@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
 using Tyr.Util;
 
 namespace Tyr.Managers
