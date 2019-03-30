@@ -134,9 +134,12 @@ namespace Tyr.BuildingPlacement
                             return false;
 
             if (!UnitTypes.ResourceCenters.Contains(type))
+            {
+                float baseDistance = (type == UnitTypes.MISSILE_TURRET || type == UnitTypes.SPORE_CRAWLER || type == UnitTypes.PYLON) ? 3f : 5f;
                 foreach (Base b in Tyr.Bot.BaseManager.Bases)
-                    if (Math.Abs(b.BaseLocation.Pos.X - location.X) < 5
-                        && Math.Abs(b.BaseLocation.Pos.Y - location.Y) < 5)
+                {
+                    if (Math.Abs(b.BaseLocation.Pos.X - location.X) < baseDistance
+                        && Math.Abs(b.BaseLocation.Pos.Y - location.Y) < baseDistance)
                         return false;
                     
                     foreach (MineralField mineral in b.BaseLocation.MineralFields)
