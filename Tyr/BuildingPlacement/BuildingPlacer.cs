@@ -29,6 +29,13 @@ namespace Tyr.BuildingPlacement
 
         public Point2D FindPlacement(Point2D target, Point2D size, uint type)
         {
+            if (Tyr.Bot.MyRace == Race.Terran)
+            {
+                if (type != UnitTypes.REFINERY
+                    && type != UnitTypes.COMMAND_CENTER
+                    && type != UnitTypes.MISSILE_TURRET)
+                    return TerranBuildingPlacement.FindPlacement(target, size, type);
+            }
             Point2D result = findPlacementLocal(target, size, type, 20);
             if (type == UnitTypes.PYLON)
                 PylonsFilled = result == null;
