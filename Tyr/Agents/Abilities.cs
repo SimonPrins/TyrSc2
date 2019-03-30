@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Tyr.Agents
 {
@@ -59,6 +55,7 @@ namespace Tyr.Agents
         public static int STRIKE_CANNON = 257;
         public static int CANCEL_STRIKE_CANNON = 258;
         public static int CANCEL = 314;
+        public static int REPAIR = 316;
         public static int SIEGE = 388;
         public static int UNSIEGE = 390;
         public static int MORPH_DRONE = 1342;
@@ -66,8 +63,11 @@ namespace Tyr.Agents
         public static int MORPH_OVERLORD = 1344;
         public static int MORPH_HYDRA = 1345;
         public static int MORPH_MUTALISK = 1346;
+        public static int MORPH_ULTRALISK = 1348;
         public static int MORPH_ROACH = 1351;
+        public static int MORPH_INFESTOR = 1352;
         public static int MORPH_CORRUPTOR = 1353;
+        public static int MORPH_SWARM_HOST = 1356;
         public static int MORPH_BROODLORD = 1372;
         public static int BLINK = 1442;
         public static int MORPH_OVERSEER = 1448;
@@ -77,5 +77,7 @@ namespace Tyr.Agents
         public static int BURROW_DOWN = 2108;
         public static int BURROW_UP = 2110;
         public static int CORROSIVE_BILE = 2338;
+        public static int WIDOW_MINE_BURROW = 2095;
+        public static int WIDOW_MINE_UNBURROW = 2097;
     }
 }
