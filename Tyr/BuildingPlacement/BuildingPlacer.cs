@@ -177,6 +177,14 @@ namespace Tyr.BuildingPlacement
                         if (!creep[(int)(location.X + dx), (int)(location.Y + dy)])
                             return false;
             }
+            if (Tyr.Bot.MyRace != Race.Zerg)
+            {
+                BoolGrid creep = new ImageBoolGrid(bot.Observation.Observation.RawData.MapState.Creep, 1);
+                for (float dx = -size.X / 2f; dx <= size.X / 2f + 0.01f; dx++)
+                    for (float dy = -size.Y / 2f; dy <= size.Y / 2f + 0.01f; dy++)
+                        if (creep[(int)(location.X + dx), (int)(location.Y + dy)])
+                            return false;
+            }
 
             if (type != UnitTypes.PYLON && bot.MyRace == Race.Protoss)
             {
