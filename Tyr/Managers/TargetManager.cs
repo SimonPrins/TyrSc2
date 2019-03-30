@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using SC2APIProtocol;
 using Tyr.Agents;
 using Tyr.Util;
@@ -15,6 +11,9 @@ namespace Tyr.Managers
         private ulong targetUnitTag = 0;
         bool enemyMainFound = false;
         public bool PrefferDistant { get; set; } = true;
+
+        public bool TargetCannons = false;
+
         public void OnFrame(Tyr tyr)
         {
             if (PotentialEnemyStartLocations.Count > 1 && !enemyMainFound)
@@ -49,7 +48,8 @@ namespace Tyr.Managers
                 BuildingLocation target = null;
                 foreach (BuildingLocation building in tyr.EnemyManager.EnemyBuildings.Values)
                 {
-                    if (UnitTypes.ResourceCenters.Contains(building.Type))
+                    if (UnitTypes.ResourceCenters.Contains(building.Type)
+                        || (TargetCannons && building.Type == UnitTypes.PHOTON_CANNON))
                     {
                         float newDist = SC2Util.DistanceSq(building.Pos, PotentialEnemyStartLocations[0]);
                         if (newDist > dist)
@@ -127,7 +127,7 @@ namespace Tyr.Managers
             foreach (Point2D location in tyr.GameInfo.StartRaw.StartLocations)
                 if (SC2Util.DistanceGrid(tyr. MapAnalyzer.StartLocation, location) > 20)
                     PotentialEnemyStartLocations.Add(location);
-            Console.WriteLine("Enemy locations: " + PotentialEnemyStartLocations.Count);
+            DebugUtil.WriteLine("Enemy locations: " + PotentialEnemyStartLocations.Count);
         }
 
         public Point2D AttackTarget { get; internal set; }
