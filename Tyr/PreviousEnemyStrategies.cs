@@ -57,7 +57,7 @@ namespace Tyr
             if (!CannonRush)
             {
                 CannonRush = true;
-                Tyr.Bot.Register("CannonRush");
+                FileUtil.Register("CannonRush");
             }
         }
 
@@ -66,7 +66,7 @@ namespace Tyr
             if (!Lifting)
             {
                 Lifting = true;
-                Tyr.Bot.Register("Lifting");
+                FileUtil.Register("Lifting");
             }
         }
 
@@ -75,7 +75,7 @@ namespace Tyr
             if (!MassRoach)
             {
                 MassRoach = true;
-                Tyr.Bot.Register("MassRoach");
+                FileUtil.Register("MassRoach");
             }
         }
 
@@ -84,7 +84,7 @@ namespace Tyr
             if (!MassHydra)
             {
                 MassHydra = true;
-                Tyr.Bot.Register("MassHydra");
+                FileUtil.Register("MassHydra");
             }
         }
 
@@ -93,7 +93,7 @@ namespace Tyr
             if (!FourRax)
             {
                 FourRax = true;
-                Tyr.Bot.Register("FourRax");
+                FileUtil.Register("FourRax");
             }
         }
 
@@ -102,7 +102,7 @@ namespace Tyr
             if (!ReaperRush)
             {
                 ReaperRush = true;
-                Tyr.Bot.Register("ReaperRush");
+                FileUtil.Register("ReaperRush");
             }
         }
 
@@ -111,7 +111,7 @@ namespace Tyr
             if (!TerranTech)
             {
                 TerranTech = true;
-                Tyr.Bot.Register("TerranTech");
+                FileUtil.Register("TerranTech");
             }
         }
 
@@ -120,7 +120,7 @@ namespace Tyr
             if (!Mech)
             {
                 Mech = true;
-                Tyr.Bot.Register("Mech");
+                FileUtil.Register("Mech");
             }
         }
 
@@ -129,7 +129,7 @@ namespace Tyr
             if (!Bio)
             {
                 Bio = true;
-                Tyr.Bot.Register("Bio");
+                FileUtil.Register("Bio");
             }
         }
 
@@ -138,7 +138,7 @@ namespace Tyr
             if (!ThreeGate)
             {
                 ThreeGate = true;
-                Tyr.Bot.Register("ThreeGate");
+                FileUtil.Register("ThreeGate");
             }
         }
 
@@ -147,7 +147,7 @@ namespace Tyr
             if (!SkyToss)
             {
                 SkyToss = true;
-                Tyr.Bot.Register("SkyToss");
+                FileUtil.Register("SkyToss");
             }
         }
 
