@@ -7,7 +7,7 @@ namespace Tyr.Agents
 {
     public class Agent
     {
-        private int lastOrderFrame = 0;
+        public int LastOrderFrame = 0;
         public int LastAbility = 0;
         public Agent(Unit unit)
         {
@@ -27,10 +27,10 @@ namespace Tyr.Agents
         public void Order(int ability, Point2D target)
         {
             // Make sure blink doesn't get cancelled.
-            if (LastAbility == Abilities.BLINK && Tyr.Bot.Frame - lastOrderFrame <= 20)
+            if (LastAbility == Abilities.BLINK && Tyr.Bot.Frame - LastOrderFrame <= 20)
                 return;
             // Short delay between orders to prevent order spam.
-            if (LastAbility == ability && Tyr.Bot.Frame - lastOrderFrame <= 5)
+            if (LastAbility == ability && Tyr.Bot.Frame - LastOrderFrame <= 5)
                 return;
 
             LastAbility = ability;
@@ -43,7 +43,7 @@ namespace Tyr.Agents
                 && Unit.Orders[0].AbilityId == ability)
                 return;
 
-            lastOrderFrame = Tyr.Bot.Frame;
+            LastOrderFrame = Tyr.Bot.Frame;
             Command = new ActionRawUnitCommand();
             Command.AbilityId = ability;
             Command.TargetWorldSpacePos = target;
@@ -71,13 +71,12 @@ namespace Tyr.Agents
         internal void ArchonMerge(Agent agent)
         {
             // Short delay between orders to prevent order spam.
-            if (Tyr.Bot.Frame - lastOrderFrame <= 5)
+            if (Tyr.Bot.Frame - LastOrderFrame <= 5)
                 return;
 
             agent.Command = null;
 
-            lastOrderFrame = Tyr.Bot.Frame;
-            System.Console.WriteLine("Merging archon.");
+            LastOrderFrame = Tyr.Bot.Frame;
             Command = new ActionRawUnitCommand();
             Command.AbilityId = 1766;
             Command.UnitTags.Add(Unit.Tag);
@@ -117,7 +116,7 @@ namespace Tyr.Agents
         public void Order(int ability, ulong targetTag)
         {
             // Make sure blink doesn't get cancelled.
-            if (LastAbility == Abilities.BLINK && Tyr.Bot.Frame - lastOrderFrame <= 20)
+            if (LastAbility == Abilities.BLINK && Tyr.Bot.Frame - LastOrderFrame <= 20)
                 return;
             // Ignore orders that are the same or similar to existing orders.
             if (Unit.Orders.Count != 0 && Unit.Orders[0].TargetUnitTag == targetTag && Unit.Orders[0].AbilityId == ability)
