@@ -73,6 +73,18 @@ namespace Tyr.Tasks
             Clear(IdleTask.Task);
         }
 
+        public void ClearLast()
+        {
+            ClearAt(units.Count - 1);
+        }
+
+        public void ClearAt(int i)
+        {
+            IdleTask.Task.Add(units[i]);
+            units[i] = units[units.Count - 1];
+            units.RemoveAt(units.Count - 1);
+        }
+
         public void RemoveAt(int i)
         {
             units[i] = units[units.Count - 1];
