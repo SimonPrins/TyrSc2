@@ -54,20 +54,12 @@ namespace Tyr.Agents
 
         public bool CanAttackAir()
         {
-            foreach (Weapon weapon in UnitTypes.LookUp[Unit.UnitType].Weapons)
-                if (weapon.Type == Weapon.Types.TargetType.Any
-                    || (weapon.Type == Weapon.Types.TargetType.Air))
-                    return true;
-            return false;
+            return UnitTypes.CanAttackAir(Unit.UnitType);
         }
 
         public bool CanAttackGround()
         {
-            foreach (Weapon weapon in UnitTypes.LookUp[Unit.UnitType].Weapons)
-                if (weapon.Type == Weapon.Types.TargetType.Any
-                    || (weapon.Type == Weapon.Types.TargetType.Ground))
-                    return true;
-            return false;
+            return UnitTypes.CanAttackGround(Unit.UnitType);
         }
 
         internal void ArchonMerge(Agent agent)

@@ -539,5 +539,41 @@ namespace Tyr.Agents
             { THOR_SINGLE_TARGET, new List<uint>() { THOR }},
             { WARP_GATE, new List<uint>() { GATEWAY }}
         };
+
+        public static bool CanAttackGround(uint type)
+        {
+            if (type == LIBERATOR 
+                || type == CARRIER
+                || type == WIDOW_MINE
+                || type == WIDOW_MINE_BURROWED
+                || type == SWARM_HOST
+                || type == SPINE_CRAWLER
+                || type == BATTLECRUISER
+                || type == INFESTOR
+                || type == DISRUPTOR
+                || type == ORACLE)
+                return true;
+            foreach (Weapon weapon in LookUp[type].Weapons)
+                if (weapon.Type == Weapon.Types.TargetType.Any
+                    || (weapon.Type == Weapon.Types.TargetType.Ground))
+                    return true;
+            return false;
+        }
+
+        public static bool CanAttackAir(uint type)
+        {
+            if (type == CARRIER
+                || type == WIDOW_MINE
+                || type == WIDOW_MINE_BURROWED
+                || type == CYCLONE
+                || type == INFESTOR
+                || type == BATTLECRUISER)
+                return true;
+            foreach (Weapon weapon in LookUp[type].Weapons)
+                if (weapon.Type == Weapon.Types.TargetType.Any
+                    || (weapon.Type == Weapon.Types.TargetType.Air))
+                    return true;
+            return false;
+        }
     }
 }
