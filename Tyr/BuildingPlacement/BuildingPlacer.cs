@@ -138,6 +138,21 @@ namespace Tyr.BuildingPlacement
                     if (Math.Abs(b.BaseLocation.Pos.X - location.X) < 5
                         && Math.Abs(b.BaseLocation.Pos.Y - location.Y) < 5)
                         return false;
+                    
+                    foreach (MineralField mineral in b.BaseLocation.MineralFields)
+                    {
+                        Point2D halfWay = SC2Util.Point((mineral.Pos.X + b.BaseLocation.Pos.X) / 2f, (mineral.Pos.Y + b.BaseLocation.Pos.Y) / 2f);
+                        if (SC2Util.DistanceSq(halfWay, location) <= 4 * 4)
+                            return false;
+                    }
+                    foreach (Gas gas in b.BaseLocation.Gasses)
+                    {
+                        Point2D halfWay = SC2Util.Point((gas.Pos.X + b.BaseLocation.Pos.X) / 2f, (gas.Pos.Y + b.BaseLocation.Pos.Y) / 2f);
+                        if (SC2Util.DistanceSq(halfWay, location) <= 4 * 4)
+                            return false;
+                    }
+                }
+            }
 
             foreach (Unit unit in bot.Observation.Observation.RawData.Units)
                 if (!CheckDistance(location, type, SC2Util.To2D(unit.Pos), unit.UnitType, buildingsOnly))
