@@ -1,5 +1,6 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
+using System.IO;
 using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Managers;
@@ -122,6 +123,11 @@ namespace Tyr.Builds
         public static uint AvailableFood()
         {
             return Tyr.Bot.Observation.Observation.PlayerCommon.FoodCap;
+        }
+
+        public static uint FoodLeft()
+        {
+            return AvailableFood() - FoodUsed();
         }
 
         public static uint ExpectedAvailableFood()
@@ -281,28 +287,56 @@ namespace Tyr.Builds
                     if (blocked)
                         break;
                 }
-                if (!blocked)
+                if (blocked)
                 {
-                    // Ignore the pocket expand as a first base.
-                    if (natural && Tyr.Bot.MapAnalyzer.EnemyDistances[(int)loc.BaseLocation.Pos.X, (int)loc.BaseLocation.Pos.Y] > Tyr.Bot.MapAnalyzer.EnemyDistances[(int)Tyr.Bot.MapAnalyzer.StartLocation.X, (int)Tyr.Bot.MapAnalyzer.StartLocation.Y])
-                        continue;
-                    int newdist = loc.DistanceToMain;
-                    if (newdist < dist)
-                    {
-                        dist = newdist;
-                        picked = loc;
-                    }
+                    File.AppendAllLines(Directory.GetCurrentDirectory() + "/Data/Tyr/debug.txt", new string[] { "Base at " + loc.BaseLocation.Pos + " blocked by allied unit." });
+                    continue;
+                }
+
+                // Ignore the pocket expand as a first base.
+                if (natural && Tyr.Bot.MapAnalyzer.EnemyDistances[(int)loc.BaseLocation.Pos.X, (int)loc.BaseLocation.Pos.Y] > Tyr.Bot.MapAnalyzer.EnemyDistances[(int)Tyr.Bot.MapAnalyzer.StartLocation.X, (int)Tyr.Bot.MapAnalyzer.StartLocation.Y])
+                    continue;
+                int newdist = loc.DistanceToMain;
+                if (newdist < dist)
+                {
+                    dist = newdist;
+                    picked = loc;
                 }
             }
             if (picked == null)
             {
-                Tyr.Bot.DrawText("No suitable base to take an expansion.");
+                ConstructionTask.Task.ExpandingBlockedUntilFrame = Tyr.Bot.Frame + 112;
                 return false;
             }
-
-            Tyr.Bot.DrawText("Starting resource center.");
-            ConstructionTask.Task.Build(unitType, picked, picked.BaseLocation.Pos);
+            
+            ConstructionTask.Task.Build(unitType, picked, picked.BaseLocation.Pos, null, false);
             return true;
+        }
+
+        public void BalanceGas()
+        {
+            if (Minerals() >= 600)
+                GasWorkerTask.WorkersPerGas = 3;
+            else if (Gas() <= 300)
+                GasWorkerTask.WorkersPerGas = 3;
+            else if (Gas() >= 600)
+                GasWorkerTask.WorkersPerGas = 1;
+            else if (GasWorkerTask.WorkersPerGas >= 3)
+            {
+                if (Gas() >= 500)
+                    GasWorkerTask.WorkersPerGas = 2;
+            }
+            else if (GasWorkerTask.WorkersPerGas == 2)
+            {
+                if (Gas() < 400)
+                    GasWorkerTask.WorkersPerGas = 3;
+            }
+            else if (GasWorkerTask.WorkersPerGas <= 1)
+            {
+                if (Gas() < 500)
+                    GasWorkerTask.WorkersPerGas = 2;
+            }
+
         }
     }
 }
