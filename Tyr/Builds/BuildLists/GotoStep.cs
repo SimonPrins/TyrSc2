@@ -12,6 +12,13 @@ namespace Tyr.Builds.BuildLists
             Pos = pos;
         }
 
+        public StepResult Perform(BuildListState state)
+        {
+            if (state.BuiltThisFrame)
+                return new NextList();
+            return new ToLine(Pos);
+        }
+
         public override string ToString()
         {
             return "Goto " + Pos;

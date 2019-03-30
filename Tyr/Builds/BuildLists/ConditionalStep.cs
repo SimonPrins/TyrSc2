@@ -20,5 +20,16 @@ namespace Tyr.Builds.BuildLists
         {
             return "Conditional";
         }
+
+        public StepResult Perform(BuildListState state)
+        {
+            if (Check())
+                return new NextItem();
+            else
+            {
+                Tyr.Bot.DrawText("Skipping list. Condition not met.");
+                return new NextList();
+            }
+        }
     }
 }
