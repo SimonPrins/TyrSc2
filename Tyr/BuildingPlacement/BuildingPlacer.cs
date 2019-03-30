@@ -214,6 +214,10 @@ namespace Tyr.BuildingPlacement
             if (buildingsOnly && !BuildingType.LookUp.ContainsKey(unitType))
                 return true;
 
+            if (unitType == UnitTypes.ADEPT_PHASE_SHIFT
+                || unitType == UnitTypes.KD8_CHARGE)
+                return true;
+
             if (UnitTypes.CombatUnitTypes.Contains(unitType))
                 return SC2Util.DistanceGrid(unitPos, location) > 1;
             if (UnitTypes.WorkerTypes.Contains(unitType))
