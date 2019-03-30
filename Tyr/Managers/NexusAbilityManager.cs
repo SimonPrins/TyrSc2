@@ -21,6 +21,8 @@ namespace Tyr.Managers
         {
             if (nexus.Unit.Energy < 50)
                 return;
+            if (Tyr.Bot.UnitManager.Completed(UnitTypes.PYLON) == 0)
+                return;
 
             foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
                 if (agent.IsProductionStructure && agent.Unit.Orders.Count > 0 && PriotitizedAbilities.Contains(agent.Unit.Orders[0].AbilityId) && Tyr.Bot.Frame - lastChrono(agent) >= 500)
