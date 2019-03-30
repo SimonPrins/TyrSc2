@@ -99,8 +99,16 @@ namespace Tyr.Managers
                         if (agent.Base != null)
                         {
                             CollectionUtil.Increment(agent.Base.BuildingCounts, unit.UnitType);
+                            if (UnitTypes.EquivalentTypes.ContainsKey(unit.UnitType))
+                                foreach (uint t in UnitTypes.EquivalentTypes[unit.UnitType])
+                                    CollectionUtil.Increment(agent.Base.BuildingCounts, t);
                             if (unit.BuildProgress >= 0.9999f)
+                            {
                                 CollectionUtil.Increment(agent.Base.BuildingsCompleted, unit.UnitType);
+                                if (UnitTypes.EquivalentTypes.ContainsKey(unit.UnitType))
+                                    foreach (uint t in UnitTypes.EquivalentTypes[unit.UnitType])
+                                        CollectionUtil.Increment(agent.Base.BuildingsCompleted, t);
+                            }
                         }
                     }
                     else
