@@ -24,8 +24,11 @@ namespace Tyr.Agents
             list.Add(new MorphingType() { FromType = UnitTypes.LARVA, ToType = UnitTypes.HYDRALISK, Ability = Abilities.MORPH_HYDRA, Minerals = 100, Gas = 50 });
             list.Add(new MorphingType() { FromType = UnitTypes.LARVA, ToType = UnitTypes.MUTALISK, Ability = Abilities.MORPH_MUTALISK, Minerals = 100, Gas = 100 });
             list.Add(new MorphingType() { FromType = UnitTypes.LARVA, ToType = UnitTypes.ROACH, Ability = Abilities.MORPH_ROACH, Minerals = 75, Gas = 25 });
+            list.Add(new MorphingType() { FromType = UnitTypes.LARVA, ToType = UnitTypes.INFESTOR, Ability = Abilities.MORPH_INFESTOR, Minerals = 100, Gas = 150 });
+            list.Add(new MorphingType() { FromType = UnitTypes.LARVA, ToType = UnitTypes.SWARM_HOST, Ability = Abilities.MORPH_SWARM_HOST, Minerals = 100, Gas = 75 });
             list.Add(new MorphingType() { FromType = UnitTypes.LARVA, ToType = UnitTypes.CORRUPTOR, Ability = Abilities.MORPH_CORRUPTOR, Minerals = 150, Gas = 100 });
             list.Add(new MorphingType() { FromType = UnitTypes.HYDRALISK, ToType = UnitTypes.LURKER, Ability = Abilities.MORPH_LURKER, Minerals = 50, Gas = 100 });
+            list.Add(new MorphingType() { FromType = UnitTypes.LARVA, ToType = UnitTypes.ULTRALISK, Ability = Abilities.MORPH_ULTRALISK, Minerals = 300, Gas = 200 });
             list.Add(new MorphingType() { FromType = UnitTypes.OVERLORD, ToType = UnitTypes.OVERSEER, Ability = Abilities.MORPH_OVERSEER, Minerals = 50, Gas = 50 });
             list.Add(new MorphingType() { FromType = UnitTypes.CORRUPTOR, ToType = UnitTypes.BROOD_LORD, Ability = Abilities.MORPH_BROODLORD, Minerals = 150, Gas = 150 });
             list.Add(new MorphingType() { FromType = UnitTypes.ROACH, ToType = UnitTypes.RAVAGER, Ability = Abilities.MORPH_RAVAGER, Minerals = 25, Gas = 75 });
