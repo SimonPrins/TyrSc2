@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SC2APIProtocol;
 using Tyr.Agents;
 using Tyr.Managers;
@@ -18,6 +19,8 @@ namespace Tyr.BuildingPlacement
         public bool BuildInsideMainOnly = false;
         public bool SpreadCannons;
         public bool BuildCompact = false;
+
+        public List<ReservedBuilding> ReservedLocation = new List<ReservedBuilding>();
 
         public BuildingPlacer(Tyr bot)
         {
