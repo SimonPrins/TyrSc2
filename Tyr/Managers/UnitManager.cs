@@ -34,6 +34,11 @@ namespace Tyr.Managers
             // Update our unit set.
             foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
             {
+                if (unit.Owner != tyr.PlayerId)
+                {
+                    Agents.Remove(unit.Tag);
+                    continue;
+                }
                 if (unit.Owner == tyr.PlayerId)
                 {
                     // Count how many of each unitType we have.
