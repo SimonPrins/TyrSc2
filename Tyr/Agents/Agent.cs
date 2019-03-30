@@ -84,6 +84,21 @@ namespace Tyr.Agents
             Command.UnitTags.Add(agent.Unit.Tag);
         }
 
+        public Agent GetAddOn()
+        {
+            if (!Tyr.Bot.UnitManager.Agents.ContainsKey(Unit.AddOnTag))
+                return null;
+            return Tyr.Bot.UnitManager.Agents[Unit.AddOnTag];
+        }
+
+        public uint CurrentAbility()
+        {
+            if (Unit.Orders == null || Unit.Orders.Count == 0)
+                return 0;
+            else
+                return Unit.Orders[0].AbilityId;
+        }
+
         public int GetDamage(Unit target)
         {
             Weapon weaponUsed = null;
@@ -174,6 +189,52 @@ namespace Tyr.Agents
         public float DistanceSq(Agent agent)
         {
             return SC2Util.DistanceSq(Unit.Pos, agent.Unit.Pos);
+        }
+
+        public Point2D Toward(Agent target, float magnitude)
+        {
+            return Toward(target.Unit, magnitude);
+        }
+
+        public Point2D Toward(Unit target, float magnitude)
+        {
+            return Toward(target.Pos, magnitude);
+        }
+
+        public Point2D Toward(Point target, float magnitude)
+        {
+            return Toward(SC2Util.To2D(target), magnitude);
+        }
+
+        public Point2D Toward(Point2D target, float magnitude)
+        {
+            PotentialHelper helper = new PotentialHelper(Unit.Pos);
+            helper.Magnitude = magnitude;
+            helper.To(target);
+            return helper.Get();
+        }
+
+        public Point2D From(Agent target, float magnitude)
+        {
+            return From(target.Unit, magnitude);
+        }
+
+        public Point2D From(Unit target, float magnitude)
+        {
+            return From(target.Pos, magnitude);
+        }
+
+        public Point2D From(Point target, float magnitude)
+        {
+            return From(SC2Util.To2D(target), magnitude);
+        }
+
+        public Point2D From(Point2D target, float magnitude)
+        {
+            PotentialHelper helper = new PotentialHelper(Unit.Pos);
+            helper.Magnitude = magnitude;
+            helper.From(target);
+            return helper.Get();
         }
     }
 }
