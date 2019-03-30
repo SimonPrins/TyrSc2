@@ -141,6 +141,19 @@ namespace Tyr.Managers
                     FoodExpected += 8;
                 if (request.Base != null)
                     CollectionUtil.Increment(request.Base.BuildingCounts, request.Type);
+
+                if (request.worker.Unit.Orders == null
+                    || request.worker.Unit.Orders.Count == 0
+                    || request.worker.Unit.Orders[0].AbilityId != BuildingType.LookUp[request.Type].Ability)
+                {
+                    tyr.ReservedMinerals += BuildingType.LookUp[request.Type].Minerals;
+                    tyr.ReservedGas += BuildingType.LookUp[request.Type].Gas;
+                    string workerAbility = "";
+                    if (request.worker.Unit.Orders != null
+                        && request.worker.Unit.Orders.Count > 0)
+                        workerAbility = " Ability: " + request.worker.Unit.Orders[0].AbilityId;
+                    tyr.DrawText("Reserving: " + BuildingType.LookUp[request.Type].Name + workerAbility);
+                }
             }
 
             foreach (BuildRequest request in ConstructionTask.Task.UnassignedRequests)
@@ -150,6 +163,10 @@ namespace Tyr.Managers
                 FoodExpected += 8;
                 if (request.Base != null)
                     CollectionUtil.Increment(request.Base.BuildingCounts, request.Type);
+
+                tyr.ReservedMinerals += BuildingType.LookUp[request.Type].Minerals;
+                tyr.ReservedGas += BuildingType.LookUp[request.Type].Gas;
+                tyr.DrawText("Reserving: " + BuildingType.LookUp[request.Type].Name);
             }
 
             // Remove dead units.
