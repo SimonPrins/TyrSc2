@@ -158,7 +158,7 @@ namespace Tyr.BuildingPlacement
             }
 
             foreach (Unit unit in bot.Observation.Observation.RawData.Units)
-                if (!CheckDistance(location, type, SC2Util.To2D(unit.Pos), unit.UnitType, buildingsOnly))
+                if (!unit.IsFlying && !CheckDistance(location, type, SC2Util.To2D(unit.Pos), unit.UnitType, buildingsOnly))
                     return false;
 
             foreach (BuildRequest request in ConstructionTask.Task.UnassignedRequests)
