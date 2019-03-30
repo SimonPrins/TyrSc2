@@ -464,6 +464,18 @@ namespace Tyr.Agents
                 CHANGELING_ZERGLING,
                 CHANGELING_ZERGLING_WINGS
         };
+        public static HashSet<uint> DefensiveBuildingsTypes = new HashSet<uint>
+            {
+                MISSILE_TURRET,
+                BUNKER,
+                PLANETARY_FORTRESS,
+                PHOTON_CANNON,
+                SHIELD_BATTERY,
+                SPORE_CRAWLER,
+                SPORE_CRAWLER_UPROOTED,
+                SPINE_CRAWLER,
+                SPINE_CRAWLER_UPROOTED
+        };
 
         public static Dictionary<uint, List<uint>> EquivalentTypes = new Dictionary<uint, List<uint>>() {
             { LURKER_BURROWED, new List<uint>() { LURKER } },
