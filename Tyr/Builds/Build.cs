@@ -263,24 +263,43 @@ namespace Tyr.Builds
 
         public static bool ConstructResourceCenter(uint unitType)
         {
-            Tyr.Bot.DrawText("Constructing resource center.");
             // Check if there is already a Resource center constructing.
             foreach (Agent unit in Tyr.Bot.UnitManager.Agents.Values)
                 if (unit.IsWorker && unit.Unit.Orders != null && unit.Unit.Orders.Count > 0 && unit.Unit.Orders[0].AbilityId == BuildingType.LookUp[unitType].Ability)
-                {
-                    Tyr.Bot.DrawText("Resource center already under construction.");
                     return false;
-                }
 
             Base picked = null;
             float dist = 1000000000;
             bool natural = Tyr.Bot.UnitManager.Count(unitType) == 1;
-
+            
             foreach (Base loc in Tyr.Bot.BaseManager.Bases)
             {
                 if (loc.Owner != -1)
                     continue;
                 bool blocked = false;
+                foreach (Unit enemy in Tyr.Bot.Enemies())
+                {
+                    if (SC2Util.DistanceSq(enemy.Pos, loc.BaseLocation.Pos) <= 6 * 6)
+                    {
+                        blocked = true;
+                        break;
+                    }
+                }
+                if (blocked)
+                    continue;
+
+                if (unitType != UnitTypes.HATCHERY)
+                {
+                    // Check for creep.
+                    BoolGrid creep = new ImageBoolGrid(Tyr.Bot.Observation.Observation.RawData.MapState.Creep, 1);
+                    for (float dx = -2.5f; !blocked && dx <= 2.51f; dx++)
+                        for (float dy = -2.5f; !blocked && dy <= 2.51f; dy++)
+                            if (creep[(int)(loc.BaseLocation.Pos.X + dx), (int)(loc.BaseLocation.Pos.Y + dy)])
+                                blocked = true;
+                    if (blocked)
+                        continue;
+                }
+
                 foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
                 {
                     if (!agent.IsBuilding)
