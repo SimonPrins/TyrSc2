@@ -218,6 +218,17 @@ namespace Tyr.BuildingPlacement
                 || unitType == UnitTypes.KD8_CHARGE)
                 return true;
 
+            if (buildingType == UnitTypes.MISSILE_TURRET
+                && unitType == UnitTypes.MISSILE_TURRET)
+                return SC2Util.DistanceSq(location, unitPos) >= 6 * 6;
+
+            if (UnitTypes.WorkerTypes.Contains(unitType))
+            {
+                if (buildingType == UnitTypes.MISSILE_TURRET)
+                    return SC2Util.DistanceSq(location, unitPos) >= 2 * 2;
+                return true;
+            }
+
             if (UnitTypes.CombatUnitTypes.Contains(unitType))
                 return SC2Util.DistanceGrid(unitPos, location) > 1;
             if (UnitTypes.WorkerTypes.Contains(unitType))
@@ -225,15 +236,17 @@ namespace Tyr.BuildingPlacement
 
             if (BuildCompact)
                 return CheckDistanceClose(location, buildingType, unitPos, unitType);
-            if ((buildingType == UnitTypes.PHOTON_CANNON && (unitType != UnitTypes.PHOTON_CANNON || !SpreadCannons))
+            if ((buildingType == UnitTypes.PHOTON_CANNON && !SpreadCannons)
                 || buildingType == UnitTypes.SHIELD_BATTERY
                 || buildingType == UnitTypes.DARK_SHRINE
                 || buildingType == UnitTypes.SPINE_CRAWLER
-                || buildingType == UnitTypes.SPORE_CRAWLER
+                || (buildingType == UnitTypes.SPORE_CRAWLER && !SpreadCannons)
                 || buildingType == UnitTypes.SUPPLY_DEPOT
+                || buildingType == UnitTypes.MISSILE_TURRET
                 || unitType == UnitTypes.SUPPLY_DEPOT
                 || unitType == UnitTypes.SUPPLY_DEPOT_LOWERED
-                || buildingType == UnitTypes.CREEP_TUMOR)
+                || buildingType == UnitTypes.CREEP_TUMOR
+                || (buildingType == UnitTypes.PYLON && PylonsFilled))
             {
                 if (CanHaveAddOn(buildingType))
                 {
