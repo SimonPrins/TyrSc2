@@ -156,8 +156,12 @@ namespace Tyr.Agents
         public static uint RICH_VESPENE_GEYSER = 344;
         public static uint MINERAL_FIELD_750 = 483;
         public static uint HELLBAT = 484;
+        public static uint SWARM_HOST = 494;
         public static uint ORACLE = 495;
+        public static uint TEMPEST = 496;
         public static uint WIDOW_MINE = 498;
+        public static uint VIPER = 499;
+        public static uint WIDOW_MINE_BURROWED = 500;
         public static uint LURKER = 502;
         public static uint LURKER_BURROWED = 503;
         public static uint PROTOSS_VESPENE_GEYSER = 608;
@@ -167,10 +171,16 @@ namespace Tyr.Agents
         public static uint RAVAGER = 688;
         public static uint LIBERATOR = 689;
         public static uint RAVAGER_BURROWED = 690;
+        public static uint THOR_SINGLE_TARGET = 691;
         public static uint CYCLONE = 692;
+        public static uint LOCUST_FLYING = 693;
+        public static uint DISRUPTOR = 694;
+        public static uint DISRUPTOR_PHASED = 733;
+        public static uint LIBERATOR_AG = 734;
         public static uint PURIFIER_RICH_MINERAL_FIELD = 796;
         public static uint PURIFIER_RICH_MINERAL_FIELD_750 = 797;
         public static uint ADEPT_PHASE_SHIFT = 801;
+        public static uint KD8_CHARGE = 830;
         public static uint PURIFIER_VESPENE_GEYSER = 880;
         public static uint SHAKURAS_VESPENE_GEYSER = 881;
         public static uint PURIFIER_MINERAL_FIELD = 884;
@@ -320,6 +330,7 @@ namespace Tyr.Agents
                 HYDRALISK,
                 HYDRALISK_BURROWED,
                 IMMORTAL,
+                INFESTOR,
                 INFESTED_TERRANS_EGG,
                 INFESTOR_BURROWED,
                 INFESTOR_TERRAN,
@@ -341,6 +352,7 @@ namespace Tyr.Agents
                 SIEGE_TANK_SIEGED,
                 STALKER,
                 THOR,
+                THOR_SINGLE_TARGET,
                 ULTRALISK,
                 URSADON,
                 VIKING_ASSUALT,
@@ -350,12 +362,20 @@ namespace Tyr.Agents
                 ZERGLING,
                 ZERGLING_BURROWED,
                 ORACLE,
+                TEMPEST,
                 ADEPT,
                 RAVAGER,
                 RAVAGER_BURROWED,
                 LURKER,
                 LURKER_BURROWED,
-                HELLBAT
+                HELLBAT,
+                LIBERATOR,
+                LIBERATOR_AG,
+                CYCLONE,
+                WIDOW_MINE,
+                WIDOW_MINE_BURROWED,
+                SWARM_HOST,
+                DISRUPTOR
             };
         public static HashSet<uint> AirAttackTypes = new HashSet<uint>
             {
@@ -367,6 +387,7 @@ namespace Tyr.Agents
                 GHOST,
                 HIGH_TEMPLAR,
                 HYDRALISK,
+                INFESTOR,
                 INFESTOR_TERRAN,
                 MARINE,
                 MOTHERSHIP,
@@ -376,12 +397,17 @@ namespace Tyr.Agents
                 SENTRY,
                 STALKER,
                 THOR,
+                THOR_SINGLE_TARGET,
                 VIKING_FIGHTER,
                 VOID_RAY,
                 PHOTON_CANNON,
                 MISSILE_TURRET,
                 SPORE_CRAWLER,
-                BUNKER
+                BUNKER,
+                LIBERATOR,
+                TEMPEST,
+                WIDOW_MINE,
+                WIDOW_MINE_BURROWED
             };
         public static HashSet<uint> ResourceCenters = new HashSet<uint>
             {
@@ -437,7 +463,12 @@ namespace Tyr.Agents
             { LAIR, new List<uint>() { HATCHERY }},
             { SUPPLY_DEPOT_LOWERED, new List<uint>() { SUPPLY_DEPOT }},
             { ORBITAL_COMMAND, new List<uint>() { COMMAND_CENTER }},
-            { PLANETARY_FORTRESS, new List<uint>() { COMMAND_CENTER }}
+            { PLANETARY_FORTRESS, new List<uint>() { COMMAND_CENTER }},
+            { LIBERATOR_AG, new List<uint>() { LIBERATOR }},
+            { SIEGE_TANK_SIEGED, new List<uint>() { SIEGE_TANK }},
+            { WIDOW_MINE_BURROWED, new List<uint>() { WIDOW_MINE }},
+            { THOR_SINGLE_TARGET, new List<uint>() { THOR }},
+            { WARP_GATE, new List<uint>() { GATEWAY }}
         };
     }
 }
