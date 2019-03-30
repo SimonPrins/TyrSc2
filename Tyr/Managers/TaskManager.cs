@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using Tyr.Agents;
 using Tyr.Tasks;
 
@@ -8,17 +7,16 @@ namespace Tyr.Managers
     public class TaskManager : Manager
     {
         private List<Task> tasks = new List<Task>();
-        
+
         public void OnFrame(Tyr tyr)
         {
-            foreach(Task task in tasks)
+            foreach (Task task in tasks)
                 task.Cleanup(tyr);
-            
-            List<Task> orderedTasks = tasks.FindAll((task) => { return task.IsNeeded(); } );
+
+            List<Task> orderedTasks = tasks.FindAll((task) => { return task.IsNeeded(); });
             orderedTasks.Sort((a, b) => { return a.Priority.CompareTo(b.Priority); });
-
-
-            for (int i = orderedTasks.Count - 1; i >- 1 ; i--)
+            
+            for (int i = orderedTasks.Count - 1; i > -1; i--)
             {
                 Task to = orderedTasks[i];
                 if (to.Stopped)
@@ -34,8 +32,11 @@ namespace Tyr.Managers
                             break;
 
                         Task from = orderedTasks[j];
+                        
                         if (to.Priority <= from.Priority)
                             break;
+                        if (!from.AllowClaiming)
+                            continue;
                         List<int> fromAgents = new List<int>();
                         int k = 0;
                         foreach (Agent agent in from.Units)
@@ -54,11 +55,12 @@ namespace Tyr.Managers
                         foreach (int a in fromAgents)
                         {
                             Agent agent = from.Units[a];
+
                             if (descriptor.UnitTypes != null && !descriptor.UnitTypes.Contains(agent.Unit.UnitType))
                                 continue;
                             if (descriptor.MaxDist < 1000000 && distances[a] > descriptor.MaxDist * descriptor.MaxDist)
                                 break;
-                            
+
                             if (to.DoWant(agent))
                             {
                                 doWant.Add(a);
@@ -79,7 +81,7 @@ namespace Tyr.Managers
                     }
                 }
             }
-            
+
             foreach (Task task in tasks)
                 task.OnFrame(tyr);
         }

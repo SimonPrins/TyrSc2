@@ -8,6 +8,8 @@ namespace Tyr.Tasks
     {
         protected List<Agent> units = new List<Agent>();
 
+        public bool AllowClaiming = true;
+
         public Task(int priority)
         {
             Priority = priority;
