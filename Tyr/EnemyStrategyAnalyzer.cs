@@ -1,12 +1,70 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
 using Tyr.Agents;
+using Tyr.StrategyAnalysis;
 using Tyr.Util;
 
 namespace Tyr
 {
     public class EnemyStrategyAnalyzer
     {
+        public List<Strategy> Strategies = new List<Strategy>()
+        {
+            Adept.Get(),
+            Archon.Get(),
+            Baneling.Get(),
+            Banshee.Get(),
+            Battlecruiser.Get(),
+            Bunker.Get(),
+            BroodLord.Get(),
+            Carrier.Get(),
+            Collosus.Get(),
+            Corruptor.Get(),
+            Cyclone.Get(),
+            DarkTemplar.Get(),
+            Disruptor.Get(),
+            Ghost.Get(),
+            Hellbat.Get(),
+            Hellion.Get(),
+            HighTemplar.Get(),
+            Hydralisk.Get(),
+            Immortal.Get(),
+            Infestor.Get(),
+            Liberator.Get(),
+            Lurker.Get(),
+            Marauder.Get(),
+            Marine.Get(),
+            Medivac.Get(),
+            Mothership.Get(),
+            Mutalisk.Get(),
+            Nydus.Get(),
+            Oracle.Get(),
+            Overseer.Get(),
+            Phoenix.Get(),
+            PhotonCannon.Get(),
+            Queen.Get(),
+            Ravager.Get(),
+            Raven.Get(),
+            Reaper.Get(),
+            Roach.Get(),
+            Sentry.Get(),
+            SpineCrawler.Get(),
+            SporeCrawler.Get(),
+            Stalker.Get(),
+            SwarmHost.Get(),
+            Tempest.Get(),
+            Thor.Get(),
+            Turret.Get(),
+            Ultralisk.Get(),
+            Viking.Get(),
+            Viper.Get(),
+            VoidRay.Get(),
+            WarpPrism.Get(),
+            WidowMine.Get(),
+            Zealot.Get(),
+            Zergling.Get()
+        };
+
         public bool CannonRushDetected;
         public bool LiftingDetected;
         public bool MassRoachDetected;
@@ -32,6 +90,9 @@ namespace Tyr
 
         public void OnFrame(Tyr tyr)
         {
+            foreach (Strategy strategy in Strategies)
+                strategy.OnFrame();
+
             EnemyCounts = new Dictionary<uint, int>();
             foreach (Unit unit in tyr.Enemies())
             {
@@ -103,6 +164,30 @@ namespace Tyr
                 + Count(UnitTypes.PLANETARY_FORTRESS) >= 2)
                 Expanded = true;
 
+            if (!Expanded)
+            {
+                foreach (Unit enemy in tyr.Enemies())
+                {
+                    if (UnitTypes.ResourceCenters.Contains(enemy.UnitType))
+                    {
+                        bool startingBase = false;
+                        foreach (Point2D loc in tyr.TargetManager.PotentialEnemyStartLocations)
+                        {
+                            if (SC2Util.DistanceSq(enemy.Pos, loc) <= 4)
+                            {
+                                startingBase = true;
+                                break;
+                            }
+                        }
+                        if (!startingBase)
+                        {
+                            Expanded = true;
+                            continue;
+                        }
+                    }
+                }
+            }
+
             // When we encounter three barracks within 3 minutes of the game, we assume the enemy probably has a fourth one somewhere as well.
             if (!FourRaxDetected
                 && tyr.Frame <= 22.4 * 60 * 3
@@ -168,7 +253,8 @@ namespace Tyr
 
             if (!BioDetected
                 && (Count(UnitTypes.MEDIVAC) > 0
-                    || Count(UnitTypes.MARAUDER) + Count(UnitTypes.MARINE) >= 20))
+                    || Count(UnitTypes.MARAUDER) + Count(UnitTypes.MARINE) >= 20)
+                    || Count(UnitTypes.MARAUDER) >= 4)
             {
                 BioDetected = true;
                 tyr.PreviousEnemyStrategies.SetBio();
