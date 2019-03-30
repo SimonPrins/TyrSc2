@@ -65,6 +65,9 @@ namespace Tyr.Builds
             ConstructionTask.Enable();
             MorphingTask.Enable();
             WorkerDefenseTask.Enable();
+            if (Tyr.Bot.MyRace == Race.Terran)
+                ConstructingSCVsTask.Enable();
+            GasWorkerTask.Enable();
         }
 
         public virtual Build OverrideBuild() { return null; }
