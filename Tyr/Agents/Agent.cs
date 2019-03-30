@@ -18,6 +18,8 @@ namespace Tyr.Agents
 
         // For a building, indicates to which base it belongs.
         public Base Base;
+        public Point2D AroundLocation;
+        public bool Exact;
 
         public void Order(int ability)
         {
