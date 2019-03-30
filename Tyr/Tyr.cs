@@ -52,6 +52,7 @@ namespace Tyr
         public TargetManager TargetManager = new TargetManager();
         public TaskManager TaskManager = new TaskManager();
         public EffectManager EffectManager = new EffectManager();
+        public EnemyMineManager EnemyMineManager = new EnemyMineManager();
 
         public BaseManager BaseManager = new BaseManager();
         public NexusAbilityManager NexusAbilityManager = new NexusAbilityManager();
@@ -374,6 +375,7 @@ namespace Tyr
             Managers.Add(TargetManager);
             Managers.Add(TaskManager);
             Managers.Add(EffectManager);
+            Managers.Add(EnemyMineManager);
 
             if (GameInfo.PlayerInfo[(int)Observation.Observation.PlayerCommon.PlayerId - 1].RaceActual == Race.Protoss)
                 Managers.Add(NexusAbilityManager);
