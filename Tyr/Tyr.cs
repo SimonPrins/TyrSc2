@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using SC2API_CSharp;
 using SC2APIProtocol;
 using Tyr.Agents;
@@ -12,6 +11,8 @@ using Tyr.Builds.Zerg;
 using Tyr.Managers;
 using Tyr.MapAnalysis;
 using Tyr.Micro;
+using Tyr.StrategyAnalysis;
+using Tyr.Util;
 
 namespace Tyr
 {
@@ -95,6 +96,7 @@ namespace Tyr
             DrawRequest = null;
             TextLine = 0;
 
+
             long time1 = 0;
             long time2 = 0;
             long time3 = 0;
@@ -105,7 +107,7 @@ namespace Tyr
 
                 if (Frame == 1)
                     Chat(Monday ? "Happy monday! :D" : "Good luck, have fun! :D");
-
+                
                 Observation = observation;
 
                 ReservedMinerals = 0;
@@ -114,10 +116,10 @@ namespace Tyr
                 EnemyStrategyAnalyzer.OnFrame(this);
 
                 time1 = stopWatch.ElapsedMilliseconds;
-                
+
                 foreach (Manager manager in Managers)
                     manager.OnFrame(this);
-                
+
                 time2 = stopWatch.ElapsedMilliseconds;
 
                 Build.OnFrameBase(this);
@@ -157,8 +159,7 @@ namespace Tyr
             stopWatch.Stop();
             totalExecutionTime += stopWatch.ElapsedMilliseconds;
             maxExecutionTime = System.Math.Max(maxExecutionTime, stopWatch.ElapsedMilliseconds);
-
-
+            
             DrawText("Average ms per frame: " + totalExecutionTime / Frame + " Max ms per frame: " + maxExecutionTime);
             DrawText("Managers time: " + (time2 - time1) + " Build order time: " + (time3 - time2));
 
@@ -187,12 +188,19 @@ namespace Tyr
         {
             DrawLine(p1.Unit.Pos, p2);
         }
+
+        public void DrawLine(Agent p1, Point2D p2)
+        {
+            Point pos3 = new Point { X = p2.X, Y = p2.Y, Z = MapAnalyzer.MapHeight((int)p2.X, (int)p2.Y) };
+            DrawLine(p1.Unit.Pos, pos3);
+        }
+
         public void DrawLine(Point p1, Point p2)
         {
             if (Debug)
             {
                 InitializeDebugCommand();
-                DrawRequest.Debug.Debug[0].Draw.Lines.Add(new DebugLine() { Color = new Color() { R = 255, G = 0, B = 0 }, Line = new Line() { P0 = p1, P1 = p2} });
+                DrawRequest.Debug.Debug[0].Draw.Lines.Add(new DebugLine() { Color = new Color() { R = 255, G = 0, B = 0 }, Line = new Line() { P0 = p1, P1 = p2 } });
             }
         }
 
@@ -214,6 +222,15 @@ namespace Tyr
             }
         }
 
+        public void DrawSphere(Point pos, float radius, Color color)
+        {
+            if (Debug)
+            {
+                InitializeDebugCommand();
+                DrawRequest.Debug.Debug[0].Draw.Spheres.Add(new DebugSphere() { Color = color, R = radius, P = pos });
+            }
+        }
+
         private void InitializeDebugCommand()
         {
             if (DrawRequest == null)
@@ -231,7 +248,7 @@ namespace Tyr
         {
             if (!Monday || Day9Sent)
                 return;
-            
+
 
             foreach (Unit unit in EnemyBases)
             {
@@ -244,7 +261,7 @@ namespace Tyr
 
                 if (!removed)
                     continue;
-                
+
                 Chat("Day[9] made me do it!");
                 Day9Sent = true;
             }
