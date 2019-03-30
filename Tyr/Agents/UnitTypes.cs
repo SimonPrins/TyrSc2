@@ -455,6 +455,15 @@ namespace Tyr.Agents
                 PROBE,
                 DRONE
         };
+        public static HashSet<uint> ChangelingTypes = new HashSet<uint>
+            {
+                CHANGELING,
+                CHANGELING_MARINE,
+                CHANGELING_MARINE_SHIELD,
+                CHANGELING_ZEALOT,
+                CHANGELING_ZERGLING,
+                CHANGELING_ZERGLING_WINGS
+        };
 
         public static Dictionary<uint, List<uint>> EquivalentTypes = new Dictionary<uint, List<uint>>() {
             { LURKER_BURROWED, new List<uint>() { LURKER } },
