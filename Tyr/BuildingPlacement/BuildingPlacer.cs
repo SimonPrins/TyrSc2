@@ -278,7 +278,20 @@ namespace Tyr.BuildingPlacement
             return Math.Abs(location.X - unitPos.X) >= dx || Math.Abs(location.Y - unitPos.Y) >= dy;
         }
 
-        public bool CanHaveAddOn(uint type)
+        public static bool CheckDistClose(float x1, float y1, float x2, float y2, Point2D unitPos, uint unitType)
+        {
+            float midX = (x1 + x2) * 0.5f;
+            float radX = (x2 - x1) * 0.5f;
+            float midY = (y1 + y2) * 0.5f;
+            float radY = (y2 - y1) * 0.5f;
+
+            float dx = radX + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.X / 2f : 1f) - 0.1f;
+            float dy = radY + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.Y / 2f : 1f) - 0.1f;
+            return Math.Abs(midX - unitPos.X) >= dx || Math.Abs(midY - unitPos.Y) >= dy;
+
+        }
+
+        public static bool CanHaveAddOn(uint type)
         {
             return type == UnitTypes.BARRACKS || type == UnitTypes.FACTORY || type == UnitTypes.STARPORT;
         }
