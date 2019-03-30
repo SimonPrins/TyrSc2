@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SC2APIProtocol;
 
 namespace Tyr.Util
@@ -89,6 +85,11 @@ namespace Tyr.Util
         public static Point2D To2D(Point pos)
         {
             return Point(pos.X, pos.Y);
+        }
+
+        public static Point To3D(Point2D pos)
+        {
+            return Point(pos.X, pos.Y, Tyr.Bot.MapAnalyzer.MapHeight((int)pos.X, (int)pos.Y));
         }
 
         public static Point2D Normalize(Point2D point)
