@@ -1,4 +1,8 @@
-﻿namespace Tyr
+﻿using System.Collections.Generic;
+using Tyr.StrategyAnalysis;
+using Tyr.Util;
+
+namespace Tyr
 {
     public class PreviousEnemyStrategies
     {
@@ -16,8 +20,10 @@
 
         public void Load(string[] lines)
         {
+            HashSet<string> lineSet = new HashSet<string>();
             foreach (string line in lines)
             {
+                lineSet.Add(line);
                 if (line == "CannonRush")
                     CannonRush = true;
                 else if (line == "Lifting")
@@ -41,6 +47,9 @@
                 else if (line == "SkyToss")
                     SkyToss = true;
             }
+
+            foreach (Strategy strategy in Tyr.Bot.EnemyStrategyAnalyzer.Strategies)
+                strategy.Load(lineSet);
         }
 
         public void SetCannonRush()
@@ -140,6 +149,11 @@
                 SkyToss = true;
                 Tyr.Bot.Register("SkyToss");
             }
+        }
+
+        public void Set(string name)
+        {
+            FileUtil.Register(name);
         }
     }
 }
