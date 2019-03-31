@@ -19,6 +19,8 @@ namespace Tyr.Tasks
         public bool OnlyCloseWorkers = true;
         public float MaxWorkerDist = 1000000;
 
+        public int ExpandingBlockedUntilFrame = -100;
+
         public ConstructionTask() : base(10)
         { }
 
@@ -40,6 +42,8 @@ namespace Tyr.Tasks
             if (OnlyWorkersFromMain && !Tyr.Bot.MapAnalyzer.StartArea[SC2Util.To2D(agent.Unit.Pos)])
                 return false;
             if ((Tyr.Bot.MyRace == Race.Zerg || Tyr.Bot.MyRace == Race.Terran) && agent.Unit.Orders != null && agent.Unit.Orders.Count > 0 && Abilities.Creates.ContainsKey(agent.Unit.Orders[0].AbilityId))
+                return false;
+            if (BuildingType.BuildingAbilities.Contains((int)agent.CurrentAbility()))
                 return false;
             return units.Count < UnassignedRequests.Count + BuildRequests.Count;
         }
@@ -90,6 +94,31 @@ namespace Tyr.Tasks
                         IdleTask.Task.Add(buildRequest.worker);
                         units.Remove(buildRequest.worker);
                     }
+                    else if (UnitTypes.ResourceCenters.Contains(buildRequest.Type))
+                    {
+                        bool closeEnemy = false;
+                        foreach (Unit enemy in Tyr.Bot.Enemies())
+                        {
+                            if (!UnitTypes.CanAttackGround(enemy.UnitType))
+                                continue;
+                            if (buildRequest.worker.DistanceSq(enemy) <= 8 * 8)
+                            {
+                                closeEnemy = true;
+                                break;
+                            }
+                        }
+
+                        if (closeEnemy)
+                        {
+                            ExpandingBlockedUntilFrame = Tyr.Bot.Frame + 224;
+                            BuildRequests[i] = BuildRequests[BuildRequests.Count - 1];
+                            BuildRequests.RemoveAt(BuildRequests.Count - 1);
+                            IdleTask.Task.Add(buildRequest.worker);
+                            units.Remove(buildRequest.worker);
+                            DebugUtil.WriteLine("Base blocked, cancelling base. BuildRequest length: " + BuildRequests.Count);
+                            continue;
+                        }
+                    }
                 }
                 foreach (Agent agent in tyr.UnitManager.Agents.Values)
                 {
@@ -97,6 +126,8 @@ namespace Tyr.Tasks
                     {
                         completed = true;
                         agent.Base = buildRequest.Base;
+                        agent.AroundLocation = buildRequest.AroundLocation;
+                        agent.Exact = buildRequest.Exact;
                         break;
                     }
                 }
@@ -145,7 +176,17 @@ namespace Tyr.Tasks
                     }
 
                     if (buildRequest is BuildRequestGas)
-                        buildRequest.worker.Order(BuildingType.LookUp[buildRequest.Type].Ability, ((BuildRequestGas)buildRequest).Gas.Tag);
+                    {
+                        Unit gas = ((BuildRequestGas)buildRequest).Gas.Unit;
+                        foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
+                        {
+                            if (SC2Util.DistanceSq(unit.Pos, ((BuildRequestGas)buildRequest).Gas.Pos) > 2 * 2)
+                                continue;
+                            gas = unit;
+                            break;
+                        }
+                        buildRequest.worker.Order(BuildingType.LookUp[buildRequest.Type].Ability, gas.Tag);
+                    }
                     else
                     {
                         buildRequest.worker.Order(BuildingType.LookUp[buildRequest.Type].Ability, buildRequest.Pos);
@@ -161,10 +202,67 @@ namespace Tyr.Tasks
 
         private bool Unbuildable(BuildRequest request)
         {
+            if (UnitTypes.ResourceCenters.Contains(request.Type))
+            {
+                if (request.Type != UnitTypes.HATCHERY)
+                {
+                    // Check for creep.
+                    BoolGrid creep = new ImageBoolGrid(Tyr.Bot.Observation.Observation.RawData.MapState.Creep, 1);
+                    for (float dx = -2.5f; dx <= 2.51f; dx++)
+                        for (float dy = -2.5f; dy <= 2.51f; dy++)
+                            if (creep[(int)(request.Pos.X + dx), (int)(request.Pos.Y + dy)])
+                                return true;
+                }
+                foreach (BuildingLocation loc in Tyr.Bot.EnemyManager.EnemyBuildings.Values)
+                    if (SC2Util.DistanceSq(request.Pos, loc.Pos) <= 6 * 6)
+                        return true;
+                foreach (Unit enemy in Tyr.Bot.Enemies())
+                    if (!enemy.IsFlying
+                        && SC2Util.DistanceSq(request.Pos, enemy.Pos) <= 6 * 6)
+                        return true;
+                return false;
+            }
+
             if (UnitTypes.GasGeysers.Contains(request.Type)
                 || UnitTypes.ResourceCenters.Contains(request.Type)
                 || UnitTypes.PYLON == request.Type)
                 return false;
+
+            if (Tyr.Bot.MyRace != Race.Zerg && request.Type != UnitTypes.COMMAND_CENTER && request.Type != UnitTypes.NEXUS)
+            {
+                Point2D size = BuildingType.LookUp[request.Type].Size;
+                BoolGrid creep = new ImageBoolGrid(Tyr.Bot.Observation.Observation.RawData.MapState.Creep, 1);
+                for (float dx = -size.X / 2f; dx <= size.X / 2f + 0.01f; dx++)
+                    for (float dy = -size.Y / 2f; dy <= size.Y / 2f + 0.01f; dy++)
+                        if (creep[(int)(request.Pos.X + dx), (int)(request.Pos.Y + dy)])
+                            return true;
+                
+                foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+                {
+                    if (!agent.IsBuilding && agent.Unit.UnitType != UnitTypes.SIEGE_TANK_SIEGED)
+                        continue;
+                    if (agent.DistanceSq(request.Pos) <= (agent.Unit.UnitType == UnitTypes.SIEGE_TANK_SIEGED ? (2 * 2) : 2))
+                        return true;
+                }
+
+                foreach (BuildRequest existingRequest in UnassignedRequests)
+                {
+                    if (existingRequest == request)
+                        continue;
+                    if (SC2Util.DistanceSq(existingRequest.Pos, request.Pos) <= 2)
+                        return true;
+                }
+
+                foreach (BuildRequest existingRequest in BuildRequests)
+                {
+                    if (existingRequest == request)
+                        continue;
+                    if (SC2Util.DistanceSq(existingRequest.Pos, request.Pos) <= 2)
+                        return true;
+                }
+                return false;
+            }
+
             return !Tyr.Bot.buildingPlacer.CheckPlacement(request.Pos, BuildingType.LookUp[request.Type].Size, request.Type, request, true);
         }
 
@@ -185,13 +283,16 @@ namespace Tyr.Tasks
             UnassignedRequests.Remove(request);
         }
 
-        public void Build(uint type, Base b, Point2D pos)
+        public void Build(uint type, Base b, Point2D pos, Point2D aroundLocation, bool exact)
         {
+            if (UnitTypes.ResourceCenters.Contains(type) && Tyr.Bot.Frame - ExpandingBlockedUntilFrame < 0)
+                return;
+
             Tyr.Bot.ReservedMinerals += BuildingType.LookUp[type].Minerals;
             Tyr.Bot.ReservedGas += BuildingType.LookUp[type].Gas;
             if (type == UnitTypes.PYLON)
                 Tyr.Bot.UnitManager.FoodExpected += 8;
-            UnassignedRequests.Add(new BuildRequest() { Type = type, Base = b, Pos = pos });
+            UnassignedRequests.Add(new BuildRequest() { Type = type, Base = b, Pos = pos, AroundLocation = aroundLocation, Exact = exact });
         }
 
         public void Build(uint type, Base b, Point2D pos, Gas gas)

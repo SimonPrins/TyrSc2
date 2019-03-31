@@ -1,14 +1,12 @@
-﻿using SC2APIProtocol;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Tyr.Agents;
 using Tyr.Builds;
-using Tyr.Util;
 
 namespace Tyr.Tasks
 {
-    class TimingAttackTask : Task
+    class GroupedAttackTask : Task
     {
-        public static TimingAttackTask Task = new TimingAttackTask();
+        public static GroupedAttackTask Task = new GroupedAttackTask();
 
         public int RequiredSize { get; set; } = 14;
         public int RetreatSize { get; set; } = 0;
@@ -16,10 +14,8 @@ namespace Tyr.Tasks
         public HashSet<uint> ExcludeUnitTypes = new HashSet<uint>();
 
         public bool AttackSent = false;
-        public bool DefendOtherAgents = true;
 
-        private Agent MedivacRetreatTarget = null;
-        private int MedivacRetreatTargetUpdateFrame = 0;
+        CombatGroup CombatGroup = new CombatGroup();
 
         public static void Enable()
         {
@@ -27,7 +23,7 @@ namespace Tyr.Tasks
             Tyr.Bot.TaskManager.Add(Task);
         }
 
-        public TimingAttackTask() : base(5)
+        public GroupedAttackTask() : base(5)
         { }
 
         public override bool DoWant(Agent agent)
@@ -103,65 +99,8 @@ namespace Tyr.Tasks
                 return;
             }
 
-            Agent defendAgent = null;
-            if (DefendOtherAgents)
-            {
-                foreach (Agent agent in units)
-                {
-                    foreach (Unit enemy in tyr.Enemies())
-                    {
-                        if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
-                            continue;
-
-                        if (SC2Util.DistanceSq(agent.Unit.Pos, enemy.Pos) <= 9 * 9)
-                        {
-                            defendAgent = agent;
-                            break;
-                        }
-                    }
-                    if (defendAgent != null)
-                        break;
-                }
-            }
-
-            foreach (Agent agent in units)
-            {
-                if (agent.Unit.UnitType == UnitTypes.MEDIVAC)
-                {
-                    UpdateMedivacRetreatTarget(tyr);
-                    if (MedivacRetreatTarget != null)
-                    {
-                        Attack(agent, SC2Util.To2D(MedivacRetreatTarget.Unit.Pos));
-                        continue;
-                    }
-                }
-
-                if (defendAgent != null && agent.DistanceSq(defendAgent) >= 3 * 3 && agent.DistanceSq(defendAgent) <= 40 * 40)
-                    Attack(agent, SC2Util.To2D(defendAgent.Unit.Pos));
-                else
-                    Attack(agent, tyr.TargetManager.AttackTarget);
-            }
-        }
-
-        private void UpdateMedivacRetreatTarget(Tyr tyr)
-        {
-            if (MedivacRetreatTargetUpdateFrame == tyr.Frame)
-                return;
-            MedivacRetreatTargetUpdateFrame = tyr.Frame;
-
-            float distance = 1000 * 1000;
-            foreach (Agent agent in Units)
-            {
-                if (agent.Unit.IsFlying)
-                    continue;
-
-                float newDist = agent.DistanceSq(tyr.TargetManager.AttackTarget);
-                if (newDist < distance)
-                {
-                    distance = newDist;
-                    MedivacRetreatTarget = agent;
-                }
-            }
+            CombatGroup.Units = Units;
+            CombatGroup.AttackAt(tyr.TargetManager.AttackTarget, this);
         }
     }
 }

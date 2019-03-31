@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using SC2APIProtocol;
+using System.Collections.Generic;
 using Tyr.Agents;
 using Tyr.Managers;
+using Tyr.Util;
 
 namespace Tyr.Tasks
 {
@@ -8,6 +10,8 @@ namespace Tyr.Tasks
     {
         public static List<QueenInjectTask> Tasks = new List<QueenInjectTask>();
         private Base b;
+        public static int DefenseRadius = 12;
+
         public QueenInjectTask(Base b) : base(10)
         {
             this.b = b;
@@ -55,9 +59,23 @@ namespace Tyr.Tasks
             }
             foreach (Agent agent in units)
             {
-                if (agent.DistanceSq(b.ResourceCenter) >= 7 * 7)
+                Unit defendEnemy = null;
+                float dist = DefenseRadius * DefenseRadius;
+                foreach (Unit enemy in tyr.Enemies())
+                {
+                    float newDist = SC2Util.DistanceSq(b.BaseLocation.Pos, enemy.Pos);
+                    if (newDist < dist)
+                    {
+                        defendEnemy = enemy;
+                        dist = newDist;
+                    }
+                }
+
+                if (defendEnemy != null)
+                    Attack(agent, SC2Util.To2D(defendEnemy.Pos));
+                else if (agent.DistanceSq(b.ResourceCenter) >= 7 * 7)
                     agent.Order(Abilities.MOVE, b.ResourceCenter.Unit.Tag);
-                else
+                else if (agent.Unit.Energy >= 23)
                     agent.Order(251, b.ResourceCenter.Unit.Tag);
             }
         }

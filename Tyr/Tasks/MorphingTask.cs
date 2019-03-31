@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using SC2APIProtocol;
+using System.Collections.Generic;
 using Tyr.Agents;
+using Tyr.Managers;
 using Tyr.Util;
 
 namespace Tyr.Tasks
@@ -24,8 +26,28 @@ namespace Tyr.Tasks
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
             foreach (uint desired in UnitsDesired)
-                if (!UnitsMorphing.Contains(desired))
+            {
+                if (UnitsMorphing.Contains(desired))
+                    continue;
+                if (desired != UnitTypes.DRONE)
+                {
                     result.Add(new UnitDescriptor() { Pos = SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation), Count = 1, UnitTypes = new HashSet<uint>() { MorphingType.LookUpToType[desired].FromType }, Marker = desired });
+                    continue;
+                }
+
+                Point2D pos = SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation);
+                int alreadyMining = 100;
+                foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                {
+                    if (b.ResourceCenter == null)
+                        continue;
+                    if (b.ResourceCenter.Unit.AssignedHarvesters >= alreadyMining)
+                        continue;
+                    pos = b.BaseLocation.Pos;
+                    alreadyMining = b.ResourceCenter.Unit.AssignedHarvesters;
+                }
+                result.Add(new UnitDescriptor() { Pos = pos, Count = 1, UnitTypes = new HashSet<uint>() { MorphingType.LookUpToType[desired].FromType }, Marker = desired });
+            }
             return result;
         }
 
@@ -52,7 +74,11 @@ namespace Tyr.Tasks
             {
                 Agent agent = units[i];
                 MorphingType morphingType = MorphingType.LookUpToType[MorphingUnits[agent.Unit.Tag]];
-                if (agent.Unit.UnitType != morphingType.FromType)
+                if (tyr.Observation.Observation.PlayerCommon.Minerals < morphingType.Minerals
+                    || tyr.Observation.Observation.PlayerCommon.Vespene < morphingType.Gas)
+                    continue;
+                if (agent.Unit.UnitType != morphingType.FromType
+                    || agent.CurrentAbility() == morphingType.Ability)
                 {
                     UnitsDesired.Remove(morphingType.ToType);
                     UnitsMorphing.Remove(morphingType.ToType);

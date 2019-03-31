@@ -11,6 +11,14 @@ namespace Tyr.Tasks
         public int Count = -1;
         public object Marker;
 
+        public UnitDescriptor()
+        { }
+
+        public UnitDescriptor(uint unitType)
+        {
+            UnitTypes = new HashSet<uint>() { unitType };
+        }
+
         public void AddType(uint type)
         {
             if (UnitTypes == null)

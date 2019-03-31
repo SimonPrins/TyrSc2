@@ -48,15 +48,6 @@ namespace Tyr.Tasks
                     foreach (Agent agent in workers.MineralWorkers)
                         unassignedWorkers.Add(agent);
                     workers.MineralWorkers = new List<Agent>();
-                    foreach (GasWorkers gasWorkers in workers.GasWorkers)
-                    {
-                        foreach (Agent agent in gasWorkers.Workers)
-                        {
-                            unassignedWorkers.Add(agent);
-                            tyr.UnitManager.DisappearedUnits.Remove(agent.Unit.Tag);
-                        }
-                        gasWorkers.Workers = new List<Agent>();
-                    }
                 }
                 else if (!workers.Base.UnderAttack || StopTransfers)
                 {
@@ -103,9 +94,6 @@ namespace Tyr.Tasks
             {
                 bool done = false;
                 int totalMineralWorkers = units.Count;
-                foreach (BaseWorkers workers in baseWorkers)
-                    foreach (GasWorkers gasWorkers in workers.GasWorkers)
-                        totalMineralWorkers -= gasWorkers.Count;
                 workersPerBase = totalMineralWorkers / myBases.Count;
                 while (!done)
                 {
@@ -137,6 +125,7 @@ namespace Tyr.Tasks
                     saturated = false;
                     break;
                 }
+
             foreach (BaseWorkers workers in myBases)
             {
                 while (workers.MineralWorkers.Count > 0 &&
@@ -158,7 +147,7 @@ namespace Tyr.Tasks
                     unassignedWorkers.RemoveAt(unassignedWorkers.Count - 1);
                 }
             }
-
+            
             for (int i = 0; myBases.Count > 0 && unassignedWorkers.Count > 0; i++)
             {
                 myBases[i % myBases.Count].Add(unassignedWorkers[unassignedWorkers.Count - 1]);
@@ -192,17 +181,6 @@ namespace Tyr.Tasks
                     {
                         workers.MineralWorkers.RemoveAt(j);
                         return result;
-                    }
-                }
-                foreach (GasWorkers gasWorkers in workers.GasWorkers)
-                {
-                    for (int j = 0; j < gasWorkers.Workers.Count; j++)
-                    {
-                        if (gasWorkers.Workers[j] == result)
-                        {
-                            gasWorkers.Workers.RemoveAt(j);
-                            return result;
-                        }
                     }
                 }
             }

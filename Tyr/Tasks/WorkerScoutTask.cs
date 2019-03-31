@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Tyr.Agents;
+using Tyr.MapAnalysis;
 using Tyr.Util;
 
 namespace Tyr.Tasks
@@ -10,8 +11,16 @@ namespace Tyr.Tasks
     {
         public static WorkerScoutTask Task = new WorkerScoutTask();
         public int StartFrame = 400;
-        private bool Done;
-        private float MaxDist = 9;
+        public bool Done;
+        private float MaxDist = 8;
+        public bool ScoutSent = false;
+        public bool ScoutNatural = false;
+        private int CheckNaturalTimeStart = 1466;
+        private int CheckNaturalTimeEnd = 2016;
+        private bool CheckedNatural = false;
+
+
+        private BaseLocation EnemyNatural;
 
         public WorkerScoutTask() : base(8)
         { }
@@ -24,6 +33,8 @@ namespace Tyr.Tasks
 
         public override bool DoWant(Agent agent)
         {
+            if (BuildingType.BuildingAbilities.Contains((int)agent.CurrentAbility()))
+                return false;
             return agent.IsWorker && units.Count == 0 && !Done;
         }
 
@@ -36,7 +47,7 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.Frame >= StartFrame;
+            return Tyr.Bot.Frame >= StartFrame && !ScoutSent;
         }
 
         public override void OnFrame(Tyr tyr)
@@ -48,8 +59,27 @@ namespace Tyr.Tasks
             if (!Done && tyr.EnemyManager.EnemyBuildings.Count > 0)
                 Done = true;
             
+            if (ScoutNatural && tyr.Frame > CheckNaturalTimeEnd)
+            {
+                Done = true;
+                Clear();
+                return;
+            }
+
+            bool scoutingNatural = ScoutNatural && tyr.Frame > CheckNaturalTimeStart && tyr.TargetManager.PotentialEnemyStartLocations.Count == 1;
+            if (scoutingNatural)
+            {
+                GetEnemyNatural();
+                target = EnemyNatural.Pos;
+            }
+            
             foreach (Agent agent in units)
             {
+                float targetDist = (float)Math.Sqrt(SC2Util.DistanceSq(agent.Unit.Pos, target));
+                if (ScoutNatural && targetDist <= 6 * 6)
+                    CheckedNatural = true;
+                
+                ScoutSent = true;
                 Point2D closest = null;
                 if (Done)
                 {
@@ -68,10 +98,9 @@ namespace Tyr.Tasks
                         }
                     }
                 }
-                float targetDist = (float)Math.Sqrt(SC2Util.DistanceSq(agent.Unit.Pos, target));
-                if (closest == null && (targetDist >= MaxDist + 1 || !Done))
+                if ((closest == null && (targetDist >= MaxDist + 1 || !Done)) || (scoutingNatural && !CheckedNatural))
                 {
-                    if (targetDist >= MaxDist + 1)
+                    if (targetDist >= MaxDist + 1 || (scoutingNatural && !CheckedNatural))
                         agent.Order(Abilities.MOVE, target);
                 }
                 else
@@ -87,6 +116,11 @@ namespace Tyr.Tasks
                     agent.Order(Abilities.MOVE, potential.Get());
                 }
             }
+        }
+
+        private void GetEnemyNatural()
+        {
+            EnemyNatural = Tyr.Bot.MapAnalyzer.GetEnemyNatural();
         }
     }
 }

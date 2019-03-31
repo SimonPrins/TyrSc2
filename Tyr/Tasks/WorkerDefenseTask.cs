@@ -11,6 +11,7 @@ namespace Tyr.Tasks
     {
         public static List<WorkerDefenseTask> Tasks = new List<WorkerDefenseTask>();
         public int DefenseRadius = 12;
+        public int PlanetaryDefenseRadius = 8;
         public int WorkerPullRadius = 20;
         public int CannonDefenseRadius = 40;
         public Base Base;
@@ -50,11 +51,17 @@ namespace Tyr.Tasks
                 && agent.Unit.Shield + agent.Unit.Health > 5
                 && (SC2Util.DistanceSq(agent.Unit.Pos, Base.BaseLocation.Pos) <= WorkerPullRadius * WorkerPullRadius || DefendProxy)
                 && SC2Util.DistanceSq(agent.Unit.Pos, Base.BaseLocation.Pos) <= CannonDefenseRadius * CannonDefenseRadius
-                && units.Count < desiredDefenders;
+                && units.Count < desiredDefenders
+                && !BuildingType.BuildingAbilities.Contains((int)agent.CurrentAbility());
         }
 
         public override bool IsNeeded()
         {
+            if (Base.ResourceCenter != null && Base.ResourceCenter.Unit.UnitType == UnitTypes.PLANETARY_FORTRESS)
+            {
+                Clear();
+                return false;
+            }
             desiredDefenders = 0;
             target = null;
             int totalEnemies = 0;
@@ -64,6 +71,8 @@ namespace Tyr.Tasks
             bool mainDefense = Base == Tyr.Bot.BaseManager.Main;
             if (mainDefense)
                 distance = 1000 * 1000;
+            else if (Base.ResourceCenter != null && Base.ResourceCenter.Unit.UnitType == UnitTypes.PLANETARY_FORTRESS)
+                distance = PlanetaryDefenseRadius * PlanetaryDefenseRadius + 1;
 
             Dictionary<uint, int> enemyCounts = new Dictionary<uint, int>();
 
@@ -85,7 +94,8 @@ namespace Tyr.Tasks
                 if (unit.IsFlying)
                     continue;
 
-                if (unit.UnitType == UnitTypes.ADEPT_PHASE_SHIFT)
+                if (unit.UnitType == UnitTypes.ADEPT_PHASE_SHIFT
+                    || unit.UnitType == UnitTypes.KD8_CHARGE)
                     continue;
 
                 if (unit.UnitType == UnitTypes.CHANGELING
@@ -110,9 +120,9 @@ namespace Tyr.Tasks
                     {
                         DefendProxy = true;
                         totalEnemies++;
-                        if (unit.BuildProgress >= 0.95 && unit.UnitType == UnitTypes.PHOTON_CANNON)
+                        if (unit.BuildProgress >= 0.95 
+                            && (unit.UnitType == UnitTypes.PHOTON_CANNON || unit.UnitType == UnitTypes.SPINE_CRAWLER))
                         {
-                            CannonsFinished = true;
                             Clear();
                             return false;
                         }
@@ -146,10 +156,15 @@ namespace Tyr.Tasks
                 || Count(enemyCounts, UnitTypes.HELLION) + Count(enemyCounts, UnitTypes.HELLBAT) >= 2
                 || Count(enemyCounts, UnitTypes.ROACH) >= 3
                 || Count(enemyCounts, UnitTypes.HYDRALISK) >= 3
-                || Count(enemyCounts, UnitTypes.ADEPT) >= 2
-                || Count(enemyCounts, UnitTypes.STALKER) >= 3
+                || Count(enemyCounts, UnitTypes.ADEPT) >= 1
+                || Count(enemyCounts, UnitTypes.STALKER) >= 2
                 || Count(enemyCounts, UnitTypes.ZEALOT) >= 3
                 || Count(enemyCounts, UnitTypes.ZERGLING) >= 11
+                || Count(enemyCounts, UnitTypes.BANELING) > 0
+                || Count(enemyCounts, UnitTypes.COLLOSUS) > 0
+                || Count(enemyCounts, UnitTypes.REAPER) > 0
+                || Count(enemyCounts, UnitTypes.WIDOW_MINE) > 0
+                || Count(enemyCounts, UnitTypes.WIDOW_MINE_BURROWED) > 0
                 || Count(enemyCounts, UnitTypes.REACTOR) > 0
                 || combatEnemies - Count(enemyCounts, UnitTypes.ZERGLING) >= 9)
             {
@@ -181,7 +196,7 @@ namespace Tyr.Tasks
                 }
             }
 
-            if (totalEnemies == 1 && UnitTypes.WorkerTypes.Contains(target.UnitType))
+            if (target != null && totalEnemies == 1 && UnitTypes.WorkerTypes.Contains(target.UnitType))
                 desiredDefenders = 1;
             else if (Tyr.Bot.EnemyStrategyAnalyzer.WorkerRushDetected)
                 desiredDefenders = totalEnemies;
@@ -210,6 +225,8 @@ namespace Tyr.Tasks
 
         public override void OnFrame(Tyr tyr)
         {
+            if (Units.Count > 0)
+                tyr.DrawText("Defending workers: " + Units.Count);
             if (target == null)
             {
                 Clear();

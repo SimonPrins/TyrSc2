@@ -1,5 +1,6 @@
 ﻿using SC2APIProtocol;
 using Tyr.Agents;
+using Tyr.Micro;
 using Tyr.Util;
 
 namespace Tyr.Tasks
@@ -10,6 +11,12 @@ namespace Tyr.Tasks
         public Point2D Target;
         public Point2D OverrideTarget;
         internal bool FearEnemies;
+        public int IdleRange = 5;
+        public bool AttackMove = false;
+
+        public bool RetreatFarOverlords = true;
+
+        private YamatoController YamatoController = new YamatoController();
 
         public IdleTask() : base(0)
         { }
@@ -50,12 +57,31 @@ namespace Tyr.Tasks
                     agent.Order(Abilities.SIEGE);
                     continue;
                 }
-                if (agent.Unit.UnitType == UnitTypes.SIEGE_TANK_SIEGED && SC2Util.DistanceSq(agent.Unit.Pos, Target) > 3 * 3)
+                if (YamatoController.DetermineAction(agent, Target))
                 {
-                    agent.Order(Abilities.UNSIEGE);
                     continue;
                 }
-                if (FearEnemies && (agent.IsCombatUnit || agent.Unit.UnitType == UnitTypes.OVERSEER))
+                if (agent.Unit.UnitType == UnitTypes.SIEGE_TANK_SIEGED && SC2Util.DistanceSq(agent.Unit.Pos, Target) > IdleRange * IdleRange)
+                {
+                    if (AttackMove)
+                        Attack(agent, Target);
+                    else
+                        agent.Order(Abilities.UNSIEGE);
+                    continue;
+                }
+                if (agent.Unit.UnitType == UnitTypes.LIBERATOR_AG)
+                {
+                    Attack(agent, Target);
+                    continue;
+                }
+                if (agent.Unit.UnitType == UnitTypes.OVERLORD 
+                    && agent.DistanceSq(tyr.MapAnalyzer.StartLocation) >= 80 * 80
+                    && RetreatFarOverlords)
+                {
+                    agent.Order(Abilities.MOVE, SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
+                    continue;
+                }
+                if (FearEnemies && (agent.IsCombatUnit || agent.Unit.UnitType == UnitTypes.OVERSEER || agent.Unit.UnitType == UnitTypes.RAVEN))
                 {
                     Unit fleeEnemy = null;
                     float distance = 10 * 10;
@@ -78,8 +104,19 @@ namespace Tyr.Tasks
                         continue;
                     }
                 }
-                if ((agent.IsCombatUnit || agent.Unit.UnitType == UnitTypes.OVERSEER) && SC2Util.DistanceSq(agent.Unit.Pos, Target) >= 5 * 5)
-                    agent.Order(Abilities.MOVE, Target);
+                if ((agent.IsCombatUnit || agent.Unit.UnitType == UnitTypes.OVERSEER || agent.Unit.UnitType == UnitTypes.OBSERVER) && SC2Util.DistanceSq(agent.Unit.Pos, Target) >= IdleRange * IdleRange)
+                {
+                    if (AttackMove)
+                        Attack(agent, Target);
+                    else
+                        agent.Order(Abilities.MOVE, Target);
+                    continue;
+                }
+                if (AttackMove && agent.Unit.UnitType == UnitTypes.SIEGE_TANK && SC2Util.DistanceSq(agent.Unit.Pos, Target) < IdleRange * IdleRange && tyr.Frame % 67 == 0)
+                {
+                    agent.Order(Abilities.SIEGE);
+                    continue;
+                }
             }
         }
     }

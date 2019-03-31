@@ -5,12 +5,18 @@ namespace Tyr.Tasks
 {
     public class ArchonMergeTask : Task
     {
+        public static ArchonMergeTask Task = new ArchonMergeTask();
         public ArchonMergeTask() : base(12)
         { }
 
+        public static void Enable()
+        {
+            Enable(Task);
+        }
+
         public override bool DoWant(Agent agent)
         {
-            return agent.Unit.UnitType == UnitTypes.DARK_TEMPLAR && SC2Util.DistanceGrid(agent.Unit.Pos, Tyr.Bot.MapAnalyzer.StartLocation) <= 30;
+            return (agent.Unit.UnitType == UnitTypes.DARK_TEMPLAR || agent.Unit.UnitType == UnitTypes.HIGH_TEMPLAR) && SC2Util.DistanceGrid(agent.Unit.Pos, Tyr.Bot.MapAnalyzer.StartLocation) <= 80;
         }
 
         public override bool IsNeeded()

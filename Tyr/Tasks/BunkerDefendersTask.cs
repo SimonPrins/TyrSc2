@@ -1,4 +1,5 @@
-﻿using Tyr.Agents;
+﻿using System.Collections.Generic;
+using Tyr.Agents;
 
 namespace Tyr.Tasks
 {
@@ -6,6 +7,7 @@ namespace Tyr.Tasks
     {
         public static BunkerDefendersTask Task = new BunkerDefendersTask();
         private Agent Bunker = null;
+        public bool LeaveBunkers = false;
         private int BunkerDeterminedFrame = -1;
 
         public static void Enable()
@@ -24,14 +26,33 @@ namespace Tyr.Tasks
             return agent.Unit.UnitType == UnitTypes.MARINE && Units.Count < Tyr.Bot.Build.Count(UnitTypes.BUNKER) * 4;
         }
 
+        public override List<UnitDescriptor> GetDescriptors()
+        {
+            List<UnitDescriptor> descriptors = new List<UnitDescriptor>();
+
+            descriptors.Add(new UnitDescriptor() {
+                Count = Tyr.Bot.Build.Completed(UnitTypes.BUNKER) * 4 - Units.Count,
+                UnitTypes = new HashSet<uint>() { UnitTypes.MARINE }
+            });
+
+            return descriptors;
+        }
+
         public override bool IsNeeded()
         {
-            return Tyr.Bot.Build.Completed(UnitTypes.BUNKER) > 0;
+            return Tyr.Bot.Build.Completed(UnitTypes.BUNKER) > 0 && !LeaveBunkers;
         }
 
         public override void OnFrame(Tyr tyr)
         {
-            Tyr.Bot.DrawText("Bunker defenders count: " + Units.Count);
+            if (LeaveBunkers)
+            {
+                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                    if (agent.Unit.UnitType == UnitTypes.BUNKER)
+                        agent.Order(408);
+                Clear();
+                return;
+            }
             GetBunker();
             if (Bunker == null)
             {

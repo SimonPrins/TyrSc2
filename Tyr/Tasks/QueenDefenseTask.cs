@@ -74,7 +74,7 @@ namespace Tyr.Tasks
                     }
                 }
 
-                if (queen.DistanceSq(target) >= 5 * 5)
+                if (queen.DistanceSq(target) >= 3 * 3)
                     queen.Order(Abilities.MOVE, target);
             }
         }

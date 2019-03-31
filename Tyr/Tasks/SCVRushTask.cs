@@ -5,14 +5,14 @@ using Tyr.Util;
 
 namespace Tyr.Tasks
 {
-    class WorkerRushTask : Task
+    class SCVRushTask : Task
     {
         public int TakeWorkers = 12;
         private HashSet<ulong> regenerating = new HashSet<ulong>();
         PriorityTargetting RangedTargetting = new PriorityTargetting();
         PriorityTargetting CloseTargetting = new PriorityTargetting();
 
-        public WorkerRushTask() : base(9)
+        public SCVRushTask() : base(9)
         {
             RangedTargetting.DefaultPriorities.MaxRange = 10;
             RangedTargetting.DefaultPriorities[UnitTypes.LARVA] = -1;
@@ -120,7 +120,10 @@ namespace Tyr.Tasks
                         agent.Order(Abilities.ATTACK, rangeTarget.Tag);
                         continue;
                     }
-                    agent.Order(Abilities.ATTACK, tyr.TargetManager.AttackTarget);
+                    if (agent.Unit.WeaponCooldown <= 3 || mineral == 0)
+                        agent.Order(Abilities.ATTACK, tyr.TargetManager.AttackTarget);
+                    else
+                        agent.Order(Abilities.MOVE, mineral);
                 }
             }
         }

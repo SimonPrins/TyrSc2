@@ -10,6 +10,9 @@ namespace Tyr.Tasks
     {
         public static QueenTumorTask Task = new QueenTumorTask();
         private Dictionary<ulong, int> BurrowFrames = new Dictionary<ulong, int>();
+
+        public bool PlaceTumorsInMain = false;
+
         public QueenTumorTask() : base(4)
         { }
 
@@ -21,12 +24,20 @@ namespace Tyr.Tasks
 
         public override bool DoWant(Agent agent)
         {
-            return Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR) + Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR_QUEEN) < 3 && agent.Unit.UnitType == UnitTypes.QUEEN && agent.Unit.Energy >= 75;
+            return Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR) + Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR_QUEEN) < 3 && agent.Unit.UnitType == UnitTypes.QUEEN && agent.Unit.Energy >= 75 && Units.Count == 0;
         }
 
         public override bool IsNeeded()
         {
-            return true;
+            return Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR) + Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR_QUEEN) + Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR_BURROWED) < 6;
+        }
+
+        public override List<UnitDescriptor> GetDescriptors()
+        {
+            List<UnitDescriptor> descriptors = new List<UnitDescriptor>();
+            if (Units.Count == 0)
+                descriptors.Add(new UnitDescriptor(UnitTypes.QUEEN) { Count = 1 });
+            return descriptors;
         }
 
         public override void OnFrame(Tyr tyr)
@@ -59,27 +70,38 @@ namespace Tyr.Tasks
                 if (b.ResourceCenter != null)
                     bases++;
 
-            Point2D target;
-            Base defendBase = null;
-            if (bases >= 2)
+
+            Point2D tumorTarget;
+            if (PlaceTumorsInMain)
             {
-                target = tyr.BaseManager.NaturalDefensePos;
-                defendBase = tyr.BaseManager.Natural;
+                Point2D main = tyr.BaseManager.Main.BaseLocation.Pos;
+                Point2D natural = tyr.BaseManager.Natural.BaseLocation.Pos;
+                Point2D halfway = SC2Util.Point((main.X + natural.X) / 2, (main.Y + natural.Y) / 2);
+                tumorTarget = tyr.buildingPlacer.FindPlacement(halfway, SC2Util.Point(1, 1), UnitTypes.CREEP_TUMOR); ;
             }
             else
             {
-                target = tyr.BaseManager.MainDefensePos;
-                defendBase = tyr.BaseManager.Main;
+                Point2D target;
+                Base defendBase = null;
+                if (bases >= 2)
+                {
+                    target = tyr.BaseManager.NaturalDefensePos;
+                    defendBase = tyr.BaseManager.Natural;
+                }
+                else
+                {
+                    target = tyr.BaseManager.MainDefensePos;
+                    defendBase = tyr.BaseManager.Main;
+                }
+                tumorTarget = tyr.buildingPlacer.FindPlacement(tyr.MapAnalyzer.Walk(target, tyr.MapAnalyzer.EnemyDistances, 4), SC2Util.Point(1, 1), UnitTypes.CREEP_TUMOR); ;
             }
-            Point2D tumorTarget = tyr.buildingPlacer.FindPlacement(tyr.MapAnalyzer.Walk(target, tyr.MapAnalyzer.EnemyDistances, 4), SC2Util.Point(1, 1), UnitTypes.CREEP_TUMOR); ;
-            
+
             foreach (Agent queen in units)
             {
                 if (queen.Unit.Energy >= 75)
                 {
                     tyr.DrawSphere(SC2Util.Point(tumorTarget.X, tumorTarget.Y, 0));
                     queen.Order(1694, tumorTarget);
-                    continue;
                 }
             }
 
