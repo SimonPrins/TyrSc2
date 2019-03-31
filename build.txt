@@ -1,0 +1,26 @@
+# This file specifies a build order for Tyr.
+# This file should be placed in the same folder with Tyr.exe.
+# Uncomment one of the lines below by removing the #-character to force Tyr to play that build.
+#
+#Protoss GatewayPush
+#Protoss MassVoidray
+#Protoss NinjaTurtleCarrier
+#Protoss NinjaTurtles
+#Protoss OneBaseAdept
+#Protoss OneBaseStalker
+#Protoss TwoBaseAdept
+#Protoss TwoBaseRobo
+#Protoss TwoBaseRoboPvT
+#Protoss TwoBaseStargate
+#Protoss WorkerRush
+#Protoss ZealotRush
+#Terran MarineRush
+#Zerg HydraLurker
+#Zerg MassHydra
+#Zerg MassZergling
+#Zerg MutaHarass
+#Zerg OneBaseRoach
+#Zerg RoachRavager
+#Zerg RushDefense
+#Zerg TurtleLords
+#Zerg ZerglingRush
