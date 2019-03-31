@@ -9,7 +9,7 @@ namespace Tyr.Builds.Zerg
 {
     public class OneBaseRoach : Build
     {
-        TimingAttackTask TimingAttackTask = new TimingAttackTask() { RequiredSize = 7 };
+        TimingAttackTask TimingAttackTask = new TimingAttackTask() { RequiredSize = 12 };
         private bool SmellCheese = false;
         public override string Name()
         {
@@ -34,7 +34,8 @@ namespace Tyr.Builds.Zerg
 
         public override void OnStart(Tyr tyr)
         {
-            MicroControllers.Add(new TargetFireController(GetPriorities()));
+            MicroControllers.Add(new StutterController());
+            //MicroControllers.Add(new TargetFireController(GetPriorities()));
             tyr.TaskManager.Add(TimingAttackTask);
             if (tyr.EnemyRace != Race.Protoss)
                 tyr.TaskManager.Add(new WorkerScoutTask());
@@ -47,6 +48,7 @@ namespace Tyr.Builds.Zerg
         {
             BuildList result = new BuildList();
             result.Building(UnitTypes.SPAWNING_POOL);
+            //result.If(() => Completed(UnitTypes.SPAWNING_POOL) > 0);
             result.Building(UnitTypes.EXTRACTOR);
             result.If(() => { return Count(UnitTypes.QUEEN) > 0; });
             result.Building(UnitTypes.ROACH_WARREN);
@@ -64,6 +66,7 @@ namespace Tyr.Builds.Zerg
 
         public override void OnFrame(Tyr tyr)
         {
+            /*
             if (tyr.EnemyStrategyAnalyzer.FourRaxDetected
                 || (tyr.Frame >= 22.4 * 85 && !tyr.EnemyStrategyAnalyzer.NoProxyTerranConfirmed && tyr.TargetManager.PotentialEnemyStartLocations.Count == 1)
                 || tyr.EnemyStrategyAnalyzer.ReaperRushDetected)
@@ -78,7 +81,13 @@ namespace Tyr.Builds.Zerg
                 TimingAttackTask.RequiredSize = 20;
                 TimingAttackTask.Clear();
             }
-            
+            */
+
+            if (Count(UnitTypes.DRONE) >= 17)
+                GasWorkerTask.WorkersPerGas = 3;
+            else
+                GasWorkerTask.WorkersPerGas = 2;
+
 
             foreach (Agent agent in tyr.UnitManager.Agents.Values)
             {
@@ -88,7 +97,8 @@ namespace Tyr.Builds.Zerg
                         break;
                     if (Minerals() >= 50
                         && ExpectedAvailableFood() > FoodUsed() + 2
-                        && Count(UnitTypes.DRONE) < 17 - Completed(UnitTypes.EXTRACTOR))
+                        && Count(UnitTypes.DRONE) < 17 - Completed(UnitTypes.EXTRACTOR)
+                        && (Count(UnitTypes.DRONE) < 14 || Completed(UnitTypes.ROACH) >= 11))
                     {
                         agent.Order(1342);
                         CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.DRONE);

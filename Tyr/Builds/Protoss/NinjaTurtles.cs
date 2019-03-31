@@ -29,7 +29,7 @@ namespace Tyr.Builds.Protoss
             tyr.TaskManager.Add(DefenseTask);
             tyr.TaskManager.Add(DTAttackTask);
             tyr.TaskManager.Add(new FlyerAttackTask() { RequiredSize = 4 });
-            tyr.TaskManager.Add(new RemoveLostWorkersTask());
+            //tyr.TaskManager.Add(new RemoveLostWorkersTask());
             tyr.TaskManager.Add(new ShieldBatteryTargetTask());
             if (tyr.BaseManager.Pocket != null)
                 tyr.TaskManager.Add(new ScoutProxyTask(tyr.BaseManager.Pocket.BaseLocation.Pos));
@@ -112,6 +112,8 @@ namespace Tyr.Builds.Protoss
 
         public override void OnFrame(Tyr tyr)
         {
+            tyr.buildingPlacer.BuildCompact = true;
+
             if (tyr.EnemyStrategyAnalyzer.CannonRushDetected)
                 VoidrayOnly = true;
 

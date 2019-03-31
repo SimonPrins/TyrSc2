@@ -1,9 +1,5 @@
-﻿using SC2APIProtocol;
-using Tyr.Agents;
+﻿using Tyr.Agents;
 using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
 
 namespace Tyr.Builds.Protoss
 {

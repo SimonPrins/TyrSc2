@@ -36,7 +36,7 @@ namespace Tyr.Builds.Zerg
                 tyr.TaskManager.Add(queenInjectTask);
                 QueenInjectTasks.Add(queenInjectTask);
                 if (b != tyr.BaseManager.Main && b != tyr.BaseManager.Natural)
-                    tyr.TaskManager.Add(new HydraDefenseTask(b));
+                    tyr.TaskManager.Add(new DefenseSquadTask(b, UnitTypes.HYDRALISK));
             }
             tyr.TaskManager.Add(new QueenDefenseTask());
             tyr.TaskManager.Add(DefenseTask);

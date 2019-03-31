@@ -27,7 +27,7 @@ namespace Tyr.Builds.Zerg
             ArmyOverseerTask.Enable();
             QueenTumorTask.Enable();
             DefenseTask.Enable();
-            HydraDefenseTask.Enable(true);
+            DefenseSquadTask.Enable(true, UnitTypes.HYDRALISK);
         }
 
         public override Build OverrideBuild()

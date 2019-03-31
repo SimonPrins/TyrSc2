@@ -24,8 +24,9 @@ namespace Tyr.Builds.Zerg
             QueenDefenseTask.Enable();
             ArmyOverseerTask.Enable();
             QueenTumorTask.Enable();
+            WorkerRushDefenseTask.Enable();
             DefenseTask.Enable();
-            HydraDefenseTask.Enable(false);
+            DefenseSquadTask.Enable(false, UnitTypes.HYDRALISK);
             //WorkerRushDefenseTask.Enable();
         }
 
@@ -110,7 +111,7 @@ namespace Tyr.Builds.Zerg
             BuildList result = new BuildList();
             result.If(() =>
             {
-                return !Tyr.Bot.EnemyStrategyAnalyzer.WorkerRushDetected || Count(UnitTypes.ZERGLING) > 10;
+                return !Tyr.Bot.EnemyStrategyAnalyzer.WorkerRushDetected || Count(UnitTypes.ZERGLING) >= 10;
             });
             result.Morph(UnitTypes.DRONE, 14);
             result.Building(UnitTypes.SPAWNING_POOL);
@@ -160,7 +161,7 @@ namespace Tyr.Builds.Zerg
             DefenseTask.AirDefenseTask.ExpandDefenseRadius = 20;
             DefenseTask.AirDefenseTask.MaxDefenseRadius = 55;
 
-            BaseWorkers.WorkersPerGas = 3;
+            GasWorkerTask.WorkersPerGas = 3;
 
             if (!TakeExpand)
                 TakeExpand = Completed(UnitTypes.ROACH) + Completed(UnitTypes.HYDRALISK) + Completed(UnitTypes.QUEEN) >= TimingAttackTask.Task.RequiredSize;

@@ -181,13 +181,13 @@ namespace Tyr.Builds.Protoss
             DefenseTask.AirDefenseTask.IgnoreEnemyTypes.Add(UnitTypes.VIKING_FIGHTER);
             
             if (Count(UnitTypes.PROBE) <= 6)
-                BaseWorkers.WorkersPerGas = 0;
+                GasWorkerTask.WorkersPerGas = 0;
             else if (Count(UnitTypes.PROBE) <= 12)
-                BaseWorkers.WorkersPerGas = 1;
+                GasWorkerTask.WorkersPerGas = 1;
             else if (Count(UnitTypes.PROBE) <= 18)
-                BaseWorkers.WorkersPerGas = 2;
+                GasWorkerTask.WorkersPerGas = 2;
             else
-                BaseWorkers.WorkersPerGas = 3;
+                GasWorkerTask.WorkersPerGas = 3;
 
             if (tyr.Frame == 118)
                 tyr.Chat("Time for some monobattles!");

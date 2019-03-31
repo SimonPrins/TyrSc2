@@ -1,4 +1,5 @@
-﻿using Tyr.Agents;
+﻿using System.Collections.Generic;
+using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Micro;
 using Tyr.Tasks;
@@ -50,8 +51,9 @@ namespace Tyr.Builds.Protoss
             result += new BuildingStep(UnitTypes.CYBERNETICS_CORE);
             result += new BuildingStep(UnitTypes.GATEWAY);
             result += new BuildingStep(UnitTypes.ASSIMILATOR);
-            result.If(() => { return Minerals() >= 250; });
-            result += new BuildingStep(UnitTypes.GATEWAY);
+            result += new BuildingStep(UnitTypes.GATEWAY, () => Minerals() >= 250);
+            //result += new BuildingStep(UnitTypes.TEMPLAR_ARCHIVE, () => TimingAttackTask.Task.AttackSent);
+            //result += new UpgradeStep(UpgradeType.Blink);
 
             return result;
         }
@@ -82,7 +84,8 @@ namespace Tyr.Builds.Protoss
             {
                 if (Completed(UnitTypes.CYBERNETICS_CORE) > 0
                     && Minerals() >= 125
-                    && Gas() >= 50)
+                    && Gas() >= 50
+                    && Count(UnitTypes.STALKER) < 10 || UpgradeType.LookUp[UpgradeType.Blink].Done())
                     agent.Order(917);
             }
         }

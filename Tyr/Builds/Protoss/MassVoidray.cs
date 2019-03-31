@@ -21,7 +21,6 @@ namespace Tyr.Builds.Protoss
         public int RequiredSize = 14;
         private bool DefendReapers = false;
         private FearVikingsController FearVikingsController = new FearVikingsController() { Stopped = true };
-        private Base FarBase;
         public bool BuildCarriers = false;
         private bool Beyond2Cannons = true;
 
@@ -38,11 +37,7 @@ namespace Tyr.Builds.Protoss
             if (Tyr.Bot.BaseManager.Pocket != null)
                 ScoutProxyTask.Enable(Tyr.Bot.BaseManager.Pocket.BaseLocation.Pos);
             WorkerSafetyTask.Enable();
-
-            if (Tyr.Bot.EnemyRace == Race.Terran)
-                HideBaseTask.Enable();
-            else if (Tyr.Bot.EnemyRace == Race.Protoss)
-                WorkerScoutTask.Enable();
+            WorkerScoutTask.Enable();
 
             FlyerDestroyTask.Enable();
             if (Tyr.Bot.EnemyRace == Race.Protoss)
@@ -57,20 +52,7 @@ namespace Tyr.Builds.Protoss
             MicroControllers.Add(new VoidrayController());
             MicroControllers.Add(new CarrierController());
             MicroControllers.Add(new StutterController());
-
-            double distance = 0;
-            foreach (Base b in tyr.BaseManager.Bases)
-            {
-                double newDist = Math.Sqrt(SC2Util.DistanceSq(b.BaseLocation.Pos, tyr.BaseManager.Main.BaseLocation.Pos)) + Math.Sqrt(SC2Util.DistanceSq(b.BaseLocation.Pos, tyr.TargetManager.PotentialEnemyStartLocations[0]));
-
-                if (newDist > distance)
-                {
-                    FarBase = b;
-                    distance = newDist;
-                }
-            }
-            HideBaseTask.Task.HideLocation = FarBase;
-
+            
             if (SkipDefenses)
                 Set += ProtossBuildUtil.Pylons();
             else
@@ -80,7 +62,6 @@ namespace Tyr.Builds.Protoss
                 Set += ProtossBuildUtil.Pylons();
                 Set += BuildReaperDefenseCannon();
                 Set += BuildReaperRushDefense();
-                if (Tyr.Bot.EnemyRace != Race.Zerg)
                 Set += ProtossBuildUtil.Nexus(2);
             }
             Set += PowerPylons();
@@ -90,17 +71,12 @@ namespace Tyr.Builds.Protoss
         private BuildList NaturalDefenses()
         {
             BuildList result = new BuildList();
-
-            result.If(() => { return Tyr.Bot.EnemyRace != Race.Zerg || Count(UnitTypes.GATEWAY) > 0; });
+            
             result.Building(UnitTypes.PYLON, Natural, NaturalDefensePos);
             result.Building(UnitTypes.FORGE, Natural, NaturalDefensePos);
             result.Building(UnitTypes.PHOTON_CANNON, Natural, NaturalDefensePos, 2);
             result.If(() => { return Count(UnitTypes.NEXUS) >= 2 && Beyond2Cannons; });
-            if (Tyr.Bot.EnemyRace == Race.Zerg)
-                result.If(() => { return Count(UnitTypes.CYBERNETICS_CORE) > 0; });
             result.Building(UnitTypes.PHOTON_CANNON, Natural, NaturalDefensePos, () => { return !DefendReapers; });
-            if (Tyr.Bot.EnemyRace == Race.Zerg)
-                result.If(() => { return Count(UnitTypes.STARGATE) > 0; });
             result.Building(UnitTypes.PHOTON_CANNON, Natural, NaturalDefensePos, () => { return !DefendReapers; });
             result.Building(UnitTypes.PYLON, Natural);
             result.Building(UnitTypes.SHIELD_BATTERY, Natural, NaturalDefensePos);
@@ -196,7 +172,7 @@ namespace Tyr.Builds.Protoss
 
             result.Building(UnitTypes.PYLON, Main);
             result.Building(UnitTypes.GATEWAY);
-            if (SkipDefenses || Tyr.Bot.EnemyRace == Race.Zerg)
+            if (SkipDefenses)
                 result.Building(UnitTypes.NEXUS, 2);
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.CYBERNETICS_CORE);
@@ -206,49 +182,6 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.FLEET_BEACON, () => { return BuildCarriers; });
             result.Building(UnitTypes.STARGATE);
             result.Building(UnitTypes.STARGATE, () => { return Count(UnitTypes.CARRIER) + Count(UnitTypes.VOID_RAY) >= 2; });
-
-            return result;
-        }
-
-        private BuildList HiddenBasePylons()
-        {
-            BuildList result = new BuildList();
-
-            result.If(() =>
-            { return FarBase.ResourceCenter != null && FarBase.ResourceCenter.Unit.BuildProgress >= 0.99; });
-            result.If(() =>
-            {
-                return FoodUsed()
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.NEXUS)
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.GATEWAY) * 2
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.STARGATE) * 2
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.ROBOTICS_FACILITY) * 2
-                    >= ExpectedAvailableFood() - 2;
-            });
-            result += new BuildingStep(UnitTypes.PYLON, FarBase);
-            result.Goto(0);
-
-            return result;
-        }
-
-        private BuildList HiddenBaseBuild()
-        {
-            BuildList result = new BuildList();
-
-            result.If(() =>
-            { return FarBase.ResourceCenter != null && FarBase.ResourceCenter.Unit.BuildProgress >= 0.99; });
-            result.Building(UnitTypes.PYLON, FarBase);
-            result.Building(UnitTypes.GATEWAY, FarBase);
-            result.Building(UnitTypes.FORGE, FarBase);
-            result.Building(UnitTypes.CYBERNETICS_CORE, FarBase);
-            result.Building(UnitTypes.PYLON, FarBase);
-            result.Building(UnitTypes.PHOTON_CANNON, FarBase, 4);
-            result.Building(UnitTypes.ASSIMILATOR, FarBase, 2);
-            result.Building(UnitTypes.PYLON, FarBase);
-            result.Building(UnitTypes.STARGATE, FarBase);
-            result.Building(UnitTypes.FLEET_BEACON, FarBase, () => { return BuildCarriers; });
-            result.Building(UnitTypes.PHOTON_CANNON, FarBase, 2);
-            result.Building(UnitTypes.STARGATE, FarBase);
 
             return result;
         }
@@ -267,10 +200,10 @@ namespace Tyr.Builds.Protoss
             FlyerDestroyTask.Task.Stopped = !DefendReapers;
             FlyerAttackTask.Task.Stopped = DefendReapers;
 
-            if (Count(UnitTypes.PROBE) <= 18)
-                BaseWorkers.WorkersPerGas = 0;
+            if (Count(UnitTypes.PROBE) <= 14)
+                GasWorkerTask.WorkersPerGas = 0;
             else
-                BaseWorkers.WorkersPerGas = 3;
+                GasWorkerTask.WorkersPerGas = 3;
 
             if (tyr.EnemyRace == Race.Zerg)
                 Beyond2Cannons = tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) > 0 || Count(UnitTypes.STARGATE) >= 3;
@@ -326,36 +259,6 @@ namespace Tyr.Builds.Protoss
                     }
                 }
             }
-
-            if (!DefendReapers && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.REAPER) >= 2)
-            {
-                FearVikingsController.Stopped = false;
-                DefendReapers = true;
-                tyr.buildingPlacer.SpreadCannons = false;
-                tyr.buildingPlacer.BuildCompact = true;
-                WorkerTask.Task.StopTransfers = true;
-                HideBaseTask.Task.BuildNexus = true;
-
-                IdleTask.Task.OverrideTarget = FarBase.BaseLocation.Pos;
-                DefenseTask.GroundDefenseTask.Stopped = true;
-                DefenseTask.AirDefenseTask.Stopped = true;
-                RequiredSize = 8;
-
-                Set = new BuildSet();
-                Set += HiddenBasePylons();
-                Set += HiddenBaseBuild();
-            }
-            /*
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.REAPER) >= 2
-                && NaturalMirrorCannonStep.DesiredBase == null)
-            {
-                PotentialHelper helper = new PotentialHelper(tyr.BaseManager.Natural.BaseLocation.Pos);
-                helper.Magnitude = 8;
-                helper.From(tyr.BaseManager.NaturalDefensePos);
-                NaturalMirrorCannonStep.DesiredPos = helper.Get();
-                NaturalMirrorPylonStep.DesiredPos = helper.Get();
-            }
-            */
         }
 
         public override void Produce(Tyr tyr, Agent agent)
@@ -366,16 +269,13 @@ namespace Tyr.Builds.Protoss
                 && (Count(UnitTypes.PROBE) < 32 || Count(UnitTypes.CARRIER) + Count(UnitTypes.VOID_RAY) > 0)
                 && (Count(UnitTypes.PROBE) < 20 || Count(UnitTypes.CYBERNETICS_CORE) > 0)
                 && (Count(UnitTypes.PROBE) < 16 || Count(UnitTypes.NEXUS) >= 2)
-                && (!DefendReapers || agent.Unit.AssignedHarvesters < 16)
-                && (!DefendReapers || agent == FarBase.ResourceCenter))
+                && (!DefendReapers || agent.Unit.AssignedHarvesters < 16))
             {
                 if (Count(UnitTypes.PROBE) < 13 || Count(UnitTypes.PYLON) > 0)
                     agent.Order(1006);
             }
             if (agent.Unit.UnitType == UnitTypes.STARGATE)
             {
-                if (DefendReapers && agent.Base != FarBase)
-                    return;
                 if (Minerals() >= 250
                     && Gas() >= 150
                     && FoodUsed() + 4 <= 200

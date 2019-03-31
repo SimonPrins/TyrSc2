@@ -22,6 +22,7 @@ namespace Tyr.Builds.Zerg
             tyr.TaskManager.Add(new TimingAttackTask() { RequiredSize = 6 });
             tyr.TaskManager.Add(WorkerScoutTask);
             tyr.TaskManager.Add(WorkerRushTask);
+            WorkerRushDefenseTask.Enable();
             MicroControllers.Add(new FleeBroodlingsController());
             MicroControllers.Add(new TargetFireController(GetPrioritiesCloseRange()) { MoveWhenNoTarget = false });
             MicroControllers.Add(new TargetFireController(GetPriorities()));
@@ -82,7 +83,7 @@ namespace Tyr.Builds.Zerg
                 WorkerScoutTask.Stopped = true;
             }
 
-            if (Count(UnitTypes.ZERGLING) >= 6
+            if (Completed(UnitTypes.ZERGLING) >= 6
                 && !WorkersSent)
             {
                 WorkerRushTask.TakeWorkers = 10;

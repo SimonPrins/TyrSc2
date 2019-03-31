@@ -1,10 +1,11 @@
 ﻿using Tyr.Agents;
+using static Tyr.Builds.BuildLists.ConditionalStep;
 
 namespace Tyr.Builds.BuildLists
 {
     public class ProtossBuildUtil
     {
-        public static BuildList Pylons()
+        public static BuildList Pylons(Test condition = null)
         {
             BuildList result = new BuildList();
 
@@ -15,8 +16,11 @@ namespace Tyr.Builds.BuildLists
                     + Tyr.Bot.UnitManager.Count(UnitTypes.GATEWAY) * 2
                     + Tyr.Bot.UnitManager.Count(UnitTypes.STARGATE) * 2
                     + Tyr.Bot.UnitManager.Count(UnitTypes.ROBOTICS_FACILITY) * 2
-                    >= Build.ExpectedAvailableFood() - 2;
+                    >= Build.ExpectedAvailableFood() - 2
+                    && Build.ExpectedAvailableFood() < 200;
             });
+            if (condition != null)
+                result.If(condition);
             result += new BuildingStep(UnitTypes.PYLON);
             result.Goto(0);
 

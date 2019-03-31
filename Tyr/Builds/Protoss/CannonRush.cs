@@ -1,11 +1,6 @@
-﻿using System;
-using SC2APIProtocol;
-using Tyr.Agents;
+﻿using Tyr.Agents;
 using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Micro;
 using Tyr.Tasks;
-using Tyr.Util;
 
 namespace Tyr.Builds.Protoss
 {

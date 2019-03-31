@@ -12,7 +12,11 @@ namespace Tyr.Builds.Zerg
         public static BuildList Overlords()
         {
             BuildList result = new BuildList();
-            result.If(() => { return Tyr.Bot.UnitManager.Count(UnitTypes.SPAWNING_POOL) > 0 && Build.FoodUsed() >= Build.ExpectedAvailableFood() - 2; });
+            result.If(() => { return Tyr.Bot.UnitManager.Count(UnitTypes.SPAWNING_POOL) > 0 
+                && Build.FoodUsed() >= Build.ExpectedAvailableFood() 
+                    - 2 * Tyr.Bot.UnitManager.Completed(UnitTypes.HATCHERY)
+                    - 16 * Tyr.Bot.UnitManager.Completed(UnitTypes.ULTRALISK_CAVERN)
+                    - (Tyr.Bot.UnitManager.Count(UnitTypes.HATCHERY) >= 4 && Tyr.Bot.UnitManager.Count(UnitTypes.DRONE) >= 40 ? 8 : 0); });
             result.Morph(UnitTypes.OVERLORD, 25);
             return result;
         }
