@@ -1,0 +1,10 @@
+{
+	"Bots": {
+		"Tyrr": {
+			"Race": "Random",
+			"Type": "BinaryCpp",
+			"RootPath": "./",
+			"FileName": "Tyr.exe"
+		}
+	}
+}
