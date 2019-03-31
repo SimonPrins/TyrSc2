@@ -3,19 +3,21 @@ using Tyr.Agents;
 
 namespace Tyr.Micro
 {
-    public class FearVikingsController : CustomController
+    public class TempestController : CustomController
     {
         public override bool DetermineAction(Agent agent, Point2D target)
         {
-            if (Stopped || agent.Unit.UnitType != UnitTypes.VOID_RAY)
+            if (agent.Unit.UnitType != UnitTypes.TEMPEST)
                 return false;
-            
 
-            float dist = 12 * 12;
+            if (agent.Unit.WeaponCooldown == 0)
+                return false;
+
+            float dist = 9 * 9;
             Unit fleeTarget = null;
             foreach (Unit enemy in Tyr.Bot.Enemies())
             {
-                if (enemy.UnitType != UnitTypes.VIKING_FIGHTER)
+                if (!UnitTypes.CanAttackAir(enemy.UnitType))
                     continue;
 
                 float newDist = agent.DistanceSq(enemy);
@@ -28,13 +30,10 @@ namespace Tyr.Micro
 
             if (fleeTarget != null)
             {
-                PotentialHelper helper = new PotentialHelper(agent.Unit.Pos);
-                helper.Magnitude = 8;
-                helper.From(fleeTarget.Pos);
-                agent.Order(Abilities.MOVE, helper.Get());
+                agent.Order(Abilities.MOVE, agent.From(fleeTarget.Pos, 4));
                 return true;
             }
-            
+
             return false;
         }
     }

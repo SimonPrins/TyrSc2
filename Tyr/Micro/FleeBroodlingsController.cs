@@ -6,7 +6,7 @@ namespace Tyr.Micro
 {
     public class FleeBroodlingsController : CustomController
     {
-        public bool DetermineAction(Agent agent, Point2D target)
+        public override bool DetermineAction(Agent agent, Point2D target)
         {
             Unit fleeTarget = null;
             float dist = 6 * 6;

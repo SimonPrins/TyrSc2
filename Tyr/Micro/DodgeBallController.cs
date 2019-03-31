@@ -1,11 +1,23 @@
 ﻿using SC2APIProtocol;
 using Tyr.Agents;
+using Tyr.Tasks;
 
 namespace Tyr.Micro
 {
     public class DodgeBallController : CustomController
     {
-        public bool DetermineAction(Agent agent, Point2D target)
+        public override bool DetermineAction(Agent agent, Point2D target)
+        {
+            if (FleeFromEffects(agent))
+                return true;
+
+            if (FleeFromAlliedDisruptors(agent))
+                return true;
+
+            return false;
+        }
+
+        public bool FleeFromEffects(Agent agent)
         {
             PotentialHelper potential = new PotentialHelper(agent.Unit.Pos);
             potential.Magnitude = 4;
@@ -17,6 +29,32 @@ namespace Tyr.Micro
                     potential.From(effect.Pos);
                     flee = true;
                 }
+
+            if (!flee)
+                return false;
+            agent.Order(Abilities.MOVE, potential.Get());
+            return true;
+        }
+
+        public bool FleeFromAlliedDisruptors(Agent agent)
+        {
+            if (agent.Unit.IsFlying)
+                return false;
+            PotentialHelper potential = new PotentialHelper(agent.Unit.Pos);
+            potential.Magnitude = 4;
+            bool flee = false;
+            foreach (Agent disruptor in PhasedDisruptorTask.Task.Units)
+            {
+                if (!PhasedDisruptorTask.Task.PhasedFrame.ContainsKey(disruptor.Unit.Tag)
+                    || Tyr.Bot.Frame - PhasedDisruptorTask.Task.PhasedFrame[disruptor.Unit.Tag] < 23)
+                    continue;
+
+                if (agent.DistanceSq(disruptor) <= 3 * 3)
+                {
+                    potential.From(disruptor.Unit.Pos);
+                    flee = true;
+                }
+            }
 
             if (!flee)
                 return false;

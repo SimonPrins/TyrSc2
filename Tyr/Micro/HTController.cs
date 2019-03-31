@@ -6,7 +6,7 @@ namespace Tyr.Micro
 {
     public class HTController : CustomController
     {
-        public bool DetermineAction(Agent agent, Point2D target)
+        public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (agent.Unit.UnitType != UnitTypes.HIGH_TEMPLAR)
                 return false;

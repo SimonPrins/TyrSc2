@@ -6,13 +6,16 @@ namespace Tyr.Micro
 {
     public class VikingController : CustomController
     {
-        public bool DetermineAction(Agent agent, Point2D target)
+        public bool StickToTanks = true;
+
+        public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (agent.Unit.UnitType != UnitTypes.VIKING_FIGHTER)
                 return false;
 
             float dist;
-            if (agent.DistanceSq(Tyr.Bot.MapAnalyzer.StartLocation) >= 40 * 40)
+            if (agent.DistanceSq(Tyr.Bot.MapAnalyzer.StartLocation) >= 40 * 40
+                && StickToTanks)
             {
                 Point2D retreatTo = null;
                 dist = 15 * 15;
@@ -43,15 +46,23 @@ namespace Tyr.Micro
                 if (!enemy.IsFlying)
                     continue;
 
+                if (killTarget != null
+                    && !SecondaryTarget(killTarget.UnitType)
+                    && SecondaryTarget(enemy.UnitType))
+                    continue;
+
                 float newDist = agent.DistanceSq(enemy);
-                if (newDist < dist)
+                if (newDist < dist
+                    || killTarget == null
+                    || (SecondaryTarget(killTarget.UnitType) && !SecondaryTarget(enemy.UnitType)))
                 {
                     killTarget = enemy;
                     dist = newDist;
                 }
             }
 
-            if (killTarget != null)
+            if (killTarget != null
+                && !SecondaryTarget(killTarget.UnitType))
             {
                 agent.Order(Abilities.ATTACK, killTarget.Tag);
                 return true;
@@ -81,7 +92,19 @@ namespace Tyr.Micro
                 return true;
             }
 
+            if (killTarget != null)
+            {
+                agent.Order(Abilities.ATTACK, killTarget.Tag);
+                return true;
+            }
+
             return false;
+        }
+
+        private bool SecondaryTarget(uint type)
+        {
+            return type == UnitTypes.OVERLORD
+                || type == UnitTypes.OVERSEER;
         }
     }
 }

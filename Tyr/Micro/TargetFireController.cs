@@ -14,7 +14,7 @@ namespace Tyr.Micro
             PriorityTargetting = priorityTargetting;
         }
 
-        public bool DetermineAction(Agent agent, Point2D target)
+        public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (agent.Unit.WeaponCooldown == 0)
                 return false;

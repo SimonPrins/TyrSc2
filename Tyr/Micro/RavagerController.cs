@@ -6,14 +6,15 @@ namespace Tyr.Micro
 {
     public class RavagerController : CustomController
     {
-        public bool DetermineAction(Agent agent, Point2D target)
+        public int Range = 8;
+        public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (agent.Unit.UnitType != UnitTypes.RAVAGER)
                 return false;
 
             foreach (Unit unit in Tyr.Bot.Enemies())
             {
-                if (UnitTypes.BuildingTypes.Contains(unit.UnitType))
+                if (UnitTypes.BuildingTypes.Contains(unit.UnitType) && unit.UnitType != UnitTypes.SPINE_CRAWLER && unit.UnitType != UnitTypes.SPINE_CRAWLER_UPROOTED)
                     continue;
 
                 if (unit.UnitType == UnitTypes.BROODLING
@@ -22,11 +23,11 @@ namespace Tyr.Micro
                     || unit.UnitType == UnitTypes.EGG)
                     continue;
 
-                if (SC2Util.DistanceSq(unit.Pos, agent.Unit.Pos) > 8 * 8)
+                if (SC2Util.DistanceSq(unit.Pos, agent.Unit.Pos) > Range * Range)
                     continue;
 
                 int count;
-                if (unit.UnitType == UnitTypes.BROOD_LORD)
+                if (unit.UnitType == UnitTypes.BROOD_LORD || unit.UnitType == UnitTypes.SPINE_CRAWLER)
                     count = 6;
                 else
                     count = 1;
@@ -44,7 +45,7 @@ namespace Tyr.Micro
                     if (SC2Util.DistanceSq(unit.Pos, unit2.Pos) > 2 * 2)
                         continue;
 
-                    if (unit.UnitType == UnitTypes.BROOD_LORD)
+                    if (unit.UnitType == UnitTypes.BROOD_LORD || unit.UnitType == UnitTypes.SPINE_CRAWLER)
                         count += 6;
                     else
                         count++;

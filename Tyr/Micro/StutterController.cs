@@ -6,8 +6,11 @@ namespace Tyr.Micro
 {
     public class StutterController : CustomController
     {
-        public bool DetermineAction(Agent agent, Point2D target)
+        public override bool DetermineAction(Agent agent, Point2D target)
         {
+            if (agent.Unit.UnitType == UnitTypes.THOR && agent.Unit.WeaponCooldown >= 5)
+                return false;
+
             if (agent.Unit.UnitType != UnitTypes.VOID_RAY
                 && agent.Unit.UnitType != UnitTypes.ADEPT
                 && agent.Unit.UnitType != UnitTypes.STALKER
@@ -22,20 +25,33 @@ namespace Tyr.Micro
                 && agent.Unit.UnitType != UnitTypes.MUTALISK
                 && agent.Unit.UnitType != UnitTypes.RAVAGER
                 && agent.Unit.UnitType != UnitTypes.MARINE
+                && agent.Unit.UnitType != UnitTypes.MARAUDER
                 && agent.Unit.UnitType != UnitTypes.SIEGE_TANK
                 && agent.Unit.UnitType != UnitTypes.HELLION
-                && agent.Unit.UnitType != UnitTypes.HELLBAT)
+                && agent.Unit.UnitType != UnitTypes.HELLBAT
+                && agent.Unit.UnitType != UnitTypes.THOR
+                && agent.Unit.UnitType != UnitTypes.THOR_SINGLE_TARGET
+                && agent.Unit.UnitType != UnitTypes.CYCLONE)
                 return false;
 
-            if (agent.Unit.WeaponCooldown == 0)
+            if (agent.Unit.WeaponCooldown == 0 && agent.Unit.UnitType != UnitTypes.CYCLONE)
                 return false;
 
             foreach (Unit unit in Tyr.Bot.Enemies())
             {
+                if (agent.Unit.UnitType == UnitTypes.HELLBAT
+                    && (UnitTypes.RangedTypes.Contains(unit.UnitType)
+                    || UnitTypes.BuildingTypes.Contains(unit.UnitType)
+                    || UnitTypes.WorkerTypes.Contains(unit.UnitType)))
+                    continue;
+
                 if (unit.UnitType == UnitTypes.OVERLORD
                     || unit.UnitType == UnitTypes.OVERSEER
                     || unit.UnitType == UnitTypes.LARVA
-                    || unit.UnitType == UnitTypes.EGG)
+                    || unit.UnitType == UnitTypes.EGG
+                    || unit.UnitType == UnitTypes.CREEP_TUMOR
+                    || unit.UnitType == UnitTypes.CREEP_TUMOR_BURROWED
+                    || unit.UnitType == UnitTypes.CREEP_TUMOR_QUEEN)
                     continue;
 
                 if (unit.UnitType != UnitTypes.PHOTON_CANNON
@@ -53,7 +69,10 @@ namespace Tyr.Micro
                 else maxDist = 4 * 4;
                 if (SC2Util.DistanceSq(unit.Pos, agent.Unit.Pos) <= maxDist)
                 {
-                    agent.Order(Abilities.MOVE, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation));
+                    if (agent.DistanceSq(Tyr.Bot.MapAnalyzer.StartLocation) > 10 * 10)
+                        agent.Order(Abilities.MOVE, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation));
+                    else
+                        agent.Order(Abilities.MOVE, agent.From(unit, 4));
                     return true;
                 }
             }

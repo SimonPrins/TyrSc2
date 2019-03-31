@@ -3,8 +3,10 @@ using Tyr.Agents;
 
 namespace Tyr.Micro
 {
-    public interface CustomController
+    public abstract class CustomController
     {
-        bool DetermineAction(Agent agent, Point2D target);
+        public bool Stopped = false;
+
+        public abstract bool DetermineAction(Agent agent, Point2D target);
     }
 }

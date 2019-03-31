@@ -6,7 +6,7 @@ namespace Tyr.Micro
 {
     public class HitAndRunController : CustomController
     {
-        public bool DetermineAction(Agent agent, Point2D target)
+        public override bool DetermineAction(Agent agent, Point2D target)
         {
             bool nearbyDead = false;
             foreach (RecentlyDeceased deceased in Tyr.Bot.EnemyManager.GetRecentlyDeceased())

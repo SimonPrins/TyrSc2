@@ -6,7 +6,7 @@ namespace Tyr.Micro
 {
     public class StalkerController : CustomController
     {
-        public bool DetermineAction(Agent agent, Point2D target)
+        public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (agent.Unit.UnitType != UnitTypes.STALKER)
                 return false;
@@ -37,9 +37,11 @@ namespace Tyr.Micro
                 }
             }
 
+            /*
             Unit kill = null;
             float hp = 10000;
             int priority = 0;
+            ulong enemyTag = 0;
             foreach (Unit enemy in Tyr.Bot.Enemies())
             {
                 int newPriority;
@@ -56,12 +58,15 @@ namespace Tyr.Micro
                 float newHp = enemy.Health + enemy.Shield;
                 if (newPriority == priority && newHp >= hp)
                     continue;
+                if (newPriority == priority && newHp == hp && enemy.Tag < enemyTag)
+                    continue;
                 if (SC2Util.DistanceSq(agent.Unit.Pos, enemy.Pos) > 8 * 8)
                     continue;
 
                 kill = enemy;
                 priority = newPriority;
                 hp = newHp;
+                enemyTag = enemy.Tag;
             }
 
             if (kill != null)
@@ -69,6 +74,7 @@ namespace Tyr.Micro
                 agent.Order(Abilities.ATTACK, kill.Tag);
                 return true;
             }
+            */
 
             return false;
         }

@@ -9,7 +9,7 @@ namespace Tyr.Micro
         public Dictionary<ulong, int> LastEnemyFrame = new Dictionary<ulong, int>();
         public int KeepLurkerBurrowedTime = 5;
 
-        public bool DetermineAction(Agent agent, Point2D target)
+        public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (agent.Unit.UnitType != UnitTypes.LURKER
                 && agent.Unit.UnitType != UnitTypes.LURKER_BURROWED)

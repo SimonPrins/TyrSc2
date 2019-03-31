@@ -7,7 +7,7 @@ namespace Tyr.Micro
     {
         private static ulong BanelingHunter = 0;
         private static int BanelingHunterFrame = -1;
-        public bool DetermineAction(Agent agent, Point2D target)
+        public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (agent.Unit.UnitType != UnitTypes.ZERGLING)
                 return false;

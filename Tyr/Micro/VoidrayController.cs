@@ -6,7 +6,7 @@ namespace Tyr.Micro
 {
     public class VoidrayController : CustomController
     {
-        public bool DetermineAction(Agent agent, Point2D target)
+        public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (agent.Unit.UnitType != UnitTypes.VOID_RAY)
                 return false;
