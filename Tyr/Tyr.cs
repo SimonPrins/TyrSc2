@@ -8,6 +8,7 @@ using Tyr.Builds;
 using Tyr.Builds.Protoss;
 using Tyr.Builds.Terran;
 using Tyr.Builds.Zerg;
+using Tyr.BuildSelection;
 using Tyr.Managers;
 using Tyr.MapAnalysis;
 using Tyr.Micro;
@@ -85,6 +86,8 @@ namespace Tyr
         private long PrevTime = -1;
 
         List<long> Times = new List<long>();
+
+        private BuildSelector BuildSelector = new RotateSelector();
 
         public Tyr()
         {
@@ -453,28 +456,7 @@ namespace Tyr
             else
                 options = null;
 
-
-            Build preffered = null;
-            int losses = int.MaxValue;
-            foreach (Build option in options)
-            {
-                if (!defeats.ContainsKey(option.Name()))
-                    defeats.Add(option.Name(), 0);
-                if (!games.ContainsKey(option.Name()))
-                    games.Add(option.Name(), 0);
-
-                DebugUtil.WriteLine(option.Name() + " wins: " + (games[option.Name()] - defeats[option.Name()]));
-                DebugUtil.WriteLine(option.Name() + " defeats: " + defeats[option.Name()]);
-
-                int newLosses = defeats[option.Name()] - (games[option.Name()] - defeats[option.Name()]) / 4;
-
-                if (newLosses < losses)
-                {
-                    losses = newLosses;
-                    preffered = option;
-                }
-            }
-            return preffered;
+            return BuildSelector.Select(options, defeats, games);
         }
 
         public List<Build> ZergBuilds()
