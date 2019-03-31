@@ -22,6 +22,11 @@ namespace Tyr.MapAnalysis
         public Point2D building2 = null;
         public Point2D building3 = null;
 
+        public BoolGrid Ramp;
+        public BoolGrid UnPathable;
+
+        private Point2D EnemyRamp = null;
+
         public void Analyze(Tyr tyr)
         {
             // Determine the start location.
@@ -35,6 +40,10 @@ namespace Tyr.MapAnalysis
                 if (UnitTypes.MineralFields.Contains(mineralField.UnitType))
                     mineralFields.Add(new MineralField() { Pos = mineralField.Pos, Tag = mineralField.Tag });
 
+            // The Units provided in our observation are not guaranteed to be in the same order every game.
+            // To ensure the base finding algorithm finds the same base location every time we sort the mineral fields by position.
+            mineralFields.Sort((a, b) => (int)(2 * (a.Pos.X + a.Pos.Y * 10000 - b.Pos.X - b.Pos.Y * 10000)));
+            
             Dictionary<ulong, int> mineralSetIds = new Dictionary<ulong, int>();
             List<List<MineralField>> mineralSets = new List<List<MineralField>>();
             int currentSet = 0;
@@ -69,101 +78,13 @@ namespace Tyr.MapAnalysis
             foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
                 if (UnitTypes.GasGeysers.Contains(unit.UnitType))
                     gasses.Add(new Gas() { Pos = unit.Pos, Tag = unit.Tag });
-            
+
+            // The Units provided in our observation are not guaranteed to be in the same order every game.
+            // To ensure the base finding algorithm finds the same base location every time we sort the gasses by position.
+            gasses.Sort((a, b) => (int)(2 * (a.Pos.X + a.Pos.Y * 10000 - b.Pos.X - b.Pos.Y * 10000)));
+
             foreach (BaseLocation loc in BaseLocations)
-            {
-                float x = 0;
-                float y = 0;
-                foreach (MineralField field in loc.MineralFields)
-                {
-                    x += (int)field.Pos.X;
-                    y += (int)field.Pos.Y;
-                }
-                x /= loc.MineralFields.Count;
-                y /= loc.MineralFields.Count;
-
-                // Round to nearest half position. Nexii are 5x5 and therefore always centered in the middle of a tile.
-                x = (int)(x) + 0.5f;
-                y = (int)(y) + 0.5f;
-
-                // Temporary position, we still need a proper position.
-                loc.Pos = SC2Util.Point(x, y);
-
-                MineralField closest = null;
-                float distance = 10000;
-                foreach (MineralField field in loc.MineralFields)
-                    if (SC2Util.DistanceGrid(field.Pos, loc.Pos) < distance)
-                    {
-                        distance = SC2Util.DistanceGrid(field.Pos, loc.Pos);
-                        closest = field;
-                    }
-
-                // Move the estimated base position slightly away from the closest mineral.
-                // This ensures that the base location will not end up on the far side of the minerals.
-                if (closest.Pos.X < loc.Pos.X)
-                    loc.Pos.X += 2;
-                else if (closest.Pos.X > loc.Pos.X)
-                    loc.Pos.X -= 2;
-                if (closest.Pos.Y < loc.Pos.Y)
-                    loc.Pos.Y += 2;
-                else if (closest.Pos.Y > loc.Pos.Y)
-                    loc.Pos.Y -= 2;
-
-                for (int i = 0; i < gasses.Count; i++)
-                {
-                    if (SC2Util.DistanceGrid(loc.Pos, gasses[i].Pos) <= 24)
-                    {
-                        loc.Gasses.Add(gasses[i]);
-                        gasses[i] = gasses[gasses.Count - 1];
-                        gasses.RemoveAt(gasses.Count - 1);
-                        i--;
-                    }
-                }
-                
-                float closestDist = 1000000;
-                for (int i = 0; i < 20; i++)
-                {
-                    for (int j = 0; j == 0 || j < i; j++)
-                    {
-                        float maxDist;
-                        Point2D newPos;
-                        newPos = SC2Util.Point(loc.Pos.X + i - j, loc.Pos.Y + j);
-                        maxDist = checkPosition(newPos, loc);
-                        if (maxDist < closestDist)
-                        {
-                            loc.Pos = newPos;
-                            closestDist = maxDist;
-                        }
-
-                        newPos = SC2Util.Point(loc.Pos.X + i - j, loc.Pos.Y - j);
-                        maxDist = checkPosition(newPos, loc);
-                        if (maxDist < closestDist)
-                        {
-                            loc.Pos = newPos;
-                            closestDist = maxDist;
-                        }
-
-                        newPos = SC2Util.Point(loc.Pos.X - i + j, loc.Pos.Y + j);
-                        maxDist = checkPosition(newPos, loc);
-                        if (maxDist < closestDist)
-                        {
-                            loc.Pos = newPos;
-                            closestDist = maxDist;
-                        }
-
-                        newPos = SC2Util.Point(loc.Pos.X - i + j, loc.Pos.Y - j);
-                        maxDist = checkPosition(newPos, loc);
-                        if (maxDist < closestDist)
-                        {
-                            loc.Pos = newPos;
-                            closestDist = maxDist;
-                        }
-                    }
-                }
-
-                if (closestDist >= 999999)
-                    System.Console.WriteLine("Unable to find proper base placement: " + loc.Pos);
-            }
+                DetermineFinalLocation(loc, gasses);
             
             if (tyr.GameInfo.MapName.Contains("Blueshift"))
             {
@@ -171,11 +92,11 @@ namespace Tyr.MapAnalysis
                 {
                     if (SC2Util.DistanceSq(loc.Pos, SC2Util.Point(141.5f, 112.5f)) <= 5 * 5 && (loc.Pos.X != 141.5 || loc.Pos.Y != 112.5))
                     {
-                        System.Console.WriteLine("Incorrect base location, fixing: " + loc.Pos);
+                        DebugUtil.WriteLine("Incorrect base location, fixing: " + loc.Pos);
                         loc.Pos = SC2Util.Point(141.5f, 112.5f);
                     } else if (SC2Util.DistanceSq(loc.Pos, SC2Util.Point(34.5f, 63.5f)) <= 5 * 5 && (loc.Pos.X != 34.5 || loc.Pos.Y != 63.5))
                     {
-                        System.Console.WriteLine("Incorrect base location, fixing: " + loc.Pos);
+                        DebugUtil.WriteLine("Incorrect base location, fixing: " + loc.Pos);
                         loc.Pos = SC2Util.Point(34.5f, 63.5f);
                     }
                 }
@@ -199,8 +120,8 @@ namespace Tyr.MapAnalysis
                 for (int y = -2; y <= 2; y++)
                     startLocations[(int)StartLocation.X + x, (int)StartLocation.Y + y] = true;
 
-            BoolGrid unPathable = new ImageBoolGrid(Tyr.Bot.GameInfo.StartRaw.PathingGrid).GetAnd(startLocations.Invert());
-            BoolGrid pathable = unPathable.Invert();
+            UnPathable = new ImageBoolGrid(Tyr.Bot.GameInfo.StartRaw.PathingGrid).GetAnd(startLocations.Invert());
+            BoolGrid pathable = UnPathable.Invert();
 
             BoolGrid chokes = Placement.Invert().GetAnd(pathable);
             BoolGrid mainExits = chokes.GetAdjacent(StartArea);
@@ -222,38 +143,175 @@ namespace Tyr.MapAnalysis
                     }
                 }
 
-            BoolGrid ramp = chokes.GetConnected(mainRamp);
+            Ramp = chokes.GetConnected(mainRamp);
 
-            BoolGrid pathingWithoutRamp = pathable.GetAnd(ramp.Invert());
+            BoolGrid pathingWithoutRamp = pathable.GetAnd(Ramp.Invert());
             MainAndPocketArea = pathingWithoutRamp.GetConnected(SC2Util.To2D(StartLocation));
 
             if (Tyr.Bot.MyRace == Race.Protoss)
-                DetermineWall(ramp, unPathable);
+                DetermineWall(Ramp, UnPathable);
 
-            WallDistances = Distances(unPathable);
+            WallDistances = Distances(UnPathable);
 
             stopWatch.Stop();
-            System.Console.WriteLine("Total time to find wall: " + stopWatch.ElapsedMilliseconds);
+            DebugUtil.WriteLine("Total time to find wall: " + stopWatch.ElapsedMilliseconds);
+        }
+
+        public Point2D GetMainRamp()
+        {
+            float totalPoints = 0;
+            float totalX = 0;
+            float totalY = 0;
+            for (int x =0; x < Ramp.Width(); x++)
+                for (int y = 0; y < Ramp.Height(); y++)
+                {
+                    if (Ramp[x, y])
+                    {
+                        totalX += x;
+                        totalY += y;
+                        totalPoints++;
+                    }
+                }
+            return SC2Util.Point(totalX / totalPoints, totalY / totalPoints);
+        }
+
+        private void DetermineFinalLocation(BaseLocation loc, List<Gas> gasses)
+        {
+            for (int i = 0; i < gasses.Count; i++)
+            {
+                foreach (MineralField field in loc.MineralFields)
+                {
+                    if (SC2Util.DistanceSq(field.Pos, gasses[i].Pos) <= 8 * 8)
+                    {
+                        loc.Gasses.Add(gasses[i]);
+                        gasses[i] = gasses[gasses.Count - 1];
+                        gasses.RemoveAt(gasses.Count - 1);
+                        i--;
+                        break;
+                    }
+                }
+            }
+
+            if (loc.Gasses.Count == 1)
+            {
+                for (int i = 0; i < gasses.Count; i++)
+                    if (SC2Util.DistanceSq(loc.Gasses[0].Pos, gasses[i].Pos) <= 8 * 8)
+                    {
+                        loc.Gasses.Add(gasses[i]);
+                        gasses[i] = gasses[gasses.Count - 1];
+                        gasses.RemoveAt(gasses.Count - 1);
+                        i--;
+                        break;
+                    }
+            }
+
+            float x = 0;
+            float y = 0;
+            foreach (MineralField field in loc.MineralFields)
+            {
+                x += (int)field.Pos.X;
+                y += (int)field.Pos.Y;
+            }
+            x /= loc.MineralFields.Count;
+            y /= loc.MineralFields.Count;
+
+            // Round to nearest half position. Nexii are 5x5 and therefore always centered in the middle of a tile.
+            x = (int)(x) + 0.5f;
+            y = (int)(y) + 0.5f;
+
+            // Temporary position, we still need a proper position.
+            loc.Pos = SC2Util.Point(x, y);
 
 
-            /*
+            MineralField closest = null;
+            float distance = 10000;
+            foreach (MineralField field in loc.MineralFields)
+                if (SC2Util.DistanceGrid(field.Pos, loc.Pos) < distance)
+                {
+                    distance = SC2Util.DistanceGrid(field.Pos, loc.Pos);
+                    closest = field;
+                }
+
+            // Move the estimated base position slightly away from the closest mineral.
+            // This ensures that the base location will not end up on the far side of the minerals.
+            if (closest.Pos.X < loc.Pos.X)
+                loc.Pos.X += 2;
+            else if (closest.Pos.X > loc.Pos.X)
+                loc.Pos.X -= 2;
+            if (closest.Pos.Y < loc.Pos.Y)
+                loc.Pos.Y += 2;
+            else if (closest.Pos.Y > loc.Pos.Y)
+                loc.Pos.Y -= 2;
+
+
+            float closestDist = 1000000;
+            for (int i = 0; i < 20; i++)
+            {
+                for (int j = 0; j == 0 || j < i; j++)
+                {
+                    float maxDist;
+                    Point2D newPos;
+                    newPos = SC2Util.Point(loc.Pos.X + i - j, loc.Pos.Y + j);
+                    maxDist = checkPosition(newPos, loc);
+                    if (maxDist < closestDist)
+                    {
+                        loc.Pos = newPos;
+                        closestDist = maxDist;
+                    }
+
+                    newPos = SC2Util.Point(loc.Pos.X + i - j, loc.Pos.Y - j);
+                    maxDist = checkPosition(newPos, loc);
+                    if (maxDist < closestDist)
+                    {
+                        loc.Pos = newPos;
+                        closestDist = maxDist;
+                    }
+
+                    newPos = SC2Util.Point(loc.Pos.X - i + j, loc.Pos.Y + j);
+                    maxDist = checkPosition(newPos, loc);
+                    if (maxDist < closestDist)
+                    {
+                        loc.Pos = newPos;
+                        closestDist = maxDist;
+                    }
+
+                    newPos = SC2Util.Point(loc.Pos.X - i + j, loc.Pos.Y - j);
+                    maxDist = checkPosition(newPos, loc);
+                    if (maxDist < closestDist)
+                    {
+                        loc.Pos = newPos;
+                        closestDist = maxDist;
+                    }
+                }
+            }
+            
+            if (loc.Gasses.Count != 2)
+                FileUtil.Debug("Wrong number of gasses, found: " + loc.Gasses.Count);
+            if (closestDist >= 999999)
+                DebugUtil.WriteLine("Unable to find proper base placement: " + loc.Pos);
+
+        }
+
+        private void Draw(int width, int height)
+        {
+            if (!Tyr.Debug)
+                return;
+
             System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height);
             for (int x = 0; x < width; x++)
                 for (int y = 0; y < height; y++)
                 {
-                    if (WallDistances[x, y] == 0)
-                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Red);
-                    else if (WallDistances[x, y] >= 25)
-                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Green);
+                    if (UnPathable[x, y])
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Black);
                     else
-                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.FromArgb(WallDistances[x, y] * 10, WallDistances[x, y] * 10, WallDistances[x, y] * 10));
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.White);
                 }
             foreach (BaseLocation loc in BaseLocations)
                 for (int dx = -2; dx <= 2; dx++)
                     for (int dy = -2; dy <= 2; dy++)
                         bmp.SetPixel((int)loc.Pos.X + dx, height - 1 - (int)loc.Pos.Y - dy, System.Drawing.Color.Blue);
-
-            foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
+            
+            foreach (Unit unit in Tyr.Bot.Observation.Observation.RawData.Units)
             {
                 if (UnitTypes.GasGeysers.Contains(unit.UnitType))
                     for (int dx = -1; dx <= 1; dx++)
@@ -263,8 +321,7 @@ namespace Tyr.MapAnalysis
                     for (int dx = 0; dx <= 1; dx++)
                         bmp.SetPixel((int)(unit.Pos.X - 0.5f) + dx, height - 1 - (int)(unit.Pos.Y - 0.5f), System.Drawing.Color.Cyan);
             }
-            bmp.Save(@"C:\Users\Simon\Desktop\WallDistances.png");
-            */
+            bmp.Save(@"C:\Users\Simon\Desktop\Bases.png");
 
         }
 
@@ -373,7 +430,6 @@ namespace Tyr.MapAnalysis
         
         private float checkPosition(Point2D pos, BaseLocation loc)
         {
-            //System.Console.WriteLine("Checking: " + pos);
             foreach (MineralField mineralField in loc.MineralFields)
                 if (SC2Util.DistanceGrid(mineralField.Pos, pos) <= 10
                     && System.Math.Abs(mineralField.Pos.X - pos.X) <= 5.5
@@ -382,12 +438,16 @@ namespace Tyr.MapAnalysis
                     return 100000000;
                 }
             foreach (Gas gas in loc.Gasses)
+            {
                 if (SC2Util.DistanceGrid(gas.Pos, pos) <= 11
                     && System.Math.Abs(gas.Pos.X - pos.X) <= 6.1
                     && System.Math.Abs(gas.Pos.Y - pos.Y) <= 6.1)
                 {
                     return 100000000;
                 }
+                if (SC2Util.DistanceSq(gas.Pos, pos) >= 11 * 11)
+                    return 100000000;
+            }
 
             // Check if a resource center can actually be built here.
             for (float x = -2.5f; x < 2.5f + 0.1f; x++)
@@ -514,6 +574,63 @@ namespace Tyr.MapAnalysis
             return false;
         }
 
+        public Point2D GetEnemyRamp()
+        {
+            if (EnemyRamp != null)
+                return EnemyRamp;
+            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+                return null;
+
+            int width = Tyr.Bot.GameInfo.StartRaw.MapSize.X;
+            int height = Tyr.Bot.GameInfo.StartRaw.MapSize.Y;
+
+            Point2D start = Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0];
+            BoolGrid enemyStartArea = Placement.GetConnected(start);
+
+            
+            BoolGrid pathable = UnPathable.Invert();
+
+            BoolGrid chokes = Placement.Invert().GetAnd(pathable);
+            BoolGrid mainExits = chokes.GetAdjacent(enemyStartArea);
+
+            int[,] startDistances = Distances(SC2Util.To2D(StartLocation));
+
+            int dist = 1000;
+            Point2D mainRamp = null;
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                {
+                    if (mainExits[x, y])
+                    {
+                        int newDist = startDistances[x, y];
+                        if (newDist < dist)
+                        {
+                            dist = newDist;
+                            mainRamp = SC2Util.Point(x, y);
+                        }
+                    }
+                }
+
+            BoolGrid enemyRamp = chokes.GetConnected(mainRamp);
+
+            float totalX = 0;
+            float totalY = 0;
+            float count = 0;
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                {
+                    if (enemyRamp[x, y])
+                    {
+                        totalX += x;
+                        totalY += y;
+                        count++;
+                    }
+                }
+
+            EnemyRamp = new Point2D() { X = totalX / count, Y = totalY / count };
+            return EnemyRamp;
+        }
+
         public Point2D Walk(Point2D start, int[,] distances, int steps)
         {
             Point2D cur = start;
@@ -551,6 +668,27 @@ namespace Tyr.MapAnalysis
                     break;
             }
             return cur;
+        }
+        
+        public BaseLocation GetEnemyNatural()
+        {
+            int[,] distances = Distances(Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]);
+            int dist = 1000000000;
+            BaseLocation enemyNatural = null;
+            foreach (BaseLocation loc in Tyr.Bot.MapAnalyzer.BaseLocations)
+            {
+                int distanceToMain = distances[(int)loc.Pos.X, (int)loc.Pos.Y];
+
+                if (distanceToMain <= 5)
+                    continue;
+
+                if (distanceToMain < dist)
+                {
+                    dist = distanceToMain;
+                    enemyNatural = loc;
+                }
+            }
+            return enemyNatural;
         }
     }
 }
