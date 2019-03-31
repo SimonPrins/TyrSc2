@@ -29,6 +29,7 @@ namespace Tyr
         public ResponseObservation Observation;
 
         public uint PlayerId;
+        public string OpponentID;
 
         List<Action> actions = new List<Action>();
 
@@ -43,8 +44,8 @@ namespace Tyr
 
         public MicroController MicroController = new MicroController();
 
-        private bool Surrendered = false;
-        private int SurrenderedFrame = 0;
+        public bool Surrendered = false;
+        public int SurrenderedFrame = 0;
 
         // Managers
         public List<Manager> Managers = new List<Manager>();
@@ -73,15 +74,17 @@ namespace Tyr
         private long totalExecutionTime;
         private long maxExecutionTime;
 
-        private string ResultsFile;
-        public Build FixedBuild = new TankPush();
-        public static bool AllowWritingFiles = true;
+        public Build FixedBuild;
 
         private Request DrawRequest;
 
-        public static bool Debug = true;
+        public static bool Debug = false;
 
         private int TextLine = 0;
+
+        private long PrevTime = -1;
+
+        List<long> Times = new List<long>();
 
         public Tyr()
         {
@@ -135,7 +138,7 @@ namespace Tyr
                     {
                         Chat("gg");
                         SurrenderedFrame = Frame;
-                        Register("result " + EnemyRace + " " + Build.Name() + " Defeat");
+                        FileUtil.Register("result " + EnemyRace + " " + Build.Name() + " Defeat");
                     }
                 }
 
@@ -143,15 +146,18 @@ namespace Tyr
                     GameConnection.RequestLeaveGame().Wait();
 
                 TrySenDay9();
+
+                DrawText("Minerals: " + Minerals());
+                DrawText("Gas: " + Gas());
             }
             catch (System.Exception e)
             {
-                if (!loggedError && AllowWritingFiles)
+                if (!loggedError)
                 {
-                    File.AppendAllLines(Directory.GetCurrentDirectory() + "/Data/Tyr/Tyr.log", new string[] { "Error occured: " + e.ToString() });
+                    FileUtil.Log("Error occured: " + e.ToString());
                     loggedError = true;
                 }
-                System.Console.WriteLine("Exception in OnFrame: " + e.ToString());
+                DebugUtil.WriteLine("Exception in OnFrame: " + e.ToString());
             }
 
             Frame++;
@@ -323,27 +329,27 @@ namespace Tyr
             {
                 try
                 {
-                    System.Console.WriteLine("New action performed:" + Observation.Actions[0].ActionRaw.UnitCommand);
-                    System.Console.WriteLine("Ability ID: " + Observation.Actions[0].ActionRaw.UnitCommand.AbilityId);
+                    DebugUtil.WriteLine("New action performed:" + Observation.Actions[0].ActionRaw.UnitCommand);
+                    DebugUtil.WriteLine("Ability ID: " + Observation.Actions[0].ActionRaw.UnitCommand.AbilityId);
                     if (Observation.Actions[0].ActionRaw.UnitCommand.TargetWorldSpacePos != null)
                     {
                         Point2D pos = Observation.Actions[0].ActionRaw.UnitCommand.TargetWorldSpacePos;
-                        System.Console.WriteLine("Position: " + pos);
+                        DebugUtil.WriteLine("Position: " + pos);
                     }
                     else if (Observation.Actions[0].ActionRaw.UnitCommand.TargetUnitTag > 0)
                     {
-                        System.Console.WriteLine("TargetUnit: " + Observation.Actions[0].ActionRaw.UnitCommand.TargetUnitTag);
+                        DebugUtil.WriteLine("TargetUnit: " + Observation.Actions[0].ActionRaw.UnitCommand.TargetUnitTag);
                         foreach (Unit unit in Observation.Observation.RawData.Units)
                             if (unit.Tag == Observation.Actions[0].ActionRaw.UnitCommand.TargetUnitTag)
                             {
-                                System.Console.WriteLine("TargetUnitType: " + unit.UnitType);
+                                DebugUtil.WriteLine("TargetUnitType: " + unit.UnitType);
                                 break;
                             }
                     }
                     foreach (Unit unit in Observation.Observation.RawData.Units)
                         if (unit.Tag == Observation.Actions[0].ActionRaw.UnitCommand.UnitTags[0])
-                            System.Console.WriteLine("By unit of type: " + unit.UnitType);
-                    System.Console.WriteLine();
+                            DebugUtil.WriteLine("By unit of type: " + unit.UnitType);
+                    DebugUtil.WriteLine();
                 }
                 catch (System.Exception) { }
             }
@@ -356,24 +362,15 @@ namespace Tyr
             PlayerId = playerId;
             Data = data;
             UnitTypes.LoadData(data);
-            
+
+            OpponentID = opponentID;
+
             MyRace = GameInfo.PlayerInfo[(int)Observation.Observation.PlayerCommon.PlayerId - 1].RaceActual;
             EnemyRace = GameInfo.PlayerInfo[2 - (int)Observation.Observation.PlayerCommon.PlayerId].RaceRequested;
-            System.Console.WriteLine("MyRace: " + MyRace);
+            DebugUtil.WriteLine("MyRace: " + MyRace);
 
-            if (AllowWritingFiles)
-            {
-                File.AppendAllLines(Directory.GetCurrentDirectory() + "/Data/Tyr/Tyr.log", new string[] { "Game started on map: " + GameInfo.MapName });
-                File.AppendAllLines(Directory.GetCurrentDirectory() + "/Data/Tyr/Tyr.log", new string[] { "Enemy race: " + EnemyRace });
-            }
-
-            if (opponentID == null)
-                ResultsFile = Directory.GetCurrentDirectory() + "/Data/Tyr/" + EnemyRace + ".txt";
-            else
-                ResultsFile = Directory.GetCurrentDirectory() + "/Data/Tyr/" + opponentID + ".txt";
-
-            if (AllowWritingFiles && !File.Exists(ResultsFile))
-                File.Create(ResultsFile).Close();
+            FileUtil.Log("Game started on map: " + GameInfo.MapName);
+            FileUtil.Log("Enemy race: " + EnemyRace);
 
             MapAnalyzer.Analyze(this);
             TargetManager.OnStart(this);
@@ -383,7 +380,7 @@ namespace Tyr
             Build.InitializeTasks();
             Build.OnStart(this);
 
-            Register("started " + EnemyRace + " " + Build.Name());
+            FileUtil.Register("started " + EnemyRace + " " + Build.Name());
 
 
             Managers.Add(UnitManager);
@@ -406,7 +403,8 @@ namespace Tyr
             if (FixedBuild != null)
                 return FixedBuild;
 
-            string[] lines = File.ReadAllLines(ResultsFile);
+
+            string[] lines = FileUtil.ReadResultsFile();
             PreviousEnemyStrategies.Load(lines);
             Dictionary<string, int> defeats = new Dictionary<string, int>();
             Dictionary<string, int> games = new Dictionary<string, int>();
@@ -428,7 +426,8 @@ namespace Tyr
                         else if (games[words[2]] < defeats[words[2]])
                             games[words[2]] = defeats[words[2]];
                     }
-                } else if (line.StartsWith("started"))
+                }
+                else if (line.StartsWith("started"))
                 {
                     string[] words = line.Split(' ');
                     if (words[1] != EnemyRace.ToString())
@@ -446,6 +445,8 @@ namespace Tyr
                 options = ProtossBuilds();
             else if (MyRace == Race.Zerg)
                 options = ZergBuilds();
+            else if (MyRace == Race.Terran)
+                options = TerranBuilds();
             else
                 options = null;
 
@@ -459,8 +460,8 @@ namespace Tyr
                 if (!games.ContainsKey(option.Name()))
                     games.Add(option.Name(), 0);
 
-                System.Console.WriteLine(option.Name() + " wins: " + (games[option.Name()] - defeats[option.Name()]));
-                System.Console.WriteLine(option.Name() + " defeats: " + defeats[option.Name()]);
+                DebugUtil.WriteLine(option.Name() + " wins: " + (games[option.Name()] - defeats[option.Name()]));
+                DebugUtil.WriteLine(option.Name() + " defeats: " + defeats[option.Name()]);
 
                 int newLosses = defeats[option.Name()] - (games[option.Name()] - defeats[option.Name()]) / 4;
 
@@ -479,26 +480,20 @@ namespace Tyr
 
             if (EnemyRace == Race.Protoss)
             {
-                options.Add(new RushDefense());
-                options.Add(new TurtleLords());
+                options.Add(new MassZergling() { AllowHydraTransition = true });
             }
             else if (EnemyRace == Race.Terran)
             {
-                options.Add(new RushDefense());
-                options.Add(new HydraLurker());
+                options.Add(new MassZergling() { AllowHydraTransition = true });
             }
             else if (EnemyRace == Race.Zerg)
             {
-                options.Add(new MassZergling());
+                options.Add(new OneBaseRoach());
                 options.Add(new RoachRavager());
             }
             else
             {
-                options.Add(new RushDefense());
-                options.Add(new MassZergling());
-                options.Add(new HydraLurker());
-                options.Add(new RoachRavager());
-                options.Add(new TurtleLords());
+                options.Add(new MacroHydra());
             }
 
             return options;
@@ -508,55 +503,141 @@ namespace Tyr
         {
             List<Build> options = new List<Build>();
             if (EnemyRace == Race.Terran)
-                options.Add(new NinjaTurtleCarrier() { BuildCarriers = true, RequiredSize = 12 });
-            else if (EnemyRace == Race.Zerg)
-                options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 10 });
-            else
             {
-                options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 8 });
-                if (PreviousEnemyStrategies.SkyToss)
-                    options.Add(new OneBaseStalker() { RequiredSize = 10 });
-            }
-            /*
-            if (EnemyRace == Race.Protoss)
-            {
-                options.Add(new TwoBaseRobo());
-                if (TargetManager.PotentialEnemyStartLocations.Count == 1)
-                    options.Add(new WorkerRush());
-                options.Add(new OneBaseStalker());
-            }
-            else if (EnemyRace == Race.Terran)
-            {
-                options.Add(new TwoBaseRoboPvT());
-                if (TargetManager.PotentialEnemyStartLocations.Count == 1)
-                    options.Add(new WorkerRush());
-                if (Bot.PreviousEnemyStrategies.FourRax && !PreviousEnemyStrategies.ReaperRush)
-                    options.Add(new NinjaTurtles());
-                if (!Bot.PreviousEnemyStrategies.FourRax && !PreviousEnemyStrategies.ReaperRush)
-                    options.Add(new ZealotRush() { RequiredSize = 20 });
-                if (!PreviousEnemyStrategies.ReaperRush)
-                    options.Add(new MassVoidray());
+                options.Add(new PvTDisruptor());
             }
             else if (EnemyRace == Race.Zerg)
             {
-                options.Add(new OneBaseStalker() { ProxyPylon = true });
-                options.Add(new TwoBaseRobo());
-                if (TargetManager.PotentialEnemyStartLocations.Count == 1)
-                    options.Add(new WorkerRush());
-                if (!PreviousEnemyStrategies.MassRoach || PreviousEnemyStrategies.MassHydra)
-                    options.Add(new TwoBaseAdept());
+                options.Add(new MacroToss());
+            }
+            else if (EnemyRace == Race.Protoss)
+            {
+                options.Add(new VoidrayPvP());
             }
             else
             {
-                options.Add(new TwoBaseRobo());
-                if (Bot.TargetManager.PotentialEnemyStartLocations.Count == 1)
-                    options.Add(new WorkerRush());
-                options.Add(new NinjaTurtles());
-                options.Add(new OneBaseStalker());
+                options.Add(new MacroPvP());
             }
-            */
 
             return options;
+        }
+
+        public List<Build> TerranBuilds()
+        {
+            List<Build> options = new List<Build>();
+
+            if (EnemyRace == Race.Terran)
+            {
+                options.Add(new BunkerRush());
+            }
+            else if (EnemyRace == Race.Zerg)
+            {
+                if (!Zergling.Get().DetectedPreviously
+                    || Queen.Get().DetectedPreviously 
+                    || Mutalisk.Get().DetectedPreviously 
+                    || Roach.Get().DetectedPreviously 
+                    || Hydralisk.Get().DetectedPreviously)
+                    options.Add(new BunkerRush());
+                options.Add(new MechTvZ());
+            }
+            else if (EnemyRace == Race.Protoss)
+            {
+                options.Add(new BunkerRush());
+            }
+            else
+            {
+                options.Add(new TankPushProbots());
+            }
+
+            return options;
+        }
+
+        private void ProcessTournamentFile()
+        {
+            string[] tournamentLines = FileUtil.ReadTournamentFile();
+            Dictionary<string, int> gamesPlayed = new Dictionary<string, int>();
+            Dictionary<string, string> races = new Dictionary<string, string>();
+
+            if (EnemyRace == Race.Terran || tournamentLines.Length >= 2)
+                FileUtil.LogTournament("started " + OpponentID + " " + EnemyRace);
+
+            for (int i = tournamentLines.Length - 1; i >= 0; i--)
+            {
+                string line = tournamentLines[i];
+                if (!line.StartsWith("started"))
+                    continue;
+                string[] words = line.Split(' ');
+                if (!races.ContainsKey(words[1]))
+                    races.Add(words[1], words[2]);
+                if (gamesPlayed.ContainsKey(words[1]))
+                    continue;
+
+                int count = 1;
+                for (int j = i - 1; j >= 0; j--)
+                {
+                    string line2 = tournamentLines[i];
+                    if (!line2.StartsWith("started"))
+                        continue;
+
+                    string[] words2 = line2.Split(' ');
+                    if (gamesPlayed.ContainsKey(words[1]))
+                        continue;
+
+                    if (words[1] != words2[1])
+                        break;
+                    count++;
+                }
+                gamesPlayed.Add(words[1], count);
+            }
+
+            bool previousZergOpponent = false;
+            foreach (string id in gamesPlayed.Keys)
+            {
+                if (id == OpponentID)
+                    continue;
+                if (races.ContainsKey(id) && races[id] != "Zerg")
+                    continue;
+                if (gamesPlayed[id] >= 3)
+                {
+                    previousZergOpponent = true;
+                    break;
+                }
+            }
+
+            bool previousTerranOpponent = false;
+            foreach (string id in gamesPlayed.Keys)
+            {
+                if (id == OpponentID)
+                    continue;
+                if (races.ContainsKey(id) && races[id] != "Terran")
+                    continue;
+                if (gamesPlayed[id] >= 2)
+                {
+                    previousTerranOpponent = true;
+                    break;
+                }
+            }
+
+            int tournamentRound = 0;
+            if (EnemyRace == Race.Protoss)
+                tournamentRound = 3;
+            else if (EnemyRace == Race.Zerg)
+            {
+                if (previousTerranOpponent && previousZergOpponent)
+                    tournamentRound = 3;
+                else
+                    tournamentRound = 2;
+            }
+            else
+            {
+                if (previousTerranOpponent && previousZergOpponent)
+                    tournamentRound = 3;
+                else
+                    tournamentRound = 1;
+            }
+
+            System.Console.WriteLine("Tournament round: " + tournamentRound);
+
         }
 
         public List<Unit> Enemies()
@@ -566,8 +647,9 @@ namespace Tyr
 
         public void OnEnd(ResponseObservation observation, Result result)
         {
-            Register("Result: " + result);
-            Register("Average ms per frame: " + totalExecutionTime / Frame + " Max ms per frame: " + maxExecutionTime);
+            FileUtil.Register("Result: " + result);
+            if (Frame > 0)
+                FileUtil.Register("Average ms per frame: " + totalExecutionTime / Frame + " Max ms per frame: " + maxExecutionTime);
         }
 
 
@@ -581,10 +663,15 @@ namespace Tyr
             return (int)Observation.Observation.PlayerCommon.Vespene - ReservedGas;
         }
 
-        public void Register(string line)
+        private void Time()
         {
-            if (AllowWritingFiles)
-                File.AppendAllLines(ResultsFile, new string[] { line });
+            long currentTime = System.DateTime.Now.Ticks;
+            if (PrevTime != -1 && Frame <= 224)
+                Times.Add(currentTime - PrevTime);
+            PrevTime = currentTime;
+            if (Frame == 224 + 22)
+                foreach (long time in Times)
+                    FileUtil.Debug(time + "");
         }
     }
 }
