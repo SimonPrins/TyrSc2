@@ -5,6 +5,6 @@ namespace Tyr.BuildSelection
 {
     public interface BuildSelector
     {
-        Build Select(List<Build> builds, Dictionary<string, int> defeats, Dictionary<string, int> games);
+        Build Select(List<Build> builds, string[] lines);
     }
 }

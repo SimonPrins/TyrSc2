@@ -412,38 +412,6 @@ namespace Tyr
 
             string[] lines = FileUtil.ReadResultsFile();
             PreviousEnemyStrategies.Load(lines);
-            Dictionary<string, int> defeats = new Dictionary<string, int>();
-            Dictionary<string, int> games = new Dictionary<string, int>();
-            foreach (string line in lines)
-            {
-                if (line.StartsWith("result "))
-                {
-                    string[] words = line.Split(' ');
-                    if (words[1] != EnemyRace.ToString())
-                        continue;
-                    if (words[3] == "Defeat")
-                    {
-                        if (!defeats.ContainsKey(words[2]))
-                            defeats.Add(words[2], 0);
-                        defeats[words[2]]++;
-
-                        if (!games.ContainsKey(words[2]))
-                            games.Add(words[2], 1);
-                        else if (games[words[2]] < defeats[words[2]])
-                            games[words[2]] = defeats[words[2]];
-                    }
-                }
-                else if (line.StartsWith("started"))
-                {
-                    string[] words = line.Split(' ');
-                    if (words[1] != EnemyRace.ToString())
-                        continue;
-
-                    if (!games.ContainsKey(words[2]))
-                        games.Add(words[2], 0);
-                    games[words[2]]++;
-                }
-            }
 
             List<Build> options;
 
@@ -456,7 +424,7 @@ namespace Tyr
             else
                 options = null;
 
-            return BuildSelector.Select(options, defeats, games);
+            return BuildSelector.Select(options, lines);
         }
 
         public List<Build> ZergBuilds()
