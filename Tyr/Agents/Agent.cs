@@ -56,11 +56,6 @@ namespace Tyr.Agents
             return UnitTypes.CanAttackAir(Unit.UnitType);
         }
 
-        public bool CanAttackAir()
-        {
-            return UnitTypes.CanAttackAir(Unit.UnitType);
-        }
-
         public bool CanAttackGround()
         {
             return UnitTypes.CanAttackGround(Unit.UnitType);

@@ -237,7 +237,7 @@ namespace Tyr.Builds
             
             if (buildLocation == null)
                 return false;
-            }
+            
             ConstructionTask.Task.Build(type, b, buildLocation, pos, exact);
             return true;
         }
