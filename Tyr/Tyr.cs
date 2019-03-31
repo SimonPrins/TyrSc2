@@ -92,12 +92,15 @@ namespace Tyr
             Bot = this;
         }
 
+        bool PrintedBarracks = false;
+
         public IEnumerable<Action> onFrame(ResponseObservation observation)
         {
             Stopwatch stopWatch = Stopwatch.StartNew();
             actions = new List<Action>();
             DrawRequest = null;
             TextLine = 0;
+            
 
 
             long time1 = 0;

@@ -221,10 +221,7 @@ namespace Tyr.Builds
             }
             Point2D buildLocation = Tyr.Bot.buildingPlacer.FindPlacement(b.BaseLocation.Pos, BuildingType.LookUp[type].Size, type);
             if (buildLocation == null)
-            {
-                Tyr.Bot.DrawText("No placement found for " + UnitTypes.LookUp[type].Name + ".");
                 return false;
-            }
             Tyr.Bot.DrawText("Building " + UnitTypes.LookUp[type].Name + ".");
             ConstructionTask.Task.Build(type, b, buildLocation, null, false);
             return true;
@@ -239,8 +236,6 @@ namespace Tyr.Builds
                 buildLocation = Tyr.Bot.buildingPlacer.FindPlacement(pos, BuildingType.LookUp[type].Size, type, type == UnitTypes.SPINE_CRAWLER ? 5 : 15);
             
             if (buildLocation == null)
-            {
-                Tyr.Bot.DrawText("No placement location found for " + UnitTypes.LookUp[type].Name + ".");
                 return false;
             }
             ConstructionTask.Task.Build(type, b, buildLocation, pos, exact);

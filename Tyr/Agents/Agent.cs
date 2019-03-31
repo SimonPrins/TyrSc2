@@ -1,5 +1,4 @@
-﻿using System;
-using SC2APIProtocol;
+﻿using SC2APIProtocol;
 using Tyr.Managers;
 using Tyr.Util;
 
@@ -50,6 +49,11 @@ namespace Tyr.Agents
             Command.AbilityId = ability;
             Command.TargetWorldSpacePos = target;
             Command.UnitTags.Add(Unit.Tag);
+        }
+        
+        public bool CanAttackAir()
+        {
+            return UnitTypes.CanAttackAir(Unit.UnitType);
         }
 
         public bool CanAttackAir()
