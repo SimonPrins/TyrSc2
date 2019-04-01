@@ -127,6 +127,7 @@
     <Compile Include="Builds\BuildLists\ToLine.cs" />
     <Compile Include="Builds\BuildLists\WaitForResources.cs" />
     <Compile Include="Builds\BuildLists\StepResult.cs" />
+    <Compile Include="Builds\Protoss\FourGateProxy.cs" />
     <Compile Include="Builds\Protoss\VoidrayPvP.cs" />
     <Compile Include="Builds\Protoss\MacroPvP.cs" />
     <Compile Include="Builds\Protoss\MassOracle.cs" />
@@ -150,6 +151,7 @@
     <Compile Include="Builds\Terran\ReaperCyclone.cs" />
     <Compile Include="Builds\Terran\BansheeRush.cs" />
     <Compile Include="Builds\Terran\ReaperRush.cs" />
+    <Compile Include="Builds\Terran\HellbatRush.cs" />
     <Compile Include="Builds\Terran\CycloneRush.cs" />
     <Compile Include="Builds\Terran\MechTvZ.cs" />
     <Compile Include="Builds\Terran\MassWidowMines.cs" />
@@ -309,6 +311,7 @@
     <Compile Include="StrategyAnalysis\Strategy.cs" />
     <Compile Include="Tasks\AdeptKillSquadTask.cs" />
     <Compile Include="Tasks\AdeptScoutTask.cs" />
+    <Compile Include="Tasks\ProxyFourGateTask.cs" />
     <Compile Include="Tasks\CreeperLordTask.cs" />
     <Compile Include="Tasks\ArmyObserverTask.cs" />
     <Compile Include="Tasks\DefendingOverseerTask.cs" />
