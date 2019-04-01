@@ -109,6 +109,7 @@
     <Compile Include="BuildingPlacement\ReservedBuilding.cs" />
     <Compile Include="BuildingPlacement\TerranBuildingPlacement.cs" />
     <Compile Include="BuildSelection\BuildSelector.cs" />
+    <Compile Include="BuildSelection\ProbabilitySelector.cs" />
     <Compile Include="BuildSelection\RotateSelector.cs" />
     <Compile Include="Builds\BuildLists\BuildingAtBase.cs" />
     <Compile Include="Builds\BuildLists\UpgradeStep.cs" />
