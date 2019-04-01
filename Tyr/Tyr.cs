@@ -87,15 +87,13 @@ namespace Tyr
 
         List<long> Times = new List<long>();
 
-        private BuildSelector BuildSelector = new RotateSelector();
+        private BuildSelector BuildSelector = new ProbabilitySelector();
 
         public Tyr()
         {
             buildingPlacer = new BuildingPlacer(this);
             Bot = this;
         }
-
-        bool PrintedBarracks = false;
 
         public IEnumerable<Action> onFrame(ResponseObservation observation)
         {
