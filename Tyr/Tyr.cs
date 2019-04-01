@@ -432,19 +432,26 @@ namespace Tyr
             if (EnemyRace == Race.Protoss)
             {
                 options.Add(new MassZergling() { AllowHydraTransition = true });
+                options.Add(new MacroHydra());
+                options.Add(new RushDefense());
             }
             else if (EnemyRace == Race.Terran)
             {
                 options.Add(new MassZergling() { AllowHydraTransition = true });
+                options.Add(new MacroHydra());
+                options.Add(new RushDefense());
             }
             else if (EnemyRace == Race.Zerg)
             {
-                options.Add(new OneBaseRoach());
                 options.Add(new RoachRavager());
+                options.Add(new MacroHydra());
+                options.Add(new RushDefense());
             }
             else
             {
+                options.Add(new MassZergling() { AllowHydraTransition = true });
                 options.Add(new MacroHydra());
+                options.Add(new RushDefense());
             }
 
             return options;
@@ -456,18 +463,26 @@ namespace Tyr
             if (EnemyRace == Race.Terran)
             {
                 options.Add(new PvTDisruptor());
+                options.Add(new NinjaTurtles());
+                options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 10 });
             }
             else if (EnemyRace == Race.Zerg)
             {
                 options.Add(new MacroToss());
+                options.Add(new NinjaTurtles());
+                options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 10 });
             }
             else if (EnemyRace == Race.Protoss)
             {
                 options.Add(new VoidrayPvP());
+                options.Add(new NinjaTurtles());
+                options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 10 });
             }
             else
             {
                 options.Add(new MacroPvP());
+                options.Add(new NinjaTurtles());
+                options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 10 });
             }
 
             return options;
@@ -480,24 +495,26 @@ namespace Tyr
             if (EnemyRace == Race.Terran)
             {
                 options.Add(new BunkerRush());
+                options.Add(new TankPushProbots());
+                options.Add(new MarineRush());
             }
             else if (EnemyRace == Race.Zerg)
             {
-                if (!Zergling.Get().DetectedPreviously
-                    || Queen.Get().DetectedPreviously 
-                    || Mutalisk.Get().DetectedPreviously 
-                    || Roach.Get().DetectedPreviously 
-                    || Hydralisk.Get().DetectedPreviously)
-                    options.Add(new BunkerRush());
+                options.Add(new BunkerRush());
                 options.Add(new MechTvZ());
+                options.Add(new MarineRush());
             }
             else if (EnemyRace == Race.Protoss)
             {
                 options.Add(new BunkerRush());
+                options.Add(new TankPushTvPProbots());
+                options.Add(new MarineRush());
             }
             else
             {
+                options.Add(new BunkerRush());
                 options.Add(new TankPushProbots());
+                options.Add(new MarineRush());
             }
 
             return options;
