@@ -80,20 +80,8 @@ namespace Tyr.Builds.Protoss
             Set += EmergencyGateways();
             Set += ExpandBuildings();
             Set += Nexii();
+            Set += Units();
             Set += MainBuild();
-        }
-
-        private BuildList Nexii()
-        {
-            BuildList result = new BuildList();
-
-            result.If(() => { return Tyr.Bot.EnemyRace != Race.Terran || Count(UnitTypes.GATEWAY) >= 2; });
-            result.If(() => { return Tyr.Bot.EnemyRace != Race.Zerg || Count(UnitTypes.GATEWAY) >= 1; });
-            result.Building(UnitTypes.NEXUS, 2);
-            result.If(() => { return Attacking; });
-            result.Building(UnitTypes.NEXUS);
-
-            return result;
         }
 
         private BuildList CannonDefense()
@@ -109,23 +97,6 @@ namespace Tyr.Builds.Protoss
             }
             result.Building(UnitTypes.PHOTON_CANNON, Main, 2, () => Count(UnitTypes.STALKER) >= 10 && Count(UnitTypes.OBSERVER) > 0);
             result.Building(UnitTypes.PHOTON_CANNON, Main, () => Count(UnitTypes.STALKER) >= 15 && Count(UnitTypes.OBSERVER) > 0);
-
-            return result;
-        }
-
-        private BuildList ExpandBuildings()
-        {
-            BuildList result = new BuildList();
-
-            result.If(() => { return !Tyr.Bot.EnemyStrategyAnalyzer.EarlyPool; });
-            foreach (Base b in Tyr.Bot.BaseManager.Bases)
-            {
-                if (b == Main)
-                    continue;
-                result.Building(UnitTypes.PYLON, b, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95);
-                result.Building(UnitTypes.GATEWAY, b, 2, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95 && Completed(b, UnitTypes.PYLON) >= 1 && Minerals() >= 350);
-                result.Building(UnitTypes.PYLON, b, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95 && Count(b, UnitTypes.GATEWAY) >= 2 && Minerals() >= 700);
-            }
 
             return result;
         }
@@ -148,6 +119,57 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
+        private BuildList ExpandBuildings()
+        {
+            BuildList result = new BuildList();
+
+            result.If(() => { return !Tyr.Bot.EnemyStrategyAnalyzer.EarlyPool; });
+            foreach (Base b in Tyr.Bot.BaseManager.Bases)
+            {
+                if (b == Main)
+                    continue;
+                result.Building(UnitTypes.PYLON, b, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95);
+                result.Building(UnitTypes.GATEWAY, b, 2, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95 && Completed(b, UnitTypes.PYLON) >= 1 && Minerals() >= 350);
+                result.Building(UnitTypes.PYLON, b, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95 && Count(b, UnitTypes.GATEWAY) >= 2 && Minerals() >= 700);
+            }
+
+            return result;
+        }
+
+        private BuildList Nexii()
+        {
+            BuildList result = new BuildList();
+
+            result.If(() => { return Tyr.Bot.EnemyRace != Race.Terran || Count(UnitTypes.GATEWAY) >= 2; });
+            result.If(() => { return Tyr.Bot.EnemyRace != Race.Zerg || Count(UnitTypes.GATEWAY) >= 1; });
+            result.Building(UnitTypes.NEXUS, 2);
+            result.If(() => { return Attacking; });
+            result.Building(UnitTypes.NEXUS);
+
+            return result;
+        }
+
+        private BuildList Units()
+        {
+            BuildList result = new BuildList();
+
+            result.Train(UnitTypes.TEMPEST);
+            result.Train(UnitTypes.STALKER, () => TotalEnemyCount(UnitTypes.BANSHEE) >= 5);
+            result.Train(UnitTypes.OBSERVER, 1);
+            result.Train(UnitTypes.OBSERVER, 3, () => TotalEnemyCount(UnitTypes.BANSHEE) >= 3);
+            result.Train(UnitTypes.IMMORTAL, 6, () => TotalEnemyCount(UnitTypes.BANSHEE) < 5);
+            result.Train(UnitTypes.DISRUPTOR, 4, () => 
+                TotalEnemyCount(UnitTypes.BATTLECRUISER) == 0 
+                && (TotalEnemyCount(UnitTypes.WIDOW_MINE) < 10 || TotalEnemyCount(UnitTypes.MARAUDER) + TotalEnemyCount(UnitTypes.MARINE) > TotalEnemyCount(UnitTypes.WIDOW_MINE) * 2) );
+            result.Train(UnitTypes.IMMORTAL, () => 
+                Count(UnitTypes.IMMORTAL) < DesiredImmortals
+                && TotalEnemyCount(UnitTypes.BANSHEE) < 5
+                && (TotalEnemyCount(UnitTypes.WIDOW_MINE) < 10 || TotalEnemyCount(UnitTypes.MARAUDER) + TotalEnemyCount(UnitTypes.MARINE) > TotalEnemyCount(UnitTypes.WIDOW_MINE) * 2));
+            result.Train(UnitTypes.STALKER, () => TotalEnemyCount(UnitTypes.BANSHEE) < 5);
+
+            return result;
+        }
+
         private BuildList MainBuild()
         {
             BuildList result = new BuildList();
@@ -162,6 +184,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.CYBERNETICS_CORE);
             result.Building(UnitTypes.GATEWAY, Main);
             result.Building(UnitTypes.ASSIMILATOR, () => !FourRaxSuspected || Count(UnitTypes.PHOTON_CANNON) >= 2);
+            result.Upgrade(UpgradeType.WarpGate);
             result.Building(UnitTypes.PYLON, Natural);
             result.Building(UnitTypes.GATEWAY, Natural, () => FourRaxSuspected && Completed(Natural, UnitTypes.PYLON) > 0);
             result.Building(UnitTypes.SHIELD_BATTERY, Natural, 2, () => FourRaxSuspected && Completed(Natural, UnitTypes.PYLON) > 0);
@@ -326,6 +349,7 @@ namespace Tyr.Builds.Protoss
                 if (Count(UnitTypes.PROBE) < 13 || Count(UnitTypes.PYLON) > 0)
                     agent.Order(1006);
             }
+            /*
             else if (agent.Unit.UnitType == UnitTypes.GATEWAY)
             {
                 if (Attacking && Count(UnitTypes.NEXUS) < 3)
@@ -340,6 +364,7 @@ namespace Tyr.Builds.Protoss
                         agent.Order(917);
                 }
             }
+            */
             else if (agent.Unit.UnitType == UnitTypes.ROBOTICS_BAY)
             {
                 if (Minerals() >= 150
@@ -350,6 +375,7 @@ namespace Tyr.Builds.Protoss
                     agent.Order(1097);
                 }
             }
+            /*
             else if (agent.Unit.UnitType == UnitTypes.ROBOTICS_FACILITY)
             {
                 if (Attacking && Count(UnitTypes.NEXUS) < 3)
@@ -391,6 +417,7 @@ namespace Tyr.Builds.Protoss
                     && Gas() >= 175)
                     agent.Order(955);
             }
+            */
             else if (agent.Unit.UnitType == UnitTypes.TWILIGHT_COUNSEL)
             {
 
