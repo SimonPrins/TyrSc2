@@ -148,6 +148,16 @@ namespace Tyr.Builds
             return Tyr.Bot.UnitManager.Completed(type);
         }
 
+        public int EnemyCount(uint type)
+        {
+            return Tyr.Bot.EnemyStrategyAnalyzer.Count(type);
+        }
+
+        public int TotalEnemyCount(uint type)
+        {
+            return Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(type);
+        }
+
         public static int Count(Base b, uint type)
         {
             if (b.BuildingCounts.ContainsKey(type))
