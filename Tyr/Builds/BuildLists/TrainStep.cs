@@ -1,6 +1,9 @@
-﻿using System;
+﻿using SC2APIProtocol;
+using System;
 using Tyr.Agents;
+using Tyr.BuildingPlacement;
 using Tyr.Tasks;
+using Tyr.Util;
 using static Tyr.Builds.BuildLists.ConditionalStep;
 
 namespace Tyr.Builds.BuildLists
@@ -97,13 +100,45 @@ namespace Tyr.Builds.BuildLists
                 if (Tyr.Bot.Build.Gas() < 0)
                     return new NextItem();
 
-                agent.Order((int)trainType.Ability);
+                if (agent.Unit.UnitType == UnitTypes.WARP_GATE)
+                {
+                    bool success = WarpIn(agent, trainType);
+                    if (!success)
+                        continue;
+                }
+                else
+                    agent.Order((int)trainType.Ability);
 
                 state.AddTraining(UnitType, 1);
                 alreadyTrained++;
             }
 
             return new NextItem();
+        }
+
+        private bool WarpIn(Agent warpGate, TrainingType trainType)
+        {
+            Point2D aroundTile;
+            Point2D placement;
+            if (Tyr.Bot.BaseManager.Natural.Owner == Tyr.Bot.PlayerId)
+            {
+                aroundTile = Tyr.Bot.BaseManager.Natural.OppositeMineralLinePos;
+                placement = WarpInPlacer.FindPlacement(aroundTile, trainType.UnitType);
+                if (placement != null)
+                {
+                    warpGate.Order((int)trainType.WarpInAbility, placement);
+                    return true;
+                }
+            }
+
+            aroundTile = SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation);
+            placement = WarpInPlacer.FindPlacement(aroundTile, trainType.UnitType);
+            if (placement != null)
+            {
+                warpGate.Order((int)trainType.WarpInAbility, placement);
+                return true;
+            }
+            return false;
         }
 
         private bool IsReactor(uint unitType)
