@@ -10,6 +10,25 @@ namespace Tyr.Util
     {
         public static int GetDataValue(ImageData data, int x, int y)
         {
+            if (data.BitsPerPixel == 1)
+                return GetDataValueBit(data, x, y);
+
+            return GetDataValueByte(data, x, y);
+        }
+        public static int GetDataValueBit(ImageData data, int x, int y)
+        {
+            int pixelID = x + y * data.Size.X;
+            int byteLocation = pixelID / 8;
+            int bitLocation = pixelID % 8;
+            return ((data.Data[byteLocation] & 1 << (7 - bitLocation)) == 0) ? 0 : 1;
+        }
+        public static int GetDataValueByte(ImageData data, int x, int y)
+        {
+            int pixelID = x + y * data.Size.X;
+            return data.Data[pixelID];
+        }
+        public static int GetDataValueOld(ImageData data, int x, int y)
+        {
             int pixelID = x + (data.Size.Y - 1 - y) * data.Size.X;
             return data.Data[pixelID];
         }
@@ -18,7 +37,7 @@ namespace Tyr.Util
         {
             if (x < 0 || y < 0 || x >= Tyr.Bot.GameInfo.StartRaw.PlacementGrid.Size.X || y >= Tyr.Bot.GameInfo.StartRaw.PlacementGrid.Size.Y)
                 return false;
-            return SC2Util.GetDataValue(Tyr.Bot.GameInfo.StartRaw.PlacementGrid, x, y) == 255;
+            return SC2Util.GetDataValue(Tyr.Bot.GameInfo.StartRaw.PlacementGrid, x, y) == 1;
         }
 
         public static Point2D Point(float x, float y)
@@ -96,6 +115,24 @@ namespace Tyr.Util
         {
             float length = (float)Math.Sqrt(point.X * point.X + point.Y * point.Y);
             return Point(point.X / length, point.Y / length);
+        }
+
+        public static Point2D TowardCardinal(Point2D pos1, Point2D pos2, float distance)
+        {
+            if (Math.Abs(pos2.X - pos1.X) >= Math.Abs(pos2.Y - pos1.Y))
+            {
+                if (pos2.X > pos1.X)
+                     return Point(pos1.X + distance, pos1.Y);
+                else
+                    return Point(pos1.X - distance, pos1.Y);
+            }
+            else
+            {
+                if (pos2.Y > pos1.Y)
+                    return Point(pos1.X, pos1.Y + distance);
+                else
+                    return Point(pos1.X, pos1.Y - distance);
+            }
         }
     }
 }
