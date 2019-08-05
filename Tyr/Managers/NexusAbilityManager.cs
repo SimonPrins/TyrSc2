@@ -8,9 +8,13 @@ namespace Tyr.Managers
     {
         Dictionary<ulong, int> lastChronoFrame = new Dictionary<ulong, int>();
         public HashSet<uint> PriotitizedAbilities = new HashSet<uint>();
+
+        public bool Stopped = false;
+
         public void OnFrame(Tyr tyr)
         {
-            if (tyr.GameInfo.PlayerInfo[(int)tyr.PlayerId - 1].RaceActual != Race.Protoss)
+            if (tyr.GameInfo.PlayerInfo[(int)tyr.PlayerId - 1].RaceActual != Race.Protoss
+                || Stopped)
                 return;
             foreach (Agent agent in tyr.UnitManager.Agents.Values)
                 if (agent.Unit.UnitType == UnitTypes.NEXUS)

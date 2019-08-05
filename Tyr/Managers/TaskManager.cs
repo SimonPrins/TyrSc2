@@ -6,14 +6,16 @@ namespace Tyr.Managers
 {
     public class TaskManager : Manager
     {
-        private List<Task> tasks = new List<Task>();
+        public List<Task> Tasks = new List<Task>();
+
+        public CombatSimulation CombatSimulation = new CombatSimulation();
 
         public void OnFrame(Tyr tyr)
         {
-            foreach (Task task in tasks)
+            foreach (Task task in Tasks)
                 task.Cleanup(tyr);
 
-            List<Task> orderedTasks = tasks.FindAll((task) => { return task.IsNeeded(); });
+            List<Task> orderedTasks = Tasks.FindAll((task) => { return task.IsNeeded(); });
             orderedTasks.Sort((a, b) => { return a.Priority.CompareTo(b.Priority); });
             
             for (int i = orderedTasks.Count - 1; i > -1; i--)
@@ -82,27 +84,29 @@ namespace Tyr.Managers
                 }
             }
 
-            foreach (Task task in tasks)
+            CombatSimulation.OnFrame(tyr);
+
+            foreach (Task task in Tasks)
                 task.OnFrame(tyr);
         }
 
         public void StopAll()
         {
-            foreach (Task task in tasks)
+            foreach (Task task in Tasks)
                 task.Stopped = true;
         }
 
         public void ClearStopped()
         {
-            foreach (Task task in tasks)
+            foreach (Task task in Tasks)
                 if (task.Stopped)
                     task.Clear();
         }
 
         public void Add(Task task)
         {
-            if (!tasks.Contains(task))
-            tasks.Add(task);
+            if (!Tasks.Contains(task))
+            Tasks.Add(task);
         }
 
         public void NewAgent(Agent agent)

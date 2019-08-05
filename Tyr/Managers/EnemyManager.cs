@@ -11,6 +11,8 @@ namespace Tyr.Managers
         private List<Unit> Enemies;
         private int EnemiesFrame = -1;
         public Queue<RecentlyDeceased> RecentlyDeceased = new Queue<RecentlyDeceased>();
+        public Dictionary<ulong, Unit> LastSeen = new Dictionary<ulong, Unit>();
+        public Dictionary<ulong, int> LastSeenFrame = new Dictionary<ulong, int>();
 
         public List<Unit> GetEnemies()
         {
@@ -55,6 +57,15 @@ namespace Tyr.Managers
 
         public void OnFrame(Tyr tyr)
         {
+            if (Tyr.Bot.Observation.Observation.RawData.Event != null
+                && Tyr.Bot.Observation.Observation.RawData.Event.DeadUnits != null)
+                foreach (ulong tag in Tyr.Bot.Observation.Observation.RawData.Event.DeadUnits)
+                {
+                    if (LastSeen.ContainsKey(tag))
+                        LastSeen.Remove(tag);
+                    if (LastSeenFrame.ContainsKey(tag))
+                        LastSeenFrame.Remove(tag);
+                }
             List<ulong> destroyedBuildings = new List<ulong>();
             foreach (BuildingLocation location in EnemyBuildings.Values)
                 foreach (Agent agent in tyr.UnitManager.Agents.Values)
@@ -65,6 +76,9 @@ namespace Tyr.Managers
 
             foreach (Unit unit in Tyr.Bot.Enemies())
             {
+                CollectionUtil.Add(LastSeen, unit.Tag, unit);
+                CollectionUtil.Add(LastSeenFrame, unit.Tag, tyr.Frame);
+
                 if (!UnitTypes.BuildingTypes.Contains(unit.UnitType))
                     continue;
 

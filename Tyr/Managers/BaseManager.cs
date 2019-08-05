@@ -104,8 +104,6 @@ namespace Tyr.Managers
                 newBase.MineralSide2 = new Point2D() { X = (newBase.MineralSide2.X + newBase.BaseLocation.Pos.X) / 2f, Y = (newBase.MineralSide2.Y + newBase.BaseLocation.Pos.Y) / 2f };
             }
 
-            DebugUtil.WriteLine("Mapname: " + tyr.GameInfo.MapName);
-
             NaturalDefensePos = tyr.MapAnalyzer.Walk(natural.Pos, tyr.MapAnalyzer.EnemyDistances, 10);
             int distToEnemy = tyr.MapAnalyzer.EnemyDistances[(int)NaturalDefensePos.X, (int)NaturalDefensePos.Y];
             int wallDist = tyr.MapAnalyzer.WallDistances[(int)NaturalDefensePos.X, (int)NaturalDefensePos.Y];
@@ -186,10 +184,10 @@ namespace Tyr.Managers
                 foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
                 {
                     if (UnitTypes.MineralFields.Contains(unit.UnitType)
-                            && SC2Util.DistanceGrid(unit.Pos, b.BaseLocation.Pos) <= 15)
+                        && SC2Util.DistanceSq(unit.Pos, b.BaseLocation.Pos) <= 10 * 10)
                         b.BaseLocation.MineralFields.Add(new MineralField() { Pos = unit.Pos, Tag = unit.Tag });
                     else if (UnitTypes.GasGeysers.Contains(unit.UnitType)
-                            && SC2Util.DistanceGrid(unit.Pos, b.BaseLocation.Pos) <= 15)
+                            && SC2Util.DistanceSq(unit.Pos, b.BaseLocation.Pos) <= 10 * 10)
                     {
                         bool available = b.ResourceCenter != null
                                 && unit.UnitType != UnitTypes.ASSIMILATOR
@@ -218,16 +216,24 @@ namespace Tyr.Managers
                         AvailableGasses++;
 
                 b.UnderAttack = false;
+                b.Evacuate = false;
+                int attackerCount = 0;
                 foreach (Unit enemy in tyr.Enemies())
                 {
                     if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                         continue;
-                    if (SC2Util.DistanceSq(enemy.Pos, b.BaseLocation.Pos) <= 15 * 15)
-                    {
-                        b.UnderAttack = true;
-                        break;
-                    }
+                    if (SC2Util.DistanceSq(enemy.Pos, b.BaseLocation.Pos) >= 15 * 15)
+                        continue;
+
+                    if (enemy.UnitType == UnitTypes.ORACLE)
+                        attackerCount += 8;
+
+                    b.UnderAttack = true;
+                    if (UnitTypes.CanAttackGround(enemy.UnitType))
+                        attackerCount++;
                 }
+                if (attackerCount >= 8)
+                    b.Evacuate = true;
 
                 if (b.ResourceCenter == null || b.ResourceCenter.Unit.BuildProgress < 0.99)
                     b.ResourceCenterFinishedFrame = -1;
