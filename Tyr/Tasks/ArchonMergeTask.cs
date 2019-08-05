@@ -1,4 +1,5 @@
-﻿using Tyr.Agents;
+﻿using SC2APIProtocol;
+using Tyr.Agents;
 using Tyr.Util;
 
 namespace Tyr.Tasks
@@ -6,6 +7,8 @@ namespace Tyr.Tasks
     public class ArchonMergeTask : Task
     {
         public static ArchonMergeTask Task = new ArchonMergeTask();
+        public Point2D MergePos = null;
+
         public ArchonMergeTask() : base(12)
         { }
 
@@ -26,17 +29,16 @@ namespace Tyr.Tasks
 
         public override void OnFrame(Tyr tyr)
         {
-            if (units.Count >= 2)
-                units[0].ArchonMerge(units[1]);
-
-            for (int i = units.Count - 1; i >= 0; i--)
+            for (int i = 0; i < units.Count - 1; i++)
             {
-                if (units[i].Unit.UnitType != UnitTypes.DARK_TEMPLAR
-                    && units[i].Unit.UnitType != UnitTypes.HIGH_TEMPLAR)
+                if (MergePos != null 
+                    && (units[i].DistanceSq(MergePos) >= 2 * 2 || units[i + 1].DistanceSq(MergePos) >= 2 * 2))
                 {
-                    IdleTask.Task.Add(units[i]);
-                    units.RemoveAt(i);
+                    units[i].Order(Abilities.MOVE, MergePos);
+                    units[i + 1].Order(Abilities.MOVE, MergePos);
                 }
+                else
+                    units[i].ArchonMerge(units[i + 1]);
             }
         }
     }

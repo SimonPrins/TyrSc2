@@ -195,9 +195,9 @@ namespace Tyr.Tasks
             }
 
             foreach (BuildRequest request in UnassignedRequests)
-                Tyr.Bot.DrawText("BuildRequest: " + UnitTypes.LookUp[request.Type].Name);
+                Tyr.Bot.DrawText("BuildRequest: " + UnitTypes.LookUp[request.Type].Name + " " + request.Pos);
             foreach (BuildRequest request in BuildRequests)
-                Tyr.Bot.DrawText("BuildRequest: " + UnitTypes.LookUp[request.Type].Name);
+                Tyr.Bot.DrawText("BuildRequest: " + UnitTypes.LookUp[request.Type].Name + " " + request.Pos);
         }
 
         private bool Unbuildable(BuildRequest request)
@@ -292,7 +292,9 @@ namespace Tyr.Tasks
             Tyr.Bot.ReservedGas += BuildingType.LookUp[type].Gas;
             if (type == UnitTypes.PYLON)
                 Tyr.Bot.UnitManager.FoodExpected += 8;
-            UnassignedRequests.Add(new BuildRequest() { Type = type, Base = b, Pos = pos, AroundLocation = aroundLocation, Exact = exact });
+            BuildRequest request = new BuildRequest() { Type = type, Base = b, Pos = pos, AroundLocation = aroundLocation, Exact = exact };
+            UnassignedRequests.Add(request);
+            Tyr.Bot.UnitManager.BuildingConstructing(request);
         }
 
         public void Build(uint type, Base b, Point2D pos, Gas gas)
@@ -308,7 +310,9 @@ namespace Tyr.Tasks
 
             Tyr.Bot.ReservedMinerals += BuildingType.LookUp[type].Minerals;
             Tyr.Bot.ReservedGas += BuildingType.LookUp[type].Gas;
-            UnassignedRequests.Add(new BuildRequestGas() { Type = type, Base = b, Pos = pos, Gas = gas });
+            BuildRequest requestGas = new BuildRequestGas() { Type = type, Base = b, Pos = pos, Gas = gas };
+            UnassignedRequests.Add(requestGas);
+            Tyr.Bot.UnitManager.BuildingConstructing(requestGas);
         }
 
     }

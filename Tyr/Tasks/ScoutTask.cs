@@ -4,29 +4,30 @@ using Tyr.Agents;
 
 namespace Tyr.Tasks
 {
-    class TimedObserverTask : Task
+    class ScoutTask : Task
     {
-        public static TimedObserverTask Task = new TimedObserverTask();
-
+        public static ScoutTask Task = new ScoutTask();
         public Point2D Target;
-        public TimedObserverTask() : base(11)
+        public uint ScoutType;
+
+        public ScoutTask() : base(11)
         { }
 
         public static void Enable()
         {
             Enable(Task);
         }
-            
 
         public override bool DoWant(Agent agent)
         {
-            return agent.Unit.UnitType == UnitTypes.OBSERVER && units.Count == 0;
+            return true;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
-            result.Add(new UnitDescriptor() { Pos = Tyr.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.OBSERVER } });
+            if (units.Count == 0)
+                result.Add(new UnitDescriptor() { Pos = Target, Count = 1, UnitTypes = new HashSet<uint>() { ScoutType } });
             return result;
         }
 

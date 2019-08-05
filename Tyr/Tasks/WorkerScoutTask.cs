@@ -19,6 +19,8 @@ namespace Tyr.Tasks
         private int CheckNaturalTimeEnd = 2016;
         private bool CheckedNatural = false;
 
+        private List<Point2D> ScoutPoints;
+
 
         private BaseLocation EnemyNatural;
 
@@ -50,8 +52,28 @@ namespace Tyr.Tasks
             return Tyr.Bot.Frame >= StartFrame && !ScoutSent;
         }
 
+        public bool BaseCircled()
+        {
+            return ScoutPoints != null && ScoutPoints.Count == 0;
+        }
+
         public override void OnFrame(Tyr tyr)
         {
+            if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 1 && ScoutPoints == null)
+            {
+                ScoutPoints = new List<Point2D>();
+                for (float dx = -15; dx <= 15; dx++)
+                    for (float dy = -15; dy <= 15; dy++)
+                    {
+                        if (dx * dx + dy * dy <= 10 * 10)
+                            continue;
+                        if (dx * dx + dy * dy > 15 * 15)
+                            continue;
+
+                        ScoutPoints.Add(new Point2D() { X = tyr.TargetManager.PotentialEnemyStartLocations[0].X + dx, Y = tyr.TargetManager.PotentialEnemyStartLocations[0].Y + dy });
+                    }
+            }
+
             Point2D target = tyr.TargetManager.PotentialEnemyStartLocations[0];
             if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 1 && units.Count > 0 && SC2Util.DistanceSq(units[0].Unit.Pos, target) <= 6 * 6)
                 Done = true;
@@ -83,6 +105,30 @@ namespace Tyr.Tasks
                 Point2D closest = null;
                 if (Done)
                 {
+                    for (int i = ScoutPoints.Count - 1; i >= 0; i--)
+                    {
+                        Point2D scoutPoint = ScoutPoints[i];
+                        if (agent.DistanceSq(scoutPoint) <= 6 * 6)
+                            CollectionUtil.RemoveAt(ScoutPoints, i);
+                    }
+                    float dist = 1000000;
+                    Point2D scoutTarget = null;
+                    foreach (Point2D scoutPoint in ScoutPoints)
+                    {
+                        float newDist = agent.DistanceSq(scoutPoint);
+                        if (newDist < dist)
+                        {
+                            dist = newDist;
+                            scoutTarget = scoutPoint;
+                        }
+                    }
+
+                    if (scoutTarget != null)
+                    {
+                        agent.Order(Abilities.MOVE, scoutTarget);
+                        continue;
+                    }
+                    
                     float distance = 6 * 6;
                     foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
                     {
