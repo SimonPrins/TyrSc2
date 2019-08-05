@@ -11,6 +11,7 @@ namespace Tyr.Tasks
         private List<BaseWorkers> baseWorkers;
         private List<Agent> unassignedWorkers = new List<Agent>();
         public bool StopTransfers = false;
+        public bool EvacuateThreatenedBases = false;
 
         public WorkerTask() : base(5)
         { }
@@ -52,6 +53,19 @@ namespace Tyr.Tasks
                 else if (!workers.Base.UnderAttack || StopTransfers)
                 {
                     myBases.Add(workers);
+                }
+            }
+
+            if (myBases.Count > 0 && EvacuateThreatenedBases)
+            {
+                foreach (BaseWorkers workers in baseWorkers)
+                {
+                    if (workers.Base.Evacuate)
+                    {
+                        foreach (Agent agent in workers.MineralWorkers)
+                            unassignedWorkers.Add(agent);
+                        workers.MineralWorkers = new List<Agent>();
+                    }
                 }
             }
 

@@ -28,7 +28,9 @@ namespace Tyr.Tasks
         }
 
         public TimingAttackTask() : base(5)
-        { }
+        {
+            this.JoinCombatSimulation = true;
+        }
 
         public override bool DoWant(Agent agent)
         {
@@ -86,7 +88,7 @@ namespace Tyr.Tasks
 
         public override void OnFrame(Tyr tyr)
         {
-            if (units.Count <= RetreatSize)
+            if (units.Count <= RetreatSize && Units.Count > 0)
             {
                 Clear();
                 return;
@@ -97,7 +99,7 @@ namespace Tyr.Tasks
                 if (agent.CanAttackGround())
                     canAttackGround = true;
 
-            if (!canAttackGround)
+            if (!canAttackGround && Units.Count > 0)
             {
                 Clear();
                 return;

@@ -11,6 +11,7 @@ namespace Tyr.Micro
         private HashSet<uint> Terror = new HashSet<uint>();
         public float Range;
         public int CourageCount = 30;
+        public float EnemyBaseRange = 0;
         public bool DefendHome = true;
 
         public FearEnemyController(uint from, uint to, float range)
@@ -44,6 +45,9 @@ namespace Tyr.Micro
         public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (!Scared.Contains(agent.Unit.UnitType))
+                return false;
+
+            if (EnemyBaseRange > 0 && agent.DistanceSq(Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]) <= EnemyBaseRange * EnemyBaseRange)
                 return false;
 
             int totalUnits = 0;

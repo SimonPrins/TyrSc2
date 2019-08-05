@@ -62,7 +62,10 @@ namespace Tyr
             WarpPrism.Get(),
             WidowMine.Get(),
             Zealot.Get(),
-            Zergling.Get()
+            Zergling.Get(),
+            ProxyDetected.Get(),
+            AdeptHarass.Get(),
+            SkippedNatural.Get(),
         };
 
         public bool CannonRushDetected;
@@ -149,8 +152,19 @@ namespace Tyr
 
             if (!EarlyPool)
             {
-                if (Count(UnitTypes.HATCHERY) < 2 && Count(UnitTypes.SPAWNING_POOL) > 0 && tyr.Frame <= 60f * 22.4f * 1.75f)
+                if ((Count(UnitTypes.ZERGLING) >= 5 && tyr.Frame <= 1800)
+                    || (Count(UnitTypes.ZERGLING) > 0 && tyr.Frame <= 1600))
                     EarlyPool = true;
+                else if (Count(UnitTypes.HATCHERY) < 2 && Count(UnitTypes.SPAWNING_POOL) > 0 && tyr.Frame <= 1600)
+                {
+                    float hp = -1;
+                    foreach (Unit enemy in tyr.Enemies())
+                        if (enemy.UnitType == UnitTypes.SPAWNING_POOL)
+                            hp = enemy.Health;
+                    System.Console.WriteLine("Spawning pool HP: " + hp + " Frame: " + tyr.Frame);
+                    if ((1600 - tyr.Frame) * 0.85 + hp >= 900)
+                        EarlyPool = true;
+                }
             }
 
             if (Count(UnitTypes.NEXUS)
@@ -289,7 +303,7 @@ namespace Tyr
                 tyr.PreviousEnemyStrategies.SetThreeGate();
             }
 
-            if (!WorkerRushDetected)
+            if (!WorkerRushDetected && tyr.Frame < 60 * 22.4)
             {
                 int farWorkers = 0;
                 foreach (Unit unit in tyr.Enemies())

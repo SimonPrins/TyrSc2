@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using SC2APIProtocol;
 using Tyr.Agents;
 using Tyr.Util;
@@ -15,6 +16,7 @@ namespace Tyr.MapAnalysis
         public BoolGrid StartArea;
         public BoolGrid MainAndPocketArea;
         private int[,] enemyDistances;
+        private int[,] MainDistancesStore;
         public int[,] WallDistances;
 
         // Positions for wallin, needs better place.
@@ -23,7 +25,8 @@ namespace Tyr.MapAnalysis
         public Point2D building3 = null;
 
         public BoolGrid Ramp;
-        public BoolGrid UnPathable;
+        public BoolGrid Pathable;
+        //public BoolGrid UnPathable;
 
         private Point2D EnemyRamp = null;
 
@@ -64,7 +67,7 @@ namespace Tyr.MapAnalysis
                         if (mineralSetIds.ContainsKey(closeMineralField.Tag))
                             continue;
 
-                        if (SC2Util.DistanceGrid(mineralFieldA.Pos, closeMineralField.Pos) <= 5)
+                        if (SC2Util.DistanceSq(mineralFieldA.Pos, closeMineralField.Pos) <= 4 * 4)
                         {
                             mineralSetIds.Add(closeMineralField.Tag, currentSet);
                             baseLocation.MineralFields.Add(closeMineralField);
@@ -120,11 +123,15 @@ namespace Tyr.MapAnalysis
                 for (int y = -2; y <= 2; y++)
                     startLocations[(int)StartLocation.X + x, (int)StartLocation.Y + y] = true;
 
-            UnPathable = new ImageBoolGrid(Tyr.Bot.GameInfo.StartRaw.PathingGrid).GetAnd(startLocations.Invert());
-            BoolGrid pathable = UnPathable.Invert();
+            Pathable = new ImageBoolGrid(Tyr.Bot.GameInfo.StartRaw.PathingGrid).GetOr(startLocations);
+            BoolGrid unPathable = Pathable.Invert();
 
-            BoolGrid chokes = Placement.Invert().GetAnd(pathable);
+            BoolGrid chokes = Placement.Invert().GetAnd(Pathable);
             BoolGrid mainExits = chokes.GetAdjacent(StartArea);
+
+            DrawRamp(Pathable, Placement, StartArea, chokes, mainExits);
+
+            //DrawBases(width, height);
 
             enemyDistances = EnemyDistances;
             int dist = 1000;
@@ -135,6 +142,7 @@ namespace Tyr.MapAnalysis
                     if (mainExits[x, y])
                     {
                         int newDist = enemyDistances[x, y];
+                        System.Console.WriteLine("Enemy distance to ramp pixel: " + newDist);
                         if (newDist < dist)
                         {
                             dist = newDist;
@@ -145,13 +153,13 @@ namespace Tyr.MapAnalysis
 
             Ramp = chokes.GetConnected(mainRamp);
 
-            BoolGrid pathingWithoutRamp = pathable.GetAnd(Ramp.Invert());
+            BoolGrid pathingWithoutRamp = Pathable.GetAnd(Ramp.Invert());
             MainAndPocketArea = pathingWithoutRamp.GetConnected(SC2Util.To2D(StartLocation));
 
             if (Tyr.Bot.MyRace == Race.Protoss)
-                DetermineWall(Ramp, UnPathable);
+                DetermineWall(Ramp, unPathable);
 
-            WallDistances = Distances(UnPathable);
+            WallDistances = Distances(unPathable);
 
             stopWatch.Stop();
             DebugUtil.WriteLine("Total time to find wall: " + stopWatch.ElapsedMilliseconds);
@@ -162,7 +170,7 @@ namespace Tyr.MapAnalysis
             float totalPoints = 0;
             float totalX = 0;
             float totalY = 0;
-            for (int x =0; x < Ramp.Width(); x++)
+            for (int x = 0; x < Ramp.Width(); x++)
                 for (int y = 0; y < Ramp.Height(); y++)
                 {
                     if (Ramp[x, y])
@@ -172,7 +180,7 @@ namespace Tyr.MapAnalysis
                         totalPoints++;
                     }
                 }
-            return SC2Util.Point(totalX / totalPoints, totalY / totalPoints);
+            return SC2Util.Point((int)(totalX / totalPoints) + 1f, (int)(totalY / totalPoints) + 1f);
         }
 
         private void DetermineFinalLocation(BaseLocation loc, List<Gas> gasses)
@@ -243,15 +251,17 @@ namespace Tyr.MapAnalysis
             else if (closest.Pos.Y > loc.Pos.Y)
                 loc.Pos.Y -= 2;
 
+            bool test = SC2Util.DistanceSq(loc.Pos, new Point2D() { X = 127.5f, Y = 77.5f }) <= 10 * 10;
 
             float closestDist = 1000000;
+            Point2D approxPos = loc.Pos;
             for (int i = 0; i < 20; i++)
             {
                 for (int j = 0; j == 0 || j < i; j++)
                 {
                     float maxDist;
                     Point2D newPos;
-                    newPos = SC2Util.Point(loc.Pos.X + i - j, loc.Pos.Y + j);
+                    newPos = SC2Util.Point(approxPos.X + i - j, approxPos.Y + j);
                     maxDist = checkPosition(newPos, loc);
                     if (maxDist < closestDist)
                     {
@@ -259,7 +269,7 @@ namespace Tyr.MapAnalysis
                         closestDist = maxDist;
                     }
 
-                    newPos = SC2Util.Point(loc.Pos.X + i - j, loc.Pos.Y - j);
+                    newPos = SC2Util.Point(approxPos.X + i - j, approxPos.Y - j);
                     maxDist = checkPosition(newPos, loc);
                     if (maxDist < closestDist)
                     {
@@ -267,7 +277,7 @@ namespace Tyr.MapAnalysis
                         closestDist = maxDist;
                     }
 
-                    newPos = SC2Util.Point(loc.Pos.X - i + j, loc.Pos.Y + j);
+                    newPos = SC2Util.Point(approxPos.X - i + j, approxPos.Y + j);
                     maxDist = checkPosition(newPos, loc);
                     if (maxDist < closestDist)
                     {
@@ -275,7 +285,7 @@ namespace Tyr.MapAnalysis
                         closestDist = maxDist;
                     }
 
-                    newPos = SC2Util.Point(loc.Pos.X - i + j, loc.Pos.Y - j);
+                    newPos = SC2Util.Point(approxPos.X - i + j, approxPos.Y - j);
                     maxDist = checkPosition(newPos, loc);
                     if (maxDist < closestDist)
                     {
@@ -284,7 +294,7 @@ namespace Tyr.MapAnalysis
                     }
                 }
             }
-            
+
             if (loc.Gasses.Count != 2)
                 FileUtil.Debug("Wrong number of gasses, found: " + loc.Gasses.Count);
             if (closestDist >= 999999)
@@ -292,7 +302,76 @@ namespace Tyr.MapAnalysis
 
         }
 
-        private void Draw(int width, int height)
+        private void DrawRamp(BoolGrid pathable, BoolGrid placememt, BoolGrid startArea, BoolGrid chokes, BoolGrid ramps)
+        {
+            if (!Tyr.Debug)
+                return;
+
+            int width = Tyr.Bot.GameInfo.StartRaw.PathingGrid.Size.X;
+            int height = Tyr.Bot.GameInfo.StartRaw.PathingGrid.Size.Y;
+
+            System.Console.WriteLine("Drawing ramp.");
+
+            System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height);
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                {
+                    /*
+                    if (pathable[x, y] && placememt[x, y])
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Purple);
+                    else if (pathable[x, y])
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Blue);
+                    else if (placememt[x, y])
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Red);
+                    else
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Black);
+                    */
+                    if (ramps[x, y])
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Blue);
+                    else if (chokes[x, y])
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Orange);
+                    else if (startArea[x, y])
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Black);
+                    else
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.White);
+                        
+                }
+            
+            bmp.Save(Directory.GetCurrentDirectory() + "/data/Ramp.png");
+        }
+
+        private void DrawPathable()
+        {
+            if (!Tyr.Debug)
+                return;
+
+            int width = Tyr.Bot.GameInfo.StartRaw.PathingGrid.Size.X;
+            int height = Tyr.Bot.GameInfo.StartRaw.PathingGrid.Size.Y;
+
+            System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height);
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                {
+                    if (SC2Util.GetTilePlacable(x, y))
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Black);
+                    else
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.White);
+                }
+
+            foreach (Unit unit in Tyr.Bot.Observation.Observation.RawData.Units)
+            {
+                if (UnitTypes.GasGeysers.Contains(unit.UnitType))
+                    for (int dx = -1; dx <= 1; dx++)
+                        for (int dy = -1; dy <= 1; dy++)
+                            bmp.SetPixel((int)unit.Pos.X + dx, height - 1 - (int)unit.Pos.Y - dy, System.Drawing.Color.Cyan);
+                if (UnitTypes.MineralFields.Contains(unit.UnitType))
+                    for (int dx = 0; dx <= 1; dx++)
+                        bmp.SetPixel((int)(unit.Pos.X - 0.5f) + dx, height - 1 - (int)(unit.Pos.Y - 0.5f), System.Drawing.Color.Cyan);
+            }
+            bmp.Save(Directory.GetCurrentDirectory() + "/data/Pathing.png");
+        }
+
+        private void DrawBases(int width, int height)
         {
             if (!Tyr.Debug)
                 return;
@@ -301,10 +380,10 @@ namespace Tyr.MapAnalysis
             for (int x = 0; x < width; x++)
                 for (int y = 0; y < height; y++)
                 {
-                    if (UnPathable[x, y])
-                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Black);
-                    else
+                    if (Pathable[x, y])
                         bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.White);
+                    else
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Black);
                 }
             foreach (BaseLocation loc in BaseLocations)
                 for (int dx = -2; dx <= 2; dx++)
@@ -321,7 +400,7 @@ namespace Tyr.MapAnalysis
                     for (int dx = 0; dx <= 1; dx++)
                         bmp.SetPixel((int)(unit.Pos.X - 0.5f) + dx, height - 1 - (int)(unit.Pos.Y - 0.5f), System.Drawing.Color.Cyan);
             }
-            bmp.Save(@"C:\Users\Simon\Desktop\Bases.png");
+            bmp.Save(Directory.GetCurrentDirectory() + "/data/Bases.png");
 
         }
 
@@ -480,11 +559,23 @@ namespace Tyr.MapAnalysis
             return crossSpawn;
         }
 
-        public int[,] EnemyDistances { get
+        public int[,] EnemyDistances
+        {
+            get
             {
                 if (enemyDistances == null)
                     enemyDistances = Distances(CrossSpawn());
                 return enemyDistances;
+            }
+        }
+
+        public int[,] MainDistances
+        {
+            get
+            {
+                if (MainDistancesStore == null)
+                    MainDistancesStore = Distances(SC2Util.To2D(StartLocation));
+                return MainDistancesStore;
             }
         }
 
@@ -563,7 +654,7 @@ namespace Tyr.MapAnalysis
         {
             if (pos.X < 0 || pos.X >= width || pos.Y < 0 || pos.Y >= height)
                 return false;
-            if (SC2Util.GetDataValue(pathingData, (int)pos.X, (int)pos.Y) == 0)
+            if (SC2Util.GetDataValue(pathingData, (int)pos.X, (int)pos.Y) == 1)
                 return true;
 
             foreach (Point2D p in Tyr.Bot.GameInfo.StartRaw.StartLocations)
@@ -588,9 +679,7 @@ namespace Tyr.MapAnalysis
             BoolGrid enemyStartArea = Placement.GetConnected(start);
 
             
-            BoolGrid pathable = UnPathable.Invert();
-
-            BoolGrid chokes = Placement.Invert().GetAnd(pathable);
+            BoolGrid chokes = Placement.Invert().GetAnd(Pathable);
             BoolGrid mainExits = chokes.GetAdjacent(enemyStartArea);
 
             int[,] startDistances = Distances(SC2Util.To2D(StartLocation));
@@ -669,9 +758,11 @@ namespace Tyr.MapAnalysis
             }
             return cur;
         }
-        
+
         public BaseLocation GetEnemyNatural()
         {
+            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+                return null;
             int[,] distances = Distances(Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]);
             int dist = 1000000000;
             BaseLocation enemyNatural = null;
@@ -689,6 +780,32 @@ namespace Tyr.MapAnalysis
                 }
             }
             return enemyNatural;
+        }
+
+        public BaseLocation GetEnemyThird()
+        {
+            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+                return null;
+            float dist = 1000000000;
+            BaseLocation enemyNatural = GetEnemyNatural();
+            BaseLocation enemyThird = null;
+            foreach (BaseLocation loc in Tyr.Bot.MapAnalyzer.BaseLocations)
+            {
+                float distanceToMain = SC2Util.DistanceSq(Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0], loc.Pos);
+
+                if (distanceToMain <= 4)
+                    continue;
+
+                if (SC2Util.DistanceSq(enemyNatural.Pos, loc.Pos) <= 2 * 2)
+                    continue;
+
+                if (distanceToMain < dist)
+                {
+                    dist = distanceToMain;
+                    enemyThird = loc;
+                }
+            }
+            return enemyThird;
         }
     }
 }

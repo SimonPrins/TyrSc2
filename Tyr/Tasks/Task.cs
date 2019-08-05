@@ -13,6 +13,7 @@ namespace Tyr.Tasks
         public List<CustomController> CustomControllers = new List<CustomController>();
 
         public bool AllowClaiming = true;
+        public bool JoinCombatSimulation = false;
 
         public Task(int priority)
         {
@@ -112,6 +113,13 @@ namespace Tyr.Tasks
         {
             if (!MicroController.TryAttack(agent, point, CustomControllers))
                 Tyr.Bot.MicroController.Attack(agent, point);
+        }
+
+        public virtual void AddCombatSimulationUnits(List<Unit> simulationUnits)
+        {
+            if (JoinCombatSimulation)
+                foreach (Agent agent in Units)
+                    simulationUnits.Add(agent.Unit);
         }
     }
 }

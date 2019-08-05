@@ -1,122 +1,172 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
 using Tyr.Agents;
+using Tyr.BuildingPlacement;
 using Tyr.Util;
 
 namespace Tyr.Tasks
 {
     class CannonRushTask : Task
     {
+        public static CannonRushTask Task = new CannonRushTask();
         private int LastBuiltFrame = 0;
+
+        private Point2D CannonLocation;
+        private Point2D NextCannonLocation;
+
         public CannonRushTask() : base(8)
         { }
 
+        public static void Enable()
+        {
+            Enable(Task);
+        }
+
         public override bool DoWant(Agent agent)
         {
-            return agent.IsWorker && Units.Count < 2;
+            return true;
         }
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.Frame >= 600;
+            return true;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
-            result.Add(new UnitDescriptor() { Pos = Tyr.Bot.TargetManager.AttackTarget, Count = 2, UnitTypes = new HashSet<uint>() { UnitTypes.PROBE } });
+            if (Units.Count == 0)
+                result.Add(new UnitDescriptor() { Pos = Tyr.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.PROBE } });
             return result;
         }
 
         public override void OnFrame(Tyr tyr)
         {
-            ulong mineral = 0;
-            if (tyr.BaseManager.Main.BaseLocation.MineralFields.Count > 0)
-                mineral = tyr.BaseManager.Main.BaseLocation.MineralFields[0].Tag;
+            DetermineCannonLocation();
+            if (CannonLocation == null)
+                return;
 
-            foreach (Agent agent in units)
+            bool firstPylonDone = false;
+            bool secondPylonDone = false;
+            Point2D firstPylonPos = new Point2D() { X = CannonLocation.X + 1, Y = CannonLocation.Y - 1 };
+            Point2D secondPylonPos = new Point2D() { X = CannonLocation.X + 1, Y = CannonLocation.Y + 1 };
+            bool firstCannonDone = false;
+            bool secondCannonDone = false;
+            Point2D firstCannonPos = new Point2D() { X = CannonLocation.X - 1, Y = CannonLocation.Y - 1 };
+            Point2D secondCannonPos = new Point2D() { X = CannonLocation.X - 1, Y = CannonLocation.Y + 1 };
+            bool powerAvailable = false;
+            bool cannonCover = false;
+            int totalCannonCount = 0;
+            foreach (Agent agent in tyr.Units())
             {
-                if (agent.Unit.Orders.Count > 0 &&
-                    (agent.Unit.Orders[0].AbilityId == BuildingType.LookUp[UnitTypes.PYLON].Ability || agent.Unit.Orders[0].AbilityId == BuildingType.LookUp[UnitTypes.PHOTON_CANNON].Ability))
-                    continue;
-                bool flee = false;
-                Unit closestEnemy = null;
-                float enemyDist = 9 * 9;
-                foreach (Unit enemy in tyr.Observation.Observation.RawData.Units)
+                if (agent.Unit.UnitType == UnitTypes.PYLON)
                 {
-                    if (enemy.Alliance != Alliance.Enemy)
-                        continue;
-                    if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType) && !UnitTypes.WorkerTypes.Contains(enemy.UnitType))
-                        continue;
-
-                    float newDist = SC2Util.DistanceSq(agent.Unit.Pos, enemy.Pos);
-                    if (newDist <= enemyDist)
+                    if (agent.DistanceSq(firstPylonPos) <= 2)
                     {
-                        flee = true;
-                        closestEnemy = enemy;
-                        enemyDist = newDist;
+                        firstPylonDone = true;
+                        if (agent.Unit.BuildProgress >= 0.99)
+                            powerAvailable = true;
+                    }
+                    else if (agent.DistanceSq(secondPylonPos) <= 2)
+                    {
+                        secondPylonDone = true;
+                        if (agent.Unit.BuildProgress >= 0.99)
+                            powerAvailable = true;
                     }
                 }
-
-                if (SC2Util.DistanceSq(agent.Unit.Pos, tyr.TargetManager.AttackTarget) >= 15 * 15)
-                    flee = false;
-
-                bool buildThings = flee || SC2Util.DistanceSq(agent.Unit.Pos, tyr.TargetManager.AttackTarget) <= 3 * 3;
-
-                if (buildThings)
+                if (agent.Unit.UnitType == UnitTypes.PHOTON_CANNON)
                 {
-                    int pylonsNeeded = 3 + tyr.UnitManager.Count(UnitTypes.PHOTON_CANNON) / 2;
-
-                    if (tyr.Observation.Observation.PlayerCommon.Minerals >= 100 && tyr.UnitManager.Count(UnitTypes.FORGE) > 0 && tyr.Frame - LastBuiltFrame >= 5
-                        && tyr.UnitManager.Count(UnitTypes.PYLON) < pylonsNeeded)
+                    if (agent.DistanceSq(CannonLocation) <= 30 * 30)
+                        totalCannonCount++;
+                    if (agent.DistanceSq(firstCannonPos) <= 2)
                     {
-                        Point2D buildLocation = tyr.buildingPlacer.FindPlacement(SC2Util.To2D(agent.Unit.Pos), SC2Util.Point(2, 2), UnitTypes.PYLON);
-                        agent.Order(BuildingType.LookUp[UnitTypes.PYLON].Ability, buildLocation);
-                        LastBuiltFrame = tyr.Frame;
-                        continue;
+                        firstCannonDone = true;
+                        if (agent.Unit.BuildProgress >= 0.99)
+                            cannonCover = true;
                     }
-                    else if (tyr.Observation.Observation.PlayerCommon.Minerals >= 150 && tyr.UnitManager.Completed(UnitTypes.FORGE) > 0 && tyr.Frame - LastBuiltFrame >= 5)
+                    else if (agent.DistanceSq(secondCannonPos) <= 2)
                     {
-                        Point aroundPos = null;
-                        foreach (Agent pylon in tyr.UnitManager.Agents.Values)
-                            if (pylon.Unit.UnitType == UnitTypes.PYLON && SC2Util.DistanceSq(pylon.Unit.Pos, agent.Unit.Pos) <= 20 * 20
-                                && pylon.Unit.BuildProgress >= 1)
-                                aroundPos = pylon.Unit.Pos;
-
-                        if (aroundPos != null)
-                        {
-                            Point2D buildLocation = tyr.buildingPlacer.FindPlacement(SC2Util.To2D(aroundPos), SC2Util.Point(2, 2), UnitTypes.PHOTON_CANNON);
-                            agent.Order(BuildingType.LookUp[UnitTypes.PHOTON_CANNON].Ability, buildLocation);
-                            LastBuiltFrame = tyr.Frame;
-                            continue;
-                        }
+                        secondCannonDone = true;
+                        if (agent.Unit.BuildProgress >= 0.99)
+                            cannonCover = true;
+                    }
+                    else if (NextCannonLocation != null && agent.DistanceSq(NextCannonLocation) <= 2)
+                    {
+                        NextCannonLocation = null;
                     }
                 }
-                Wander(agent, flee, closestEnemy);
             }
+
+            if (firstCannonDone && secondCannonDone && cannonCover && totalCannonCount < 4 && NextCannonLocation == null)
+            {
+                NextCannonLocation = tyr.buildingPlacer.FindPlacement(new PotentialHelper(CannonLocation, 5).To(tyr.TargetManager.PotentialEnemyStartLocations[0]).Get(), new Point2D() { X = 2, Y = 2 }, UnitTypes.PHOTON_CANNON);
+            }
+
+            foreach (Agent agent in Units)
+            {
+                if (agent.DistanceSq(CannonLocation) >= 20 * 20)
+                {
+                    agent.Order(Abilities.MOVE, CannonLocation);
+                    continue;
+                }
+                if (!firstPylonDone)
+                {
+                    agent.Order(881, firstPylonPos);
+                    continue;
+                }
+                if (!secondPylonDone)
+                {
+                    agent.Order(881, secondPylonPos);
+                    continue;
+                }
+                if (!firstCannonDone)
+                {
+                    agent.Order(887, firstCannonPos);
+                    continue;
+                }
+                if (!secondCannonDone)
+                {
+                    agent.Order(887, secondCannonPos);
+                    continue;
+                }
+                if (NextCannonLocation != null)
+                {
+                    agent.Order(887, NextCannonLocation);
+                    continue;
+                }
+            }
+
+            
         }
 
-        public void Wander(Agent agent, bool flee, Unit closestEnemy)
+        private void DetermineCannonLocation()
         {
-            if (flee)
-            {
-                Point2D fleeDir = SC2Util.Point(0, 0);
-                if (closestEnemy != null)
+            if (CannonLocation != null)
+                return;
+            
+            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+                return;
+            Point2D enemyMain = Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0];
+            Point2D enemyRamp = Tyr.Bot.MapAnalyzer.GetEnemyRamp();
+
+            for (float x = -20; x <= 20; x++)
+                for (float y = -20; y <= 20; y++)
                 {
-                    fleeDir = SC2Util.Point(agent.Unit.Pos.X - closestEnemy.Pos.X, agent.Unit.Pos.Y - closestEnemy.Pos.Y);
-                    fleeDir = SC2Util.Normalize(fleeDir);
-                    fleeDir = SC2Util.Point(fleeDir.X * 2, fleeDir.Y * 2);
+                    Point2D loc = new Point2D() { X = enemyMain.X + x, Y = enemyMain.Y + y };
+                    float enemyMainDist = SC2Util.DistanceSq(loc, enemyMain);
+                    if (enemyMainDist <= 16 * 16 || enemyMainDist >= 18 * 18)
+                        continue;
+                    float enemyRampDist = SC2Util.DistanceSq(loc, enemyRamp);
+                    if (enemyRampDist <= 18 * 18 || enemyRampDist >= 20 * 20)
+                        continue;
+
+                    if (!(ProtossBuildingPlacement.RectBuildable(loc.X - 2, loc.Y - 2, loc.X + 2, loc.Y + 2)))
+                        continue;
+
+                    CannonLocation = loc;
+                    System.Console.WriteLine("Picked: " + loc);
+                    return;
                 }
-                Point2D targetDir = SC2Util.Point(Tyr.Bot.TargetManager.AttackTarget.X - agent.Unit.Pos.X, Tyr.Bot.TargetManager.AttackTarget.Y - agent.Unit.Pos.Y);
-                targetDir = SC2Util.Normalize(targetDir);
-
-                // Considered harmful.
-                Point2D goTo = SC2Util.Point(agent.Unit.Pos.X + fleeDir.X * 2 + targetDir.X * 2, agent.Unit.Pos.Y + fleeDir.Y * 2 + targetDir.Y * 2);
-
-                agent.Order(Abilities.MOVE, goTo);
-            }
-            else
-                agent.Order(Abilities.MOVE, Tyr.Bot.TargetManager.AttackTarget);
         }
     }
 }

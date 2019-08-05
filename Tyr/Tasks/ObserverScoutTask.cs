@@ -7,10 +7,17 @@ namespace Tyr.Tasks
 {
     class ObserverScoutTask : Task
     {
+        public static ObserverScoutTask Task = new ObserverScoutTask();
         private List<Base> Bases = new List<Base>();
         private Base Target;
+
         public ObserverScoutTask() : base(10)
         { }
+
+        public static void Enable()
+        {
+            Enable(Task);
+        }
 
         public override bool DoWant(Agent agent)
         {

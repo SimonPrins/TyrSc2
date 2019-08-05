@@ -39,11 +39,21 @@ namespace Tyr.Agents
             Add(result, new TrainingType() { UnitType = UnitTypes.BATTLECRUISER, ProducingUnits = Set(UnitTypes.STARPORT), Minerals = 400, Gas = 300, Ability = 623, Food = 6, RequiresTechLab = true });
             Add(result, new TrainingType() { UnitType = UnitTypes.VIKING_FIGHTER, ProducingUnits = Set(UnitTypes.STARPORT), Minerals = 150, Gas = 75, Ability = 624, Food = 2 });
             Add(result, new TrainingType() { UnitType = UnitTypes.LIBERATOR, ProducingUnits = Set(UnitTypes.STARPORT), Minerals = 150, Gas = 150, Ability = 626, Food = 2 });
-            Add(result, new TrainingType() { UnitType = UnitTypes.ZEALOT, ProducingUnits = Set(UnitTypes.GATEWAY), Minerals = 100, Ability = 916, WarpInAbility = 1413, Food = 2 });
-            Add(result, new TrainingType() { UnitType = UnitTypes.STALKER, ProducingUnits = Set(UnitTypes.GATEWAY), Minerals = 125, Gas = 50, Ability = 917, WarpInAbility = 1414, Food = 2 });
+            Add(result, new TrainingType() { UnitType = UnitTypes.ZEALOT, ProducingUnits = Set(UnitTypes.GATEWAY, UnitTypes.WARP_GATE), Minerals = 100, Ability = 916, WarpInAbility = 1413, Food = 2 });
+            Add(result, new TrainingType() { UnitType = UnitTypes.STALKER, ProducingUnits = Set(UnitTypes.GATEWAY, UnitTypes.WARP_GATE), Minerals = 125, Gas = 50, Ability = 917, WarpInAbility = 1414, Food = 2 });
+            Add(result, new TrainingType() { UnitType = UnitTypes.HIGH_TEMPLAR, ProducingUnits = Set(UnitTypes.GATEWAY, UnitTypes.WARP_GATE), Minerals = 50, Gas = 150, Ability = 919, WarpInAbility = 1416, Food = 2 });
+            Add(result, new TrainingType() { UnitType = UnitTypes.SENTRY, ProducingUnits = Set(UnitTypes.GATEWAY, UnitTypes.WARP_GATE), Minerals = 50, Gas = 100, Ability = 921, WarpInAbility = 1418, Food = 2 });
+            Add(result, new TrainingType() { UnitType = UnitTypes.ADEPT, ProducingUnits = Set(UnitTypes.GATEWAY, UnitTypes.WARP_GATE), Minerals = 100, Gas = 25, Ability = 922, WarpInAbility = 1419, Food = 2 });
+            Add(result, new TrainingType() { UnitType = UnitTypes.PHOENIX, ProducingUnits = Set(UnitTypes.STARGATE), Minerals = 150, Gas = 100, Ability = 946, Food = 2 });
+            Add(result, new TrainingType() { UnitType = UnitTypes.VOID_RAY, ProducingUnits = Set(UnitTypes.STARGATE), Minerals = 250, Gas = 150, Ability = 950, Food = 4 });
             Add(result, new TrainingType() { UnitType = UnitTypes.ORACLE, ProducingUnits = Set(UnitTypes.STARGATE), Minerals = 150, Gas = 150, Ability = 954, Food = 2 });
+            Add(result, new TrainingType() { UnitType = UnitTypes.TEMPEST, ProducingUnits = Set(UnitTypes.STARGATE), Minerals = 250, Gas = 175, Ability = 955, Food = 5 });
+            Add(result, new TrainingType() { UnitType = UnitTypes.WARP_PRISM, ProducingUnits = Set(UnitTypes.ROBOTICS_FACILITY), Minerals = 200, Ability = 976, Food = 2 });
             Add(result, new TrainingType() { UnitType = UnitTypes.OBSERVER, ProducingUnits = Set(UnitTypes.ROBOTICS_FACILITY), Minerals = 25, Gas = 75, Ability = 977, Food = 1 });
+            Add(result, new TrainingType() { UnitType = UnitTypes.COLOSUS, ProducingUnits = Set(UnitTypes.ROBOTICS_FACILITY), Minerals = 300, Gas = 200, Ability = 978, Food = 6 });
             Add(result, new TrainingType() { UnitType = UnitTypes.IMMORTAL, ProducingUnits = Set(UnitTypes.ROBOTICS_FACILITY), Minerals = 275, Gas = 100, Ability = 979, Food = 4 });
+            Add(result, new TrainingType() { UnitType = UnitTypes.DISRUPTOR, ProducingUnits = Set(UnitTypes.ROBOTICS_FACILITY), Minerals = 150, Gas = 150, Ability = 994, Food = 3 });
+            Add(result, new TrainingType() { UnitType = UnitTypes.PROBE, ProducingUnits = Set(UnitTypes.NEXUS), Minerals = 50, Ability = 1006, Food = 1 });
             Add(result, new TrainingType() { UnitType = UnitTypes.LAIR, ProducingUnits = Set(UnitTypes.HATCHERY), Minerals = 150, Gas = 100, Ability = 1216 });
             Add(result, new TrainingType() { UnitType = UnitTypes.HIVE, ProducingUnits = Set(UnitTypes.LAIR), Minerals = 200, Gas = 150, Ability = 1218 });
             Add(result, new TrainingType() { UnitType = UnitTypes.GREATER_SPIRE, ProducingUnits = Set(UnitTypes.SPIRE), Minerals = 100, Gas = 150, Ability = 1220 });
@@ -53,9 +63,12 @@ namespace Tyr.Agents
             return result;
         }
 
-        private static HashSet<T> Set<T>(T element)
+        private static HashSet<T> Set<T>(params T[] elements)
         {
-            return new HashSet<T>() { element };
+            HashSet<T> set = new HashSet<T>();
+            foreach (T element in elements)
+                set.Add(element);
+            return set;
         }
 
         private static void Add(Dictionary<uint, TrainingType> result, TrainingType trainingType)

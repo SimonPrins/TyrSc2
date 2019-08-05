@@ -49,6 +49,9 @@ namespace Tyr.Tasks
                 if (!UnitTypes.AirAttackTypes.Contains(enemy.UnitType))
                     continue;
                 float newDist = units[0].DistanceSq(enemy);
+                if (enemy.UnitType == UnitTypes.WIDOW_MINE_BURROWED
+                    && dist >= 6 * 6)
+                    continue;
                 if (newDist < dist)
                 {
                     fleeEnemy = enemy;

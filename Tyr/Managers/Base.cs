@@ -15,6 +15,7 @@ namespace Tyr.Managers
         public Dictionary<uint, int> BuildingsCompleted = new Dictionary<uint, int>();
         public int DistanceToMain { get; set; }
         public bool UnderAttack;
+        public bool Evacuate;
         public bool Blocked;
         public Point2D MineralLinePos;
         public Point2D OppositeMineralLinePos;

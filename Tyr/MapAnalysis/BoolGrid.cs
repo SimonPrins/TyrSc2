@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SC2APIProtocol;
 using Tyr.Util;
 
@@ -98,6 +99,16 @@ namespace Tyr.MapAnalysis
             return result;
         }
 
+        public int Count()
+        {
+            int result = 0;
+            for (int x = 0; x < Width(); x++)
+                for (int y = 0; y < Height(); y++)
+                    if (this[x, y])
+                        result++;
+            return result;
+        }
+
         public BoolGrid GetConnected(BoolGrid connectedTo, int steps)
         {
             ArrayBoolGrid result = new ArrayBoolGrid(Width(), Height());
@@ -171,6 +182,19 @@ namespace Tyr.MapAnalysis
                     if (this[x, y])
                         result.Add(SC2Util.Point(x, y));
 
+            return result;
+        }
+
+        public BoolGrid Crop(int startX, int startY, int endX, int endY)
+        {
+            ArrayBoolGrid result = new ArrayBoolGrid(Width(), Height());
+            for (int x = 0; x < Width(); x++)
+                for (int y = 0; y < Height(); y++)
+                {
+                    if (x < startX || x >= endX || y < startY || y >= endY)
+                        result[x, y] = false;
+                    else result[x, y] = this[x, y];
+                }
             return result;
         }
     }

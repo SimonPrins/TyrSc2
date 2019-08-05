@@ -44,7 +44,7 @@ namespace Tyr.Agents
             lookUp.Add(68, new BuildingType() { Type = 68, Ability = 890, Size = SC2Util.Point(3, 3), Name = "TemplarArchives", Minerals = 150, Gas = 200 });
             lookUp.Add(69, new BuildingType() { Type = 69, Ability = 891, Size = SC2Util.Point(2, 2), Name = "DarkShrine", Minerals = 150, Gas = 150 });
             lookUp.Add(70, new BuildingType() { Type = 70, Ability = 892, Size = SC2Util.Point(3, 3), Name = "RoboticsBay", Minerals = 200, Gas = 200 });
-            lookUp.Add(71, new BuildingType() { Type = 71, Ability = 893, Size = SC2Util.Point(3, 3), Name = "RoboticsFacility", Minerals = 200, Gas = 100 });
+            lookUp.Add(71, new BuildingType() { Type = 71, Ability = 893, Size = SC2Util.Point(3, 3), Name = "RoboticsFacility", Minerals = 150, Gas = 100 });
             lookUp.Add(72, new BuildingType() { Type = 72, Ability = 894, Size = SC2Util.Point(3, 3), Name = "CyberneticsCore", Minerals = 150 });
             lookUp.Add(86, new BuildingType() { Type = 86, Ability = 1152, Size = SC2Util.Point(5, 5), Name = "Hatchery", Minerals = 300 });
             lookUp.Add(87, new BuildingType() { Type = 87, Ability = 1694, Size = SC2Util.Point(1, 1), Name = "CreepTumor"});
@@ -60,6 +60,7 @@ namespace Tyr.Agents
             lookUp.Add(99, new BuildingType() { Type = 99, Ability = 1167, Size = SC2Util.Point(2, 2), Name = "SporeCrawler", Minerals = 75 });
             lookUp.Add(130, new BuildingType() { Type = 130, Ability = 1450, Size = SC2Util.Point(5, 5), Name = "PlanetaryFortress", Minerals = 150, Gas = 150 });
             lookUp.Add(132, new BuildingType() { Type = 132, Ability = 1516, Size = SC2Util.Point(5, 5), Name = "OrbitalCommand", Minerals = 150 });
+            lookUp.Add(133, new BuildingType() { Type = 133, Ability = 0, Size = SC2Util.Point(3, 3), Name = "WarpGate" });
             lookUp.Add(504, new BuildingType() { Type = 504, Ability = 1163, Size = SC2Util.Point(3, 3), Name = "LurkerDen", Minerals = 100, Gas = 150 });
             lookUp.Add(1910, new BuildingType() { Type = 1910, Ability = 895, Size = SC2Util.Point(2, 2), Name = "ShieldBattery", Minerals = 100 });
             lookUp.Add(639, new BuildingType() { Type = 639, Size = SC2Util.Point(6, 6), Name = "DestructibleRocks" });

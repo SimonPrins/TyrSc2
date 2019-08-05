@@ -125,7 +125,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.ROBOTICS_BAY, () => { return !DefendMech; });
             result.Building(UnitTypes.GATEWAY);
             result.Building(UnitTypes.PYLON, Natural);
-            result.Building(UnitTypes.ROBOTICS_FACILITY, () => { return Count(UnitTypes.COLLOSUS) > 0; });
+            result.Building(UnitTypes.ROBOTICS_FACILITY, () => { return Count(UnitTypes.COLOSUS) > 0; });
             result.Building(UnitTypes.PYLON, Natural);
             result.Building(UnitTypes.PYLON, Natural);
 
@@ -134,7 +134,7 @@ namespace Tyr.Builds.Protoss
 
         public override void OnFrame(Tyr tyr)
         {
-            if (Count(UnitTypes.ZEALOT) + Count(UnitTypes.ADEPT) + Count(UnitTypes.STALKER) + Count(UnitTypes.COLLOSUS) + Count(UnitTypes.IMMORTAL) >= attackTask.RequiredSize)
+            if (Count(UnitTypes.ZEALOT) + Count(UnitTypes.ADEPT) + Count(UnitTypes.STALKER) + Count(UnitTypes.COLOSUS) + Count(UnitTypes.IMMORTAL) >= attackTask.RequiredSize)
                 Attacking = true;
 
             if (tyr.EnemyStrategyAnalyzer.FourRaxDetected
@@ -224,7 +224,7 @@ namespace Tyr.Builds.Protoss
                     return;
 
                 if (Count(UnitTypes.STALKER) + Count(UnitTypes.ADEPT) >= 25
-                    && Count(UnitTypes.COLLOSUS) + Count(UnitTypes.IMMORTAL) == 0)
+                    && Count(UnitTypes.COLOSUS) + Count(UnitTypes.IMMORTAL) == 0)
                     return;
 
                 int extraAdepts;
@@ -273,7 +273,7 @@ namespace Tyr.Builds.Protoss
                     && Gas() >= 150
                     && !Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
                     && !DefendMech
-                    && Count(UnitTypes.COLLOSUS) > 0)
+                    && Count(UnitTypes.COLOSUS) > 0)
                 {
                     agent.Order(1097);
                 }

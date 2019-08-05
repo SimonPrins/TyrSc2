@@ -8,7 +8,7 @@ namespace Tyr.Micro
     {
         public override bool DetermineAction(Agent agent, Point2D target)
         {
-            if (agent.Unit.UnitType != UnitTypes.COLLOSUS)
+            if (agent.Unit.UnitType != UnitTypes.COLOSUS)
                 return false;
 
             int count = 0;
@@ -16,7 +16,7 @@ namespace Tyr.Micro
             float dist = 1000000000f;
             foreach (Agent ally in Tyr.Bot.UnitManager.Agents.Values)
             {
-                if (ally.Unit.UnitType == UnitTypes.COLLOSUS)
+                if (ally.Unit.UnitType == UnitTypes.COLOSUS)
                     continue;
                 if (!UnitTypes.CombatUnitTypes.Contains(ally.Unit.UnitType))
                     continue;

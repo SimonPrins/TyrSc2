@@ -21,6 +21,12 @@ namespace Tyr.Tasks
         public bool RetreatMoveCommand = false;
 
 
+        public DefenseSquadTask(Base b) : base(6)
+        {
+            Base = b;
+            Type = 0;
+        }
+
         public DefenseSquadTask(Base b, uint type) : base(6)
         {
             Base = b;
@@ -67,7 +73,8 @@ namespace Tyr.Tasks
 
         public override bool DoWant(Agent agent)
         {
-            return agent.Unit.UnitType == Type
+            return (agent.Unit.UnitType == Type || Type == 0)
+                && (UnitTypes.CombatUnitTypes.Contains(agent.Unit.UnitType) || Type != 0)
                 && units.Count < MaxDefenders
                 && (agent.DistanceSq(Tyr.Bot.MapAnalyzer.StartLocation) <= 55 * 55 || DraftFromFarAway);
         }
@@ -75,7 +82,10 @@ namespace Tyr.Tasks
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
-            result.Add(new UnitDescriptor() { Pos = Base.BaseLocation.Pos, Count = MaxDefenders - units.Count, UnitTypes = new HashSet<uint>() { Type } });
+            HashSet<uint> unitTypes = null;
+            if (Type != 0)
+                unitTypes = new HashSet<uint>() { Type };
+            result.Add(new UnitDescriptor() { Pos = Base.BaseLocation.Pos, Count = MaxDefenders - units.Count, UnitTypes = unitTypes });
             return result;
         }
 

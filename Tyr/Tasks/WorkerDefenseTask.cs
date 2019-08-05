@@ -161,7 +161,7 @@ namespace Tyr.Tasks
                 || Count(enemyCounts, UnitTypes.ZEALOT) >= 3
                 || Count(enemyCounts, UnitTypes.ZERGLING) >= 11
                 || Count(enemyCounts, UnitTypes.BANELING) > 0
-                || Count(enemyCounts, UnitTypes.COLLOSUS) > 0
+                || Count(enemyCounts, UnitTypes.COLOSUS) > 0
                 || Count(enemyCounts, UnitTypes.REAPER) > 0
                 || Count(enemyCounts, UnitTypes.WIDOW_MINE) > 0
                 || Count(enemyCounts, UnitTypes.WIDOW_MINE_BURROWED) > 0

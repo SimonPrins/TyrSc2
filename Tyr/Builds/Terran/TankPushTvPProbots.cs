@@ -323,7 +323,7 @@ namespace Tyr.Builds.Terran
                 OraclesDetectedFrame = tyr.Frame;
             OraclesDetected = tyr.Frame - OraclesDetectedFrame < 30 * 22.4;
 
-            if (Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLLOSUS)
+            if (Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS)
                 + Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ROBOTICS_BAY)
                 + Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ROBOTICS_FACILITY) > 0)
                 CollosusSuspected = true;

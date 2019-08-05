@@ -7,8 +7,15 @@ namespace Tyr.Tasks
 {
     class DTAttackTask : Task
     {
+        public static DTAttackTask Task = new DTAttackTask();
+
         public DTAttackTask() : base(5)
         { }
+
+        public static void Enable()
+        {
+            Enable(Task);
+        }
 
         public override bool DoWant(Agent agent)
         {

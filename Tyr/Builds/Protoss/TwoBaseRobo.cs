@@ -94,7 +94,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.PYLON, Natural);
             result.Building(UnitTypes.TWILIGHT_COUNSEL);
             result.Building(UnitTypes.PYLON, Natural);
-            result.If(() => { return Count(UnitTypes.COLLOSUS) >= 6; } );
+            result.If(() => { return Count(UnitTypes.COLOSUS) >= 6; } );
             result.Building(UnitTypes.GATEWAY, 2);
 
             return result;
@@ -102,7 +102,7 @@ namespace Tyr.Builds.Protoss
 
         public override void OnFrame(Tyr tyr)
         {
-            if (Count(UnitTypes.ZEALOT) + Count(UnitTypes.ADEPT) + Count(UnitTypes.STALKER) + Count(UnitTypes.COLLOSUS) + Count(UnitTypes.IMMORTAL) >= attackTask.RequiredSize)
+            if (Count(UnitTypes.ZEALOT) + Count(UnitTypes.ADEPT) + Count(UnitTypes.STALKER) + Count(UnitTypes.COLOSUS) + Count(UnitTypes.IMMORTAL) >= attackTask.RequiredSize)
                 Attacking = true;
 
             if (tyr.EnemyStrategyAnalyzer.CannonRushDetected)
@@ -233,7 +233,7 @@ namespace Tyr.Builds.Protoss
                     && Minerals() >= 300
                     && Gas() >= 200
                     && !UseImmortals
-                    && Count(UnitTypes.COLLOSUS) < 7)
+                    && Count(UnitTypes.COLOSUS) < 7)
                 {
                     agent.Order(978);
                 }

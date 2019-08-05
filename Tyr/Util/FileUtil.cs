@@ -115,5 +115,31 @@ namespace Tyr.Util
                 }
             }
         }
+
+        public static void WriteToFile(string filename, string text, bool overwrite)
+        {
+            string fullpath = DataFolder + filename;
+            if (AllowWritingFiles)
+            {
+                if (overwrite)
+                    File.WriteAllText(fullpath, text);
+                else
+                {
+                    if (!File.Exists(fullpath))
+                        Directory.CreateDirectory(DataFolder);
+                    File.Create(fullpath).Close();
+                    File.AppendAllLines(fullpath, new string[] { text });
+                }
+            }
+        }
+
+        public static string ReadFile(string filename)
+        {
+            string fullpath = DataFolder + filename;
+            if (!File.Exists(fullpath))
+                return null;
+
+            return File.ReadAllText(fullpath);
+        }
     }
 }

@@ -8,6 +8,6 @@ namespace SC2API_CSharp
     {
         IEnumerable<SC2APIProtocol.Action> onFrame(ResponseObservation observation);
         void OnEnd(ResponseObservation observation, Result result);
-        void OnStart(ResponseGameInfo gameInfo, ResponseData data, ResponseObservation observation, uint playerId, String opponentId);
+        void OnStart(ResponseGameInfo gameInfo, ResponseData data, ResponsePing pingResponse, ResponseObservation observation, uint playerId, String opponentId);
     }
 }

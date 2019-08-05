@@ -274,7 +274,7 @@ namespace Tyr.Builds.Protoss
                     && FoodLeft() >= 2
                     && Completed(UnitTypes.CYBERNETICS_CORE) > 0
                     && ((Minerals() >= 300 && Gas() >= 250) || Completed(UnitTypes.STARGATE) == 0 || Completed(UnitTypes.FLEET_BEACON) == 0 || Count(UnitTypes.TEMPEST) > Completed(UnitTypes.TEMPEST))
-                    && (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) >= 5 || (Minerals() >= 300 && Gas() >= 250) || Completed(UnitTypes.ROBOTICS_FACILITY) == 0 || Count(UnitTypes.DISRUPTOR) + Count(UnitTypes.IMMORTAL) + Count(UnitTypes.OBSERVER) + Count(UnitTypes.COLLOSUS) > Completed(UnitTypes.DISRUPTOR) + Completed(UnitTypes.IMMORTAL) + Completed(UnitTypes.OBSERVER) + Completed(UnitTypes.COLLOSUS)))
+                    && (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) >= 5 || (Minerals() >= 300 && Gas() >= 250) || Completed(UnitTypes.ROBOTICS_FACILITY) == 0 || Count(UnitTypes.DISRUPTOR) + Count(UnitTypes.IMMORTAL) + Count(UnitTypes.OBSERVER) + Count(UnitTypes.COLOSUS) > Completed(UnitTypes.DISRUPTOR) + Completed(UnitTypes.IMMORTAL) + Completed(UnitTypes.OBSERVER) + Completed(UnitTypes.COLOSUS)))
                     agent.Order(917);
 
             }
@@ -283,7 +283,7 @@ namespace Tyr.Builds.Protoss
                 if (Minerals() >= 150
                     && Gas() >= 150
                     && !Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
-                    && Count(UnitTypes.COLLOSUS) > 0)
+                    && Count(UnitTypes.COLOSUS) > 0)
                 {
                     agent.Order(1097);
                 }

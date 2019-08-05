@@ -12,7 +12,10 @@ namespace Tyr.Managers
         bool enemyMainFound = false;
         public bool PrefferDistant { get; set; } = true;
 
+        public bool TargetAllBuildings = false;
         public bool TargetCannons = false;
+        public bool TargetGateways = false;
+        public bool SkipPlanetaries = false;
 
         public void OnFrame(Tyr tyr)
         {
@@ -44,15 +47,21 @@ namespace Tyr.Managers
 
             if (PotentialEnemyStartLocations.Count == 1)
             {
-                float dist = -1;
+                float dist = PrefferDistant ? -1 : 1000000;
                 BuildingLocation target = null;
                 foreach (BuildingLocation building in tyr.EnemyManager.EnemyBuildings.Values)
                 {
+                    if (SkipPlanetaries && building.Type == UnitTypes.PLANETARY_FORTRESS)
+                        continue;
                     if (UnitTypes.ResourceCenters.Contains(building.Type)
-                        || (TargetCannons && building.Type == UnitTypes.PHOTON_CANNON))
+                        || (TargetCannons && building.Type == UnitTypes.PHOTON_CANNON)
+                        || (TargetGateways && building.Type == UnitTypes.GATEWAY)
+                        || (TargetGateways && building.Type == UnitTypes.WARP_GATE)
+                        || TargetAllBuildings)
                     {
                         float newDist = SC2Util.DistanceSq(building.Pos, PotentialEnemyStartLocations[0]);
-                        if (newDist > dist)
+                        if ((PrefferDistant && newDist > dist)
+                            || (!PrefferDistant && newDist < dist))
                         {
                             dist = newDist;
                             target = building;

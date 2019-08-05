@@ -48,9 +48,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Google.Protobuf, Version=3.5.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Protobuf.3.5.1\lib\net45\Google.Protobuf.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SuperSocket.ClientEngine, Version=0.10.0.0, Culture=neutral, PublicKeyToken=ee9af13f57f00acc, processorArchitecture=MSIL">
       <HintPath>..\packages\SuperSocket.ClientEngine.Core.0.10.0\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
@@ -104,6 +110,7 @@
     <Compile Include="Agents\PotentialHelper.cs" />
     <Compile Include="Agents\UpgradeTypes.cs" />
     <Compile Include="Agents\TrainingTypes.cs" />
+    <Compile Include="BuildingPlacement\ProtossBuildingPlacement.cs" />
     <Compile Include="BuildingPlacement\WarpInPlacer.cs" />
     <Compile Include="BuildingPlacement\ProxyBuildingPlacer.cs" />
     <Compile Include="BuildingPlacement\ReservedBuilding.cs" />
@@ -127,6 +134,24 @@
     <Compile Include="Builds\BuildLists\ToLine.cs" />
     <Compile Include="Builds\BuildLists\WaitForResources.cs" />
     <Compile Include="Builds\BuildLists\StepResult.cs" />
+    <Compile Include="Builds\DoNothing.cs" />
+    <Compile Include="Builds\Protoss\NinjaTurtlesRush.cs" />
+    <Compile Include="Builds\Protoss\AntiMicro.cs" />
+    <Compile Include="Builds\Protoss\PvPRushDefense.cs" />
+    <Compile Include="Builds\Protoss\PvZMassPhoenix.cs" />
+    <Compile Include="Builds\Protoss\TempestProxy.cs" />
+    <Compile Include="Builds\Protoss\DoubleRoboProxy.cs" />
+    <Compile Include="Builds\Protoss\PvPAdeptAllIn.cs" />
+    <Compile Include="Builds\Protoss\ZealotRushProxy.cs" />
+    <Compile Include="Builds\Protoss\FourGateProxy.cs" />
+    <Compile Include="Builds\Protoss\MassTempest.cs" />
+    <Compile Include="Builds\Protoss\PvTStalkerImmortal.cs" />
+    <Compile Include="Builds\Protoss\OneBaseStalkerImmortal.cs" />
+    <Compile Include="Builds\Protoss\PvZZealotArchon.cs" />
+    <Compile Include="Builds\Protoss\PvZStalkerImmortal.cs" />
+    <Compile Include="Builds\Protoss\PvPStalkerImmortal.cs" />
+    <Compile Include="Builds\Protoss\TestBuild.cs" />
+    <Compile Include="Builds\Protoss\ZealotImmortalArchon.cs" />
     <Compile Include="Builds\Protoss\VoidrayPvP.cs" />
     <Compile Include="Builds\Protoss\MacroPvP.cs" />
     <Compile Include="Builds\Protoss\MassOracle.cs" />
@@ -150,6 +175,7 @@
     <Compile Include="Builds\Terran\ReaperCyclone.cs" />
     <Compile Include="Builds\Terran\BansheeRush.cs" />
     <Compile Include="Builds\Terran\ReaperRush.cs" />
+    <Compile Include="Builds\Terran\HellbatRush.cs" />
     <Compile Include="Builds\Terran\CycloneRush.cs" />
     <Compile Include="Builds\Terran\MechTvZ.cs" />
     <Compile Include="Builds\Terran\MassWidowMines.cs" />
@@ -172,6 +198,39 @@
     <Compile Include="Builds\Zerg\OneBaseRoach.cs" />
     <Compile Include="Builds\Zerg\MassZergling.cs" />
     <Compile Include="Builds\Zerg\ZerglingRush.cs" />
+    <Compile Include="CombatSim\ActionProcessors\ActionProcessor.cs" />
+    <Compile Include="CombatSim\ActionProcessors\ConcussiveShellsProcessor.cs" />
+    <Compile Include="CombatSim\ActionProcessors\ZealotChargeProcessor.cs" />
+    <Compile Include="CombatSim\Actions\Action.cs" />
+    <Compile Include="CombatSim\Actions\AttackSiegeTank.cs" />
+    <Compile Include="CombatSim\Actions\MedivacHeal.cs" />
+    <Compile Include="CombatSim\Actions\AttackConcussiveShells.cs" />
+    <Compile Include="CombatSim\Actions\Move.cs" />
+    <Compile Include="CombatSim\Actions\Attack.cs" />
+    <Compile Include="CombatSim\Actions\DoNothing.cs" />
+    <Compile Include="CombatSim\CombatMicro\Flee.cs" />
+    <Compile Include="CombatSim\CombatSimulationDecision.cs" />
+    <Compile Include="CombatSim\DamageProcessors\BarrierDamageProcessor.cs" />
+    <Compile Include="CombatSim\Buffs\Buff.cs" />
+    <Compile Include="CombatSim\Buffs\ConcussiveShell.cs" />
+    <Compile Include="CombatSim\Buffs\Charge.cs" />
+    <Compile Include="CombatSim\DamageProcessors\DamageProcessor.cs" />
+    <Compile Include="CombatSim\CombatMicro\AttackClosestSiegeTank.cs" />
+    <Compile Include="CombatSim\CombatMicro\MedivacHealClosest.cs" />
+    <Compile Include="CombatSim\CombatMicro\StutterBack.cs" />
+    <Compile Include="CombatSim\CombatMicro\AttackClosest.cs" />
+    <Compile Include="CombatSim\CombatMicro\CombatMicro.cs" />
+    <Compile Include="CombatSim\CombatUnit.cs" />
+    <Compile Include="CombatSim\CombatWeapon.cs" />
+    <Compile Include="CombatSim\Point.cs" />
+    <Compile Include="CombatSim\SimulationState.cs" />
+    <Compile Include="CombatSim\SimulationUtil.cs" />
+    <Compile Include="CombatSim\TestCombatSim.cs" />
+    <Compile Include="CombatSim\UnitAttribute.cs" />
+    <Compile Include="Managers\CombatSimulation.cs" />
+    <Compile Include="Managers\EnemyBansheesManager.cs" />
+    <Compile Include="Managers\EnemyCycloneManager.cs" />
+    <Compile Include="Managers\EnemyTankManager.cs" />
     <Compile Include="Managers\UnitLocation.cs" />
     <Compile Include="Managers\Effect.cs" />
     <Compile Include="Managers\EnemyMineManager.cs" />
@@ -181,16 +240,30 @@
     <Compile Include="Managers\ScanCommand.cs" />
     <Compile Include="MapAnalysis\WallBuilding.cs" />
     <Compile Include="MapAnalysis\WallInCreator.cs" />
+    <Compile Include="Micro\AdeptKillWorkersController.cs" />
+    <Compile Include="Micro\AdvanceController.cs" />
+    <Compile Include="Micro\AdeptPhaseEnemyMainController.cs" />
+    <Compile Include="Micro\FallBackController.cs" />
+    <Compile Include="Micro\AttackEnemyController.cs" />
+    <Compile Include="Micro\FearMinesController.cs" />
+    <Compile Include="Micro\FleeCyclonesController.cs" />
+    <Compile Include="Micro\KillTargetController.cs" />
+    <Compile Include="Micro\SentryController.cs" />
+    <Compile Include="Micro\EvadeCannonsController.cs" />
+    <Compile Include="Micro\TargetUnguardedBuildingsController.cs" />
+    <Compile Include="Micro\WaitForDetectionController.cs" />
     <Compile Include="Micro\OracleController.cs" />
     <Compile Include="Micro\BansheeController.cs" />
     <Compile Include="Micro\CycloneVsBansheeController.cs" />
     <Compile Include="Micro\InfestorController.cs" />
     <Compile Include="Micro\KillParasitedController.cs" />
     <Compile Include="Micro\StalkerAttackNaturalController.cs" />
+    <Compile Include="Micro\SpreadOutController.cs" />
     <Compile Include="Micro\TargetRepairingSCVController.cs" />
     <Compile Include="Micro\StutterForwardController.cs" />
     <Compile Include="Micro\TempestController.cs" />
     <Compile Include="Micro\DisruptorController.cs" />
+    <Compile Include="Micro\GravitonBeamController.cs" />
     <Compile Include="Micro\YamatoController.cs" />
     <Compile Include="Micro\FearEnemyController.cs" />
     <Compile Include="Micro\CycloneController.cs" />
@@ -220,6 +293,8 @@
     <Compile Include="Micro\HitAndRunController.cs" />
     <Compile Include="Micro\FleeBroodlingsController.cs" />
     <Compile Include="Micro\TargetFireController.cs" />
+    <Compile Include="EmptyBot.cs" />
+    <Compile Include="MLBot.cs" />
     <Compile Include="PreviousEnemyStrategies.cs" />
     <Compile Include="EnemyStrategyAnalyzer.cs" />
     <Compile Include="Managers\WallInManager.cs" />
@@ -253,8 +328,11 @@
     <Compile Include="Micro\HTController.cs" />
     <Compile Include="Micro\ColloxenController.cs" />
     <Compile Include="Micro\VoidrayController.cs" />
+    <Compile Include="StrategyAnalysis\AdeptHarass.cs" />
+    <Compile Include="StrategyAnalysis\ProxyDetected.cs" />
     <Compile Include="StrategyAnalysis\Infestor.cs" />
     <Compile Include="StrategyAnalysis\Overseer.cs" />
+    <Compile Include="StrategyAnalysis\SkippedNatural.cs" />
     <Compile Include="StrategyAnalysis\Turret.cs" />
     <Compile Include="StrategyAnalysis\SwarmHost.cs" />
     <Compile Include="StrategyAnalysis\Nydus.cs" />
@@ -309,6 +387,15 @@
     <Compile Include="StrategyAnalysis\Strategy.cs" />
     <Compile Include="Tasks\AdeptKillSquadTask.cs" />
     <Compile Include="Tasks\AdeptScoutTask.cs" />
+    <Compile Include="Tasks\DefendRegionTask.cs" />
+    <Compile Include="Tasks\KillOwnUnitTask.cs" />
+    <Compile Include="Tasks\ForceFieldRampTask.cs" />
+    <Compile Include="Tasks\PhoenixHarassTask.cs" />
+    <Compile Include="Tasks\ProxyTask.cs" />
+    <Compile Include="Tasks\ProxyTwoGateTask.cs" />
+    <Compile Include="Tasks\WarpPrismElevatorTask.cs" />
+    <Compile Include="Tasks\HodorTask.cs" />
+    <Compile Include="Tasks\ProxyFourGateTask.cs" />
     <Compile Include="Tasks\CreeperLordTask.cs" />
     <Compile Include="Tasks\ArmyObserverTask.cs" />
     <Compile Include="Tasks\DefendingOverseerTask.cs" />
@@ -334,6 +421,8 @@
     <Compile Include="Tasks\AttackTask.cs" />
     <Compile Include="Tasks\GroupedAttackTask.cs" />
     <Compile Include="Tasks\OracleHarassBasesTask.cs" />
+    <Compile Include="Tasks\ShieldRegenTask.cs" />
+    <Compile Include="Tasks\ScoutTask.cs" />
     <Compile Include="Tasks\TransformTask.cs" />
     <Compile Include="Tasks\ReplenishBuildingSCVTask.cs" />
     <Compile Include="Tasks\RepairTask.cs" />
@@ -362,6 +451,7 @@
     <Compile Include="Tasks\BunkerDefendersTask.cs" />
     <Compile Include="Tasks\MechDestroyExpandsTask.cs" />
     <Compile Include="Tasks\SCVRushTask.cs" />
+    <Compile Include="Tasks\SaveWorkersTask.cs" />
     <Compile Include="Tasks\WorkerSafetyTask.cs" />
     <Compile Include="Tasks\UnitDescriptor.cs" />
     <Compile Include="Tasks\WorkerRushDefenseTask.cs" />
@@ -375,6 +465,7 @@
     <Compile Include="Tasks\HideBaseTask.cs" />
     <Compile Include="Tasks\ProxySpotterTask.cs" />
     <Compile Include="Tasks\OverlordScoutTask.cs" />
+    <Compile Include="Tasks\ForwardProbeTask.cs" />
     <Compile Include="Tasks\WorkerScoutTask.cs" />
     <Compile Include="Tasks\BuildRequestGas.cs" />
     <Compile Include="Tasks\BuildRequest.cs" />
@@ -425,6 +516,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.2.0.0\build\netstandard1.4\Fody.targets" Condition="Exists('..\packages\Fody.2.0.0\build\netstandard1.4\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -131,9 +131,12 @@ namespace SC2API_CSharp
             return response.JoinGame.PlayerId;
         }
 
-        public async Task Ping()
+        public async Task<ResponsePing> Ping()
         {
-            await proxy.Ping();
+            Request request = new Request();
+            request.Ping = new RequestPing();
+            Response response = await proxy.SendRequest(request);
+            return response.Ping;
         }
 
         public async Task RequestLeaveGame()
@@ -173,6 +176,8 @@ namespace SC2API_CSharp
 
             Response dataResponse = await proxy.SendRequest(gameDataRequest);
 
+            ResponsePing pingResponse = await Ping();
+
             bool start = true;
             
             while (true)
@@ -197,7 +202,7 @@ namespace SC2API_CSharp
                 if (start)
                 {
                     start = false;
-                    bot.OnStart(gameInfoResponse.GameInfo, dataResponse.Data, observation, playerId, opponentID);
+                    bot.OnStart(gameInfoResponse.GameInfo, dataResponse.Data, pingResponse, observation, playerId, opponentID);
                 }
                 
                 IEnumerable<SC2APIProtocol.Action> actions = bot.onFrame(observation);

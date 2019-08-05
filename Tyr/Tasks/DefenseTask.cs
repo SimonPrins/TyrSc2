@@ -14,6 +14,8 @@ namespace Tyr.Tasks
         public int DrawDefenderRadius = 40;
         public int MainDefenseRadius = 30;
         public int ExpandDefenseRadius = 20;
+        public int BufferZone = 5;
+        public bool IncludePhoenixes;
         public bool Air = false;
 
         private bool Defending = false;
@@ -25,7 +27,9 @@ namespace Tyr.Tasks
         private int TargetCalculatedFrame = 0;
 
         public DefenseTask() : base(7)
-        { }
+        {
+            JoinCombatSimulation = true;
+        }
 
         public static void Enable()
         {
@@ -35,13 +39,18 @@ namespace Tyr.Tasks
             Tyr.Bot.TaskManager.Add(AirDefenseTask);
         }
 
+        public bool IsDefending()
+        {
+            return Defending;
+        }
+
         public override bool DoWant(Agent agent)
         {
             if (!agent.IsCombatUnit)
                 return false;
             if (!agent.CanAttackAir() && Air)
                 return false;
-            if (!agent.CanAttackGround() && !Air)
+            if (!agent.CanAttackGround() && !Air && (agent.Unit.UnitType != UnitTypes.PHOENIX || !IncludePhoenixes))
                 return false;
             if (SC2Util.DistanceSq(agent.Unit.Pos, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation)) <= DrawDefenderRadius * DrawDefenderRadius)
                 return true;
@@ -68,9 +77,7 @@ namespace Tyr.Tasks
             float dist = GetMaxDefenseRadiusSq();
 
             foreach (Unit unit in Tyr.Bot.Enemies())
-                if (unit.Owner != Tyr.Bot.PlayerId
-                    && !IgnoreEnemyTypes.Contains(unit.UnitType)
-                    && unit.Owner != Tyr.Bot.NeutralPlayerId
+                if (!IgnoreEnemyTypes.Contains(unit.UnitType)
                     && unit.UnitType != UnitTypes.ADEPT_PHASE_SHIFT
                     && unit.UnitType != UnitTypes.KD8_CHARGE
                     && unit.UnitType != UnitTypes.OVERLORD
@@ -84,7 +91,7 @@ namespace Tyr.Tasks
                 {
                     if (unit.IsFlying && !Air)
                         continue;
-                    if (!unit.IsFlying && Air && unit.UnitType != UnitTypes.COLLOSUS)
+                    if (!unit.IsFlying && Air && unit.UnitType != UnitTypes.COLOSUS)
                         continue;
                     float newDist = SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation));
                     if (newDist >= GetMaxDefenseRadiusSq())
@@ -119,7 +126,7 @@ namespace Tyr.Tasks
                     if (newDist >= dist && !PreferEnemyTypes.Contains(unit.UnitType))
                         continue;
 
-                    if (newDist >= dist && Target != null &&  PreferEnemyTypes.Contains(Target.UnitType))
+                    if (newDist >= dist && Target != null && PreferEnemyTypes.Contains(Target.UnitType))
                         continue;
 
                     if (newDist > GetMaxDefenseRadiusSq())
@@ -146,7 +153,7 @@ namespace Tyr.Tasks
         float GetMainDefenseRadiusSq()
         {
             if (Defending)
-                return (MainDefenseRadius + 5) * (MainDefenseRadius + 5);
+                return (MainDefenseRadius + BufferZone) * (MainDefenseRadius + BufferZone);
             else
                 return MainDefenseRadius * MainDefenseRadius;
         }
@@ -154,7 +161,7 @@ namespace Tyr.Tasks
         float GetMaxDefenseRadiusSq()
         {
             if (Defending)
-                return (MaxDefenseRadius + 5) * (MaxDefenseRadius + 5);
+                return (MaxDefenseRadius + BufferZone) * (MaxDefenseRadius + BufferZone);
             else
                 return MaxDefenseRadius * MaxDefenseRadius;
         }
@@ -162,7 +169,7 @@ namespace Tyr.Tasks
         float GetExpandDefenseRadiusSq()
         {
             if (Defending)
-                return (ExpandDefenseRadius + 5) * (ExpandDefenseRadius + 5);
+                return (ExpandDefenseRadius + BufferZone) * (ExpandDefenseRadius + BufferZone);
             else
                 return ExpandDefenseRadius * ExpandDefenseRadius;
         }

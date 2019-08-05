@@ -5,6 +5,8 @@ namespace Tyr.Micro
 {
     public class TempestController : CustomController
     {
+        public Point2D RetreatPos;
+
         public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (agent.Unit.UnitType != UnitTypes.TEMPEST)
@@ -13,7 +15,7 @@ namespace Tyr.Micro
             if (agent.Unit.WeaponCooldown == 0)
                 return false;
 
-            float dist = 9 * 9;
+            float dist = 11 * 11;
             Unit fleeTarget = null;
             foreach (Unit enemy in Tyr.Bot.Enemies())
             {
@@ -21,6 +23,9 @@ namespace Tyr.Micro
                     continue;
 
                 float newDist = agent.DistanceSq(enemy);
+
+                if (!enemy.IsFlying && newDist >= 9 * 9)
+                    continue;
                 if (newDist < dist)
                 {
                     fleeTarget = enemy;
@@ -30,7 +35,10 @@ namespace Tyr.Micro
 
             if (fleeTarget != null)
             {
-                agent.Order(Abilities.MOVE, agent.From(fleeTarget.Pos, 4));
+                if (RetreatPos != null)
+                    agent.Flee(fleeTarget.Pos, RetreatPos);
+                else
+                    agent.Flee(fleeTarget.Pos);
                 return true;
             }
 

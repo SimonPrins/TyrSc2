@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using SC2APIProtocol;
 using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
+using Tyr.Builds.BuildLists;
 using Tyr.Tasks;
 using Tyr.Util;
 
@@ -13,16 +11,16 @@ namespace Tyr.BuildingPlacement
      * This class is responsible for managing the placement of buildings.
      */
     public class WarpInPlacer
-    {   
+    {
         public static Point2D FindPlacement(Point2D target, uint type)
         {
-            Point2D result = findPlacementLocal(target, type, 20);
-            return result;
+            return findPlacementLocal(target, type, 20);
         }
 
         private static Point2D findPlacementLocal(Point2D target, uint type, int maxDist)
         {
-            target = SC2Util.Point((int)target.X, (int)target.Y);
+            FileUtil.Debug("Frame: " + Tyr.Bot.Frame + " finding location around: " + target);
+            target = SC2Util.Point((int)target.X + 0.5f, (int)target.Y + 0.5f);
 
             for (int range = 0; range < maxDist; range++)
             {
@@ -41,12 +39,19 @@ namespace Tyr.BuildingPlacement
                         return SC2Util.Point(target.X - range, target.Y + y);
                 }
             }
+            FileUtil.Debug("");
             // No placement found.
             return null;
         }
 
         public static bool CheckPlacement(Point2D location, uint type, BuildRequest skipRequest, bool buildingsOnly)
         {
+            int timeSinceLastWarpIn = Tyr.Bot.Frame - TrainStep.LastWarpInFrame;
+            if (timeSinceLastWarpIn >= 4
+                && timeSinceLastWarpIn <= 10
+                && SC2Util.DistanceSq(location, TrainStep.LastWarpInLocation) <= 0.25f)
+                return false;
+
             // Check if the building can be placed on this position of the map.
             if (!SC2Util.GetTilePlacable((int)Math.Round(location.X), (int)Math.Round(location.Y)))
                 return false;
@@ -67,7 +72,7 @@ namespace Tyr.BuildingPlacement
             {
                 if (unit.UnitType != UnitTypes.PYLON || unit.BuildProgress < 1)
                     continue;
-
+                
                 if (Tyr.Bot.MapAnalyzer.MapHeight((int)unit.Pos.X, (int)unit.Pos.Y) < Tyr.Bot.MapAnalyzer.MapHeight((int)location.X, (int)location.Y))
                     continue;
 
@@ -90,18 +95,13 @@ namespace Tyr.BuildingPlacement
                 || unitType == UnitTypes.KD8_CHARGE)
                 return true;
             
-            if (UnitTypes.CombatUnitTypes.Contains(unitType))
-                return SC2Util.DistanceGrid(unitPos, location) > 1;
-            if (UnitTypes.WorkerTypes.Contains(unitType))
-                return SC2Util.DistanceGrid(unitPos, location) > 3;
-            
             return CheckDistanceClose(location, buildingType, unitPos, unitType);
         }
 
         public static bool CheckDistanceClose(Point2D location, uint buildingType, Point2D unitPos, uint unitType)
         {
-            float dx = 0.5f + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.X / 2f: 1.2f) - 0.1f;
-            float dy = 0.5f + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.Y / 2f : 1.2f) - 0.1f;
+            float dx = 1f + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.X / 2f: 1f) - 0.1f;
+            float dy = 1f + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.Y / 2f : 1f) - 0.1f;
             
             return Math.Abs(location.X - unitPos.X) >= dx || Math.Abs(location.Y - unitPos.Y) >= dy;
         }

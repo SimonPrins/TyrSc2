@@ -6,9 +6,17 @@ namespace Tyr.Tasks
 {
     class TimedObserverTask : Task
     {
+        public static TimedObserverTask Task = new TimedObserverTask();
+
         public Point2D Target;
         public TimedObserverTask() : base(11)
         { }
+
+        public static void Enable()
+        {
+            Enable(Task);
+        }
+            
 
         public override bool DoWant(Agent agent)
         {

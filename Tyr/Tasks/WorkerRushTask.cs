@@ -7,10 +7,13 @@ namespace Tyr.Tasks
 {
     class WorkerRushTask : Task
     {
+        public static WorkerRushTask Task = new WorkerRushTask();
+
         public int TakeWorkers = 12;
         private HashSet<ulong> regenerating = new HashSet<ulong>();
         PriorityTargetting RangedTargetting = new PriorityTargetting();
         PriorityTargetting CloseTargetting = new PriorityTargetting();
+        private bool Close = false;
 
         public WorkerRushTask() : base(9)
         {
@@ -29,6 +32,11 @@ namespace Tyr.Tasks
 
             foreach (uint t in UnitTypes.BuildingTypes)
                 CloseTargetting.DefaultPriorities[t] = -1;
+        }
+
+        public static void Enable()
+        {
+            Enable(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -60,6 +68,17 @@ namespace Tyr.Tasks
             ulong mineral = 0;
             if (tyr.BaseManager.Main.BaseLocation.MineralFields.Count > 0)
                 mineral = tyr.BaseManager.Main.BaseLocation.MineralFields[0].Tag;
+
+            if (!Close)
+            {
+                foreach (Agent agent in units)
+                {
+                    agent.Order(Abilities.MOVE, tyr.TargetManager.AttackTarget);
+                    if (agent.DistanceSq(tyr.TargetManager.AttackTarget) <= 15 * 15)
+                        Close = true;
+                }
+                return;
+            }
 
             foreach (Agent agent in units)
             {

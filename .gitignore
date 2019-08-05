@@ -1,0 +1,7 @@
+packages/ 
+Tyr/bin/
+Tyr/obj/
+SC2API-CSharp/bin/
+SC2API-CSharp/obj/
+SC2APIProtocol/bin/
+SC2APIProtocol/obj/

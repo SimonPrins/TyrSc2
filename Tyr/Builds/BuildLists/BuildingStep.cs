@@ -220,8 +220,18 @@ namespace Tyr.Builds.BuildLists
             {
                 bool isCenter = UnitTypes.ResourceCenters.Contains(UnitType);
 
-                if (Tyr.Bot.Minerals() < BuildingType.LookUp[UnitType].Minerals - (UnitTypes.ResourceCenters.Contains(UnitType) ? 75 : 25)
-                    || (Tyr.Bot.Gas() < BuildingType.LookUp[UnitType].Gas - 16 && BuildingType.LookUp[UnitType].Gas > 0))
+                int requiredMinerals;
+                if (isCenter)
+                    requiredMinerals = BuildingType.LookUp[UnitType].Minerals - 75;
+                else if (DesiredBase != null
+                    && DesiredBase == Tyr.Bot.BaseManager.Natural
+                    && (Tyr.Bot.BaseManager.Natural.ResourceCenter == null || Tyr.Bot.BaseManager.Natural.ResourceCenter.Unit.BuildProgress >= 0.99))
+                    requiredMinerals = BuildingType.LookUp[UnitType].Minerals - 50;
+                else
+                    requiredMinerals = BuildingType.LookUp[UnitType].Minerals - 25;
+                int requiredGas = BuildingType.LookUp[UnitType].Gas - 16;
+                if (Tyr.Bot.Minerals() < requiredMinerals
+                    || (Tyr.Bot.Gas() < requiredGas && BuildingType.LookUp[UnitType].Gas > 0))
                 {
                     Tyr.Bot.DrawText("Not enough resources for " + UnitTypes.LookUp[UnitType].Name + ".");
                     return false;
