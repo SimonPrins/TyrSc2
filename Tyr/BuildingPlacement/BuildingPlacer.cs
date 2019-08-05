@@ -36,6 +36,16 @@ namespace Tyr.BuildingPlacement
                     && type != UnitTypes.MISSILE_TURRET)
                     return TerranBuildingPlacement.FindPlacement(target, size, type);
             }
+            else if (Tyr.Bot.MyRace == Race.Protoss)
+            {
+                if (type != UnitTypes.ASSIMILATOR
+                    && type != UnitTypes.NEXUS
+                    && type != UnitTypes.PHOTON_CANNON
+                    && type != UnitTypes.SHIELD_BATTERY
+                    && Tyr.Bot.MapAnalyzer.StartArea[target]
+                    && !BuildCompact)
+                    return ProtossBuildingPlacement.FindPlacement(target, size, type);
+            }
             Point2D result = findPlacementLocal(target, size, type, 20);
             if (type == UnitTypes.PYLON)
                 PylonsFilled = result == null;
@@ -169,6 +179,10 @@ namespace Tyr.BuildingPlacement
                 if (request != skipRequest && !CheckDistance(location, type, request.Pos, request.Type, buildingsOnly))
                     return false;
 
+            foreach (ReservedBuilding building in Tyr.Bot.buildingPlacer.ReservedLocation)
+                if (!CheckDistClose(location.X - 1.5f, location.Y - 1.5f, location.X + 1.5f, location.Y + 1.5f, building.Pos, building.Type))
+                    return false;
+
             if (Tyr.Bot.MyRace == Race.Zerg && type != UnitTypes.HATCHERY && type != UnitTypes.EXTRACTOR)
             {
                 BoolGrid creep = new ImageBoolGrid(bot.Observation.Observation.RawData.MapState.Creep, 1);
@@ -287,6 +301,22 @@ namespace Tyr.BuildingPlacement
 
             float dx = radX + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.X / 2f : 1f) - 0.1f;
             float dy = radY + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.Y / 2f : 1f) - 0.1f;
+
+            return Math.Abs(midX - unitPos.X) >= dx || Math.Abs(midY - unitPos.Y) >= dy;
+
+        }
+
+        public static bool CheckDistDebug(float x1, float y1, float x2, float y2, Point2D unitPos, uint unitType)
+        {
+            float midX = (x1 + x2) * 0.5f;
+            float radX = (x2 - x1) * 0.5f;
+            float midY = (y1 + y2) * 0.5f;
+            float radY = (y2 - y1) * 0.5f;
+
+            float dx = radX + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.X / 2f : 1f) - 0.1f;
+            float dy = radY + (BuildingType.LookUp.ContainsKey(unitType) ? BuildingType.LookUp[unitType].Size.Y / 2f : 1f) - 0.1f;
+
+
             return Math.Abs(midX - unitPos.X) >= dx || Math.Abs(midY - unitPos.Y) >= dy;
 
         }
