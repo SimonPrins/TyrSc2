@@ -309,21 +309,19 @@ namespace Tyr.Builds
                 {
                     if (!agent.IsBuilding)
                         continue;
-                    blocked = System.Math.Abs(agent.Unit.Pos.X - loc.BaseLocation.Pos.X) < 5
-                        && System.Math.Abs(agent.Unit.Pos.Y - loc.BaseLocation.Pos.Y) < 5;
+                    blocked = !Tyr.Bot.buildingPlacer.CheckDistanceClose(loc.BaseLocation.Pos, unitType, SC2Util.To2D(agent.Unit.Pos), agent.Unit.UnitType);
+                    //blocked = System.Math.Abs(agent.Unit.Pos.X - loc.BaseLocation.Pos.X) < 5
+                    //    && System.Math.Abs(agent.Unit.Pos.Y - loc.BaseLocation.Pos.Y) < 5;
                     if (blocked)
                         break;
                 }
                 if (blocked)
-                {
-                    File.AppendAllLines(Directory.GetCurrentDirectory() + "/Data/Tyr/debug.txt", new string[] { "Base at " + loc.BaseLocation.Pos + " blocked by allied unit." });
                     continue;
-                }
 
                 // Ignore the pocket expand as a first base.
                 if (natural && Tyr.Bot.MapAnalyzer.EnemyDistances[(int)loc.BaseLocation.Pos.X, (int)loc.BaseLocation.Pos.Y] > Tyr.Bot.MapAnalyzer.EnemyDistances[(int)Tyr.Bot.MapAnalyzer.StartLocation.X, (int)Tyr.Bot.MapAnalyzer.StartLocation.Y])
                     continue;
-                int newdist = loc.DistanceToMain;
+                int newdist = loc.DistanceToMain - Tyr.Bot.MapAnalyzer.EnemyDistances[(int)loc.BaseLocation.Pos.X, (int)loc.BaseLocation.Pos.Y];
                 if (newdist < dist)
                 {
                     dist = newdist;

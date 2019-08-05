@@ -154,8 +154,8 @@ namespace Tyr.Builds.Zerg
             result.Morph(UnitTypes.DRONE, 20);
             result.Upgrade(UpgradeType.GroovedSpines);
             result.Upgrade(UpgradeType.MuscularAugments);
-            result.Building(UnitTypes.INFESTATION_PIT, () => Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLLOSUS) > 0);
-            result.Building(UnitTypes.EXTRACTOR, 2, () => Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLLOSUS) > 0);
+            result.Building(UnitTypes.INFESTATION_PIT, () => Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS) > 0);
+            result.Building(UnitTypes.EXTRACTOR, 2, () => Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS) > 0);
             result.Upgrade(UpgradeType.PathogenGlands);
             result.Upgrade(UpgradeType.NeuralParasite);
             result.Morph(UnitTypes.HYDRALISK, 10);
@@ -264,7 +264,7 @@ namespace Tyr.Builds.Zerg
 
             if (DefendEnemyNaturalTask != null)
             {
-                DefendEnemyNaturalTask.Stopped = tyr.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) < 3 || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLLOSUS) > 0;
+                DefendEnemyNaturalTask.Stopped = tyr.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) < 3 || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS) > 0;
                 if (DefendEnemyNaturalTask.Stopped)
                     DefendEnemyNaturalTask.Clear();
             }
@@ -347,7 +347,7 @@ namespace Tyr.Builds.Zerg
                 TimingAttackTask.Task.RequiredSize = 50;
                 TimingAttackTask.Task.RetreatSize = 5;
             }
-            else if (tyr.Frame >= HydraTransitionFrame && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLLOSUS) > 0)
+            else if (tyr.Frame >= HydraTransitionFrame && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS) > 0)
             {
                 TimingAttackTask.Task.RequiredSize = 40;
                 TimingAttackTask.Task.RetreatSize = 8;

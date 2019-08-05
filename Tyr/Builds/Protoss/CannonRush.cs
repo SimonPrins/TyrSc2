@@ -11,11 +11,17 @@ namespace Tyr.Builds.Protoss
             return "CannonRush";
         }
 
+        public override void InitializeTasks()
+        {
+            base.InitializeTasks();
+            DefenseTask.Enable();
+            CannonRushTask.Enable();
+            TimingAttackTask.Enable();
+        }
+
         public override void OnStart(Tyr tyr)
         {
-            tyr.TaskManager.Add(new DefenseTask());
-            tyr.TaskManager.Add(new CannonRushTask());
-
+            Set += ProtossBuildUtil.Pylons(() => Count(UnitTypes.PYLON) > 0 && (Count(UnitTypes.PHOTON_CANNON) >= 2 || Tyr.Bot.Frame >= 22.4 * 60 * 2));
             Set += MainBuild();
         }
 
@@ -25,12 +31,19 @@ namespace Tyr.Builds.Protoss
 
             result.Building(UnitTypes.PYLON);
             result.Building(UnitTypes.FORGE);
+            result.Building(UnitTypes.GATEWAY, 3, () => Minerals() >= 750 - Count(UnitTypes.PHOTON_CANNON) || CannonRushTask.Task.Units.Count == 0);
+            result.Train(UnitTypes.ZEALOT);
 
             return result;
         }
 
         public override void OnFrame(Tyr tyr)
-        { }
+        {
+            TimingAttackTask.Task.RequiredSize = 6;
+
+            if (Tyr.Bot.Frame >= 22.4 * 30)
+                CannonRushTask.Task.Stopped = true;
+        }
 
         public override void Produce(Tyr tyr, Agent agent)
         {

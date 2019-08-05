@@ -1,5 +1,4 @@
 ﻿using SC2APIProtocol;
-using System;
 using Tyr.Agents;
 using Tyr.BuildingPlacement;
 using Tyr.Tasks;
@@ -13,6 +12,11 @@ namespace Tyr.Builds.BuildLists
         public uint UnitType;
         public int Number = 1000000;
         public Test Condition = () => { return true; };
+
+
+        public static Point2D WarpInLocation = null;
+        public static Point2D LastWarpInLocation = null;
+        public static int LastWarpInFrame = 0;
 
         public TrainStep(uint unitType)
         {
@@ -92,6 +96,9 @@ namespace Tyr.Builds.BuildLists
                 if (Tyr.Bot.Frame - agent.LastOrderFrame < 5)
                     continue;
 
+                if (agent.Unit.UnitType == UnitTypes.GATEWAY && UpgradeType.LookUp[UpgradeType.WarpGate].Done())
+                    continue;
+
                 Tyr.Bot.ReservedGas += trainType.Gas;
                 Tyr.Bot.ReservedMinerals += trainType.Minerals;
 
@@ -107,7 +114,10 @@ namespace Tyr.Builds.BuildLists
                         continue;
                 }
                 else
+                {
                     agent.Order((int)trainType.Ability);
+                    Tyr.Bot.UnitManager.UnitTraining(trainType.UnitType);
+                }
 
                 state.AddTraining(UnitType, 1);
                 alreadyTrained++;
@@ -118,14 +128,49 @@ namespace Tyr.Builds.BuildLists
 
         private bool WarpIn(Agent warpGate, TrainingType trainType)
         {
+            int framesSinceLastWarpIn = Tyr.Bot.Frame - LastWarpInFrame;
+            
+            if (framesSinceLastWarpIn <= 4)
+            {
+                foreach (Agent agent in Tyr.Bot.Units())
+                {
+                    if (agent.DistanceSq(LastWarpInLocation) <= 0.5f * 0.5f)
+                    {
+                        LastWarpInFrame = 0;
+                        break;
+                    }
+                }
+            }
+
             Point2D aroundTile;
             Point2D placement;
-            if (Tyr.Bot.BaseManager.Natural.Owner == Tyr.Bot.PlayerId)
+            if (WarpInLocation != null)
+            {
+                aroundTile = WarpInLocation;
+                placement = WarpInPlacer.FindPlacement(aroundTile, trainType.UnitType);
+                if (placement != null)
+                {
+                    if (framesSinceLastWarpIn >= 10)
+                    {
+                        LastWarpInFrame = Tyr.Bot.Frame;
+                        LastWarpInLocation = placement;
+                    }
+                    warpGate.Order((int)trainType.WarpInAbility, placement);
+                    return true;
+                }
+            }
+
+            if (Tyr.Bot.BaseManager.Natural.Owner == Tyr.Bot.PlayerId && Tyr.Bot.Build.Completed(UnitTypes.PYLON) >= 1)
             {
                 aroundTile = Tyr.Bot.BaseManager.Natural.OppositeMineralLinePos;
                 placement = WarpInPlacer.FindPlacement(aroundTile, trainType.UnitType);
                 if (placement != null)
                 {
+                    if (framesSinceLastWarpIn >= 10)
+                    {
+                        LastWarpInFrame = Tyr.Bot.Frame;
+                        LastWarpInLocation = placement;
+                    }
                     warpGate.Order((int)trainType.WarpInAbility, placement);
                     return true;
                 }
@@ -135,7 +180,13 @@ namespace Tyr.Builds.BuildLists
             placement = WarpInPlacer.FindPlacement(aroundTile, trainType.UnitType);
             if (placement != null)
             {
+                if (framesSinceLastWarpIn >= 10)
+                {
+                    LastWarpInFrame = Tyr.Bot.Frame;
+                    LastWarpInLocation = placement;
+                }
                 warpGate.Order((int)trainType.WarpInAbility, placement);
+                Tyr.Bot.UnitManager.UnitTraining(trainType.UnitType);
                 return true;
             }
             return false;
