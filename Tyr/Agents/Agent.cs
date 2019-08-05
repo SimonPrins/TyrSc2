@@ -1,4 +1,5 @@
-﻿using SC2APIProtocol;
+﻿using System;
+using SC2APIProtocol;
 using Tyr.Managers;
 using Tyr.Util;
 
@@ -6,19 +7,25 @@ namespace Tyr.Agents
 {
     public class Agent
     {
+        public Unit Unit;
+        public Unit PreviousUnit;
         public int LastOrderFrame = 0;
         public int LastAbility = 0;
-        public Agent(Unit unit)
-        {
-            Unit = unit;
-        }
-
         public ActionRawUnitCommand Command;
 
         // For a building, indicates to which base it belongs.
         public Base Base;
         public Point2D AroundLocation;
         public bool Exact;
+
+        public CombatSim.CombatSimulationDecision CombatSimulationDecision = CombatSim.CombatSimulationDecision.None;
+
+        public int CombatSimulationDecisionFrame = 0;
+
+        public Agent(Unit unit)
+        {
+            Unit = unit;
+        }
 
         public void Order(int ability)
         {
@@ -50,7 +57,93 @@ namespace Tyr.Agents
             Command.TargetWorldSpacePos = target;
             Command.UnitTags.Add(Unit.Tag);
         }
-        
+
+        public bool FleeEnemies(bool returnFire)
+        {
+            return FleeEnemies(returnFire, 15);
+        }
+
+        public bool FleeEnemies(bool returnFire, float fleeDistance)
+        {
+            Point2D retreatFrom = null;
+            Unit retreatUnit = null;
+            float dist = fleeDistance * fleeDistance;
+            foreach (Unit enemy in Tyr.Bot.Enemies())
+            {
+                float newDist = DistanceSq(enemy);
+                if (newDist < dist)
+                {
+                    retreatFrom = SC2Util.To2D(enemy.Pos);
+                    retreatUnit = enemy;
+                    dist = newDist;
+                }
+            }
+            foreach (UnitLocation enemy in Tyr.Bot.EnemyMineManager.Mines)
+            {
+                float newDist = DistanceSq(enemy.Pos);
+                if (newDist < dist)
+                {
+                    retreatFrom = SC2Util.To2D(enemy.Pos);
+                    dist = newDist;
+                }
+            }
+            foreach (UnitLocation enemy in Tyr.Bot.EnemyTankManager.Tanks)
+            {
+                float newDist = DistanceSq(enemy.Pos);
+                if (newDist < dist)
+                {
+                    retreatFrom = SC2Util.To2D(enemy.Pos);
+                    dist = newDist;
+                }
+            }
+            if (retreatFrom != null)
+            {
+                if (retreatUnit != null && returnFire && Unit.WeaponCooldown == 0)
+                {
+                    float range = GetRange(retreatUnit);
+                    if (DistanceSq(retreatFrom) <= range * range)
+                    {
+                        Order(Abilities.ATTACK, retreatFrom);
+                        return true;
+                    }
+                }
+                Flee(retreatFrom);
+                return true;
+            }
+            return false;
+        }
+
+        public void Flee(Point retreatFrom)
+        {
+            Flee(SC2Util.To2D(retreatFrom));
+        }
+
+        public void Flee(Point2D retreatFrom)
+        {
+            PotentialHelper potential = new PotentialHelper(Unit.Pos, 4);
+            potential.From(retreatFrom);
+            Point2D fleeTo;
+            if (Unit.IsFlying)
+                fleeTo = SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation);
+            else
+                fleeTo = Tyr.Bot.MapAnalyzer.Walk(SC2Util.To2D(Unit.Pos), Tyr.Bot.MapAnalyzer.MainDistances, 6);
+            potential.To(fleeTo);
+            Order(Abilities.MOVE, potential.Get());
+        }
+
+        public void Flee(Point retreatFrom, Point2D retreatTo)
+        {
+            Flee(SC2Util.To2D(retreatFrom), retreatTo);
+        }
+
+        public void Flee(Point2D retreatFrom, Point2D retreatTo)
+        {
+            PotentialHelper potential = new PotentialHelper(Unit.Pos, 4);
+            potential.From(retreatFrom);
+            potential.To(retreatTo);
+            Order(Abilities.MOVE, potential.Get());
+        }
+
         public bool CanAttackAir()
         {
             return UnitTypes.CanAttackAir(Unit.UnitType);
@@ -91,19 +184,32 @@ namespace Tyr.Agents
                 return Unit.Orders[0].AbilityId;
         }
 
-        public int GetDamage(Unit target)
+        public Weapon GetWeapon(Unit target)
         {
-            Weapon weaponUsed = null;
             foreach (Weapon weapon in UnitTypes.LookUp[Unit.UnitType].Weapons)
             {
                 if (weapon.Type == Weapon.Types.TargetType.Any
                     || (weapon.Type == Weapon.Types.TargetType.Ground && !target.IsFlying)
                     || (weapon.Type == Weapon.Types.TargetType.Air && target.IsFlying))
-                    weaponUsed = weapon;
+                    return weapon;
             }
+            return null;
+        }
+
+        public int GetDamage(Unit target)
+        {
+            Weapon weaponUsed = GetWeapon(target);
             if (weaponUsed == null)
                 return 0;
             return (int)(weaponUsed.Damage - UnitTypes.LookUp[Unit.UnitType].Armor);
+        }
+
+        private float GetRange(Unit target)
+        {
+            Weapon weaponUsed = GetWeapon(target);
+            if (weaponUsed == null)
+                return -1;
+            return weaponUsed.Range;
         }
 
         public void Order(int ability, ulong targetTag)
@@ -123,7 +229,6 @@ namespace Tyr.Agents
             Command.UnitTags.Add(Unit.Tag);
         }
 
-        public Unit Unit { get; set; }
         public bool IsBuilding
         {
             get

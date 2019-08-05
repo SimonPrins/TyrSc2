@@ -13,6 +13,7 @@ namespace Tyr.Agents
         public uint Previous;
 
         public static uint ChitinousPlating = 4;
+        public static uint ConcussiveShells = 17;
         public static uint InfernalPreigniter = 19;
         public static uint BansheeCloak = 20;
         public static uint ProtossGroundWeapons1 = 39;
@@ -23,6 +24,7 @@ namespace Tyr.Agents
         public static uint ProtossGroundArmor2 = 43;
         public static uint ProtossGroundArmor3 = 44;
         public static uint ProtossGroundArmor = 44;
+        public static uint ExtendedThermalLance = 50;
         public static uint ZergMeleeWeapons1 = 53;
         public static uint ZergMeleeWeapons2 = 54;
         public static uint ZergMeleeWeapons3 = 55;
@@ -39,6 +41,7 @@ namespace Tyr.Agents
         public static uint MetabolicBoost = 66;
         public static uint PathogenGlands = 74;
         public static uint YamatoCannon = 76;
+        public static uint Charge = 86;
         public static uint Blink = 87;
         public static uint WarpGate = 84;
         public static uint AnabolicSynthesis = 88;
@@ -53,6 +56,7 @@ namespace Tyr.Agents
             Dictionary<uint, UpgradeType> result = new Dictionary<uint, UpgradeType>();
 
             Add(result, new UpgradeType() { UpgradeID = ChitinousPlating, ProducingUnits = Set(UnitTypes.ULTRALISK_CAVERN), Minerals = 150, Gas = 150, Ability = 265 });
+            Add(result, new UpgradeType() { UpgradeID = ConcussiveShells, ProducingUnits = Set(UnitTypes.BARRACKS_TECH_LAB), Minerals = 50, Gas = 50, Ability = 732 });
             Add(result, new UpgradeType() { UpgradeID = BansheeCloak, ProducingUnits = Set(UnitTypes.STARPORT_TECH_LAB), Minerals = 100, Gas = 100, Ability = 790 });
             Add(result, new UpgradeType() { UpgradeID = ProtossGroundWeapons1, ProducingUnits = Set(UnitTypes.FORGE), Minerals = 100, Gas = 100, Ability = 1062 });
             Add(result, new UpgradeType() { UpgradeID = ProtossGroundWeapons2, ProducingUnits = Set(UnitTypes.FORGE), Minerals = 150, Gas = 150, Ability = 1063, Previous = ProtossGroundWeapons1 });
@@ -60,6 +64,7 @@ namespace Tyr.Agents
             Add(result, new UpgradeType() { UpgradeID = ProtossGroundArmor1, ProducingUnits = Set(UnitTypes.FORGE), Minerals = 100, Gas = 100, Ability = 1065 });
             Add(result, new UpgradeType() { UpgradeID = ProtossGroundArmor2, ProducingUnits = Set(UnitTypes.FORGE), Minerals = 150, Gas = 150, Ability = 1066, Previous = ProtossGroundArmor1 });
             Add(result, new UpgradeType() { UpgradeID = ProtossGroundArmor3, ProducingUnits = Set(UnitTypes.FORGE), Minerals = 200, Gas = 200, Ability = 1067, Previous = ProtossGroundArmor2 });
+            Add(result, new UpgradeType() { UpgradeID = ExtendedThermalLance, ProducingUnits = Set(UnitTypes.ROBOTICS_BAY), Minerals = 150, Gas = 150, Ability = 1097 });
             Add(result, new UpgradeType() { UpgradeID = ZergMeleeWeapons1, ProducingUnits = Set(UnitTypes.EVOLUTION_CHAMBER), Minerals = 100, Gas = 100, Ability = 1186 });
             Add(result, new UpgradeType() { UpgradeID = ZergMeleeWeapons2, ProducingUnits = Set(UnitTypes.EVOLUTION_CHAMBER), Minerals = 150, Gas = 150, Ability = 1187, Previous = ZergMeleeWeapons1 });
             Add(result, new UpgradeType() { UpgradeID = ZergMeleeWeapons3, ProducingUnits = Set(UnitTypes.EVOLUTION_CHAMBER), Minerals = 200, Gas = 200, Ability = 1188, Previous = ZergMeleeWeapons2 });
@@ -75,7 +80,8 @@ namespace Tyr.Agents
             Add(result, new UpgradeType() { UpgradeID = GroovedSpines, ProducingUnits = Set(UnitTypes.HYDRALISK_DEN), Minerals = 100, Gas = 100, Ability = 1282 });
             Add(result, new UpgradeType() { UpgradeID = MuscularAugments, ProducingUnits = Set(UnitTypes.HYDRALISK_DEN), Minerals = 100, Gas = 100, Ability = 1283 });
             Add(result, new UpgradeType() { UpgradeID = YamatoCannon, ProducingUnits = Set(UnitTypes.FUSION_CORE), Minerals = 150, Gas = 150, Ability = 1532 });
-            Add(result, new UpgradeType() { UpgradeID = Blink, ProducingUnits = Set(UnitTypes.TEMPLAR_ARCHIVE), Minerals = 150, Gas = 150, Ability = 1597 });
+            Add(result, new UpgradeType() { UpgradeID = Charge, ProducingUnits = Set(UnitTypes.TWILIGHT_COUNSEL), Minerals = 100, Gas = 100, Ability = 1592 });
+            Add(result, new UpgradeType() { UpgradeID = Blink, ProducingUnits = Set(UnitTypes.TWILIGHT_COUNSEL), Minerals = 150, Gas = 150, Ability = 1597 });
             Add(result, new UpgradeType() { UpgradeID = AnabolicSynthesis, ProducingUnits = Set(UnitTypes.ULTRALISK_CAVERN), Minerals = 150, Gas = 150, Ability = 263 });
             Add(result, new UpgradeType() { UpgradeID = PathogenGlands, ProducingUnits = Set(UnitTypes.INFESTATION_PIT), Minerals = 150, Gas = 150, Ability = 1454 });
             Add(result, new UpgradeType() { UpgradeID = NeuralParasite, ProducingUnits = Set(UnitTypes.INFESTATION_PIT), Minerals = 150, Gas = 150, Ability = 1455 });

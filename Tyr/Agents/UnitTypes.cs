@@ -6,7 +6,7 @@ namespace Tyr.Agents
     class UnitTypes
     {
         public static Dictionary<uint, UnitTypeData> LookUp = new Dictionary<uint, UnitTypeData>();
-        public static uint COLLOSUS = 4;
+        public static uint COLOSUS = 4;
         public static uint TECH_LAB = 5;
         public static uint REACTOR = 6;
         public static uint INFESTOR_TERRAN = 7;
@@ -321,7 +321,7 @@ namespace Tyr.Agents
                 BROOD_LORD,
                 BROOD_LORD_COCOON,
                 CARRIER,
-                COLLOSUS,
+                COLOSUS,
                 CORRUPTOR,
                 DARK_TEMPLAR,
                 GHOST,
@@ -417,7 +417,7 @@ namespace Tyr.Agents
                 BATTLECRUISER,
                 BROOD_LORD,
                 CARRIER,
-                COLLOSUS,
+                COLOSUS,
                 CORRUPTOR,
                 GHOST,
                 HELLION,
@@ -551,7 +551,8 @@ namespace Tyr.Agents
                 || type == BATTLECRUISER
                 || type == INFESTOR
                 || type == DISRUPTOR
-                || type == ORACLE)
+                || type == ORACLE
+                || type == PHOENIX)
                 return true;
             foreach (Weapon weapon in LookUp[type].Weapons)
                 if (weapon.Type == Weapon.Types.TargetType.Any
