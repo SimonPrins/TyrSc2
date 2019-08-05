@@ -12,7 +12,6 @@ using Tyr.BuildSelection;
 using Tyr.Managers;
 using Tyr.MapAnalysis;
 using Tyr.Micro;
-using Tyr.StrategyAnalysis;
 using Tyr.Util;
 
 namespace Tyr
@@ -35,7 +34,7 @@ namespace Tyr
         List<Action> actions = new List<Action>();
 
         public BuildingPlacer buildingPlacer;
-        public int Frame { get; internal set; }
+        public int Frame { get; private set; }
         public MapAnalyzer MapAnalyzer { get; internal set; } = new MapAnalyzer();
         public EnemyStrategyAnalyzer EnemyStrategyAnalyzer = new EnemyStrategyAnalyzer();
         public PreviousEnemyStrategies PreviousEnemyStrategies = new PreviousEnemyStrategies();
@@ -56,6 +55,9 @@ namespace Tyr
         public TaskManager TaskManager = new TaskManager();
         public EffectManager EffectManager = new EffectManager();
         public EnemyMineManager EnemyMineManager = new EnemyMineManager();
+        public EnemyTankManager EnemyTankManager = new EnemyTankManager();
+        public EnemyCycloneManager EnemyCycloneManager = new EnemyCycloneManager();
+        public EnemyBansheesManager EnemyBansheesManager = new EnemyBansheesManager();
 
         public BaseManager BaseManager = new BaseManager();
         public NexusAbilityManager NexusAbilityManager = new NexusAbilityManager();
@@ -88,6 +90,8 @@ namespace Tyr
         List<long> Times = new List<long>();
 
         private BuildSelector BuildSelector = new ProbabilitySelector();
+
+        public int TournamentRound;
 
         public Tyr()
         {
@@ -359,7 +363,7 @@ namespace Tyr
             }
         }
 
-        public void OnStart(ResponseGameInfo gameInfo, ResponseData data, ResponseObservation observation, uint playerId, string opponentID)
+        public void OnStart(ResponseGameInfo gameInfo, ResponseData data, ResponsePing pingResponse, ResponseObservation observation, uint playerId, string opponentID)
         {
             Observation = observation;
             GameInfo = gameInfo;
@@ -367,11 +371,15 @@ namespace Tyr
             Data = data;
             UnitTypes.LoadData(data);
 
+            DebugUtil.WriteLine("Game version: " + pingResponse.GameVersion);
+
             OpponentID = opponentID;
 
             MyRace = GameInfo.PlayerInfo[(int)Observation.Observation.PlayerCommon.PlayerId - 1].RaceActual;
-            EnemyRace = GameInfo.PlayerInfo[2 - (int)Observation.Observation.PlayerCommon.PlayerId].RaceRequested;
+            EnemyRace = GameInfo.PlayerInfo[2 - (int)Observation.Observation.PlayerCommon.PlayerId].RaceActual;
             DebugUtil.WriteLine("MyRace: " + MyRace);
+            DebugUtil.WriteLine("EnemyRace: " + EnemyRace);
+            DebugUtil.WriteLine("Game started on map: " + GameInfo.MapName);
 
             FileUtil.Log("Game started on map: " + GameInfo.MapName);
             FileUtil.Log("Enemy race: " + EnemyRace);
@@ -394,6 +402,9 @@ namespace Tyr
             Managers.Add(TaskManager);
             Managers.Add(EffectManager);
             Managers.Add(EnemyMineManager);
+            Managers.Add(EnemyTankManager);
+            Managers.Add(EnemyCycloneManager);
+            Managers.Add(EnemyBansheesManager);
 
             if (GameInfo.PlayerInfo[(int)Observation.Observation.PlayerCommon.PlayerId - 1].RaceActual == Race.Protoss)
                 Managers.Add(NexusAbilityManager);
@@ -405,7 +416,10 @@ namespace Tyr
         private Build DetermineBuild()
         {
             if (FixedBuild != null)
+            {
+                System.Console.WriteLine("Picking fixed build: " + FixedBuild.Name());
                 return FixedBuild;
+            }
 
 
             string[] lines = FileUtil.ReadResultsFile();
@@ -462,28 +476,75 @@ namespace Tyr
             List<Build> options = new List<Build>();
             if (EnemyRace == Race.Terran)
             {
-                options.Add(new PvTDisruptor());
-                options.Add(new NinjaTurtles());
-                options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 10 });
+                options.Add(new PvTStalkerImmortal());
+                options.Add(new TempestProxy() { UseCloseHideLocation = false, DefendingStalker = true });
+                options.Add(new PvPAdeptAllIn());
+                options.Add(new DoubleRoboProxy());
             }
             else if (EnemyRace == Race.Zerg)
             {
-                options.Add(new MacroToss());
-                options.Add(new NinjaTurtles());
-                options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 10 });
+                options.Add(new PvZStalkerImmortal());
+                options.Add(new TempestProxy() { UseCloseHideLocation = false, DefendingStalker = true });
+                options.Add(new PvPAdeptAllIn());
+                options.Add(new DoubleRoboProxy());
             }
             else if (EnemyRace == Race.Protoss)
             {
-                options.Add(new VoidrayPvP());
-                options.Add(new NinjaTurtles());
-                options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 10 });
+                options.Add(new PvPStalkerImmortal());
+                options.Add(new TempestProxy() { UseCloseHideLocation = false, DefendingStalker = true });
+                options.Add(new PvPAdeptAllIn());
+                options.Add(new DoubleRoboProxy());
             }
             else
             {
-                options.Add(new MacroPvP());
-                options.Add(new NinjaTurtles());
-                options.Add(new MassVoidray() { BuildCarriers = true, RequiredSize = 10 });
+                options.Add(new OneBaseStalker());
+                options.Add(new TempestProxy() { UseCloseHideLocation = false, DefendingStalker = true });
+                options.Add(new PvPAdeptAllIn());
+                options.Add(new DoubleRoboProxy());
             }
+
+            /*
+            List<Build> options = new List<Build>();
+            if (EnemyRace == Race.Terran)
+            {
+                bool microMachineSigns = StrategyAnalysis.Banshee.Get().DetectedPreviously || StrategyAnalysis.Battlecruiser.Get().DetectedPreviously;
+                bool tychusSigns = StrategyAnalysis.Marauder.Get().DetectedPreviously || StrategyAnalysis.Medivac.Get().DetectedPreviously;
+                if (!tychusSigns && (microMachineSigns || TournamentRound == 2))
+                {
+                    options.Add(new OneBaseStalkerImmortal());
+                    options.Add(new AntiMicro());
+                } else
+                {
+                    options.Add(new OneBaseStalkerImmortal());
+                    options.Add(new DoubleRoboProxy());
+                }
+            }
+            else if (EnemyRace == Race.Zerg)
+            {
+                options.Add(new OneBaseStalkerImmortal() { StartZealots = true });
+            }
+            else if (EnemyRace == Race.Protoss)
+            {
+                if (TournamentRound == 1)
+                {
+                    options.Add(new PvPRushDefense());
+                }
+                else if (TournamentRound == 2)
+                {
+                    options.Add(new OneBaseStalkerImmortal() { DoubleRobo = true, EarlySentry = false, UseCombatSim = false, AggressiveMicro = true });
+                    options.Add(new MassTempest());
+                } else if (TournamentRound == 3)
+                {
+                    options.Add(new OneBaseStalkerImmortal() { DoubleRobo = true, EarlySentry = false, UseCombatSim = false, AggressiveMicro = true });
+                    options.Add(new DoubleRoboProxy());
+                    options.Add(new MassTempest());
+                }
+            }
+            else
+            {
+                options.Add(new OneBaseStalker());
+            }
+            */
 
             return options;
         }
@@ -526,7 +587,7 @@ namespace Tyr
             Dictionary<string, int> gamesPlayed = new Dictionary<string, int>();
             Dictionary<string, string> races = new Dictionary<string, string>();
 
-            if (EnemyRace == Race.Terran || tournamentLines.Length >= 2)
+            if (EnemyRace == Race.Protoss || tournamentLines.Length >= 2)
                 FileUtil.LogTournament("started " + OpponentID + " " + EnemyRace);
 
             for (int i = tournamentLines.Length - 1; i >= 0; i--)
@@ -543,7 +604,7 @@ namespace Tyr
                 int count = 1;
                 for (int j = i - 1; j >= 0; j--)
                 {
-                    string line2 = tournamentLines[i];
+                    string line2 = tournamentLines[j];
                     if (!line2.StartsWith("started"))
                         continue;
 
@@ -579,38 +640,54 @@ namespace Tyr
                     continue;
                 if (races.ContainsKey(id) && races[id] != "Terran")
                     continue;
-                if (gamesPlayed[id] >= 2)
+                System.Console.WriteLine("Terran games played: " + gamesPlayed[id]);
+                if (gamesPlayed[id] >= 3)
                 {
                     previousTerranOpponent = true;
                     break;
                 }
             }
-
-            int tournamentRound = 0;
-            if (EnemyRace == Race.Protoss)
-                tournamentRound = 3;
-            else if (EnemyRace == Race.Zerg)
+            bool previousProtossOpponent2 = false;
+            bool previousProtossOpponent3 = false;
+            foreach (string id in gamesPlayed.Keys)
             {
-                if (previousTerranOpponent && previousZergOpponent)
-                    tournamentRound = 3;
-                else
-                    tournamentRound = 2;
+                if (id == OpponentID)
+                    continue;
+                if (races.ContainsKey(id) && races[id] != "Protoss")
+                    continue;
+                if (gamesPlayed[id] >= 3)
+                {
+                    if (previousProtossOpponent3)
+                        previousProtossOpponent2 = true;
+                    else
+                        previousProtossOpponent3 = true;
+                } else if (gamesPlayed[id] >= 2)
+                    previousProtossOpponent2 = true;
             }
+
+            if (EnemyRace == Race.Zerg)
+                TournamentRound = 3;
+            else if (previousTerranOpponent)
+                TournamentRound = 3;
+            else if (previousProtossOpponent2 && previousProtossOpponent3)
+                TournamentRound = 3;
+            else if (previousProtossOpponent2 || previousProtossOpponent3)
+                TournamentRound = 2;
             else
-            {
-                if (previousTerranOpponent && previousZergOpponent)
-                    tournamentRound = 3;
-                else
-                    tournamentRound = 1;
-            }
+                TournamentRound = 1;
 
-            System.Console.WriteLine("Tournament round: " + tournamentRound);
+            System.Console.WriteLine("Tournament round: " + TournamentRound);
 
         }
 
         public List<Unit> Enemies()
         {
             return EnemyManager.GetEnemies();
+        }
+
+        public Dictionary<ulong, Agent>.ValueCollection Units()
+        {
+            return UnitManager.Agents.Values;
         }
 
         public void OnEnd(ResponseObservation observation, Result result)
