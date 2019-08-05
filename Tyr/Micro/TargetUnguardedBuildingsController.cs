@@ -4,11 +4,9 @@ using Tyr.Util;
 
 namespace Tyr.Micro
 {
-    public class StutterForwardController : CustomController
+    public class TargetUnguardedBuildingsController : CustomController
     {
-        public float MaxDist = 5;
-        public bool TowardEnemies = false;
-
+        public Point2D Toward;
         public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (agent.Unit.UnitType == UnitTypes.THOR && agent.Unit.WeaponCooldown >= 5)
@@ -40,51 +38,37 @@ namespace Tyr.Micro
             if (agent.Unit.WeaponCooldown == 0 && agent.Unit.UnitType != UnitTypes.CYCLONE)
                 return false;
 
-            if (agent.DistanceSq(target) < MaxDist * MaxDist)
+            Unit closeCannon = null;
+            float dist = 9 * 9;
+
+            foreach (Unit unit in Tyr.Bot.Enemies())
+            {
+                if (unit.UnitType != UnitTypes.PHOTON_CANNON)
+                    continue;
+                if (unit.BuildProgress < 0.9)
+                    continue;
+                float newDist = agent.DistanceSq(unit);
+                if (newDist > dist)
+                    continue;
+                dist = newDist;
+                closeCannon = unit;
+            }
+            if (closeCannon == null)
                 return false;
 
-            if (TowardEnemies)
+            foreach (Unit unit in Tyr.Bot.Enemies())
             {
-
-                Point2D moveToward = null;
-                float dist = 10 * 10;
-                int priority = -1;
-
-                foreach (Unit enemy in Tyr.Bot.Enemies())
-                {
-                    if (enemy.IsFlying && !agent.CanAttackAir())
-                        continue;
-                    if (!enemy.IsFlying && enemy.UnitType != UnitTypes.COLOSUS && !agent.CanAttackGround())
-                        continue;
-
-                    int newPriority;
-                    if (UnitTypes.WorkerTypes.Contains(enemy.UnitType))
-                        newPriority = 2;
-                    else if (UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
-                        newPriority = 3;
-                    else
-                        newPriority = 1;
-
-                    if (newPriority < priority)
-                        continue;
-
-                    float newDist = agent.DistanceSq(enemy);
-                    if (newPriority > priority || newDist < dist)
-                    {
-                        moveToward = SC2Util.To2D(enemy.Pos);
-                        dist = newDist;
-                        priority = newPriority;
-                    }
-                }
-                if (moveToward != null)
-                {
-                    agent.Order(Abilities.MOVE, moveToward);
-                    return true;
-                }
+                if (unit.UnitType == UnitTypes.PHOTON_CANNON)
+                    continue;
+                if (!UnitTypes.BuildingTypes.Contains(unit.UnitType))
+                    continue;
+                float newDist = agent.DistanceSq(unit);
+                if (newDist > dist)
+                    continue;
+                agent.Order(Abilities.MOVE, agent.From(closeCannon, 4));
+                return true;
             }
-
-            agent.Order(Abilities.MOVE, target);
-            return true;
+            return false;
         }
     }
 }

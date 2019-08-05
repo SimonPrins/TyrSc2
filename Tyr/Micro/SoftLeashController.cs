@@ -10,6 +10,7 @@ namespace Tyr.Micro
         private HashSet<uint> LeashedFrom = new HashSet<uint>();
         private HashSet<uint> LeashedTo = new HashSet<uint>();
         private readonly float Range;
+        public float MinEnemyRange = 0;
 
         public SoftLeashController(uint from, uint to, float range)
         {
@@ -43,7 +44,11 @@ namespace Tyr.Micro
         {
             if (!LeashedFrom.Contains(agent.Unit.UnitType))
                 return false;
-            
+
+            if (MinEnemyRange > 0
+                && agent.DistanceSq(Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]) <= MinEnemyRange * MinEnemyRange)
+                return false;
+
             float dist;
 
             Point2D retreatTo = null;

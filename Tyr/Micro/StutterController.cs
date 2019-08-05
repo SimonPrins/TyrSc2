@@ -6,6 +6,7 @@ namespace Tyr.Micro
 {
     public class StutterController : CustomController
     {
+        public Point2D Toward;
         public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (agent.Unit.UnitType == UnitTypes.THOR && agent.Unit.WeaponCooldown >= 5)
@@ -14,7 +15,7 @@ namespace Tyr.Micro
             if (agent.Unit.UnitType != UnitTypes.VOID_RAY
                 && agent.Unit.UnitType != UnitTypes.ADEPT
                 && agent.Unit.UnitType != UnitTypes.STALKER
-                && agent.Unit.UnitType != UnitTypes.COLLOSUS
+                && agent.Unit.UnitType != UnitTypes.COLOSUS
                 && agent.Unit.UnitType != UnitTypes.IMMORTAL
                 && agent.Unit.UnitType != UnitTypes.ROACH
                 && agent.Unit.UnitType != UnitTypes.HYDRALISK
@@ -69,8 +70,9 @@ namespace Tyr.Micro
                 else maxDist = 4 * 4;
                 if (SC2Util.DistanceSq(unit.Pos, agent.Unit.Pos) <= maxDist)
                 {
-                    if (agent.DistanceSq(Tyr.Bot.MapAnalyzer.StartLocation) > 10 * 10)
-                        agent.Order(Abilities.MOVE, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation));
+                    Point2D stutterTarget = Toward == null ? SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation) : Toward;
+                    if (agent.DistanceSq(stutterTarget) > 10 * 10)
+                        agent.Order(Abilities.MOVE, stutterTarget);
                     else
                         agent.Order(Abilities.MOVE, agent.From(unit, 4));
                     return true;

@@ -75,7 +75,7 @@ namespace Tyr.Micro
             {
                 if (unit.UnitType != UnitTypes.BATTLECRUISER
                     && unit.UnitType != UnitTypes.TEMPEST
-                    && unit.UnitType != UnitTypes.COLLOSUS
+                    && unit.UnitType != UnitTypes.COLOSUS
                     && unit.UnitType != UnitTypes.MOTHERSHIP
                     && unit.UnitType != UnitTypes.CARRIER)
                     continue;
