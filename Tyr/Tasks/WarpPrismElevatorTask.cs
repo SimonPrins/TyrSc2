@@ -97,8 +97,6 @@ namespace Tyr.Tasks
                     dist = mainDist;
                     EnemyThird = loc.Pos;
                 }
-                System.Console.WriteLine("Enemy third: " + EnemyThird);
-                System.Console.WriteLine("Enemy third dist: " + System.Math.Sqrt(dist));
                 PotentialHelper potential;
                 dist = 25 * 25;
                 for (int x = 0; x < tyr.MapAnalyzer.EnemyDistances.GetLength(0); x++)

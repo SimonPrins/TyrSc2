@@ -142,7 +142,6 @@ namespace Tyr.MapAnalysis
                     if (mainExits[x, y])
                     {
                         int newDist = enemyDistances[x, y];
-                        System.Console.WriteLine("Enemy distance to ramp pixel: " + newDist);
                         if (newDist < dist)
                         {
                             dist = newDist;
@@ -309,8 +308,6 @@ namespace Tyr.MapAnalysis
 
             int width = Tyr.Bot.GameInfo.StartRaw.PathingGrid.Size.X;
             int height = Tyr.Bot.GameInfo.StartRaw.PathingGrid.Size.Y;
-
-            System.Console.WriteLine("Drawing ramp.");
 
             System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height);
             for (int x = 0; x < width; x++)

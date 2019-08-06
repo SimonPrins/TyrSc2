@@ -417,7 +417,7 @@ namespace Tyr
         {
             if (FixedBuild != null)
             {
-                System.Console.WriteLine("Picking fixed build: " + FixedBuild.Name());
+                DebugUtil.WriteLine("Picking fixed build: " + FixedBuild.Name());
                 return FixedBuild;
             }
 
@@ -640,7 +640,7 @@ namespace Tyr
                     continue;
                 if (races.ContainsKey(id) && races[id] != "Terran")
                     continue;
-                System.Console.WriteLine("Terran games played: " + gamesPlayed[id]);
+                DebugUtil.WriteLine("Terran games played: " + gamesPlayed[id]);
                 if (gamesPlayed[id] >= 3)
                 {
                     previousTerranOpponent = true;
@@ -676,7 +676,7 @@ namespace Tyr
             else
                 TournamentRound = 1;
 
-            System.Console.WriteLine("Tournament round: " + TournamentRound);
+            DebugUtil.WriteLine("Tournament round: " + TournamentRound);
 
         }
 

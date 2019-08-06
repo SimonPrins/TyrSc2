@@ -57,13 +57,9 @@ namespace Tyr.Builds.Protoss
 
             if (WallIn == null)
             {
-                System.Console.WriteLine("Creating wall.");
                 WallIn = new WallInCreator();
                 WallIn.Create(new List<uint>() { UnitTypes.GATEWAY, UnitTypes.PYLON, UnitTypes.GATEWAY});
                 WallIn.ReserveSpace();
-                System.Console.WriteLine("Wall size: " + WallIn.Wall.Count);
-                foreach (WallBuilding building in WallIn.Wall)
-                    System.Console.WriteLine("Building pos: " + building.Pos);
             }
 
             Set += ProtossBuildUtil.Pylons(() => Completed(UnitTypes.PYLON) > 0);
@@ -205,12 +201,7 @@ namespace Tyr.Builds.Protoss
 
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.Stopped = Completed(UnitTypes.ZEALOT) >= 5;
-
-            /*
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
-                if (agent.Unit.UnitType == UnitTypes.PROBE && agent.CurrentAbility() == 883)
-                    System.Console.WriteLine("Building gateway at: " + agent.Unit.Orders[0].TargetWorldSpacePos);
-            */
+            
             if (Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 5 && tyr.Frame <= 22.4 * 60 * 2)
                 SmellCheese = true;
             if (Tyr.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.SPAWNING_POOL) > 0 && tyr.Frame <= 22.4 * 60 * 1.4 && !tyr.EnemyStrategyAnalyzer.Expanded)

@@ -15,8 +15,6 @@ namespace Tyr.Tasks
 
         Dictionary<ulong, Base> AssignedBases = new Dictionary<ulong, Base>();
 
-        bool printed = false;
-
         public CreeperLordTask() : base(7)
         { }
 
@@ -61,29 +59,13 @@ namespace Tyr.Tasks
             List<Base> bases = new List<Base>();
             foreach (Base b in tyr.BaseManager.Bases)
             {
-                if (!printed)
-                {
-                    Console.WriteLine("Checking base: " + b.BaseLocation.Pos);
-                    Console.WriteLine("Is main: " + (b == tyr.BaseManager.Main));
-                    Console.WriteLine("Is natural: " + (b == tyr.BaseManager.Natural));
-                    Console.WriteLine("Is enemy main: " + (SC2Util.DistanceSq(b.BaseLocation.Pos, tyr.TargetManager.PotentialEnemyStartLocations[0]) < 2 * 2));
-                    Console.WriteLine("Owner is neutral: " + (b.Owner == -1));
-                    Console.WriteLine("Alread assigned: " + (alreadyAssigned.Contains(b)));
-                }
                 if (b != tyr.BaseManager.Main
                     && b != tyr.BaseManager.Natural
                     && SC2Util.DistanceSq(b.BaseLocation.Pos, tyr.TargetManager.PotentialEnemyStartLocations[0]) >= 2 * 2
                     && b.Owner == -1
                     && !alreadyAssigned.Contains(b))
-                {
-                    if (!printed)
-                        Console.WriteLine("Adding base.");
                     bases.Add(b);
-                }
-                if (!printed)
-                    Console.WriteLine();
             }
-            printed = true;
             bases.Sort((Base a, Base b) => Math.Sign(tyr.MapAnalyzer.EnemyDistances[(int)a.BaseLocation.Pos.X, (int)a.BaseLocation.Pos.Y] - tyr.MapAnalyzer.EnemyDistances[(int)b.BaseLocation.Pos.X, (int)b.BaseLocation.Pos.Y]));
             
             int assignPos = 0;

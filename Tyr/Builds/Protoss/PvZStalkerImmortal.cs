@@ -124,15 +124,9 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.ASSIMILATOR, () => !Tyr.Bot.EnemyStrategyAnalyzer.EarlyPool || Count(UnitTypes.ZEALOT) >= 6);
             result.Building(UnitTypes.GATEWAY, Natural, WallIn.Wall[3].Pos, true, () => !Tyr.Bot.EnemyStrategyAnalyzer.EarlyPool);
             if (ShieldBatteryPos == null)
-            {
-                System.Console.WriteLine("Shield battery free.");
                 result.Building(UnitTypes.SHIELD_BATTERY, Natural, NaturalDefensePos);
-            }
             else
-            {
-                System.Console.WriteLine("Shield battery fixed.");
                 result.Building(UnitTypes.SHIELD_BATTERY, Natural, ShieldBatteryPos, true);
-            }
             result.Building(UnitTypes.ASSIMILATOR, () => !Tyr.Bot.EnemyStrategyAnalyzer.EarlyPool || Count(UnitTypes.ZEALOT) >= 6);
             result.Building(UnitTypes.ROBOTICS_FACILITY, () => !Tyr.Bot.EnemyStrategyAnalyzer.EarlyPool || Completed(UnitTypes.ADEPT) + Completed(UnitTypes.STALKER) >= 8);
             result.Upgrade(UpgradeType.WarpGate);

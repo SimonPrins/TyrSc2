@@ -128,7 +128,6 @@ namespace Tyr.Builds.Protoss
                 if (agent.DistanceSq(TrainStep.WarpInLocation) >= 30 * 30)
                     continue;
                 printed = true;
-                System.Console.WriteLine("Proxy pylon: " + agent.Unit.Pos);
             }
 
 

@@ -164,7 +164,6 @@ namespace Tyr.Tasks
                         continue;
 
                     CannonLocation = loc;
-                    System.Console.WriteLine("Picked: " + loc);
                     return;
                 }
         }
