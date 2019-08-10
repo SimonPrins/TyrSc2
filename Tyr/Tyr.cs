@@ -93,6 +93,10 @@ namespace Tyr
 
         public int TournamentRound;
 
+        public string GameVersion;
+
+        public bool OldMapData;
+
         public Tyr()
         {
             buildingPlacer = new BuildingPlacer(this);
@@ -371,6 +375,8 @@ namespace Tyr
             Data = data;
             UnitTypes.LoadData(data);
 
+            GameVersion = pingResponse.GameVersion;
+            OldMapData = SC2Util.IsVersionBefore("4.9.3");
             DebugUtil.WriteLine("Game version: " + pingResponse.GameVersion);
 
             OpponentID = opponentID;

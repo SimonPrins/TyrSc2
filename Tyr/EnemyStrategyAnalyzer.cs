@@ -161,7 +161,6 @@ namespace Tyr
                     foreach (Unit enemy in tyr.Enemies())
                         if (enemy.UnitType == UnitTypes.SPAWNING_POOL)
                             hp = enemy.Health;
-                    System.Console.WriteLine("Spawning pool HP: " + hp + " Frame: " + tyr.Frame);
                     if ((1600 - tyr.Frame) * 0.85 + hp >= 900)
                         EarlyPool = true;
                 }

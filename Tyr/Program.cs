@@ -4,15 +4,23 @@ using System.Linq;
 using SC2API_CSharp;
 using SC2APIProtocol;
 using Tyr.Builds;
+using Tyr.CombatSim;
 using Tyr.Util;
 
 namespace Tyr
 {
-    class Program
+    public class Program
     {
-        private static Race MyRace = Race.Random;
-        static void Main(string[] args)
-        {
+        public static Race MyRace = Race.Random;
+        public static void Run(string[] args)
+        {/*
+            if (args.Length == 0)
+            {
+                TestCombatSim.Test();
+                return;
+            }
+            */
+
             Tyr tyr = new Tyr();
             ReadBuildFile(tyr);
 
@@ -26,8 +34,6 @@ namespace Tyr
             GameConnection gameConnection = new GameConnection();
             tyr.GameConnection = gameConnection;
 
-
-
             if (args.Length == 0)
                 gameConnection.RunSinglePlayer(tyr, RandomMap(), MyRace, Race.Terran, Difficulty.VeryHard).Wait();
             else
@@ -38,6 +44,9 @@ namespace Tyr
         {
             List<string> maps = new List<string>();
 
+            maps.Add(@"AutomatonLE.SC2Map");
+
+            /*
             maps.Add(@"AcidPlantLE.SC2Map");
             maps.Add(@"BlueshiftLE.SC2Map");
             maps.Add(@"CeruleanFallLE.SC2Map");
@@ -45,6 +54,7 @@ namespace Tyr
             maps.Add(@"FractureLE.SC2Map");
             maps.Add(@"LostAndFoundLE.SC2Map");
             maps.Add(@"ParaSiteLE.SC2Map");
+            */
 
             Random rand = new Random();
             return maps[rand.Next(maps.Count)];

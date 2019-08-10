@@ -5,3 +5,8 @@ SC2API-CSharp/bin/
 SC2API-CSharp/obj/
 SC2APIProtocol/bin/
 SC2APIProtocol/obj/
+TyrDotnetCore/bin/
+TyrDotnetCore/obj/
+TyrExecutable/bin/
+TyrExecutable/obj/
+.vs/

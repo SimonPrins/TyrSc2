@@ -29,7 +29,7 @@ namespace Tyr.MapAnalysis
         //public BoolGrid UnPathable;
 
         private Point2D EnemyRamp = null;
-
+        
         public void Analyze(Tyr tyr)
         {
             // Determine the start location.
@@ -123,17 +123,23 @@ namespace Tyr.MapAnalysis
                 for (int y = -2; y <= 2; y++)
                     startLocations[(int)StartLocation.X + x, (int)StartLocation.Y + y] = true;
 
-            Pathable = new ImageBoolGrid(Tyr.Bot.GameInfo.StartRaw.PathingGrid).GetOr(startLocations);
-            BoolGrid unPathable = Pathable.Invert();
+            BoolGrid unPathable;
+            if (Tyr.Bot.OldMapData)
+            {
+                unPathable = new ImageBoolGrid(Tyr.Bot.GameInfo.StartRaw.PathingGrid).GetAnd(startLocations.Invert());
+                Pathable = unPathable.Invert();
+            }
+            else
+            {
+                Pathable = new ImageBoolGrid(Tyr.Bot.GameInfo.StartRaw.PathingGrid).GetOr(startLocations);
+                unPathable = Pathable.Invert();
+            }
 
             BoolGrid chokes = Placement.Invert().GetAnd(Pathable);
             BoolGrid mainExits = chokes.GetAdjacent(StartArea);
-
-            DrawRamp(Pathable, Placement, StartArea, chokes, mainExits);
-
-            //DrawBases(width, height);
-
+            
             enemyDistances = EnemyDistances;
+
             int dist = 1000;
             Point2D mainRamp = null;
             for (int x = 0; x < width; x++)
@@ -301,7 +307,7 @@ namespace Tyr.MapAnalysis
 
         }
 
-        private void DrawRamp(BoolGrid pathable, BoolGrid placememt, BoolGrid startArea, BoolGrid chokes, BoolGrid ramps)
+        private void DrawPathing(BoolGrid pathable, BoolGrid placememt)
         {
             if (!Tyr.Debug)
                 return;
@@ -313,7 +319,6 @@ namespace Tyr.MapAnalysis
             for (int x = 0; x < width; x++)
                 for (int y = 0; y < height; y++)
                 {
-                    /*
                     if (pathable[x, y] && placememt[x, y])
                         bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Purple);
                     else if (pathable[x, y])
@@ -322,7 +327,52 @@ namespace Tyr.MapAnalysis
                         bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Red);
                     else
                         bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Black);
-                    */
+                }
+
+            bmp.Save(Directory.GetCurrentDirectory() + "/data/Pathing.png");
+        }
+
+        private void DrawDistances(int[,] distances)
+        {
+            if (!Tyr.Debug)
+                return;
+
+            int width = distances.GetLength(0);
+            int height = distances.GetLength(1);
+            int max = 1;
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                    if (distances[x, y] < 1000000000)
+                        max = Math.Max(max, distances[x, y]);
+
+            System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height);
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                {
+                    if (distances[x, y] >= 1000000000)
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Red);
+                    else
+                    {
+                        int val = Math.Min(255, distances[x, y] * 255 / max);
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.FromArgb(val, val, val));
+                    }
+                }
+
+            bmp.Save(Directory.GetCurrentDirectory() + "/data/Distances.png");
+        }
+
+        private void DrawRamp(BoolGrid startArea, BoolGrid chokes, BoolGrid ramps)
+        {
+            if (!Tyr.Debug)
+                return;
+
+            int width = Tyr.Bot.GameInfo.StartRaw.PathingGrid.Size.X;
+            int height = Tyr.Bot.GameInfo.StartRaw.PathingGrid.Size.Y;
+
+            System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height);
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                {
                     if (ramps[x, y])
                         bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Blue);
                     else if (chokes[x, y])
@@ -331,12 +381,29 @@ namespace Tyr.MapAnalysis
                         bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Black);
                     else
                         bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.White);
-                        
+
                 }
-            
+
             bmp.Save(Directory.GetCurrentDirectory() + "/data/Ramp.png");
         }
 
+        private void DrawPathingGrid()
+        {
+            if (!Tyr.Debug)
+                return;
+
+            int width = Tyr.Bot.GameInfo.StartRaw.PathingGrid.Size.X;
+            int height = Tyr.Bot.GameInfo.StartRaw.PathingGrid.Size.Y;
+
+            System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height);
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                {
+                    int val = SC2Util.GetDataValue(Tyr.Bot.GameInfo.StartRaw.PathingGrid, x, y);
+                    bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.FromArgb(val, val, val));
+                }
+            bmp.Save(Directory.GetCurrentDirectory() + "/data/PathingGrid.png");
+        }
         private void DrawPathable()
         {
             if (!Tyr.Debug)
@@ -365,7 +432,7 @@ namespace Tyr.MapAnalysis
                     for (int dx = 0; dx <= 1; dx++)
                         bmp.SetPixel((int)(unit.Pos.X - 0.5f) + dx, height - 1 - (int)(unit.Pos.Y - 0.5f), System.Drawing.Color.Cyan);
             }
-            bmp.Save(Directory.GetCurrentDirectory() + "/data/Pathing.png");
+            bmp.Save(Directory.GetCurrentDirectory() + "/data/Pathable.png");
         }
 
         private void DrawBases(int width, int height)
@@ -580,7 +647,6 @@ namespace Tyr.MapAnalysis
         {
             int width = Tyr.Bot.GameInfo.StartRaw.MapSize.X;
             int height = Tyr.Bot.GameInfo.StartRaw.MapSize.Y;
-            ImageData pathingData = Tyr.Bot.GameInfo.StartRaw.PathingGrid;
             int[,] distances = new int[width, height];
 
             for (int x = 0; x < width; x++)
@@ -594,10 +660,10 @@ namespace Tyr.MapAnalysis
             while (q.Count > 0)
             {
                 Point2D cur = q.Dequeue();
-                check(pathingData, distances, q, SC2Util.Point(cur.X + 1, cur.Y), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
-                check(pathingData, distances, q, SC2Util.Point(cur.X - 1, cur.Y), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
-                check(pathingData, distances, q, SC2Util.Point(cur.X, cur.Y + 1), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
-                check(pathingData, distances, q, SC2Util.Point(cur.X, cur.Y - 1), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
+                check(Pathable, distances, q, SC2Util.Point(cur.X + 1, cur.Y), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
+                check(Pathable, distances, q, SC2Util.Point(cur.X - 1, cur.Y), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
+                check(Pathable, distances, q, SC2Util.Point(cur.X, cur.Y + 1), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
+                check(Pathable, distances, q, SC2Util.Point(cur.X, cur.Y - 1), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
             }
 
             return distances;
@@ -607,7 +673,6 @@ namespace Tyr.MapAnalysis
         {
             int width = Tyr.Bot.GameInfo.StartRaw.MapSize.X;
             int height = Tyr.Bot.GameInfo.StartRaw.MapSize.Y;
-            ImageData pathingData = Tyr.Bot.GameInfo.StartRaw.PathingGrid;
             int[,] distances = new int[width, height];
 
             for (int x = 0; x < width; x++)
@@ -629,16 +694,16 @@ namespace Tyr.MapAnalysis
             while (q.Count > 0)
             {
                 Point2D cur = q.Dequeue();
-                check(pathingData, distances, q, SC2Util.Point(cur.X + 1, cur.Y), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
-                check(pathingData, distances, q, SC2Util.Point(cur.X - 1, cur.Y), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
-                check(pathingData, distances, q, SC2Util.Point(cur.X, cur.Y + 1), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
-                check(pathingData, distances, q, SC2Util.Point(cur.X, cur.Y - 1), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
+                check(Pathable, distances, q, SC2Util.Point(cur.X + 1, cur.Y), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
+                check(Pathable, distances, q, SC2Util.Point(cur.X - 1, cur.Y), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
+                check(Pathable, distances, q, SC2Util.Point(cur.X, cur.Y + 1), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
+                check(Pathable, distances, q, SC2Util.Point(cur.X, cur.Y - 1), width, height, distances[(int)cur.X, (int)cur.Y] + 1);
             }
 
             return distances;
         }
 
-        private void check(ImageData pathingData, int[,] distances, Queue<Point2D> q, Point2D pos, int width, int height, int newVal)
+        private void check(BoolGrid pathingData, int[,] distances, Queue<Point2D> q, Point2D pos, int width, int height, int newVal)
         {
             if (check(pathingData, pos, width, height) && distances[(int)pos.X, (int)pos.Y] == 1000000000)
             {
@@ -647,11 +712,11 @@ namespace Tyr.MapAnalysis
             }
         }
 
-        private bool check(ImageData pathingData, Point2D pos, int width, int height)
+        private bool check(BoolGrid pathingData, Point2D pos, int width, int height)
         {
             if (pos.X < 0 || pos.X >= width || pos.Y < 0 || pos.Y >= height)
                 return false;
-            if (SC2Util.GetDataValue(pathingData, (int)pos.X, (int)pos.Y) == 1)
+            if (pathingData[pos])
                 return true;
 
             foreach (Point2D p in Tyr.Bot.GameInfo.StartRaw.StartLocations)
@@ -689,6 +754,7 @@ namespace Tyr.MapAnalysis
                     if (mainExits[x, y])
                     {
                         int newDist = startDistances[x, y];
+                        FileUtil.Debug("Ramp distance: " + newDist);
                         if (newDist < dist)
                         {
                             dist = newDist;

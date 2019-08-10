@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>TyrP</AssemblyName>
+    <RootNamespace>Tyr</RootNamespace>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.5.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Tyr\Tyr.csproj" />
+    <ProjectReference Include="..\SC2API-CSharp\SC2API-CSharp.csproj" />
+    <ProjectReference Include="..\SC2APIProtocol\SC2APIProtocol.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -78,8 +78,6 @@ namespace Tyr.Tasks
             {
                 Point2D enemyNatural = tyr.MapAnalyzer.GetEnemyNatural().Pos;
                 Point2D enemyMain = tyr.TargetManager.PotentialEnemyStartLocations[0];
-                System.Console.WriteLine("Enemy main: " + enemyMain);
-                System.Console.WriteLine("Enemy natural: " + enemyNatural);
                 Point2D enemyRamp = tyr.MapAnalyzer.GetEnemyRamp();
                 float dist = 1000000;
                 foreach (BaseLocation loc in tyr.MapAnalyzer.BaseLocations)

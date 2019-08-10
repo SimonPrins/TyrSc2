@@ -10,6 +10,9 @@ namespace Tyr.Util
     {
         public static int GetDataValue(ImageData data, int x, int y)
         {
+            if (Tyr.Bot.OldMapData)
+                return GetDataValueOld(data, x, y);
+
             if (data.BitsPerPixel == 1)
                 return GetDataValueBit(data, x, y);
 
@@ -37,7 +40,7 @@ namespace Tyr.Util
         {
             if (x < 0 || y < 0 || x >= Tyr.Bot.GameInfo.StartRaw.PlacementGrid.Size.X || y >= Tyr.Bot.GameInfo.StartRaw.PlacementGrid.Size.Y)
                 return false;
-            return SC2Util.GetDataValue(Tyr.Bot.GameInfo.StartRaw.PlacementGrid, x, y) == 1;
+            return SC2Util.GetDataValue(Tyr.Bot.GameInfo.StartRaw.PlacementGrid, x, y) != 0;
         }
 
         public static Point2D Point(float x, float y)
@@ -133,6 +136,23 @@ namespace Tyr.Util
                 else
                     return Point(pos1.X, pos1.Y - distance);
             }
+        }
+        
+        public static bool IsVersionBefore(string version)
+        {
+            string[] currentVersionParts = Tyr.Bot.GameVersion.Split('.');
+            string[] compareVersionParts = version.Split('.');
+
+            for (int i = 0; i < compareVersionParts.Length; i++)
+            {
+                int currentPart = int.Parse(currentVersionParts[i]);
+                int comparePart = int.Parse(compareVersionParts[i]);
+                if (currentPart < comparePart)
+                    return true;
+                if (currentPart > comparePart)
+                    return false;
+            }
+            return false;
         }
     }
 }
