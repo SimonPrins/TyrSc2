@@ -115,7 +115,11 @@ namespace Tyr.Tasks
             Tyr.Bot.UnitManager.UnitTraining(unitType);
             MorphingType morphingType = MorphingType.LookUpToType[unitType];
             if (Tyr.Bot.Gas() >= morphingType.Gas && Tyr.Bot.Minerals() >= morphingType.Minerals)
+            {
                 UnitsDesired.Add(unitType);
+                Tyr.Bot.ReservedGas += morphingType.Gas;
+                Tyr.Bot.ReservedMinerals += morphingType.Minerals;
+            }
         }
     }
 }
