@@ -30,7 +30,7 @@ namespace Tyr.Tasks
         public override bool IsNeeded()
         {
             UpdateNeedsRepairing();
-            return RepairTarget != null && Bot.Bot.UnitManager.Completed(UnitTypes.SCV) >= 15;
+            return RepairTarget != null && Bot.Main.UnitManager.Completed(UnitTypes.SCV) >= 15;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -49,23 +49,23 @@ namespace Tyr.Tasks
 
         private void UpdateNeedsRepairing()
         {
-            if (NeedsRepairingUpdateFrame >= Bot.Bot.Frame)
+            if (NeedsRepairingUpdateFrame >= Bot.Main.Frame)
                 return;
-            NeedsRepairingUpdateFrame = Bot.Bot.Frame;
+            NeedsRepairingUpdateFrame = Bot.Main.Frame;
             
             if (RepairTarget != null)
             {
-                if (!Bot.Bot.UnitManager.Agents.ContainsKey(RepairTarget.Unit.Tag))
+                if (!Bot.Main.UnitManager.Agents.ContainsKey(RepairTarget.Unit.Tag))
                     RepairTarget = null;
                 else if (RepairTarget.Unit.Health == RepairTarget.Unit.HealthMax)
                     RepairTarget = null;
-                else if (RepairTarget.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) <= (Range + 10) * (Range + 10))
+                else if (RepairTarget.DistanceSq(Bot.Main.MapAnalyzer.StartLocation) <= (Range + 10) * (Range + 10))
                     RepairTarget = null;
             }
             if (RepairTarget != null)
                 return;
 
-            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
+            foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType == UnitTypes.BUNKER
                     || agent.Unit.UnitType == UnitTypes.PLANETARY_FORTRESS
@@ -79,7 +79,7 @@ namespace Tyr.Tasks
                 if (!UnitTypes.LookUp[agent.Unit.UnitType].Attributes.Contains(SC2APIProtocol.Attribute.Mechanical))
                     continue;
 
-                if (agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) >= Range * Range)
+                if (agent.DistanceSq(Bot.Main.MapAnalyzer.StartLocation) >= Range * Range)
                     continue;
 
                 if (agent.Unit.Health < agent.Unit.HealthMax)

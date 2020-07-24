@@ -42,9 +42,9 @@ namespace Tyr.Tasks
 
         private void UpdateTarget()
         {
-            if (Bot.Bot.Frame >= UpdateTargetFrame)
+            if (Bot.Main.Frame >= UpdateTargetFrame)
                 return;
-            UpdateTargetFrame = Bot.Bot.Frame;
+            UpdateTargetFrame = Bot.Main.Frame;
 
             Target = null;
             if (DefenseTask.AirDefenseTask.IsDefending() || DefenseTask.GroundDefenseTask.IsDefending() || TimingAttackTask.Task.Units.Count > 0)
@@ -54,18 +54,18 @@ namespace Tyr.Tasks
             if (Units.Count > 0)
                 reference = SC2Util.To2D(Units[0].Unit.Pos);
             else
-                reference = SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation);
+                reference = SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation);
 
 
             float dist = 80 * 80;
-            foreach (Unit enemy in Bot.Bot.CloakedEnemies())
+            foreach (Unit enemy in Bot.Main.CloakedEnemies())
             {
                 if (enemy.UnitType != UnitTypes.OBSERVER)
                     continue;
                 float newDist = SC2Util.DistanceSq(reference, enemy.Pos);
                 if (newDist > dist)
                     continue;
-                if (SC2Util.DistanceSq(enemy.Pos, Bot.Bot.MapAnalyzer.StartLocation) > 80 * 80)
+                if (SC2Util.DistanceSq(enemy.Pos, Bot.Main.MapAnalyzer.StartLocation) > 80 * 80)
                     continue;
                 Target = enemy;
                 dist = newDist;

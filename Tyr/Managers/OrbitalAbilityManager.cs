@@ -26,7 +26,7 @@ namespace Tyr.Managers
 
             ScanCommand scanCommand = null;
             foreach (ScanCommand potentialScan in ScanCommands)
-                if (potentialScan.FromFrame <= Bot.Bot.Frame)
+                if (potentialScan.FromFrame <= Bot.Main.Frame)
                 {
                     scanCommand = potentialScan;
                     break;
@@ -42,12 +42,12 @@ namespace Tyr.Managers
             if (orbital.Unit.Energy < 50 + SaveEnergy)
                 return;
 
-            if (Bot.Bot.Frame % 4 != 0)
+            if (Bot.Main.Frame % 4 != 0)
                 return;
 
             float distance = 1000000;
             Unit target = null;
-            foreach (Unit mineral in Bot.Bot.Observation.Observation.RawData.Units)
+            foreach (Unit mineral in Bot.Main.Observation.Observation.RawData.Units)
             {
                 if (!UnitTypes.MineralFields.Contains(mineral.UnitType))
                     continue;

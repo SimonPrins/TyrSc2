@@ -46,10 +46,10 @@ namespace Tyr.Builds.Terran
             result.If(() =>
             {
                 return Build.FoodUsed()
-                    + Bot.Bot.UnitManager.Count(UnitTypes.COMMAND_CENTER)
-                    + Bot.Bot.UnitManager.Count(UnitTypes.BARRACKS) * 2
-                    + Bot.Bot.UnitManager.Count(UnitTypes.FACTORY) * 2
-                    + Bot.Bot.UnitManager.Count(UnitTypes.STARPORT) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.COMMAND_CENTER)
+                    + Bot.Main.UnitManager.Count(UnitTypes.BARRACKS) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.FACTORY) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.STARPORT) * 2
                     >= Build.ExpectedAvailableFood() - 2
                     && Build.ExpectedAvailableFood() < 200;
             });

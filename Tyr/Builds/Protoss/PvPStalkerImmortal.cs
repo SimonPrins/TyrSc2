@@ -51,8 +51,8 @@ namespace Tyr.Builds.Protoss
             TimingAttackTask.Enable();
             WorkerScoutTask.Enable();
             ArmyObserverTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ArchonMergeTask.Enable();
             ForwardProbeTask.Enable();
             ShieldRegenTask.Enable();
@@ -100,7 +100,7 @@ namespace Tyr.Builds.Protoss
             BuildList result = new BuildList();
 
             result.If(() => { return !EarlyPool.Get().Detected; });
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -125,7 +125,7 @@ namespace Tyr.Builds.Protoss
             result.Train(UnitTypes.TEMPEST);
             result.Train(UnitTypes.VOID_RAY);
             result.Train(UnitTypes.WARP_PRISM, 1, () => CannonDefenseDetected && !CancelElevator);
-            result.Train(UnitTypes.OBSERVER, 1, () => Bot.Bot.Frame >= 22.4 * 60 * 5);
+            result.Train(UnitTypes.OBSERVER, 1, () => Bot.Main.Frame >= 22.4 * 60 * 5);
             result.Train(UnitTypes.IMMORTAL, 1, () => TotalEnemyCount(UnitTypes.CARRIER) + TotalEnemyCount(UnitTypes.TEMPEST) == 0 && (!CannonDefenseDetected || !StargateDetected));
             result.Train(UnitTypes.IMMORTAL, 3, () => !CannonDefenseDetected && TotalEnemyCount(UnitTypes.CARRIER) + TotalEnemyCount(UnitTypes.TEMPEST) + TotalEnemyCount(UnitTypes.FORGE) + TotalEnemyCount(UnitTypes.PHOTON_CANNON) == 0);
             result.Train(UnitTypes.OBSERVER, 1);
@@ -263,10 +263,10 @@ namespace Tyr.Builds.Protoss
 
             if (!ZealotRushSuspected && !StrategyAnalysis.WorkerRush.Get().Detected)
             {
-                if ((Bot.Bot.Frame >= 22.4 * 60 * 1.5
-                    && !Bot.Bot.EnemyStrategyAnalyzer.NoProxyGatewayConfirmed
+                if ((Bot.Main.Frame >= 22.4 * 60 * 1.5
+                    && !Bot.Main.EnemyStrategyAnalyzer.NoProxyGatewayConfirmed
                     && TotalEnemyCount(UnitTypes.ASSIMILATOR) + TotalEnemyCount(UnitTypes.CYBERNETICS_CORE) == 0)
-                    || (Bot.Bot.Frame < 22.4 * 60 * 1.5 && ThreeGate.Get().Detected))
+                    || (Bot.Main.Frame < 22.4 * 60 * 1.5 && ThreeGate.Get().Detected))
                     ZealotRushSuspected = true;
             }
 
@@ -488,7 +488,7 @@ namespace Tyr.Builds.Protoss
             {
                 if (Minerals() >= 150
                     && Gas() >= 150
-                    && !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
+                    && !Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
                     && Count(UnitTypes.COLOSUS) > 0)
                 {
                     agent.Order(1097);
@@ -497,17 +497,17 @@ namespace Tyr.Builds.Protoss
             else if (agent.Unit.UnitType == UnitTypes.TWILIGHT_COUNSEL)
             {
 
-                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
+                if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
                      && Minerals() >= 150
                      && Gas() >= 150
                     && Completed(UnitTypes.STALKER) > 0)
                     agent.Order(1593);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
                     && Minerals() >= 100
                     && Gas() >= 100
                     && Completed(UnitTypes.ADEPT) > 0)
                     agent.Order(1594);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
                          && Minerals() >= 100
                          && Gas() >= 100
                          && Completed(UnitTypes.ZEALOT) > 0)

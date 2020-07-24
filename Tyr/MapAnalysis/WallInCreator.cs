@@ -17,16 +17,16 @@ namespace Tyr.MapAnalysis
                 Wall.Add(new WallBuilding() { Type = type });
 
             
-            BoolGrid pathable = Bot.Bot.MapAnalyzer.Pathable;
+            BoolGrid pathable = Bot.Main.MapAnalyzer.Pathable;
             BoolGrid unPathable = pathable.Invert();
-            BoolGrid ramp = Bot.Bot.MapAnalyzer.Ramp;
+            BoolGrid ramp = Bot.Main.MapAnalyzer.Ramp;
 
             BoolGrid rampAdjacent = unPathable.GetAdjacent(ramp);
             BoolGrid rampSides = unPathable.GetConnected(rampAdjacent, 5);
             List<BoolGrid> sides = rampSides.GetGroups();
 
-            List<Point2D> building1Positions = Placable(sides[0], Bot.Bot.MapAnalyzer.StartArea, BuildingType.LookUp[types[0]].Size, true);
-            List<Point2D> building2Positions = Placable(sides[1], Bot.Bot.MapAnalyzer.StartArea, BuildingType.LookUp[types[2]].Size, true);
+            List<Point2D> building1Positions = Placable(sides[0], Bot.Main.MapAnalyzer.StartArea, BuildingType.LookUp[types[0]].Size, true);
+            List<Point2D> building2Positions = Placable(sides[1], Bot.Main.MapAnalyzer.StartArea, BuildingType.LookUp[types[2]].Size, true);
 
             float wallScore = 1000;
             foreach (Point2D p1 in building1Positions)
@@ -46,9 +46,9 @@ namespace Tyr.MapAnalysis
                 }
 
             HashSet<Point2D> around1 = new HashSet<Point2D>();
-            GetPlacableAround(Bot.Bot.MapAnalyzer.StartArea, Wall[0].Pos, Wall[0].Size, Wall[1].Size, around1, true, false);
+            GetPlacableAround(Bot.Main.MapAnalyzer.StartArea, Wall[0].Pos, Wall[0].Size, Wall[1].Size, around1, true, false);
             HashSet<Point2D> around2 = new HashSet<Point2D>();
-            GetPlacableAround(Bot.Bot.MapAnalyzer.StartArea, Wall[2].Pos, Wall[2].Size, Wall[1].Size, around2, true, false);
+            GetPlacableAround(Bot.Main.MapAnalyzer.StartArea, Wall[2].Pos, Wall[2].Size, Wall[1].Size, around2, true, false);
             around1.IntersectWith(around2);
 
             foreach (Point2D pos in around1)
@@ -62,9 +62,9 @@ namespace Tyr.MapAnalysis
 
         public void CreateNatural(List<uint> types)
         {
-            if (Bot.Bot.Map == MapEnum.Zen)
+            if (Bot.Main.Map == MapEnum.Zen)
             {
-                if (Bot.Bot.MapAnalyzer.StartLocation.X <= 100)
+                if (Bot.Main.MapAnalyzer.StartLocation.X <= 100)
                 {
                     Wall = new List<WallBuilding>();
                     Wall.Add(new WallBuilding() { Pos = new Point2D() { X = 55.5f, Y = 62.5f }, Type = types[0] });
@@ -85,9 +85,9 @@ namespace Tyr.MapAnalysis
                     return;
                 }
             }
-            if (Bot.Bot.Map == MapEnum.Acropolis)
+            if (Bot.Main.Map == MapEnum.Acropolis)
             {
-                if (Bot.Bot.MapAnalyzer.StartLocation.X <= 100)
+                if (Bot.Main.MapAnalyzer.StartLocation.X <= 100)
                 {
                     Wall = new List<WallBuilding>();
                     Wall.Add(new WallBuilding() { Pos = new Point2D() { X = 39.5f, Y = 102.5f }, Type = types[0] });
@@ -108,9 +108,9 @@ namespace Tyr.MapAnalysis
                     return;
                 }
             }
-            if (Bot.Bot.Map == MapEnum.EternalEmpire)
+            if (Bot.Main.Map == MapEnum.EternalEmpire)
             {
-                if (Bot.Bot.MapAnalyzer.StartLocation.X <= 100)
+                if (Bot.Main.MapAnalyzer.StartLocation.X <= 100)
                 {
                     Wall = new List<WallBuilding>();
                     Wall.Add(new WallBuilding() { Pos = new Point2D() { X = 43.5f, Y = 61.5f }, Type = types[0] });
@@ -131,9 +131,9 @@ namespace Tyr.MapAnalysis
                     return;
                 }
             }
-            if (Bot.Bot.Map == MapEnum.DeathAura)
+            if (Bot.Main.Map == MapEnum.DeathAura)
             {
-                if (Bot.Bot.MapAnalyzer.StartLocation.X <= 100)
+                if (Bot.Main.MapAnalyzer.StartLocation.X <= 100)
                 {
                     Wall = new List<WallBuilding>();
                     Wall.Add(new WallBuilding() { Pos = new Point2D() { X = 57.5f, Y = 138.5f }, Type = types[0] });
@@ -154,9 +154,9 @@ namespace Tyr.MapAnalysis
                     return;
                 }
             }
-            if (Bot.Bot.Map == MapEnum.IceAndChrome)
+            if (Bot.Main.Map == MapEnum.IceAndChrome)
             {
-                if (Bot.Bot.MapAnalyzer.StartLocation.X <= 100)
+                if (Bot.Main.MapAnalyzer.StartLocation.X <= 100)
                 {
                     Wall = new List<WallBuilding>();
                     Wall.Add(new WallBuilding() { Pos = new Point2D() { X = 80.5f, Y = 94.5f }, Type = types[0] });
@@ -168,14 +168,14 @@ namespace Tyr.MapAnalysis
                 }
             }
 
-            BoolGrid pathable = Bot.Bot.MapAnalyzer.Pathable;
+            BoolGrid pathable = Bot.Main.MapAnalyzer.Pathable;
             BoolGrid unPathable = pathable.Invert();
-            Point2D naturalExit = Bot.Bot.BaseManager.NaturalDefensePos;
+            Point2D naturalExit = Bot.Main.BaseManager.NaturalDefensePos;
             ArrayBoolGrid unPathableIncludingMinerals = new ArrayBoolGrid(unPathable.Width(), unPathable.Height());
             for (int x = 0; x < unPathable.Width(); x++)
                 for (int y = 0; y < unPathable.Height(); y++)
                     unPathableIncludingMinerals[x, y] = unPathable[x, y];
-            foreach (Unit mineral in Bot.Bot.Observation.Observation.RawData.Units)
+            foreach (Unit mineral in Bot.Main.Observation.Observation.RawData.Units)
             {
                 if (mineral.Alliance != Alliance.Neutral)
                     continue;
@@ -199,11 +199,11 @@ namespace Tyr.MapAnalysis
                 return;
             }
 
-            List<Point2D> building1Positions = Placable(sides[0], Bot.Bot.MapAnalyzer.Placement, BuildingType.LookUp[types[0]].Size, false);
-            List<Point2D> building2Positions = Placable(sides[1], Bot.Bot.MapAnalyzer.Placement, BuildingType.LookUp[types[3]].Size, false);
-            int naturalHeight = Bot.Bot.MapAnalyzer.MapHeight((int)Bot.Bot.BaseManager.Natural.BaseLocation.Pos.X, (int)Bot.Bot.BaseManager.Natural.BaseLocation.Pos.Y);
-            building1Positions = building1Positions.FindAll((p) => Bot.Bot.MapAnalyzer.MapHeight((int)p.X, (int)p.Y) == naturalHeight);
-            building2Positions = building2Positions.FindAll((p) => Bot.Bot.MapAnalyzer.MapHeight((int)p.X, (int)p.Y) == naturalHeight);
+            List<Point2D> building1Positions = Placable(sides[0], Bot.Main.MapAnalyzer.Placement, BuildingType.LookUp[types[0]].Size, false);
+            List<Point2D> building2Positions = Placable(sides[1], Bot.Main.MapAnalyzer.Placement, BuildingType.LookUp[types[3]].Size, false);
+            int naturalHeight = Bot.Main.MapAnalyzer.MapHeight((int)Bot.Main.BaseManager.Natural.BaseLocation.Pos.X, (int)Bot.Main.BaseManager.Natural.BaseLocation.Pos.Y);
+            building1Positions = building1Positions.FindAll((p) => Bot.Main.MapAnalyzer.MapHeight((int)p.X, (int)p.Y) == naturalHeight);
+            building2Positions = building2Positions.FindAll((p) => Bot.Main.MapAnalyzer.MapHeight((int)p.X, (int)p.Y) == naturalHeight);
 
             Point2D buildingPosition1 = null;
             Point2D buildingPosition2 = null;
@@ -224,13 +224,13 @@ namespace Tyr.MapAnalysis
             building2Positions = new List<Point2D>() { buildingPosition2 };
             FileUtil.Debug("Start building positions: " + buildingPosition1 + " " + buildingPosition2);
 
-            FindWall(types, building1Positions, building2Positions, Bot.Bot.MapAnalyzer.Placement, false);
+            FindWall(types, building1Positions, building2Positions, Bot.Main.MapAnalyzer.Placement, false);
 
             if (Wall.Count > 0)
             {
 
-                if (Bot.Bot.Map == MapEnum.WorldOfSleepers
-                    && Bot.Bot.MapAnalyzer.StartLocation.X <= 80
+                if (Bot.Main.Map == MapEnum.WorldOfSleepers
+                    && Bot.Main.MapAnalyzer.StartLocation.X <= 80
                     && Math.Abs(Wall[4].Pos.Y - Wall[3].Pos.Y) <= 2.5
                     && Math.Abs(Wall[4].Pos.X - Wall[3].Pos.X) <= 2.5)
                 {
@@ -239,8 +239,8 @@ namespace Tyr.MapAnalysis
                 return;
             }
             // No wall was found. Try three straight buildings with zealot at the end.
-            building2Positions = Placable(sides[1], Bot.Bot.MapAnalyzer.Placement, BuildingType.LookUp[types[3]].Size, false, true);
-            building2Positions = building2Positions.FindAll((p) => Bot.Bot.MapAnalyzer.MapHeight((int)p.X, (int)p.Y) == naturalHeight);
+            building2Positions = Placable(sides[1], Bot.Main.MapAnalyzer.Placement, BuildingType.LookUp[types[3]].Size, false, true);
+            building2Positions = building2Positions.FindAll((p) => Bot.Main.MapAnalyzer.MapHeight((int)p.X, (int)p.Y) == naturalHeight);
 
             buildingPosition1 = null;
             buildingPosition2 = null;
@@ -261,15 +261,15 @@ namespace Tyr.MapAnalysis
             building2Positions = new List<Point2D>() { buildingPosition2 };
             FileUtil.Debug("Start building positions: " + buildingPosition1 + " " + buildingPosition2);
 
-            FindWallZealotAtEnd(types, building1Positions, building2Positions, Bot.Bot.MapAnalyzer.Placement);
+            FindWallZealotAtEnd(types, building1Positions, building2Positions, Bot.Main.MapAnalyzer.Placement);
             DrawResult(unPathableIncludingMinerals, naturalWalls, building1Positions, building2Positions);
         }
 
         public void CreateFullNatural(List<uint> types)
         {
-            BoolGrid pathable = Bot.Bot.MapAnalyzer.Pathable;
+            BoolGrid pathable = Bot.Main.MapAnalyzer.Pathable;
             BoolGrid unPathable = pathable.Invert();
-            Point2D naturalExit = Bot.Bot.BaseManager.NaturalDefensePos;
+            Point2D naturalExit = Bot.Main.BaseManager.NaturalDefensePos;
             BoolGrid naturalWalls = unPathable.GetConnected(new Point2D() { X = 0, Y = 0 }).Crop((int)naturalExit.X - 12, (int)naturalExit.Y - 12, (int)naturalExit.X + 12, (int)naturalExit.Y + 12);
             List<BoolGrid> sides = naturalWalls.GetGroups();
             if (sides.Count < 2)
@@ -279,14 +279,14 @@ namespace Tyr.MapAnalysis
                 counts.Add(side, side.Count());
             sides.Sort((BoolGrid a, BoolGrid b) => counts[b] - counts[a]);
 
-            List<Point2D> building1Positions = Placable(sides[0], Bot.Bot.MapAnalyzer.Placement, BuildingType.LookUp[types[0]].Size, false);
-            List<Point2D> building2Positions = Placable(sides[1], Bot.Bot.MapAnalyzer.Placement, BuildingType.LookUp[types[3]].Size, false);
-            int naturalHeight = Bot.Bot.MapAnalyzer.MapHeight((int)Bot.Bot.BaseManager.Natural.BaseLocation.Pos.X, (int)Bot.Bot.BaseManager.Natural.BaseLocation.Pos.Y);
-            building1Positions = building1Positions.FindAll((p) => Bot.Bot.MapAnalyzer.MapHeight((int)p.X, (int)p.Y) == naturalHeight);
-            building2Positions = building2Positions.FindAll((p) => Bot.Bot.MapAnalyzer.MapHeight((int)p.X, (int)p.Y) == naturalHeight);
+            List<Point2D> building1Positions = Placable(sides[0], Bot.Main.MapAnalyzer.Placement, BuildingType.LookUp[types[0]].Size, false);
+            List<Point2D> building2Positions = Placable(sides[1], Bot.Main.MapAnalyzer.Placement, BuildingType.LookUp[types[3]].Size, false);
+            int naturalHeight = Bot.Main.MapAnalyzer.MapHeight((int)Bot.Main.BaseManager.Natural.BaseLocation.Pos.X, (int)Bot.Main.BaseManager.Natural.BaseLocation.Pos.Y);
+            building1Positions = building1Positions.FindAll((p) => Bot.Main.MapAnalyzer.MapHeight((int)p.X, (int)p.Y) == naturalHeight);
+            building2Positions = building2Positions.FindAll((p) => Bot.Main.MapAnalyzer.MapHeight((int)p.X, (int)p.Y) == naturalHeight);
 
 
-            FindWall(types, building1Positions, building2Positions, Bot.Bot.MapAnalyzer.Placement, true);
+            FindWall(types, building1Positions, building2Positions, Bot.Main.MapAnalyzer.Placement, true);
             //DrawResult(unPathable, naturalWalls, building1Positions, building2Positions);
         }
 
@@ -296,15 +296,15 @@ namespace Tyr.MapAnalysis
                 Wall.Add(new WallBuilding() { Type = type });
 
 
-            BoolGrid startArea = Bot.Bot.MapAnalyzer.StartArea;
-            BoolGrid placement = Bot.Bot.MapAnalyzer.Placement;
+            BoolGrid startArea = Bot.Main.MapAnalyzer.StartArea;
+            BoolGrid placement = Bot.Main.MapAnalyzer.Placement;
 
-            BoolGrid mainAndNatural = Bot.Bot.MapAnalyzer.Pathable.GetConnected(Bot.Bot.MapAnalyzer.StartArea, 25).GetOr(Bot.Bot.MapAnalyzer.StartArea);
+            BoolGrid mainAndNatural = Bot.Main.MapAnalyzer.Pathable.GetConnected(Bot.Main.MapAnalyzer.StartArea, 25).GetOr(Bot.Main.MapAnalyzer.StartArea);
             ArrayBoolGrid outside = (ArrayBoolGrid)placement.GetAnd(mainAndNatural.Invert());
 
-            if (Bot.Bot.Map == MapEnum.Thunderbird)
+            if (Bot.Main.Map == MapEnum.Thunderbird)
             {
-                if (Bot.Bot.MapAnalyzer.StartLocation.X <= 100)
+                if (Bot.Main.MapAnalyzer.StartLocation.X <= 100)
                 {
                     Wall[0].Pos = new Point2D() { X = 51.5f, Y = 167 - 45.5f };
                     Wall[1].Pos = new Point2D() { X = 53f, Y = 167 - 43f };
@@ -319,9 +319,9 @@ namespace Tyr.MapAnalysis
                 //DrawReaperWall(outside, mainAndNatural, new ArrayBoolGrid(placement.Width(), placement.Height()), new ArrayBoolGrid(placement.Width(), placement.Height()), null, null);
                 return;
             }
-            if (Bot.Bot.Map == MapEnum.Zen)
+            if (Bot.Main.Map == MapEnum.Zen)
             {
-                if (Bot.Bot.MapAnalyzer.StartLocation.X <= 100)
+                if (Bot.Main.MapAnalyzer.StartLocation.X <= 100)
                 {
                     Wall[0].Pos = new Point2D() { X = 65.5f, Y = 25.5f };
                     Wall[1].Pos = new Point2D() { X = 63f, Y = 26f };
@@ -335,9 +335,9 @@ namespace Tyr.MapAnalysis
                 }
                 return;
             }
-            if (Bot.Bot.Map == MapEnum.IceAndChrome)
+            if (Bot.Main.Map == MapEnum.IceAndChrome)
             {
-                if (Bot.Bot.MapAnalyzer.StartLocation.X <= 100)
+                if (Bot.Main.MapAnalyzer.StartLocation.X <= 100)
                 {
                     Wall[0].Pos = new Point2D() { X = 87.5f, Y = 77.5f };
                     Wall[1].Pos = new Point2D() { X = 88, Y = 75f };
@@ -351,9 +351,9 @@ namespace Tyr.MapAnalysis
                 }
                 return;
             }
-            if (Bot.Bot.Map == MapEnum.DeathAura)
+            if (Bot.Main.Map == MapEnum.DeathAura)
             {
-                if (Bot.Bot.MapAnalyzer.StartLocation.X <= 100)
+                if (Bot.Main.MapAnalyzer.StartLocation.X <= 100)
                 {
                     Wall[0].Pos = new Point2D() { X = 46.5f, Y = 128.5f };
                     Wall[1].Pos = new Point2D() { X = 49f, Y = 130f };
@@ -367,9 +367,9 @@ namespace Tyr.MapAnalysis
                 }
                 return;
             }
-            if (Bot.Bot.Map == MapEnum.Simulacrum)
+            if (Bot.Main.Map == MapEnum.Simulacrum)
             {
-                if (Bot.Bot.MapAnalyzer.StartLocation.X <= 100)
+                if (Bot.Main.MapAnalyzer.StartLocation.X <= 100)
                 {
                     Wall[0].Pos = new Point2D() { X = 76.5f, Y = 132.5f };
                     Wall[1].Pos = new Point2D() { X = 77f, Y = 135f };
@@ -383,9 +383,9 @@ namespace Tyr.MapAnalysis
                 }
                 return;
             }
-            if (Bot.Bot.Map == MapEnum.Nightshade)
+            if (Bot.Main.Map == MapEnum.Nightshade)
             {
-                if (Bot.Bot.MapAnalyzer.StartLocation.X <= 100)
+                if (Bot.Main.MapAnalyzer.StartLocation.X <= 100)
                 {
                     Wall[0].Pos = new Point2D() { X = 50.5f, Y = 124.5f };
                     Wall[1].Pos = new Point2D() { X = 52f, Y = 127f };
@@ -402,7 +402,7 @@ namespace Tyr.MapAnalysis
             //DrawReaperWall(outside, mainAndNatural, new ArrayBoolGrid(placement.Width(), placement.Height()), new ArrayBoolGrid(placement.Width(), placement.Height()), null, null);
             if (CreateReaperWall(types, outside, 2, false))
                 return;
-            int mainHeight = Bot.Bot.MapAnalyzer.MapHeight((int)Bot.Bot.MapAnalyzer.StartLocation.X, (int)Bot.Bot.MapAnalyzer.StartLocation.Y);
+            int mainHeight = Bot.Main.MapAnalyzer.MapHeight((int)Bot.Main.MapAnalyzer.StartLocation.X, (int)Bot.Main.MapAnalyzer.StartLocation.Y);
 
             outside = (ArrayBoolGrid)mainAndNatural.Invert();
 
@@ -410,8 +410,8 @@ namespace Tyr.MapAnalysis
                 for (int y = 0; y < outside.Height(); y++)
                 {
                     if (outside[x, y]
-                        && (Bot.Bot.MapAnalyzer.MapHeight(x, y) < mainHeight - 16
-                        || Bot.Bot.MapAnalyzer.MapHeight(x, y) >= mainHeight))
+                        && (Bot.Main.MapAnalyzer.MapHeight(x, y) < mainHeight - 16
+                        || Bot.Main.MapAnalyzer.MapHeight(x, y) >= mainHeight))
                         outside[x, y] = false;
                 }
             if (CreateReaperWall(types, outside, 0, true))
@@ -421,10 +421,10 @@ namespace Tyr.MapAnalysis
 
         private bool CreateReaperWall(List<uint> types, ArrayBoolGrid outside, int minSize, bool cliffCutoffHeight)
         {
-            BoolGrid startArea = Bot.Bot.MapAnalyzer.StartArea;
-            BoolGrid placement = Bot.Bot.MapAnalyzer.Placement;
+            BoolGrid startArea = Bot.Main.MapAnalyzer.StartArea;
+            BoolGrid placement = Bot.Main.MapAnalyzer.Placement;
 
-            int mainHeight = Bot.Bot.MapAnalyzer.MapHeight((int)Bot.Bot.MapAnalyzer.StartLocation.X, (int)Bot.Bot.MapAnalyzer.StartLocation.Y);
+            int mainHeight = Bot.Main.MapAnalyzer.MapHeight((int)Bot.Main.MapAnalyzer.StartLocation.X, (int)Bot.Main.MapAnalyzer.StartLocation.Y);
 
             BoolGrid grownStartArea = startArea.Grow();
             BoolGrid grownOutside = outside.Grow();
@@ -432,7 +432,7 @@ namespace Tyr.MapAnalysis
             if (cliffCutoffHeight)
                 for (int x = 0; x < reaperCliffs.Width(); x++)
                     for (int y = 0; y < reaperCliffs.Height(); y++)
-                        if (reaperCliffs[x, y] && SC2Util.GetDataValue(Bot.Bot.GameInfo.StartRaw.TerrainHeight, x, y) >= mainHeight - 24)
+                        if (reaperCliffs[x, y] && SC2Util.GetDataValue(Bot.Main.GameInfo.StartRaw.TerrainHeight, x, y) >= mainHeight - 24)
                             reaperCliffs[x, y] = false;
             //DrawReaperWall(outside, startArea, reaperCliffs, new ArrayBoolGrid(placement.Width(), placement.Height()), null, null);
             List<BoolGrid> reaperCliffGroups = reaperCliffs.GetGroups();
@@ -498,8 +498,8 @@ namespace Tyr.MapAnalysis
                 }
             }
 
-            List<Point2D> building1Positions = Placable(side1, Bot.Bot.MapAnalyzer.StartArea, BuildingType.LookUp[types[0]].Size, false);
-            List<Point2D> building2Positions = Placable(side2, Bot.Bot.MapAnalyzer.StartArea, BuildingType.LookUp[types[2]].Size, false);
+            List<Point2D> building1Positions = Placable(side1, Bot.Main.MapAnalyzer.StartArea, BuildingType.LookUp[types[0]].Size, false);
+            List<Point2D> building2Positions = Placable(side2, Bot.Main.MapAnalyzer.StartArea, BuildingType.LookUp[types[2]].Size, false);
 
             DrawReaperWall(outside, startArea, reaperCliff, side1.GetOr(side2), building1Positions, building2Positions);
 
@@ -521,9 +521,9 @@ namespace Tyr.MapAnalysis
                 }
 
             HashSet<Point2D> around1 = new HashSet<Point2D>();
-            GetPlacableAround(Bot.Bot.MapAnalyzer.StartArea, Wall[0].Pos, Wall[0].Size, Wall[1].Size, around1, true, false);
+            GetPlacableAround(Bot.Main.MapAnalyzer.StartArea, Wall[0].Pos, Wall[0].Size, Wall[1].Size, around1, true, false);
             HashSet<Point2D> around2 = new HashSet<Point2D>();
-            GetPlacableAround(Bot.Bot.MapAnalyzer.StartArea, Wall[2].Pos, Wall[2].Size, Wall[1].Size, around2, true, false);
+            GetPlacableAround(Bot.Main.MapAnalyzer.StartArea, Wall[2].Pos, Wall[2].Size, Wall[1].Size, around2, true, false);
             around1.IntersectWith(around2);
 
             foreach (Point2D pos in around1)
@@ -647,7 +647,7 @@ namespace Tyr.MapAnalysis
 
             if (Math.Abs(zealotPos.X - end.X) > Math.Abs(zealotPos.Y - end.Y) )
             {
-                if (zealotPos.Y - Bot.Bot.BaseManager.Natural.BaseLocation.Pos.Y > 0)
+                if (zealotPos.Y - Bot.Main.BaseManager.Natural.BaseLocation.Pos.Y > 0)
                 {
                     zealotPos.Y -= 0.5f;
                     DebugUtil.WriteLine("zealotPos 1: " + zealotPos);
@@ -659,7 +659,7 @@ namespace Tyr.MapAnalysis
                 }
             } else
             {
-                if (zealotPos.X - Bot.Bot.BaseManager.Natural.BaseLocation.Pos.X > 0)
+                if (zealotPos.X - Bot.Main.BaseManager.Natural.BaseLocation.Pos.X > 0)
                 {
                     zealotPos.X -= 0.5f;
                     DebugUtil.WriteLine("zealotPos 3: " + zealotPos);
@@ -681,7 +681,7 @@ namespace Tyr.MapAnalysis
                 zealotPos.Y += 2;
                 */
             Point2D[] pylonPositions = new Point2D[2];
-            Point2D natural = Bot.Bot.BaseManager.Natural.BaseLocation.Pos;
+            Point2D natural = Bot.Main.BaseManager.Natural.BaseLocation.Pos;
             if (Math.Abs(natural.X - middle.X) >= Math.Abs(natural.Y - middle.Y))
             {
                 if (natural.X > middle.X)
@@ -714,8 +714,8 @@ namespace Tyr.MapAnalysis
             {
                 if (ProtossBuildingPlacement.IsBuildingInPowerField(start, SC2Util.Point(3, 3), pos)
                     && ProtossBuildingPlacement.IsBuildingInPowerField(end, SC2Util.Point(3, 3), pos)
-                    && Bot.Bot.buildingPlacer.CheckDistanceClose(pos, UnitTypes.PYLON, start, types[0])
-                    && Bot.Bot.buildingPlacer.CheckDistanceClose(pos, UnitTypes.PYLON, end, types[3]))
+                    && Bot.Main.buildingPlacer.CheckDistanceClose(pos, UnitTypes.PYLON, start, types[0])
+                    && Bot.Main.buildingPlacer.CheckDistanceClose(pos, UnitTypes.PYLON, end, types[3]))
                     pylonPos = pos;
             }
             if (pylonPos == null)
@@ -727,7 +727,7 @@ namespace Tyr.MapAnalysis
             Wall.Add(new WallBuilding() { Pos = zealotPos, Type = types[2] });
             Wall.Add(new WallBuilding() { Pos = end, Type = types[3] });
             Wall.Add(new WallBuilding() { Pos = pylonPos, Type = UnitTypes.PYLON });
-            if (Bot.Bot.Map == MapEnum.WinterGate && Bot.Bot.MapAnalyzer.StartLocation.X < 60)
+            if (Bot.Main.Map == MapEnum.WinterGate && Bot.Main.MapAnalyzer.StartLocation.X < 60)
                 Wall[4].Pos.X--;
 
             return true;
@@ -783,7 +783,7 @@ namespace Tyr.MapAnalysis
             */
 
             Point2D[] pylonPositions = new Point2D[2];
-            Point2D natural = Bot.Bot.BaseManager.Natural.BaseLocation.Pos;
+            Point2D natural = Bot.Main.BaseManager.Natural.BaseLocation.Pos;
             if (Math.Abs(natural.X - middle.X) >= Math.Abs(natural.Y - middle.Y))
             {
                 if (natural.X > middle.X)
@@ -816,8 +816,8 @@ namespace Tyr.MapAnalysis
             {
                 if (ProtossBuildingPlacement.IsBuildingInPowerField(start, SC2Util.Point(3, 3), pos)
                     && ProtossBuildingPlacement.IsBuildingInPowerField(end, SC2Util.Point(3, 3), pos)
-                    && Bot.Bot.buildingPlacer.CheckDistanceClose(pos, UnitTypes.PYLON, start, types[0])
-                    && Bot.Bot.buildingPlacer.CheckDistanceClose(pos, UnitTypes.PYLON, end, types[3]))
+                    && Bot.Main.buildingPlacer.CheckDistanceClose(pos, UnitTypes.PYLON, start, types[0])
+                    && Bot.Main.buildingPlacer.CheckDistanceClose(pos, UnitTypes.PYLON, end, types[3]))
                     pylonPos = pos;
             }
             if (pylonPos == null)
@@ -832,7 +832,7 @@ namespace Tyr.MapAnalysis
             Wall.Add(new WallBuilding() { Pos = zealotPos, Type = types[2] });
             Wall.Add(new WallBuilding() { Pos = end, Type = types[3] });
             Wall.Add(new WallBuilding() { Pos = pylonPos, Type = UnitTypes.PYLON });
-            if (Bot.Bot.Map == MapEnum.WinterGate && Bot.Bot.MapAnalyzer.StartLocation.X < 60)
+            if (Bot.Main.Map == MapEnum.WinterGate && Bot.Main.MapAnalyzer.StartLocation.X < 60)
                 Wall[4].Pos.X--;
 
             return true;
@@ -870,7 +870,7 @@ namespace Tyr.MapAnalysis
         public void ReserveSpace()
         {
             foreach (WallBuilding building in Wall)
-                Bot.Bot.buildingPlacer.ReservedLocation.Add(new ReservedBuilding() { Type = building.Type, Pos = building.Pos });
+                Bot.Main.buildingPlacer.ReservedLocation.Add(new ReservedBuilding() { Type = building.Type, Pos = building.Pos });
         }
 
         private void DrawResult(BoolGrid unPathable, BoolGrid naturalWalls, List<Point2D> building1Positions, List<Point2D> building2Positions)
@@ -878,8 +878,8 @@ namespace Tyr.MapAnalysis
             if (!Bot.Debug)
                 return;
 
-            int width = Bot.Bot.GameInfo.StartRaw.MapSize.X;
-            int height = Bot.Bot.GameInfo.StartRaw.MapSize.Y;
+            int width = Bot.Main.GameInfo.StartRaw.MapSize.X;
+            int height = Bot.Main.GameInfo.StartRaw.MapSize.Y;
             System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height);
             for (int x = 0; x < width; x++)
                 for (int y = 0; y < height; y++)
@@ -888,7 +888,7 @@ namespace Tyr.MapAnalysis
                         bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Red);
                     else if (unPathable[x, y])
                         bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Black);
-                    else if (!Bot.Bot.MapAnalyzer.Placement[x, y])
+                    else if (!Bot.Main.MapAnalyzer.Placement[x, y])
                         bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Gray);
                     else
                         bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.White);
@@ -954,13 +954,13 @@ namespace Tyr.MapAnalysis
             if (!Bot.Debug)
                 return;
 
-            int width = Bot.Bot.GameInfo.StartRaw.MapSize.X;
-            int height = Bot.Bot.GameInfo.StartRaw.MapSize.Y;
+            int width = Bot.Main.GameInfo.StartRaw.MapSize.X;
+            int height = Bot.Main.GameInfo.StartRaw.MapSize.Y;
             System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height);
             for (int x = 0; x < width; x++)
                 for (int y = 0; y < height; y++)
                 {
-                    int mapHeight = Bot.Bot.MapAnalyzer.MapHeight(x, y);
+                    int mapHeight = Bot.Main.MapAnalyzer.MapHeight(x, y);
                     int val = Math.Min(255, Math.Max(0, (mapHeight - 191) * 8));
                     bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.FromArgb(val, val, val));
                     

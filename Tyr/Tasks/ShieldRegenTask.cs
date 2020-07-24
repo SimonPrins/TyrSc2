@@ -26,7 +26,7 @@ namespace Tyr.Tasks
 
         public bool DefensiveStructureClose(Agent agent)
         {
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.BUNKER
                     && enemy.UnitType != UnitTypes.PLANETARY_FORTRESS

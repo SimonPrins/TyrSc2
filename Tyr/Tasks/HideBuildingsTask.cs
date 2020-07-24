@@ -21,12 +21,12 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
         {
-            return agent.IsWorker && units.Count == 0 && Bot.Bot.Frame >= MoveOutFrame;
+            return agent.IsWorker && units.Count == 0 && Bot.Main.Frame >= MoveOutFrame;
         }
 
         public override List<UnitDescriptor> GetDescriptors()

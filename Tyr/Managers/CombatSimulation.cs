@@ -131,7 +131,7 @@ namespace Tyr.Managers
                     for (int i = simulatedUnits.Count - 1; i >= 0; i--)
                     {
                         Unit compare = simulatedUnits[i];
-                        if (SC2Util.DistanceSq(current.Pos, compare.Pos) > (current.Owner != Bot.Bot.PlayerId || compare.Owner != Bot.Bot.PlayerId ? EnemyDistance * EnemyDistance : AllyDistance * AllyDistance))
+                        if (SC2Util.DistanceSq(current.Pos, compare.Pos) > (current.Owner != Bot.Main.PlayerId || compare.Owner != Bot.Main.PlayerId ? EnemyDistance * EnemyDistance : AllyDistance * AllyDistance))
                             continue;
                         simulationGroup.Add(compare);
                         CollectionUtil.RemoveAt(simulatedUnits, i);
@@ -194,11 +194,11 @@ namespace Tyr.Managers
             int prevProceed = 0;
             int prevFallBack = 0;
             foreach (Unit unit in simulationGroup)
-                if (Bot.Bot.UnitManager.Agents.ContainsKey(unit.Tag) && Bot.Bot.Frame - Bot.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecisionFrame < 10)
+                if (Bot.Main.UnitManager.Agents.ContainsKey(unit.Tag) && Bot.Main.Frame - Bot.Main.UnitManager.Agents[unit.Tag].CombatSimulationDecisionFrame < 10)
                 {
-                    if (Bot.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecision == CombatSimulationDecision.Proceed)
+                    if (Bot.Main.UnitManager.Agents[unit.Tag].CombatSimulationDecision == CombatSimulationDecision.Proceed)
                         prevProceed++;
-                    else if (Bot.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecision == CombatSimulationDecision.FallBack)
+                    else if (Bot.Main.UnitManager.Agents[unit.Tag].CombatSimulationDecision == CombatSimulationDecision.FallBack)
                         prevFallBack++;
                 }
 
@@ -208,12 +208,12 @@ namespace Tyr.Managers
             else
                 partProceed = (float)prevProceed / (prevProceed + prevFallBack);
             if (ShowStats)
-                Bot.Bot.DrawText("Proceed: " + partProceed);
+                Bot.Main.DrawText("Proceed: " + partProceed);
             if (enemyResources - enemyNewResources >= (myResources - myNewResources) * (1.1 - 0.3 * partProceed))
                 ApplyDecision(simulationGroup, CombatSimulationDecision.Proceed);
             else
             {
-                SimulationState fleeState = GetState(Bot.Bot, simulationGroup, myUpgrades, enemyUpgrades, true);
+                SimulationState fleeState = GetState(Bot.Main, simulationGroup, myUpgrades, enemyUpgrades, true);
                 state.Simulate(100);
                 float myFleeResources = GetResources(fleeState, true);
                 if (enemyResources - enemyNewResources >= (myFleeResources - myNewResources) * (1.1 - 0.3 * partProceed))
@@ -226,10 +226,10 @@ namespace Tyr.Managers
         private void ApplyDecision(List<Unit> simulationGroup, CombatSimulationDecision decision)
         {
             foreach (Unit unit in simulationGroup)
-                if (Bot.Bot.UnitManager.Agents.ContainsKey(unit.Tag))
+                if (Bot.Main.UnitManager.Agents.ContainsKey(unit.Tag))
                 {
-                    Bot.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecision = decision;
-                    Bot.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecisionFrame = Bot.Bot.Frame;
+                    Bot.Main.UnitManager.Agents[unit.Tag].CombatSimulationDecision = decision;
+                    Bot.Main.UnitManager.Agents[unit.Tag].CombatSimulationDecisionFrame = Bot.Main.Frame;
                 }
         }
     }

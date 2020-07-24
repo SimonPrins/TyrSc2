@@ -17,7 +17,7 @@ namespace Tyr.Micro
 
             Unit fleeCyclone = null;
             float distance = 15.5f * 15.5f;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.CYCLONE)
                     continue;

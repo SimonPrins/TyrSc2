@@ -61,7 +61,7 @@ namespace Tyr.Tasks
         private void DetermineTarget()
         {
             if (Target != null)
-                foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
+                foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
                     if (SC2Util.DistanceSq(agent.Unit.Pos, Target.BaseLocation.Pos) <= 3 * 3)
                     {
                         Bases.RemoveAt(Bases.Count - 1);
@@ -69,7 +69,7 @@ namespace Tyr.Tasks
                         break;
                     }
             if (Target != null)
-                foreach (BuildingLocation building in Bot.Bot.EnemyManager.EnemyBuildings.Values)
+                foreach (BuildingLocation building in Bot.Main.EnemyManager.EnemyBuildings.Values)
                     if (SC2Util.DistanceSq(building.Pos, Target.BaseLocation.Pos) <= 6 * 6)
                     {
                         Bases.RemoveAt(Bases.Count - 1);
@@ -79,7 +79,7 @@ namespace Tyr.Tasks
 
 
             if (Bases.Count == 0)
-                foreach (Base b in Bot.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Main.BaseManager.Bases)
                     Bases.Add(b);
 
 

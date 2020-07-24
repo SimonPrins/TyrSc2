@@ -40,9 +40,9 @@ namespace Tyr.Tasks
                     break;
                 }
             if (warpPrism == null)
-                result.Add(new UnitDescriptor(UnitTypes.WARP_PRISM) { Pos = SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation), Count = 1, MaxDist = 50 });
+                result.Add(new UnitDescriptor(UnitTypes.WARP_PRISM) { Pos = SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation), Count = 1, MaxDist = 50 });
             else if (5 - Units.Count - warpPrism.Unit.Passengers.Count > 0)
-                result.Add(new UnitDescriptor(UnitTypes.SENTRY) { Pos = SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation), Count = 5 - Units.Count - warpPrism.Unit.Passengers.Count, MaxDist = 50 });
+                result.Add(new UnitDescriptor(UnitTypes.SENTRY) { Pos = SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation), Count = 5 - Units.Count - warpPrism.Unit.Passengers.Count, MaxDist = 50 });
 
             return result;
         }
@@ -127,13 +127,13 @@ namespace Tyr.Tasks
         {
             if (DropPos != null)
                 return;
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count == 0)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count == 0)
                 return;
 
             Base enemyMain = null;
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
-                if (SC2Util.DistanceSq(b.BaseLocation.Pos, Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) <= 2 * 2)
+                if (SC2Util.DistanceSq(b.BaseLocation.Pos, Bot.Main.TargetManager.PotentialEnemyStartLocations[0]) <= 2 * 2)
                 {
                     enemyMain = b;
                     break;
@@ -141,26 +141,26 @@ namespace Tyr.Tasks
             }
             if (enemyMain == null)
                 return;
-            DropPos = new PotentialHelper(enemyMain.MineralLinePos, 4).From(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]).Get();
-            Point2D enemyThird = Bot.Bot.MapAnalyzer.GetEnemyThird().Pos;
+            DropPos = new PotentialHelper(enemyMain.MineralLinePos, 4).From(Bot.Main.TargetManager.PotentialEnemyStartLocations[0]).Get();
+            Point2D enemyThird = Bot.Main.MapAnalyzer.GetEnemyThird().Pos;
             float topDist = enemyThird.Y;
             float leftDist = enemyThird.X;
-            float bottomDist = Bot.Bot.GameInfo.StartRaw.MapSize.Y - enemyThird.Y;
-            float rightDist = Bot.Bot.GameInfo.StartRaw.MapSize.X - enemyThird.X;
+            float bottomDist = Bot.Main.GameInfo.StartRaw.MapSize.Y - enemyThird.Y;
+            float rightDist = Bot.Main.GameInfo.StartRaw.MapSize.X - enemyThird.X;
 
             if (topDist < leftDist && topDist < bottomDist && topDist < rightDist)
-                enemyThird = new Point2D() { X = enemyThird.X, Y = Bot.Bot.GameInfo.StartRaw.PlayableArea.P0.Y + 5};
+                enemyThird = new Point2D() { X = enemyThird.X, Y = Bot.Main.GameInfo.StartRaw.PlayableArea.P0.Y + 5};
             else if (leftDist < bottomDist && leftDist < rightDist)
-                enemyThird = new Point2D() { X = Bot.Bot.GameInfo.StartRaw.PlayableArea.P0.X + 5, Y = enemyThird.Y };
+                enemyThird = new Point2D() { X = Bot.Main.GameInfo.StartRaw.PlayableArea.P0.X + 5, Y = enemyThird.Y };
             else if (bottomDist < rightDist)
-                enemyThird = new Point2D() { X = enemyThird.X, Y = Bot.Bot.GameInfo.StartRaw.PlayableArea.P1.Y - 5 };
+                enemyThird = new Point2D() { X = enemyThird.X, Y = Bot.Main.GameInfo.StartRaw.PlayableArea.P1.Y - 5 };
             else
-                enemyThird = new Point2D() { X = Bot.Bot.GameInfo.StartRaw.PlayableArea.P1.X - 5, Y = enemyThird.Y };
+                enemyThird = new Point2D() { X = Bot.Main.GameInfo.StartRaw.PlayableArea.P1.X - 5, Y = enemyThird.Y };
             WayPoint = new PotentialHelper(enemyMain.BaseLocation.Pos, 50).To(enemyThird).Get();
-            WayPoint.X = Math.Max(Bot.Bot.GameInfo.StartRaw.PlayableArea.P0.X + 5, WayPoint.X);
-            WayPoint.X = Math.Min(Bot.Bot.GameInfo.StartRaw.PlayableArea.P1.X - 5, WayPoint.X);
-            WayPoint.Y = Math.Max(Bot.Bot.GameInfo.StartRaw.PlayableArea.P0.Y + 5, WayPoint.Y);
-            WayPoint.Y = Math.Min(Bot.Bot.GameInfo.StartRaw.PlayableArea.P1.Y - 5, WayPoint.Y);
+            WayPoint.X = Math.Max(Bot.Main.GameInfo.StartRaw.PlayableArea.P0.X + 5, WayPoint.X);
+            WayPoint.X = Math.Min(Bot.Main.GameInfo.StartRaw.PlayableArea.P1.X - 5, WayPoint.X);
+            WayPoint.Y = Math.Max(Bot.Main.GameInfo.StartRaw.PlayableArea.P0.Y + 5, WayPoint.Y);
+            WayPoint.Y = Math.Min(Bot.Main.GameInfo.StartRaw.PlayableArea.P1.Y - 5, WayPoint.Y);
             DebugUtil.WriteLine("Warp prism DropPos: " + DropPos);
             DebugUtil.WriteLine("Warp prism WayPoint: " + WayPoint);
         }

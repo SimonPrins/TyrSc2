@@ -38,15 +38,15 @@ namespace Tyr.Micro
             if (ExcludedAttackerTypes.Contains(agent.Unit.UnitType))
                 return false;
 
-            bool debugThisFrame = Debug && LastDebugFrame != Bot.Bot.Frame;
-            LastDebugFrame = Bot.Bot.Frame;
+            bool debugThisFrame = Debug && LastDebugFrame != Bot.Main.Frame;
+            LastDebugFrame = Bot.Main.Frame;
             if (debugThisFrame)
-                Bot.Bot.DrawText("Try attack target.");
+                Bot.Main.DrawText("Try attack target.");
             Unit killTarget = null;
 
             float dist = MaxDist * MaxDist;
             float hp = 1000000;
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (!Filter(unit))
                 {
@@ -60,7 +60,7 @@ namespace Tyr.Micro
                     continue;
                 }
                 if (debugThisFrame)
-                    Bot.Bot.DrawText("Found potential attack target.");
+                    Bot.Main.DrawText("Found potential attack target.");
 
                 if (unit.UnitType != UnitTypes.COLOSUS && !agent.CanAttackGround() && !unit.IsFlying)
                     continue;
@@ -86,12 +86,12 @@ namespace Tyr.Micro
             if (killTarget == null)
             {
                 if (debugThisFrame)
-                    Bot.Bot.DrawText("No attack target found.");
+                    Bot.Main.DrawText("No attack target found.");
                 return false;
             }
 
             if (Debug)
-                Bot.Bot.DrawLine(agent, killTarget.Pos);
+                Bot.Main.DrawLine(agent, killTarget.Pos);
             if (agent.Unit.WeaponCooldown > 0)
             {
                 if (!MoveForwardWhenInRange)

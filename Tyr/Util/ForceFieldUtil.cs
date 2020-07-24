@@ -12,7 +12,7 @@ namespace Tyr.Util
         private Dictionary<ulong, Point2D> ForceFieldPlacementAssignments = new Dictionary<ulong, Point2D>();
         public void DetermineForceFieldPlacement(List<Agent> units)
         {
-            if (Bot.Bot.Frame - ForceFieldPlacementFrame < 250)
+            if (Bot.Main.Frame - ForceFieldPlacementFrame < 250)
                 return;
 
             List<Unit> sentries = new List<Unit>();
@@ -26,13 +26,13 @@ namespace Tyr.Util
                 if (sentryGroup.Count > mainSentryGroup.Count)
                     mainSentryGroup = sentryGroup;
 
-            Bot.Bot.DrawText("MainSentryGroup size: " + mainSentryGroup.Count);
+            Bot.Main.DrawText("MainSentryGroup size: " + mainSentryGroup.Count);
 
             if (mainSentryGroup.Count < 8)
                 return;
             List<Unit> closeEnemies = new List<Unit>();
             HashSet<ulong> enemyTags = new HashSet<ulong>();
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!ConsiderEnemy(enemy))
                     continue;
@@ -48,7 +48,7 @@ namespace Tyr.Util
             for (int i = 0; i < closeEnemies.Count; i++)
             {
                 Unit closeEnemy = closeEnemies[i];
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (!ConsiderEnemy(enemy))
                         continue;
@@ -68,7 +68,7 @@ namespace Tyr.Util
                 if (enemyGroup.Count > mainEnemyGroup.Count)
                     mainEnemyGroup = enemyGroup;
 
-            Bot.Bot.DrawText("mainEnemyGroup size: " + mainEnemyGroup.Count);
+            Bot.Main.DrawText("mainEnemyGroup size: " + mainEnemyGroup.Count);
             if (mainEnemyGroup.Count < 6)
                 return;
 
@@ -123,7 +123,7 @@ namespace Tyr.Util
                         continue;
                     if (agent.Unit.Energy < 50)
                         continue;
-                    if (Bot.Bot.Frame - agent.LastOrderFrame < 3 && agent.LastAbility != Abilities.MOVE && agent.LastAbility != Abilities.ATTACK)
+                    if (Bot.Main.Frame - agent.LastOrderFrame < 3 && agent.LastAbility != Abilities.MOVE && agent.LastAbility != Abilities.ATTACK)
                         continue;
                     float newDist = agent.DistanceSq(forceFieldLocation);
                     if (newDist >= dist)
@@ -133,12 +133,12 @@ namespace Tyr.Util
                 }
                 if (pickedSentry == null)
                 {
-                    Bot.Bot.DrawText("Failed to find Sentry for forceField placement.");
+                    Bot.Main.DrawText("Failed to find Sentry for forceField placement.");
                     return;
                 }
                 newForceFieldLocations.Add(pickedSentry.Unit.Tag, forceFieldLocation);
             }
-            ForceFieldPlacementFrame = Bot.Bot.Frame;
+            ForceFieldPlacementFrame = Bot.Main.Frame;
             ForceFieldPlacementAssignments = newForceFieldLocations;
         }
 
@@ -159,7 +159,7 @@ namespace Tyr.Util
         {
             if (ForceFieldPlacementAssignments.ContainsKey(agent.Unit.Tag))
             {
-                foreach (Unit unit in Bot.Bot.Observation.Observation.RawData.Units)
+                foreach (Unit unit in Bot.Main.Observation.Observation.RawData.Units)
                 {
                     if (unit.UnitType != 135)
                         continue;

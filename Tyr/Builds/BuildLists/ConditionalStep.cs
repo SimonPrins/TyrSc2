@@ -27,7 +27,7 @@ namespace Tyr.Builds.BuildLists
                 return new NextItem();
             else
             {
-                Bot.Bot.DrawText("Skipping list. Condition not met.");
+                Bot.Main.DrawText("Skipping list. Condition not met.");
                 return new NextList();
             }
         }

@@ -14,7 +14,7 @@ namespace Tyr.Micro
 
             float dist = 14 * 14;
             Unit fleeTarget = null;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!UnitTypes.CanAttackAir(enemy.UnitType))
                     continue;
@@ -38,7 +38,7 @@ namespace Tyr.Micro
             }
 
             dist = 10 * 10;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (UnitTypes.CanAttackAir(enemy.UnitType))
                     continue;

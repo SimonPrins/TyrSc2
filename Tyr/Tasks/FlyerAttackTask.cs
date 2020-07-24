@@ -16,7 +16,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -26,7 +26,7 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Bot.Bot.UnitManager.Completed(UnitTypes.VOID_RAY) + Bot.Bot.UnitManager.Completed(UnitTypes.CARRIER) + Bot.Bot.UnitManager.Completed(UnitTypes.TEMPEST) >= RequiredSize;
+            return Bot.Main.UnitManager.Completed(UnitTypes.VOID_RAY) + Bot.Main.UnitManager.Completed(UnitTypes.CARRIER) + Bot.Main.UnitManager.Completed(UnitTypes.TEMPEST) >= RequiredSize;
         }
 
         public override void OnFrame(Bot tyr)

@@ -13,11 +13,11 @@ namespace Tyr.Builds.Zerg
         public static BuildList Overlords()
         {
             BuildList result = new BuildList();
-            result.If(() => { return Bot.Bot.UnitManager.Count(UnitTypes.SPAWNING_POOL) > 0 
+            result.If(() => { return Bot.Main.UnitManager.Count(UnitTypes.SPAWNING_POOL) > 0 
                 && Build.FoodUsed() >= Build.ExpectedAvailableFood() 
-                    - 2 * Bot.Bot.UnitManager.Completed(UnitTypes.HATCHERY)
-                    - 16 * Bot.Bot.UnitManager.Completed(UnitTypes.ULTRALISK_CAVERN)
-                    - (Bot.Bot.UnitManager.Count(UnitTypes.HATCHERY) >= 4 && Bot.Bot.UnitManager.Count(UnitTypes.DRONE) >= 40 ? 8 : 0); });
+                    - 2 * Bot.Main.UnitManager.Completed(UnitTypes.HATCHERY)
+                    - 16 * Bot.Main.UnitManager.Completed(UnitTypes.ULTRALISK_CAVERN)
+                    - (Bot.Main.UnitManager.Count(UnitTypes.HATCHERY) >= 4 && Bot.Main.UnitManager.Count(UnitTypes.DRONE) >= 40 ? 8 : 0); });
             result.Morph(UnitTypes.OVERLORD, 25);
             return result;
         }
@@ -26,23 +26,23 @@ namespace Tyr.Builds.Zerg
         {
             if (!SmellCheese)
             {
-                if (Bot.Bot.EnemyRace == Race.Terran)
+                if (Bot.Main.EnemyRace == Race.Terran)
                 {
                     if (FourRax.Get().Detected
-                        || (Bot.Bot.Frame >= 22.4 * 85 && !Bot.Bot.EnemyStrategyAnalyzer.NoProxyTerranConfirmed && Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count == 1)
+                        || (Bot.Main.Frame >= 22.4 * 85 && !Bot.Main.EnemyStrategyAnalyzer.NoProxyTerranConfirmed && Bot.Main.TargetManager.PotentialEnemyStartLocations.Count == 1)
                         || ReaperRush.Get().Detected)
                     {
-                        RushDefense.OnStart(Bot.Bot);
+                        RushDefense.OnStart(Bot.Main);
                         SmellCheese = true;
                     }
                 }
-                else if (Bot.Bot.EnemyRace == Race.Protoss)
+                else if (Bot.Main.EnemyRace == Race.Protoss)
                 {
-                    if ((Bot.Bot.Frame >= 22.4 * 60 * 1.5
-                        && !Bot.Bot.EnemyStrategyAnalyzer.NoProxyGatewayConfirmed)
-                        || (Bot.Bot.Frame < 22.4 * 60 * 1.5 && ThreeGate.Get().Detected))
+                    if ((Bot.Main.Frame >= 22.4 * 60 * 1.5
+                        && !Bot.Main.EnemyStrategyAnalyzer.NoProxyGatewayConfirmed)
+                        || (Bot.Main.Frame < 22.4 * 60 * 1.5 && ThreeGate.Get().Detected))
                     {
-                        RushDefense.OnStart(Bot.Bot);
+                        RushDefense.OnStart(Bot.Main);
                         SmellCheese = true;
                     }
                 }

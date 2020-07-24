@@ -56,15 +56,15 @@ namespace Tyr.Builds.Zerg
         {
             BuildList result = new BuildList();
 
-            result.If(() => Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.DARK_TEMPLAR)
-                + Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.DARK_SHRINE)
-                + Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MEDIVAC)
-                + Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.LIBERATOR)
-                + Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.LIBERATOR_AG)
-                + Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0);
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            result.If(() => Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.DARK_TEMPLAR)
+                + Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.DARK_SHRINE)
+                + Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MEDIVAC)
+                + Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.LIBERATOR)
+                + Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.LIBERATOR_AG)
+                + Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0);
+            foreach (Base b in Bot.Main.BaseManager.Bases)
                 if (b != Main && b != Natural)
-                    result.Building(UnitTypes.SPORE_CRAWLER, b, () => b.ResourceCenterFinishedFrame >= 0 && Bot.Bot.Frame - b.ResourceCenterFinishedFrame >= 224);
+                    result.Building(UnitTypes.SPORE_CRAWLER, b, () => b.ResourceCenterFinishedFrame >= 0 && Bot.Main.Frame - b.ResourceCenterFinishedFrame >= 224);
 
             return result;
         }
@@ -76,7 +76,7 @@ namespace Tyr.Builds.Zerg
             result.If(() => !GoingUltras);
             result.If(() => Count(UnitTypes.DRONE) >= 55 && Count(UnitTypes.HATCHERY) >= 4 && Count(UnitTypes.EVOLUTION_CHAMBER) >= 2);
             result.Morph(UnitTypes.ZERGLING, 130);
-            result.If(() => !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeType.AdrenalGlands));
+            result.If(() => !Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeType.AdrenalGlands));
             result.Morph(UnitTypes.ZERGLING, 30);
 
             return result;
@@ -175,7 +175,7 @@ namespace Tyr.Builds.Zerg
                 TimingAttackTask.Task.RequiredSize = 12;
                 TimingAttackTask.Task.RetreatSize = 4;
             }
-            else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeType.AdrenalGlands))
+            else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeType.AdrenalGlands))
             {
                 TimingAttackTask.Task.RequiredSize = 160;
                 TimingAttackTask.Task.RetreatSize = 0;

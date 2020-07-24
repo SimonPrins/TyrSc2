@@ -25,8 +25,8 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ScoutTask.Enable();
             ArmyObserverTask.Enable();
             ForceFieldRampTask.Enable();

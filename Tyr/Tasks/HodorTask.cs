@@ -46,7 +46,7 @@ namespace Tyr.Tasks
                 tyr.DrawText("Hodor dist: " + System.Math.Sqrt(agent.DistanceSq(Target)));
                 if (agent.DistanceSq(Target) <= 0.1)
                 {
-                    if (Bot.Bot.Frame % 23 == 0)
+                    if (Bot.Main.Frame % 23 == 0)
                         agent.Order(18);
                 }
                 else

@@ -23,7 +23,7 @@ namespace Tyr.Micro
             bool stillExists = false;
             if (TargetTag != 0)
             {
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (enemy.Tag == TargetTag)
                     {
@@ -39,9 +39,9 @@ namespace Tyr.Micro
             }
 
             if (LastGravitonUnitTag == agent.Unit.Tag
-                && Bot.Bot.Frame - LastGravitonFrame < 22.4 * 5)
+                && Bot.Main.Frame - LastGravitonFrame < 22.4 * 5)
             {
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (enemy.Tag == TargetTag)
                     {
@@ -51,10 +51,10 @@ namespace Tyr.Micro
                 }
             }
 
-            if (Bot.Bot.Frame - LastGravitonFrame < Delay)
+            if (Bot.Main.Frame - LastGravitonFrame < Delay)
                 return false;
 
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.CYCLONE
                     && enemy.UnitType != UnitTypes.SIEGE_TANK
@@ -71,13 +71,13 @@ namespace Tyr.Micro
                 if (agent.DistanceSq(enemy) <= 10 * 10)
                 {
                     agent.Order(173, enemy.Tag);
-                    LastGravitonFrame = Bot.Bot.Frame;
+                    LastGravitonFrame = Bot.Main.Frame;
                     LastGravitonUnitTag = agent.Unit.Tag;
                     TargetTag = enemy.Tag;
                     return true;
                 }
             }
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.STALKER)
                     continue;
@@ -85,13 +85,13 @@ namespace Tyr.Micro
                 if (agent.DistanceSq(enemy) <= 8 * 8)
                 {
                     agent.Order(173, enemy.Tag);
-                    LastGravitonFrame = Bot.Bot.Frame;
+                    LastGravitonFrame = Bot.Main.Frame;
                     LastGravitonUnitTag = agent.Unit.Tag;
                     TargetTag = enemy.Tag;
                     return true;
                 }
             }
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.DRONE)
                     continue;
@@ -99,7 +99,7 @@ namespace Tyr.Micro
                 if (agent.DistanceSq(enemy) <= 10 * 10)
                 {
                     agent.Order(173, enemy.Tag);
-                    LastGravitonFrame = Bot.Bot.Frame;
+                    LastGravitonFrame = Bot.Main.Frame;
                     LastGravitonUnitTag = agent.Unit.Tag;
                     TargetTag = enemy.Tag;
                     return true;

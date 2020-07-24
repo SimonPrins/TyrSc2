@@ -18,17 +18,17 @@ namespace Tyr.Micro
 
             bool closeEnemy = false;
             if (agent.Unit.UnitType == UnitTypes.WIDOW_MINE_BURROWED
-                && (!LastCheckFrame.ContainsKey(agent.Unit.Tag) || Bot.Bot.Frame - LastCheckFrame[agent.Unit.Tag] > 22.4 * KeepMineBurrowedTime))
-                LastEnemyFrame[agent.Unit.Tag] = Bot.Bot.Frame;
-            LastCheckFrame[agent.Unit.Tag] = Bot.Bot.Frame;
+                && (!LastCheckFrame.ContainsKey(agent.Unit.Tag) || Bot.Main.Frame - LastCheckFrame[agent.Unit.Tag] > 22.4 * KeepMineBurrowedTime))
+                LastEnemyFrame[agent.Unit.Tag] = Bot.Main.Frame;
+            LastCheckFrame[agent.Unit.Tag] = Bot.Main.Frame;
 
             if (!LastEnemyFrame.ContainsKey(agent.Unit.Tag))
                 LastEnemyFrame.Add(agent.Unit.Tag, 0);
-            else if (Bot.Bot.Frame - LastEnemyFrame[agent.Unit.Tag] <= 22.4 * KeepMineBurrowedTime)
+            else if (Bot.Main.Frame - LastEnemyFrame[agent.Unit.Tag] <= 22.4 * KeepMineBurrowedTime)
                 closeEnemy = true;
 
 
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (UnitTypes.BuildingTypes.Contains(enemy.UnitType)
                     && enemy.UnitType != UnitTypes.BARRACKS)
@@ -51,7 +51,7 @@ namespace Tyr.Micro
                 if (agent.DistanceSq(enemy) <= dist * dist)
                 {
                     closeEnemy = true;
-                    LastEnemyFrame[agent.Unit.Tag] = Bot.Bot.Frame;
+                    LastEnemyFrame[agent.Unit.Tag] = Bot.Main.Frame;
                     break;
                 }
             }

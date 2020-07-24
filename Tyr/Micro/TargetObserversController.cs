@@ -21,7 +21,7 @@ namespace Tyr.Micro
             {
                 if (agent.DistanceSq(Observer) <= 14 * 14)
                 {
-                    FocusTempests[agent.Unit.Tag] = Bot.Bot.Frame;
+                    FocusTempests[agent.Unit.Tag] = Bot.Main.Frame;
                     agent.Order(Abilities.ATTACK, Observer.Tag);
                     return true;
                 }
@@ -36,14 +36,14 @@ namespace Tyr.Micro
             {
                 if (agent.DistanceSq(Observer) <= 14 * 14)
                 {
-                    FocusTempests[agent.Unit.Tag] = Bot.Bot.Frame;
+                    FocusTempests[agent.Unit.Tag] = Bot.Main.Frame;
                     agent.Order(Abilities.ATTACK, Observer.Tag);
                     return true;
                 }
                 return false;
             }
 
-            foreach (Unit enemy in Bot.Bot.EnemyManager.GetEnemies())
+            foreach (Unit enemy in Bot.Main.EnemyManager.GetEnemies())
             {
                 if (enemy.UnitType != UnitTypes.OBSERVER)
                     continue;
@@ -52,7 +52,7 @@ namespace Tyr.Micro
                 TargetObserver = enemy.Tag;
                 Observer = enemy;
 
-                FocusTempests[agent.Unit.Tag] = Bot.Bot.Frame;
+                FocusTempests[agent.Unit.Tag] = Bot.Main.Frame;
                 agent.Order(Abilities.ATTACK, Observer.Tag);
                 return true;
             }
@@ -62,14 +62,14 @@ namespace Tyr.Micro
 
         public void UpdateTarget()
         {
-            if (Bot.Bot.Frame == UpdatedFrame)
+            if (Bot.Main.Frame == UpdatedFrame)
                 return;
-            UpdatedFrame = Bot.Bot.Frame;
+            UpdatedFrame = Bot.Main.Frame;
 
             if (TargetObserver != 0)
             {
                 bool found = false;
-                foreach (Unit enemy in Bot.Bot.EnemyManager.GetEnemies())
+                foreach (Unit enemy in Bot.Main.EnemyManager.GetEnemies())
                 {
                     if (enemy.Tag == TargetObserver)
                     {
@@ -88,7 +88,7 @@ namespace Tyr.Micro
 
             List<ulong> remove = new List<ulong>();
             foreach (ulong tag in FocusTempests.Keys)
-                if (FocusTempests[tag] < Bot.Bot.Frame - 1)
+                if (FocusTempests[tag] < Bot.Main.Frame - 1)
                     remove.Add(tag);
             foreach (ulong tag in remove)
                 FocusTempests.Remove(tag);

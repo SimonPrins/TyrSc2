@@ -13,9 +13,9 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            return Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.THOR) > 0
-                    || Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.HELLION) + Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.HELLBAT) >= 5
-                    || Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.CYCLONE) > 2;
+            return Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.THOR) > 0
+                    || Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.HELLION) + Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.HELLBAT) >= 5
+                    || Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.CYCLONE) > 2;
         }
 
         public override string Name()

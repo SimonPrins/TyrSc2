@@ -10,7 +10,7 @@ namespace Tyr.Micro
         {
             Unit fleeTarget = null;
             float dist = 6 * 6;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.BROODLING)
                     continue;
@@ -26,7 +26,7 @@ namespace Tyr.Micro
             if (fleeTarget == null)
                 return false;
 
-            agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
+            agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation));
             return true;
         }
     }

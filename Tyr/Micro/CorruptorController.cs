@@ -13,7 +13,7 @@ namespace Tyr.Micro
             
             Point2D retreatTo = null;
             float dist = 15 * 15;
-            foreach (Agent ally in Bot.Bot.UnitManager.Agents.Values)
+            foreach (Agent ally in Bot.Main.UnitManager.Agents.Values)
             {
                 if (ally.Unit.UnitType != UnitTypes.BROOD_LORD)
                     continue;
@@ -33,7 +33,7 @@ namespace Tyr.Micro
 
             dist = 15 * 15;
             Unit killTarget = null;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!enemy.IsFlying)
                     continue;
@@ -54,7 +54,7 @@ namespace Tyr.Micro
 
             dist = 10 * 10;
             Unit fleeTarget = null;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!UnitTypes.AirAttackTypes.Contains(enemy.UnitType))
                     continue;

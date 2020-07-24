@@ -24,7 +24,7 @@ namespace Tyr
             }
             */
 
-            Tyr tyr = new Tyr();
+            Bot tyr = new Bot();
             string[] settings = FileUtil.ReadSettingsFile();
             foreach (string line in settings)
             {
@@ -34,9 +34,9 @@ namespace Tyr
                 if (setting[0].Trim() != "debug")
                     continue;
                 if (setting[1].Trim() == "true")
-                    Tyr.Debug = true;
+                    Bot.Debug = true;
                 else if (setting[1].Trim() == "false")
-                    Tyr.Debug = false;
+                    Bot.Debug = false;
             }
 
             string now = DateTime.Now.ToShortDateString();
@@ -115,7 +115,7 @@ namespace Tyr
             return maps[rand.Next(maps.Count)];
         }
 
-        private static void ReadBuildFile(Tyr tyr)
+        private static void ReadBuildFile(Bot tyr)
         {
             foreach (string line in FileUtil.ReadBuildFile())
             {
@@ -147,7 +147,7 @@ namespace Tyr
             }
         }
 
-        private static void DetermineBuildsProvider(Tyr tyr)
+        private static void DetermineBuildsProvider(Bot tyr)
         {
             string[] settings = FileUtil.ReadSettingsFile();
             foreach (string line in settings)
@@ -173,7 +173,7 @@ namespace Tyr
             }
         }
 
-        private static void DetermineBuildSelector(Tyr tyr)
+        private static void DetermineBuildSelector(Bot tyr)
         {
             string[] settings = FileUtil.ReadSettingsFile();
             foreach (string line in settings)
@@ -198,7 +198,7 @@ namespace Tyr
             }
         }
 
-        private static void DetermineProbotsChat(Tyr tyr)
+        private static void DetermineProbotsChat(Bot tyr)
         {
             string[] settings = FileUtil.ReadSettingsFile();
             foreach (string line in settings)

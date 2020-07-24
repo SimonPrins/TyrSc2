@@ -12,10 +12,10 @@ namespace Tyr.Builds.BuildLists
             result.If(() =>
             {
                 return Build.FoodUsed()
-                    + Bot.Bot.UnitManager.Count(UnitTypes.NEXUS)
-                    + Bot.Bot.UnitManager.Count(UnitTypes.GATEWAY) * 2
-                    + Bot.Bot.UnitManager.Count(UnitTypes.STARGATE) * 2
-                    + Bot.Bot.UnitManager.Count(UnitTypes.ROBOTICS_FACILITY) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.NEXUS)
+                    + Bot.Main.UnitManager.Count(UnitTypes.GATEWAY) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.STARGATE) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.ROBOTICS_FACILITY) * 2
                     >= Build.ExpectedAvailableFood()
                     && Build.ExpectedAvailableFood() < 200;
             });

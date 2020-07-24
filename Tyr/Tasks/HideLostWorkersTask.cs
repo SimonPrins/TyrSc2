@@ -12,13 +12,13 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
         {
-            return agent.IsWorker && Bot.Bot.BaseManager.Main.ResourceCenter != null 
-                && agent.Unit.Pos.Z < Bot.Bot.BaseManager.Main.ResourceCenter.Unit.Pos.Z - 0.1
+            return agent.IsWorker && Bot.Main.BaseManager.Main.ResourceCenter != null 
+                && agent.Unit.Pos.Z < Bot.Main.BaseManager.Main.ResourceCenter.Unit.Pos.Z - 0.1
                 && agent.DistanceSq(HideBaseTask.Task.HideLocation.BaseLocation.Pos) >= 20 * 20;
         }
 

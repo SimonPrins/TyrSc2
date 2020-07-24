@@ -12,7 +12,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)

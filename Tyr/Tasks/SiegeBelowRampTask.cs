@@ -32,9 +32,9 @@ namespace Tyr.Tasks
         public override List<UnitDescriptor> GetDescriptors()
         {
             if (Natural == null)
-                Natural = Bot.Bot.BaseManager.Natural.BaseLocation.Pos;
+                Natural = Bot.Main.BaseManager.Natural.BaseLocation.Pos;
             if (NaturalDefensePos == null)
-                NaturalDefensePos = Bot.Bot.BaseManager.NaturalDefensePos;
+                NaturalDefensePos = Bot.Main.BaseManager.NaturalDefensePos;
             List<UnitDescriptor> result = new List<UnitDescriptor>();
             if (units.Count == 0)
                 result.Add(new UnitDescriptor() { Pos = Natural, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.SIEGE_TANK, UnitTypes.SIEGE_TANK_SIEGED } });
@@ -49,9 +49,9 @@ namespace Tyr.Tasks
                 return;
             }
             if (Natural == null)
-                Natural = Bot.Bot.BaseManager.Natural.BaseLocation.Pos;
+                Natural = Bot.Main.BaseManager.Natural.BaseLocation.Pos;
             if (NaturalDefensePos == null)
-                NaturalDefensePos = Bot.Bot.BaseManager.NaturalDefensePos;
+                NaturalDefensePos = Bot.Main.BaseManager.NaturalDefensePos;
             
 
             foreach (Agent agent in units)

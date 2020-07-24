@@ -30,7 +30,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -43,13 +43,13 @@ namespace Tyr.Tasks
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
-            result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = UnitTypes.WorkerTypes });
+            result.Add(new UnitDescriptor() { Pos = Bot.Main.TargetManager.AttackTarget, Count = 1, UnitTypes = UnitTypes.WorkerTypes });
             return result;
         }
 
         public override bool IsNeeded()
         {
-            return Bot.Bot.Frame >= StartFrame && !ScoutSent;
+            return Bot.Main.Frame >= StartFrame && !ScoutSent;
         }
 
         public bool BaseCircled()
@@ -164,7 +164,7 @@ namespace Tyr.Tasks
 
         private void GetEnemyNatural()
         {
-            EnemyNatural = Bot.Bot.MapAnalyzer.GetEnemyNatural();
+            EnemyNatural = Bot.Main.MapAnalyzer.GetEnemyNatural();
         }
     }
 }

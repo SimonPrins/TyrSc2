@@ -23,10 +23,10 @@ namespace Tyr.Managers
 
         public void Update(Bot tyr)
         {
-            if (Bot.Bot.Observation.Observation.RawData.Effects == null)
+            if (Bot.Main.Observation.Observation.RawData.Effects == null)
                 return;
 
-            foreach (SC2APIProtocol.Effect effect in Bot.Bot.Observation.Observation.RawData.Effects)
+            foreach (SC2APIProtocol.Effect effect in Bot.Main.Observation.Observation.RawData.Effects)
                 if (effect.EffectId == 11)
                 {
                     bool found = false;

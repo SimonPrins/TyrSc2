@@ -21,7 +21,7 @@ namespace Tyr.Micro
 
             float dist = 3 * 3;
             Agent away = null;
-            foreach (Agent other in Bot.Bot.Units())
+            foreach (Agent other in Bot.Main.Units())
             {
                 if (!SpreadTypes.Contains(other.Unit.UnitType))
                     continue;

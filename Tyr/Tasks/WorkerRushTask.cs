@@ -49,7 +49,7 @@ namespace Tyr.Tasks
         public override bool DoWant(Agent agent)
         {
             return agent.IsWorker && (TakeWorkers > 0 || 
-                SC2Util.DistanceSq(agent.Unit.Pos, Bot.Bot.MapAnalyzer.StartLocation) >= 20 * 20 && SC2Util.DistanceSq(agent.Unit.Pos, Bot.Bot.MapAnalyzer.StartLocation) <= 41 * 41);
+                SC2Util.DistanceSq(agent.Unit.Pos, Bot.Main.MapAnalyzer.StartLocation) >= 20 * 20 && SC2Util.DistanceSq(agent.Unit.Pos, Bot.Main.MapAnalyzer.StartLocation) <= 41 * 41);
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -170,7 +170,7 @@ namespace Tyr.Tasks
         {
             Unit broodling = null;
             float dist = 6 * 6;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.BROODLING)
                     continue;

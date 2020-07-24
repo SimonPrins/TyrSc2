@@ -56,8 +56,8 @@ namespace Tyr.Builds.Protoss
                 WorkerScoutTask.Enable();
             ArmyObserverTask.Enable();
             ObserverScoutTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ArchonMergeTask.Enable();
             ShieldRegenTask.Enable();
             HodorTask.Enable();
@@ -102,7 +102,7 @@ namespace Tyr.Builds.Protoss
                 WallIn.ReserveSpace();
                 foreach (WallBuilding building in WallIn.Wall)
                     if (building.Type == UnitTypes.PYLON)
-                        Bot.Bot.buildingPlacer.ReservedLocation.Add(new ReservedBuilding() { Type = UnitTypes.NEXUS, Pos = building.Pos });
+                        Bot.Main.buildingPlacer.ReservedLocation.Add(new ReservedBuilding() { Type = UnitTypes.NEXUS, Pos = building.Pos });
             }
 
             Base third = null;
@@ -133,7 +133,7 @@ namespace Tyr.Builds.Protoss
             BuildList result = new BuildList();
 
             result.If(() => { return !EarlyPool.Get().Detected; });
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -205,7 +205,7 @@ namespace Tyr.Builds.Protoss
             BuildList result = new BuildList();
 
             result.Building(UnitTypes.NEXUS);
-            result.If(() => Bot.Bot.Frame >= 22.4 * 17);
+            result.If(() => Bot.Main.Frame >= 22.4 * 17);
             if (WallIn.Wall.Count >= 5)
             {
                 result.Building(UnitTypes.PYLON, Natural, WallIn.Wall[4].Pos, true);
@@ -220,7 +220,7 @@ namespace Tyr.Builds.Protoss
             }
             result.If(() => Count(UnitTypes.GATEWAY) > 0);
             //result.Building(UnitTypes.ASSIMILATOR, () => !EarlyPool.Get().Detected || Expanded.Get().Detected || Count(UnitTypes.ZEALOT) >= 6);
-            result.Building(UnitTypes.ASSIMILATOR, () => Bot.Bot.Frame >= 22.4 * 53);
+            result.Building(UnitTypes.ASSIMILATOR, () => Bot.Main.Frame >= 22.4 * 53);
             result.Building(UnitTypes.NEXUS, () => (!EarlyPool.Get().Detected || Completed(UnitTypes.ADEPT) + Completed(UnitTypes.ZEALOT) >= 3 || RoachRushDetected) && (!RoachRushDetected || Completed(UnitTypes.IMMORTAL) > 0));
             if (WallIn.Wall.Count >= 5)
                 result.Building(UnitTypes.CYBERNETICS_CORE, Natural, WallIn.Wall[1].Pos, true);
@@ -285,11 +285,11 @@ namespace Tyr.Builds.Protoss
             if (WallIn.Wall.Count < 5)
                 return null;
 
-            if (Bot.Bot.Map == MapEnum.DiscoBloodbath
+            if (Bot.Main.Map == MapEnum.DiscoBloodbath
                 && Main.BaseLocation.Pos.X <= 100)
                 return new Point2D() { X = WallIn.Wall[4].Pos.X, Y = WallIn.Wall[4].Pos.Y + 2 };
 
-            if (Bot.Bot.Map == MapEnum.Zen)
+            if (Bot.Main.Map == MapEnum.Zen)
             {
                 if (Main.BaseLocation.Pos.X <= 100)
                     return new Point2D() { X = 64, Y = 58 };
@@ -301,7 +301,7 @@ namespace Tyr.Builds.Protoss
             if (Math.Abs(pos.X - Natural.BaseLocation.Pos.X) <= 3
                 && Math.Abs(pos.Y - Natural.BaseLocation.Pos.Y) <= 3)
                 return null;
-            if (Bot.Bot.buildingPlacer.CheckPlacement(pos, SC2Util.Point(2, 2), UnitTypes.PYLON, null, true))
+            if (Bot.Main.buildingPlacer.CheckPlacement(pos, SC2Util.Point(2, 2), UnitTypes.PYLON, null, true))
                 return pos;
             return null;
         }
@@ -387,7 +387,7 @@ namespace Tyr.Builds.Protoss
 
             if (!ActiveHatchery)
             {
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.HATCHERY)
                         continue;
@@ -399,20 +399,20 @@ namespace Tyr.Builds.Protoss
 
             if (!RoachRushDetected && CounterRoaches)
             {
-                if (Bot.Bot.Frame < 22.4 * 60 * 4.5
+                if (Bot.Main.Frame < 22.4 * 60 * 4.5
                     && TotalEnemyCount(UnitTypes.ROACH_WARREN) > 0)
                     RoachRushDetected = true;
-                if (Bot.Bot.Frame < 22.4 * 60 * 2.5
+                if (Bot.Main.Frame < 22.4 * 60 * 2.5
                     && TotalEnemyCount(UnitTypes.LAIR) > 0)
                     RoachRushDetected = true;
-                if (Bot.Bot.Frame < 22.4 * 60 * 2.5
+                if (Bot.Main.Frame < 22.4 * 60 * 2.5
                     && ActiveHatchery
                     && EarlyPool.Get().Detected)
                     RoachRushDetected = true;
-                else if (Bot.Bot.Frame < 22.4 * 60 * 5
+                else if (Bot.Main.Frame < 22.4 * 60 * 5
                     && TotalEnemyCount(UnitTypes.ROACH) > 0)
                     RoachRushDetected = true;
-                else if (Bot.Bot.Frame < 22.4 * 60 * 5
+                else if (Bot.Main.Frame < 22.4 * 60 * 5
                     && EnemyCount(UnitTypes.ROACH_WARREN) > 0)
                 {
                     foreach (Unit enemy in tyr.Enemies())
@@ -432,7 +432,7 @@ namespace Tyr.Builds.Protoss
 
             if (!WarpPrismTask.Task.WarpInObjectiveSet()
                 && TimingAttackTask.Task.Units.Count > 0
-                && Bot.Bot.Frame % 112 == 0)
+                && Bot.Main.Frame % 112 == 0)
             {
                 int desiredZealots = Math.Min(Minerals() / 100, Math.Min(Completed(UnitTypes.WARP_GATE), 10 - Count(UnitTypes.ZEALOT)));
                 if (desiredZealots > 0)
@@ -489,17 +489,17 @@ namespace Tyr.Builds.Protoss
 
             if (RoachRushDetected)
                 BalanceGas();
-            else if (Bot.Bot.Frame < 22.4 * 60 * 2
+            else if (Bot.Main.Frame < 22.4 * 60 * 2
                 && Count(UnitTypes.NEXUS) < 2)
                 GasWorkerTask.WorkersPerGas = 1;
-            else if (Bot.Bot.Frame < 22.4 * 60 * 2
+            else if (Bot.Main.Frame < 22.4 * 60 * 2
                 && Count(UnitTypes.ASSIMILATOR) < 2)
                 GasWorkerTask.WorkersPerGas = 2;
             else
                 BalanceGas();
 
             bool gatewayExists = false;
-            foreach (Agent agent in Bot.Bot.Units())
+            foreach (Agent agent in Bot.Main.Units())
                 if (agent.Unit.UnitType == UnitTypes.GATEWAY
                     || agent.Unit.UnitType == UnitTypes.WARP_GATE)
                     gatewayExists = true;

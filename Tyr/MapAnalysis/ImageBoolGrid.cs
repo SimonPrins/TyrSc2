@@ -6,7 +6,7 @@ namespace Tyr.MapAnalysis
     public class ImageBoolGrid : BoolGrid
     {
         private ImageData data;
-        private int trueValue = Bot.Bot.OldMapData ? 255 : 1;
+        private int trueValue = Bot.Main.OldMapData ? 255 : 1;
 
         public ImageBoolGrid(ImageData data)
         {

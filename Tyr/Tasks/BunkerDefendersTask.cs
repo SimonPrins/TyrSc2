@@ -13,7 +13,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public BunkerDefendersTask() : base(10)
@@ -23,7 +23,7 @@ namespace Tyr.Tasks
         {
             if (GetBunker() == null)
                 return false;
-            return agent.Unit.UnitType == UnitTypes.MARINE && Units.Count < Bot.Bot.Build.Count(UnitTypes.BUNKER) * 4;
+            return agent.Unit.UnitType == UnitTypes.MARINE && Units.Count < Bot.Main.Build.Count(UnitTypes.BUNKER) * 4;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -31,7 +31,7 @@ namespace Tyr.Tasks
             List<UnitDescriptor> descriptors = new List<UnitDescriptor>();
 
             descriptors.Add(new UnitDescriptor() {
-                Count = Bot.Bot.Build.Completed(UnitTypes.BUNKER) * 4 - Units.Count,
+                Count = Bot.Main.Build.Completed(UnitTypes.BUNKER) * 4 - Units.Count,
                 UnitTypes = new HashSet<uint>() { UnitTypes.MARINE }
             });
 
@@ -40,7 +40,7 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Bot.Bot.Build.Completed(UnitTypes.BUNKER) > 0 && !LeaveBunkers;
+            return Bot.Main.Build.Completed(UnitTypes.BUNKER) > 0 && !LeaveBunkers;
         }
 
         public override void OnFrame(Bot tyr)
@@ -66,12 +66,12 @@ namespace Tyr.Tasks
 
         public Agent GetBunker()
         {
-            if (Bot.Bot.Frame == BunkerDeterminedFrame)
+            if (Bot.Main.Frame == BunkerDeterminedFrame)
                 return Bunker;
-            BunkerDeterminedFrame = Bot.Bot.Frame;
+            BunkerDeterminedFrame = Bot.Main.Frame;
 
             Bunker = null;
-            foreach (Agent bunker in Bot.Bot.UnitManager.Agents.Values)
+            foreach (Agent bunker in Bot.Main.UnitManager.Agents.Values)
             {
                 if (bunker.Unit.UnitType != UnitTypes.BUNKER
                     || bunker.Unit.BuildProgress < 0.90)

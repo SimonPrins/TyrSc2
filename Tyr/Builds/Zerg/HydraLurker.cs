@@ -100,17 +100,17 @@ namespace Tyr.Builds.Zerg
         private BuildList MainBuild()
         {
             BuildList result = new BuildList();
-            result.Building(UnitTypes.HATCHERY, 2, () => { return Bot.Bot.EnemyRace != Race.Protoss || (Count(UnitTypes.HATCHERY) + Count(UnitTypes.LAIR) + Count(UnitTypes.HIVE) < 2); });
+            result.Building(UnitTypes.HATCHERY, 2, () => { return Bot.Main.EnemyRace != Race.Protoss || (Count(UnitTypes.HATCHERY) + Count(UnitTypes.LAIR) + Count(UnitTypes.HIVE) < 2); });
             result.Building(UnitTypes.SPAWNING_POOL);
             result.If(() => { return Count(UnitTypes.QUEEN) > 0; });
-            result.If(() => { return Completed(UnitTypes.HATCHERY) >= 2 && Bot.Bot.Frame >= 22.4 * 60 * 2; });
+            result.If(() => { return Completed(UnitTypes.HATCHERY) >= 2 && Bot.Main.Frame >= 22.4 * 60 * 2; });
             result.Building(UnitTypes.EXTRACTOR);
-            result.Building(UnitTypes.SPINE_CRAWLER, Natural, Bot.Bot.MapAnalyzer.Walk(NaturalDefensePos, Bot.Bot.MapAnalyzer.EnemyDistances, 5), 2);
+            result.Building(UnitTypes.SPINE_CRAWLER, Natural, Bot.Main.MapAnalyzer.Walk(NaturalDefensePos, Bot.Main.MapAnalyzer.EnemyDistances, 5), 2);
             result.If(() => { return Count(UnitTypes.ZERGLING) >= RequiredZerglings && Count(UnitTypes.DRONE) >= 20; });
             result.Building(UnitTypes.EXTRACTOR);
             result.Building(UnitTypes.HYDRALISK_DEN);
             result.Building(UnitTypes.EXTRACTOR, 2);
-            result.Building(UnitTypes.EXTRACTOR, 2, () => { return Bot.Bot.EnemyRace != Race.Protoss; });
+            result.Building(UnitTypes.EXTRACTOR, 2, () => { return Bot.Main.EnemyRace != Race.Protoss; });
             result.If(() => { return Count(UnitTypes.HYDRALISK) >= 5; });
             result.Building(UnitTypes.LURKER_DEN);
             return result;
@@ -165,9 +165,9 @@ namespace Tyr.Builds.Zerg
                 MorphingTask.Task.Morph(UnitTypes.OVERSEER);
 
             if (FoodUsed()
-                        + Bot.Bot.UnitManager.Count(UnitTypes.HATCHERY) * 2
-                        + Bot.Bot.UnitManager.Count(UnitTypes.LAIR) * 2
-                        + Bot.Bot.UnitManager.Count(UnitTypes.HIVE) * 2
+                        + Bot.Main.UnitManager.Count(UnitTypes.HATCHERY) * 2
+                        + Bot.Main.UnitManager.Count(UnitTypes.LAIR) * 2
+                        + Bot.Main.UnitManager.Count(UnitTypes.HIVE) * 2
                         >= ExpectedAvailableFood() - 2)
                 MorphingTask.Task.Morph(UnitTypes.OVERLORD);
             else if (Count(UnitTypes.DRONE) >= 14 && Count(UnitTypes.SPAWNING_POOL) == 0) { }
@@ -218,12 +218,12 @@ namespace Tyr.Builds.Zerg
                     && Completed(UnitTypes.INFESTATION_PIT) > 0
                     && Minerals() >= 200 && Gas() >= 150
                     && Count(UnitTypes.LURKER) >= 4
-                    && Bot.Bot.EnemyRace == Race.Protoss)
+                    && Bot.Main.EnemyRace == Race.Protoss)
                     agent.Order(1218);
             }
             else if (agent.Unit.UnitType == UnitTypes.HYDRALISK_DEN)
             {
-                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(134)
+                if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(134)
                     && Gas() >= 100
                     && Minerals() >= 100)
                     agent.Order(1282);

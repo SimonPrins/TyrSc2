@@ -13,9 +13,9 @@ namespace Tyr.Micro
             if (agent.Unit.UnitType != UnitTypes.BANSHEE)
                 return false;
 
-            if (Bot.Bot.Frame % 22 == 0)
+            if (Bot.Main.Frame % 22 == 0)
             {
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (!UnitTypes.CanAttackAir(enemy.UnitType))
                         continue;
@@ -28,7 +28,7 @@ namespace Tyr.Micro
             }
             Unit targetWorker = null;
             float distance = 9 * 9;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.IsFlying)
                     continue;

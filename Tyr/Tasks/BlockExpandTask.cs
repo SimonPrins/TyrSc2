@@ -18,19 +18,19 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
         {
-            return agent.Unit.UnitType == UnitTypes.PROBE && units.Count == 0 && Bot.Bot.Frame <= 220;
+            return agent.Unit.UnitType == UnitTypes.PROBE && units.Count == 0 && Bot.Main.Frame <= 220;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
             if (Units.Count == 0)
-                result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = UnitTypes.WorkerTypes });
+                result.Add(new UnitDescriptor() { Pos = Bot.Main.TargetManager.AttackTarget, Count = 1, UnitTypes = UnitTypes.WorkerTypes });
             return result;
         }
 

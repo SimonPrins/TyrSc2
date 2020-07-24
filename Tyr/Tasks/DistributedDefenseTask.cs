@@ -29,7 +29,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             AirDefenseTask.Stopped = false;
-            Bot.Bot.TaskManager.Add(AirDefenseTask);
+            Bot.Main.TaskManager.Add(AirDefenseTask);
         }
 
         public override bool DoWant(Agent agent)
@@ -42,15 +42,15 @@ namespace Tyr.Tasks
                 return false;
             if (!agent.CanAttackGround() && !Air)
                 return false;
-            return SC2Util.DistanceSq(agent.Unit.Pos, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation)) <= DrawDefenderRadius * DrawDefenderRadius;
+            return SC2Util.DistanceSq(agent.Unit.Pos, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation)) <= DrawDefenderRadius * DrawDefenderRadius;
         }
 
         public override bool IsNeeded()
         {
-            foreach (Unit unit in Bot.Bot.Observation.Observation.RawData.Units)
-                if (unit.Owner != Bot.Bot.PlayerId
+            foreach (Unit unit in Bot.Main.Observation.Observation.RawData.Units)
+                if (unit.Owner != Bot.Main.PlayerId
                     && !IgnoreEnemyTypes.Contains(unit.UnitType)
-                    && unit.Owner != Bot.Bot.NeutralPlayerId
+                    && unit.Owner != Bot.Main.NeutralPlayerId
                     && unit.UnitType != UnitTypes.ADEPT_PHASE_SHIFT
                     && unit.UnitType != UnitTypes.KD8_CHARGE
                     && unit.UnitType != UnitTypes.OVERLORD
@@ -66,12 +66,12 @@ namespace Tyr.Tasks
                         continue;
                     if (!unit.IsFlying && Air)
                         continue;
-                    if (SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation)) <= MainDefenseRadius * MainDefenseRadius)
+                    if (SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation)) <= MainDefenseRadius * MainDefenseRadius)
                         return true;
-                    if (SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation)) >= MaxDefenseRadius * MaxDefenseRadius)
+                    if (SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation)) >= MaxDefenseRadius * MaxDefenseRadius)
                         continue;
-                    foreach (Base b in Bot.Bot.BaseManager.Bases)
-                        if (b.Owner == Bot.Bot.PlayerId && SC2Util.DistanceSq(unit.Pos, b.BaseLocation.Pos) <= ExpandDefenseRadius * ExpandDefenseRadius)
+                    foreach (Base b in Bot.Main.BaseManager.Bases)
+                        if (b.Owner == Bot.Main.PlayerId && SC2Util.DistanceSq(unit.Pos, b.BaseLocation.Pos) <= ExpandDefenseRadius * ExpandDefenseRadius)
                             return true;
                 }
             Clear();
@@ -88,7 +88,7 @@ namespace Tyr.Tasks
 
             int requiredDefenders = attackers.Count - Units.Count;
             if (requiredDefenders > 0)
-                descriptors.Add(new UnitDescriptor() { UnitTypes = AllowedDefenderTypes.Count > 0 ? AllowedDefenderTypes : null, Count = requiredDefenders , Pos = Bot.Bot.BaseManager.Main.BaseLocation.Pos });
+                descriptors.Add(new UnitDescriptor() { UnitTypes = AllowedDefenderTypes.Count > 0 ? AllowedDefenderTypes : null, Count = requiredDefenders , Pos = Bot.Main.BaseManager.Main.BaseLocation.Pos });
             return descriptors;
         }
 
@@ -174,10 +174,10 @@ namespace Tyr.Tasks
         public Dictionary<ulong, Unit> GetAttackers()
         {
             Dictionary<ulong, Unit> attackers = new Dictionary<ulong, Unit>();
-            foreach (Unit unit in Bot.Bot.Observation.Observation.RawData.Units)
-                if (unit.Owner != Bot.Bot.PlayerId
+            foreach (Unit unit in Bot.Main.Observation.Observation.RawData.Units)
+                if (unit.Owner != Bot.Main.PlayerId
                     && !IgnoreEnemyTypes.Contains(unit.UnitType)
-                    && unit.Owner != Bot.Bot.NeutralPlayerId
+                    && unit.Owner != Bot.Main.NeutralPlayerId
                     && unit.UnitType != UnitTypes.ADEPT_PHASE_SHIFT
                     && unit.UnitType != UnitTypes.KD8_CHARGE
                     && unit.UnitType != UnitTypes.OVERLORD
@@ -193,15 +193,15 @@ namespace Tyr.Tasks
                         continue;
                     if (!unit.IsFlying && Air)
                         continue;
-                    float newDist = SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
+                    float newDist = SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation));
                     if (newDist >= MaxDefenseRadius * MaxDefenseRadius)
                         continue;
 
                     bool nearBase = newDist <= MainDefenseRadius * MainDefenseRadius;
                     if (!nearBase)
                     {
-                        foreach (Base b in Bot.Bot.BaseManager.Bases)
-                            if (b.Owner == Bot.Bot.PlayerId && SC2Util.DistanceSq(unit.Pos, b.BaseLocation.Pos) <= ExpandDefenseRadius * ExpandDefenseRadius)
+                        foreach (Base b in Bot.Main.BaseManager.Bases)
+                            if (b.Owner == Bot.Main.PlayerId && SC2Util.DistanceSq(unit.Pos, b.BaseLocation.Pos) <= ExpandDefenseRadius * ExpandDefenseRadius)
                             {
                                 nearBase = true;
                                 break;

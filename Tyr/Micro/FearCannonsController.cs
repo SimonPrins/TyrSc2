@@ -30,7 +30,7 @@ namespace Tyr.Micro
 
             Point2D retreatFrom = null;
             dist = Range * Range;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if ((enemy.UnitType != UnitTypes.PHOTON_CANNON
                     && enemy.UnitType != UnitTypes.SPINE_CRAWLER
@@ -39,7 +39,7 @@ namespace Tyr.Micro
                     || enemy.BuildProgress < 1)
                     continue;
 
-                if (AttackCannonsInMain && Bot.Bot.MapAnalyzer.MainAndPocketArea[SC2Util.To2D(enemy.Pos)])
+                if (AttackCannonsInMain && Bot.Main.MapAnalyzer.MainAndPocketArea[SC2Util.To2D(enemy.Pos)])
                     continue;
 
                 float newDist = agent.DistanceSq(enemy);
@@ -51,7 +51,7 @@ namespace Tyr.Micro
             }
             if (retreatFrom != null && dist < Range * Range)
             {
-                agent.Order(Abilities.MOVE, Bot.Bot.MapAnalyzer.StartLocation);
+                agent.Order(Abilities.MOVE, Bot.Main.MapAnalyzer.StartLocation);
                 return true;
             }
 

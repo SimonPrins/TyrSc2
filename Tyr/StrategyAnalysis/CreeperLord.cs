@@ -18,11 +18,11 @@ namespace Tyr.StrategyAnalysis
         public override bool Detect()
         {
             HashSet<ulong> creeperLords = new HashSet<ulong>();
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.OVERLORD)
                     continue;
-                foreach (Agent agent in Bot.Bot.Units())
+                foreach (Agent agent in Bot.Main.Units())
                 {
                     if (!UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))
                         continue;
@@ -30,8 +30,8 @@ namespace Tyr.StrategyAnalysis
                     {
                         creeperLords.Add(enemy.Tag);
                         if (!LastExpansionHoverFrame.ContainsKey(enemy.Tag))
-                            LastExpansionHoverFrame.Add(enemy.Tag, Bot.Bot.Frame);
-                        else if (Bot.Bot.Frame - LastExpansionHoverFrame[enemy.Tag] >= 22.4 * 10)
+                            LastExpansionHoverFrame.Add(enemy.Tag, Bot.Main.Frame);
+                        else if (Bot.Main.Frame - LastExpansionHoverFrame[enemy.Tag] >= 22.4 * 10)
                             return true;
                         break;
                     }

@@ -24,7 +24,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public TimingAttackTask() : base(5)
@@ -44,12 +44,12 @@ namespace Tyr.Tasks
         public override bool IsNeeded()
         {
             if (UnitType != 0)
-                return Bot.Bot.UnitManager.Completed(UnitType) >= RequiredSize;
+                return Bot.Main.UnitManager.Completed(UnitType) >= RequiredSize;
             int combatUnits = 0;
             foreach (uint combatType in UnitTypes.CombatUnitTypes)
                 if (!UnitTypes.EquivalentTypes.ContainsKey(combatType)
                     && !ExcludeUnitTypes.Contains(combatType))
-                    combatUnits += Bot.Bot.UnitManager.Completed(combatType);
+                    combatUnits += Bot.Main.UnitManager.Completed(combatType);
             if (combatUnits >= RequiredSize)
             {
                 AttackSent = true;
@@ -58,7 +58,7 @@ namespace Tyr.Tasks
             if (Build.FoodUsed() > 194)
             {
                 bool producing = false;
-                foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
+                foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
                 {
                     if (agent.Unit.UnitType == UnitTypes.FACTORY
                         || agent.Unit.UnitType == UnitTypes.BARRACKS

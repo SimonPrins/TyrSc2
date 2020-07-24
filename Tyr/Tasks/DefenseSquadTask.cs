@@ -36,11 +36,11 @@ namespace Tyr.Tasks
         public static void Enable(bool excludeMainAndNatural, uint type)
         {
             if (Tasks.Count == 0)
-                foreach (Base b in Bot.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Main.BaseManager.Bases)
                 {
                     DefenseSquadTask task = new DefenseSquadTask(b, type);
                     Tasks.Add(task);
-                    Bot.Bot.TaskManager.Add(task);
+                    Bot.Main.TaskManager.Add(task);
                 }
 
             Enable(Tasks, excludeMainAndNatural, excludeMainAndNatural);
@@ -50,9 +50,9 @@ namespace Tyr.Tasks
         {
             foreach (DefenseSquadTask task in tasks)
             {
-                if (task.Base == Bot.Bot.BaseManager.Main && excludeMain)
+                if (task.Base == Bot.Main.BaseManager.Main && excludeMain)
                     task.Stopped = true;
-                else if (task.Base == Bot.Bot.BaseManager.Natural && excludeNatural)
+                else if (task.Base == Bot.Main.BaseManager.Natural && excludeNatural)
                     task.Stopped = true;
                 else
                     task.Stopped = false;
@@ -62,10 +62,10 @@ namespace Tyr.Tasks
         public static List<DefenseSquadTask>  GetDefenseTasks(uint type)
         {
             List<DefenseSquadTask> tasks = new List<DefenseSquadTask>();
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 DefenseSquadTask task = new DefenseSquadTask(b, type);
-                Bot.Bot.TaskManager.Add(task);
+                Bot.Main.TaskManager.Add(task);
                 tasks.Add(task);
             }
             return tasks;
@@ -76,7 +76,7 @@ namespace Tyr.Tasks
             return (agent.Unit.UnitType == Type || Type == 0)
                 && (UnitTypes.CombatUnitTypes.Contains(agent.Unit.UnitType) || Type != 0)
                 && units.Count < MaxDefenders
-                && (agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) <= 55 * 55 || DraftFromFarAway);
+                && (agent.DistanceSq(Bot.Main.MapAnalyzer.StartLocation) <= 55 * 55 || DraftFromFarAway);
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -91,12 +91,12 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Base.Owner == Bot.Bot.PlayerId || AlwaysNeeded;
+            return Base.Owner == Bot.Main.PlayerId || AlwaysNeeded;
         }
 
         public override void OnFrame(Bot tyr)
         {
-            if (Stopped || (Base.Owner != Bot.Bot.PlayerId && !AlwaysNeeded))
+            if (Stopped || (Base.Owner != Bot.Main.PlayerId && !AlwaysNeeded))
             {
                 Clear();
                 return;
@@ -111,7 +111,7 @@ namespace Tyr.Tasks
 
             float distance = DefendRange * DefendRange;
             Unit target = null;
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (unit.UnitType == UnitTypes.ADEPT_PHASE_SHIFT
                     || unit.UnitType == UnitTypes.KD8_CHARGE)

@@ -14,7 +14,7 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            return (Bot.Bot.EnemyRace == Race.Protoss || Bot.Bot.EnemyRace == Race.Random)
+            return (Bot.Main.EnemyRace == Race.Protoss || Bot.Main.EnemyRace == Race.Random)
                 && Count(UnitTypes.CARRIER) + Count(UnitTypes.MOTHERSHIP) + Count(UnitTypes.INTERCEPTOR) > 0;
         }
 

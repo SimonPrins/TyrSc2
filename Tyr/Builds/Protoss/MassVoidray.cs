@@ -43,14 +43,14 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             FlyerAttackTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             WorkerSafetyTask.Enable();
             WorkerScoutTask.Enable();
             RecallTask.Enable();
 
             FlyerDestroyTask.Enable();
-            if (Bot.Bot.EnemyRace == Race.Protoss)
+            if (Bot.Main.EnemyRace == Race.Protoss)
                 ProxySpotterTask.Enable();
         }
 
@@ -105,7 +105,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.PYLON, Natural);
             result.Building(UnitTypes.SHIELD_BATTERY, Natural, NaturalDefensePos);
             result.If(() => { return !DefendReapers; });
-            result.If(() => { return Minerals() >= 650 && Bot.Bot.Frame % 9 == 0; });
+            result.If(() => { return Minerals() >= 650 && Bot.Main.Frame % 9 == 0; });
             result.Building(UnitTypes.PHOTON_CANNON, Natural, NaturalDefensePos, 2);
             result.If(() => { return Minerals() >= 650; });
             result.Building(UnitTypes.PHOTON_CANNON, Natural, NaturalDefensePos, 2);
@@ -134,13 +134,13 @@ namespace Tyr.Builds.Protoss
 
             result.If(() => BuildDefenses());
             Base reaperBase = null;
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
-                if (b != Bot.Bot.BaseManager.Main && b != Bot.Bot.BaseManager.Natural)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
+                if (b != Bot.Main.BaseManager.Main && b != Bot.Main.BaseManager.Natural)
                     reaperBase = b;
 
             Base naturalMirrorBase = null;
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
-                if (b != Bot.Bot.BaseManager.Main && b != Bot.Bot.BaseManager.Natural
+            foreach (Base b in Bot.Main.BaseManager.Bases)
+                if (b != Bot.Main.BaseManager.Main && b != Bot.Main.BaseManager.Natural
                     && b != reaperBase)
                     naturalMirrorBase = b;
 
@@ -283,7 +283,7 @@ namespace Tyr.Builds.Protoss
             }
                 
 
-            if (!DefendRush && tyr.Frame <= 4800 && Bot.Bot.EnemyRace != Race.Zerg)
+            if (!DefendRush && tyr.Frame <= 4800 && Bot.Main.EnemyRace != Race.Zerg)
             {
                 int enemyCount = 0;
                 foreach (Unit enemy in tyr.Enemies())
@@ -302,7 +302,7 @@ namespace Tyr.Builds.Protoss
                 foreach (Unit unit in tyr.Enemies())
                 {
                     if (unit.UnitType == UnitTypes.REAPER
-                        && Bot.Bot.MapAnalyzer.StartArea[(int)System.Math.Round(unit.Pos.X), (int)System.Math.Round(unit.Pos.Y)])
+                        && Bot.Main.MapAnalyzer.StartArea[(int)System.Math.Round(unit.Pos.X), (int)System.Math.Round(unit.Pos.Y)])
                     {
                         Point2D dir = SC2Util.Point(unit.Pos.X - tyr.MapAnalyzer.StartLocation.X, unit.Pos.Y - tyr.MapAnalyzer.StartLocation.Y);
                         float length = (float)System.Math.Sqrt(dir.X * dir.X + dir.Y * dir.Y);

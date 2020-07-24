@@ -31,7 +31,7 @@ namespace Tyr.Tasks
         public override List<UnitDescriptor> GetDescriptors()
         {
             if (IdleLocation == null)
-                IdleLocation = Bot.Bot.MapAnalyzer.GetMainRamp();
+                IdleLocation = Bot.Main.MapAnalyzer.GetMainRamp();
             List<UnitDescriptor> result = new List<UnitDescriptor>();
             if (units.Count == 0)
                 result.Add(new UnitDescriptor() { Pos = IdleLocation, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.SIEGE_TANK, UnitTypes.SIEGE_TANK_SIEGED } });

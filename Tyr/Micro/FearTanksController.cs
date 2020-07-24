@@ -12,9 +12,9 @@ namespace Tyr.Micro
             Point2D retreatFrom = null;
             float dist = 15 * 15;
 
-            foreach (UnitLocation enemy in Bot.Bot.EnemyTankManager.Tanks)
+            foreach (UnitLocation enemy in Bot.Main.EnemyTankManager.Tanks)
             {
-                if (!Bot.Bot.EnemyManager.LastSeenFrame.ContainsKey(enemy.Tag))
+                if (!Bot.Main.EnemyManager.LastSeenFrame.ContainsKey(enemy.Tag))
                     continue;
                 float newDist = agent.DistanceSq(enemy.Pos);
                 if (enemy.UnitType != UnitTypes.SIEGE_TANK_SIEGED)

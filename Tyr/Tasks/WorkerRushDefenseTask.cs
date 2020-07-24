@@ -30,7 +30,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -40,33 +40,33 @@ namespace Tyr.Tasks
 
         private bool GetWorkerRushHappening()
         {
-            if (Bot.Bot.Frame == WorkerRushHappeningFrame)
+            if (Bot.Main.Frame == WorkerRushHappeningFrame)
                 return WorkerRushHappening;
 
-            WorkerRushHappeningFrame = Bot.Bot.Frame;
+            WorkerRushHappeningFrame = Bot.Main.Frame;
 
             int invadingWorkers = 0;
             int dist = WorkerRushHappening ? 80 * 80 : 30 * 30;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!UnitTypes.WorkerTypes.Contains(enemy.UnitType))
                     continue;
 
-                if (SC2Util.DistanceSq(enemy.Pos, Bot.Bot.MapAnalyzer.StartLocation) <= dist)
+                if (SC2Util.DistanceSq(enemy.Pos, Bot.Main.MapAnalyzer.StartLocation) <= dist)
                     invadingWorkers++;
             }
             if (!WorkerRushHappening && invadingWorkers >= 8)
             {
                 WorkerRushHappening = true;
                 State = GatherDefenders;
-                GatherDefendersStartFrame = Bot.Bot.Frame;
+                GatherDefendersStartFrame = Bot.Main.Frame;
             }
 
             if (WorkerRushHappening && invadingWorkers == 0)
                 WorkerRushHappening = false;
 
-            Bot.Bot.DrawText("Invading workers: " + invadingWorkers);
-            Bot.Bot.DrawText("Workerrush happening: " + WorkerRushHappening);
+            Bot.Main.DrawText("Invading workers: " + invadingWorkers);
+            Bot.Main.DrawText("Workerrush happening: " + WorkerRushHappening);
 
             return WorkerRushHappening;
         }

@@ -12,7 +12,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public AttackTask() : base(10)
@@ -30,11 +30,11 @@ namespace Tyr.Tasks
         public override bool IsNeeded()
         {
             if (UnitType != 0)
-                return Bot.Bot.UnitManager.Completed(UnitType) > LeaveAtHome;
+                return Bot.Main.UnitManager.Completed(UnitType) > LeaveAtHome;
             int combatUnits = 0;
             foreach (uint combatType in UnitTypes.CombatUnitTypes)
                 if (!UnitTypes.EquivalentTypes.ContainsKey(combatType))
-                    combatUnits += Bot.Bot.UnitManager.Completed(combatType);
+                    combatUnits += Bot.Main.UnitManager.Completed(combatType);
             if (combatUnits > LeaveAtHome)
                 return true;
             return false;

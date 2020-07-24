@@ -24,13 +24,13 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ScoutTask.Enable();
             ArmyObserverTask.Enable();
-            if (Bot.Bot.EnemyRace == SC2APIProtocol.Race.Zerg || Bot.Bot.EnemyRace == SC2APIProtocol.Race.Protoss)
+            if (Bot.Main.EnemyRace == SC2APIProtocol.Race.Zerg || Bot.Main.EnemyRace == SC2APIProtocol.Race.Protoss)
                 ForceFieldRampTask.Enable();
             WorkerRushDefenseTask.Enable();
             KillOwnUnitTask.Enable();
@@ -85,7 +85,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.PYLON, Main, WallIn.Wall[1].Pos, true);
             result.If(() => Completed(UnitTypes.PYLON) > 0);
-            result.Building(UnitTypes.FORGE, Main, WallIn.Wall[2].Pos, true, () => Bot.Bot.Frame < 22.4 * 60 * 4);
+            result.Building(UnitTypes.FORGE, Main, WallIn.Wall[2].Pos, true, () => Bot.Main.Frame < 22.4 * 60 * 4);
             result.Building(UnitTypes.GATEWAY, Main, WallIn.Wall[0].Pos, true);
             result.Building(UnitTypes.PHOTON_CANNON, Main, WallIn.Wall[1].Pos, 5, () => Completed(UnitTypes.FORGE) > 0);
             result.Building(UnitTypes.ASSIMILATOR);
@@ -108,7 +108,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.CYBERNETICS_CORE);
             result.Building(UnitTypes.GATEWAY);
             result.Building(UnitTypes.ASSIMILATOR);
-            result.If(() => Bot.Bot.Frame >= 22.4 * 131);
+            result.If(() => Bot.Main.Frame >= 22.4 * 131);
             result.Building(UnitTypes.ROBOTICS_FACILITY, () => !DefendColossus);
             result.Building(UnitTypes.STARGATE, () => DefendColossus);
             result.Building(UnitTypes.NEXUS);

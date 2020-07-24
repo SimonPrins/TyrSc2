@@ -14,24 +14,24 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            if (Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) > 0 && Bot.Bot.Frame <= 22.4 * 90)
+            if (Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) > 0 && Bot.Main.Frame <= 22.4 * 90)
                 return true;
             if (!Expanded.Get().Detected
-                && Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.SPAWNING_POOL) > 0 && Bot.Bot.Frame <= 22.4 * 120)
+                && Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.SPAWNING_POOL) > 0 && Bot.Main.Frame <= 22.4 * 120)
             {
                 float hp = -1;
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                     if (enemy.UnitType == UnitTypes.SPAWNING_POOL)
                         hp = enemy.Health;
-                if ((22.4 * 120 - Bot.Bot.Frame) * 0.85 + hp >= 900)
+                if ((22.4 * 120 - Bot.Main.Frame) * 0.85 + hp >= 900)
                     return true;
-            } else if (Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.SPAWNING_POOL) > 0 && Bot.Bot.Frame <= 22.4 * 105)
+            } else if (Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.SPAWNING_POOL) > 0 && Bot.Main.Frame <= 22.4 * 105)
             {
                 float hp = -1;
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                     if (enemy.UnitType == UnitTypes.SPAWNING_POOL)
                         hp = enemy.Health;
-                if ((22.4 * 105 - Bot.Bot.Frame) * 0.85 + hp >= 900)
+                if ((22.4 * 105 - Bot.Main.Frame) * 0.85 + hp >= 900)
                     return true;
             }
             return false;

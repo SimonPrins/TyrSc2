@@ -49,8 +49,8 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => { return Bot.Bot.EnemyRace != Race.Terran || Count(UnitTypes.GATEWAY) >= 2; });
-            if (Bot.Bot.EnemyRace == Race.Zerg)
+            result.If(() => { return Bot.Main.EnemyRace != Race.Terran || Count(UnitTypes.GATEWAY) >= 2; });
+            if (Bot.Main.EnemyRace == Race.Zerg)
                 result.If(() => { return !EarlyPool.Get().Detected || Expanded.Get().Detected || Completed(UnitTypes.ZEALOT) >= 2; });
             result.Building(UnitTypes.NEXUS, 2);
             result.If(() => { return Attacking; });
@@ -76,7 +76,7 @@ namespace Tyr.Builds.Protoss
 
             result.Building(UnitTypes.PYLON);
             result.Building(UnitTypes.GATEWAY);
-            if (Bot.Bot.EnemyRace != Race.Terran)
+            if (Bot.Main.EnemyRace != Race.Terran)
                 result.If(() => { return !EarlyPool.Get().Detected || Expanded.Get().Detected || Completed(UnitTypes.ZEALOT) >= 2; });
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.PYLON, Natural, NaturalDefensePos);
@@ -249,7 +249,7 @@ namespace Tyr.Builds.Protoss
             {
                 if (Minerals() >= 150
                     && Gas() >= 150
-                    && !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
+                    && !Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
                     && !UseImmortals)
                 {
                     agent.Order(1097);
@@ -257,7 +257,7 @@ namespace Tyr.Builds.Protoss
             }
             else if (agent.Unit.UnitType == UnitTypes.TEMPLAR_ARCHIVE)
             {
-                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(52)
+                if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(52)
                     && Minerals() >= 200
                     && Gas() >= 200)
                     agent.Order(1126);
@@ -266,18 +266,18 @@ namespace Tyr.Builds.Protoss
             {
                 if (UseStalkers)
                 {
-                    if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
+                    if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
                          && Minerals() >= 150
                          && Gas() >= 150)
                         agent.Order(1593);
                 }
                 else
                 {
-                    if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
+                    if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
                         && Minerals() >= 100
                         && Gas() >= 100)
                         agent.Order(1594);
-                    else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
+                    else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
                          && Minerals() >= 100
                          && Gas() >= 100)
                         agent.Order(1592);

@@ -50,7 +50,7 @@ namespace Tyr.Micro
                 float dist = 10 * 10;
                 int priority = -1;
 
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (enemy.IsFlying && !agent.CanAttackAir())
                         continue;

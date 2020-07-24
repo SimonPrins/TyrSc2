@@ -75,9 +75,9 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => { return Bot.Bot.EnemyRace != Race.Terran || Count(UnitTypes.GATEWAY) >= 2; });
-            result.If(() => { return Bot.Bot.EnemyRace != Race.Zerg || Count(UnitTypes.GATEWAY) >= 1; });
-            if (Bot.Bot.EnemyRace == Race.Zerg)
+            result.If(() => { return Bot.Main.EnemyRace != Race.Terran || Count(UnitTypes.GATEWAY) >= 2; });
+            result.If(() => { return Bot.Main.EnemyRace != Race.Zerg || Count(UnitTypes.GATEWAY) >= 1; });
+            if (Bot.Main.EnemyRace == Race.Zerg)
                 result.If(() => { return !EarlyPool.Get().Detected || Expanded.Get().Detected || Completed(UnitTypes.ZEALOT) + Completed(UnitTypes.ADEPT) >= 15; });
             result.Building(UnitTypes.NEXUS, 2);
             result.If(() => { return Attacking; });
@@ -90,9 +90,9 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => { return Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK) + Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.SPIRE) > 0; });
+            result.If(() => { return Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK) + Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.SPIRE) > 0; });
             result.Building(UnitTypes.FORGE);
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -109,7 +109,7 @@ namespace Tyr.Builds.Protoss
 
             result.If(() => !EarlyPool.Get().Detected);
             result.If(() => Count(UnitTypes.NEXUS) >= 4 || Minerals() >= 600);
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -146,7 +146,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.PYLON, Main, WallIn.Wall[1].Pos, true);
             result.Building(UnitTypes.GATEWAY, Main, WallIn.Wall[0].Pos, true, () => Completed(UnitTypes.PYLON) > 0);
-            if (Bot.Bot.EnemyRace != Race.Terran)
+            if (Bot.Main.EnemyRace != Race.Terran)
                 result.If(() => { return !EarlyPool.Get().Detected || Expanded.Get().Detected || Completed(UnitTypes.ZEALOT) + Completed(UnitTypes.ADEPT) >= 15; });
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.ASSIMILATOR);
@@ -203,9 +203,9 @@ namespace Tyr.Builds.Protoss
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.Stopped = Completed(UnitTypes.ZEALOT) >= 5;
             
-            if (Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 5 && tyr.Frame <= 22.4 * 60 * 2)
+            if (Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 5 && tyr.Frame <= 22.4 * 60 * 2)
                 SmellCheese = true;
-            if (Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.SPAWNING_POOL) > 0 && tyr.Frame <= 22.4 * 60 * 1.4 && !Expanded.Get().Detected)
+            if (Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.SPAWNING_POOL) > 0 && tyr.Frame <= 22.4 * 60 * 1.4 && !Expanded.Get().Detected)
                 SmellCheese = true;
             if (!SpinePushDetected && SmellCheese)
             {
@@ -352,12 +352,12 @@ namespace Tyr.Builds.Protoss
             }
             else if (agent.Unit.UnitType == UnitTypes.TWILIGHT_COUNSEL)
             {
-                    if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
+                    if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
                         && Minerals() >= 100
                         && Gas() >= 100
                         && Completed(UnitTypes.ADEPT) > 0)
                         agent.Order(1594);
-                    else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
+                    else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
                          && Minerals() >= 100
                          && Gas() >= 100)
                         agent.Order(1592);

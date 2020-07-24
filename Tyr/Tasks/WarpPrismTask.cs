@@ -41,7 +41,7 @@ namespace Tyr.Tasks
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
             if (Units.Count == 0)
-                result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.WARP_PRISM } });
+                result.Add(new UnitDescriptor() { Pos = Bot.Main.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.WARP_PRISM } });
             return result;
         }
 
@@ -117,10 +117,10 @@ namespace Tyr.Tasks
                     continue;
                 }
 
-                if ((agent.DistanceSq(armyLocation) >= 10 * 10 || Bot.Bot.Frame - WarpInStartFrane >= 22.4 * 20)
+                if ((agent.DistanceSq(armyLocation) >= 10 * 10 || Bot.Main.Frame - WarpInStartFrane >= 22.4 * 20)
                     && agent.Unit.UnitType == UnitTypes.WARP_PRISM_PHASING
                     && !WarpInInProgress
-                    && (!WarpInObjectiveSet() || Bot.Bot.Frame - WarpInStartFrane >= 22.4 * 20))
+                    && (!WarpInObjectiveSet() || Bot.Main.Frame - WarpInStartFrane >= 22.4 * 20))
                 {
                     agent.Order(Abilities.WarpPrismTransportMode);
                     continue;
@@ -171,12 +171,12 @@ namespace Tyr.Tasks
                 if (objective is PickUpObjective)
                 {
                     ulong tag = ((PickUpObjective)objective).UnitTag;
-                    if (!Bot.Bot.UnitManager.Agents.ContainsKey(tag))
+                    if (!Bot.Main.UnitManager.Agents.ContainsKey(tag))
                     {
                         Objectives.RemoveAt(i);
                         continue;
                     }
-                    Agent agent = Bot.Bot.UnitManager.Agents[tag];
+                    Agent agent = Bot.Main.UnitManager.Agents[tag];
                     if (!IsInDanger(agent))
                     {
                         Objectives.RemoveAt(i);
@@ -188,7 +188,7 @@ namespace Tyr.Tasks
                         foreach (PassengerUnit passenger in prism.Unit.Passengers)
                             if (passenger.Tag == tag)
                                 alreadyPickedUp = true;
-                        Bot.Bot.DrawLine(prism, agent.Unit.Pos);
+                        Bot.Main.DrawLine(prism, agent.Unit.Pos);
                     }
                     if (alreadyPickedUp)
                     {
@@ -198,7 +198,7 @@ namespace Tyr.Tasks
                     count++;
                 }
             }
-            foreach (Agent agent in Bot.Bot.Units())
+            foreach (Agent agent in Bot.Main.Units())
             {
                 if (count >= 2)
                     break;
@@ -212,7 +212,7 @@ namespace Tyr.Tasks
                     continue;
                 Objectives.Add(new PickUpObjective() { UnitTag = agent.Unit.Tag });
                 foreach (Agent prism in Units)
-                    Bot.Bot.DrawLine(prism, agent.Unit.Pos);
+                    Bot.Main.DrawLine(prism, agent.Unit.Pos);
                 count++;
             }
         }
@@ -221,7 +221,7 @@ namespace Tyr.Tasks
         {
             int closeEnemyValue = 0;
             float range = UnitTypes.LookUp[agent.Unit.UnitType].Weapons[0].Range;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (agent.DistanceSq(enemy) >= range * range)
                     continue;
@@ -234,7 +234,7 @@ namespace Tyr.Tasks
         private void UpdateWarpingInUnits()
         {
             WarpInInProgress = false;
-            foreach (Agent agent in Bot.Bot.Units())
+            foreach (Agent agent in Bot.Main.Units())
             {
                 if (agent.Unit.BuildProgress >= 0.99)
                     continue;
@@ -298,18 +298,18 @@ namespace Tyr.Tasks
                 if (agent.Command != null)
                     continue;
 
-                if (Bot.Bot.Frame - agent.LastOrderFrame < 5)
+                if (Bot.Main.Frame - agent.LastOrderFrame < 5)
                     continue;
 
                 if (agent.Unit.UnitType == UnitTypes.GATEWAY && UpgradeType.LookUp[UpgradeType.WarpGate].Done())
                     continue;
 
-                Bot.Bot.ReservedGas += trainType.Gas;
-                Bot.Bot.ReservedMinerals += trainType.Minerals;
+                Bot.Main.ReservedGas += trainType.Gas;
+                Bot.Main.ReservedMinerals += trainType.Minerals;
 
-                if (Bot.Bot.Build.Minerals() < 0)
+                if (Bot.Main.Build.Minerals() < 0)
                     return;
-                if (Bot.Bot.Build.Gas() < 0)
+                if (Bot.Main.Build.Gas() < 0)
                     return;
 
                 if (agent.Unit.UnitType == UnitTypes.WARP_GATE)
@@ -353,11 +353,11 @@ namespace Tyr.Tasks
 
         public Point2D GetArmyFrontPosition()
         {
-            Point2D target = Bot.Bot.TargetManager.AttackTarget;
+            Point2D target = Bot.Main.TargetManager.AttackTarget;
 
             Agent closest = null;
             float dist = 1000000;
-            foreach (Agent agent in Bot.Bot.Units())
+            foreach (Agent agent in Bot.Main.Units())
             {
                 if (IgnoreAllyUnitTypes.Contains(agent.Unit.UnitType))
                     continue;
@@ -380,7 +380,7 @@ namespace Tyr.Tasks
             Agent furthest = closest;
             dist = 0;
 
-            foreach (Agent agent in Bot.Bot.Units())
+            foreach (Agent agent in Bot.Main.Units())
             {
                 if (IgnoreAllyUnitTypes.Contains(agent.Unit.UnitType))
                     continue;
@@ -394,7 +394,7 @@ namespace Tyr.Tasks
                     continue;
 
                 float enemyDist = 1000000;
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                     if (UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                         enemyDist = Math.Min(enemyDist, agent.DistanceSq(enemy));
                 if (enemyDist < dist)
@@ -411,7 +411,7 @@ namespace Tyr.Tasks
         {
             Unit closestEnemy = null;
             float dist = 1000000;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                     continue;

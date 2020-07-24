@@ -15,12 +15,12 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            if (Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) == 0)
+            if (Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) == 0)
                 return false;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
                 if (enemy.UnitType == UnitTypes.PHOTON_CANNON
                     && enemy.BuildProgress >= 0.9
-                    && SC2Util.DistanceSq(enemy.Pos, Bot.Bot.MapAnalyzer.StartLocation) <= 50 * 50)
+                    && SC2Util.DistanceSq(enemy.Pos, Bot.Main.MapAnalyzer.StartLocation) <= 50 * 50)
                     return true;
             return false;
         }

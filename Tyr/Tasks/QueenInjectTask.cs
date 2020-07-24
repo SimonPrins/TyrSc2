@@ -20,7 +20,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             if (Tasks.Count == 0)
-                foreach (Base b in Bot.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Main.BaseManager.Bases)
                 {
                     QueenInjectTask queenInjectTask = new QueenInjectTask(b);
                     Tasks.Add(queenInjectTask);
@@ -29,7 +29,7 @@ namespace Tyr.Tasks
             foreach (Task task in Tasks)
             {
                 task.Stopped = false;
-                Bot.Bot.TaskManager.Add(task);
+                Bot.Main.TaskManager.Add(task);
             }
         }
 
@@ -47,7 +47,7 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return b.Owner == Bot.Bot.PlayerId;
+            return b.Owner == Bot.Main.PlayerId;
         }
 
         public override void OnFrame(Bot tyr)

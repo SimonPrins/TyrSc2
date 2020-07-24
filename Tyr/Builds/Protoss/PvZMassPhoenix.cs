@@ -26,11 +26,11 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
             ArmyObserverTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ArchonMergeTask.Enable();
             WorkerRushDefenseTask.Enable();
             PhoenixHarassTask.Enable();
@@ -66,7 +66,7 @@ namespace Tyr.Builds.Protoss
             BuildList result = new BuildList();
 
             result.If(() => { return !EarlyPool.Get().Detected; });
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -124,7 +124,7 @@ namespace Tyr.Builds.Protoss
         
         public override void OnFrame(Bot tyr)
         {
-            if (Bot.Bot.Frame == (int)(45 * 22.4))
+            if (Bot.Main.Frame == (int)(45 * 22.4))
                 tyr.Chat("This build was requested by Infy!");
             foreach (Agent agent in tyr.UnitManager.Agents.Values)
             {

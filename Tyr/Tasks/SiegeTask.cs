@@ -44,7 +44,7 @@ namespace Tyr.Tasks
             int combatUnits = 0;
             foreach (uint combatType in UnitTypes.CombatUnitTypes)
                 if (!UnitTypes.EquivalentTypes.ContainsKey(combatType))
-                    combatUnits += Bot.Bot.UnitManager.Completed(combatType);
+                    combatUnits += Bot.Main.UnitManager.Completed(combatType);
             if (combatUnits >= RequiredSize)
                 return true;
             return false;
@@ -126,7 +126,7 @@ namespace Tyr.Tasks
                     && agent.DistanceSq(tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 50 * 50)
                 {
                     bool closeEnemy = false;
-                    foreach (Unit enemy in Bot.Bot.Enemies())
+                    foreach (Unit enemy in Bot.Main.Enemies())
                         if (agent.DistanceSq(enemy) <= 14 * 14)
                         {
                             closeEnemy = true;
@@ -322,7 +322,7 @@ namespace Tyr.Tasks
                     if (UnsiegingTanks.Contains(agent.Unit.Tag))
                     {
                         bool closeEnemy = false;
-                        foreach (Unit enemy in Bot.Bot.Enemies())
+                        foreach (Unit enemy in Bot.Main.Enemies())
                         {
                             if (!UnitTypes.CanAttackGround(enemy.UnitType) && !UnitTypes.BuildingTypes.Contains(enemy.UnitType))
                                 continue;
@@ -417,7 +417,7 @@ namespace Tyr.Tasks
                     result.Add(agent);
 
             result.Sort((agent1, agent2) => {
-                return Math.Sign(agent2.DistanceSq(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) - agent1.DistanceSq(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]));
+                return Math.Sign(agent2.DistanceSq(Bot.Main.TargetManager.PotentialEnemyStartLocations[0]) - agent1.DistanceSq(Bot.Main.TargetManager.PotentialEnemyStartLocations[0]));
             });
 
             return result;

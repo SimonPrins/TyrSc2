@@ -28,8 +28,8 @@ namespace Tyr.Builds.Protoss
             OracleHarassBasesTask.Enable();
             WorkerScoutTask.Enable();
             ArmyObserverTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
         }
 
         public override void OnStart(Bot tyr)
@@ -50,7 +50,7 @@ namespace Tyr.Builds.Protoss
             BuildList result = new BuildList();
 
             result.If(() => { return Minerals() >= 550 || OraclesDone || Count(UnitTypes.ORACLE) >= 6; });
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 result.Building(UnitTypes.PYLON, b, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95);
                 result.Building(UnitTypes.GATEWAY, b, 2, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95 && Completed(b, UnitTypes.PYLON) >= 1 && Minerals() >= 350);
@@ -69,7 +69,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.CYBERNETICS_CORE);
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.NEXUS);
-            if (Bot.Bot.EnemyRace == Race.Zerg)
+            if (Bot.Main.EnemyRace == Race.Zerg)
                 result.Train(UnitTypes.ZEALOT, 1);
             else
                 result.Train(UnitTypes.STALKER, 1);
@@ -84,7 +84,7 @@ namespace Tyr.Builds.Protoss
             result.Train(UnitTypes.IMMORTAL);
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.ASSIMILATOR);
-            if (Bot.Bot.EnemyRace == Race.Zerg)
+            if (Bot.Main.EnemyRace == Race.Zerg)
                 result.Train(UnitTypes.ZEALOT);
             else
                 result.Train(UnitTypes.STALKER, () => OraclesDone);

@@ -44,16 +44,16 @@ namespace Tyr.Builds.BuildLists
             if (!Condition.Invoke())
                 return new NextItem();
 
-            if (Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeId))
+            if (Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeId))
                 return new NextItem();
             UpgradeType upgradeType = UpgradeType.LookUp[UpgradeId];
-            if (Bot.Bot.UnitManager.ActiveOrders.Contains(upgradeType.Ability))
+            if (Bot.Main.UnitManager.ActiveOrders.Contains(upgradeType.Ability))
                 return new NextItem();
 
-            while (upgradeType.Previous > 0 && !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(upgradeType.Previous))
+            while (upgradeType.Previous > 0 && !Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(upgradeType.Previous))
             {
                 upgradeType = UpgradeType.LookUp[upgradeType.Previous];
-                if (Bot.Bot.UnitManager.ActiveOrders.Contains(upgradeType.Ability))
+                if (Bot.Main.UnitManager.ActiveOrders.Contains(upgradeType.Ability))
                     return new NextItem();
             }
 
@@ -66,15 +66,15 @@ namespace Tyr.Builds.BuildLists
                 if (agent.Unit.Orders != null && agent.Unit.Orders.Count > 0)
                     continue;
                 
-                if (Bot.Bot.Frame - agent.LastOrderFrame < 5)
+                if (Bot.Main.Frame - agent.LastOrderFrame < 5)
                     continue;
 
-                Bot.Bot.ReservedGas += upgradeType.Gas;
-                Bot.Bot.ReservedMinerals += upgradeType.Minerals;
+                Bot.Main.ReservedGas += upgradeType.Gas;
+                Bot.Main.ReservedMinerals += upgradeType.Minerals;
 
-                if (Bot.Bot.Build.Gas() < 0)
+                if (Bot.Main.Build.Gas() < 0)
                     new NextItem();
-                if (Bot.Bot.Build.Minerals() < 0)
+                if (Bot.Main.Build.Minerals() < 0)
                     return new NextList();
 
                 agent.Order((int)upgradeType.Ability);

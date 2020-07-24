@@ -27,9 +27,9 @@ namespace Tyr.Builds.Protoss
         {
             base.InitializeTasks();
             WorkerRushTask = CounterJensiii ? new WorkerRushJensiiTask() : new WorkerRushTask();
-            Bot.Bot.TaskManager.Add(WorkerRushTask);
-            Bot.Bot.TaskManager.Add(new FlyerAttackTask() { RequiredSize = 3 });
-            Bot.Bot.TaskManager.Add(new ElevatorChaserTask());
+            Bot.Main.TaskManager.Add(WorkerRushTask);
+            Bot.Main.TaskManager.Add(new FlyerAttackTask() { RequiredSize = 3 });
+            Bot.Main.TaskManager.Add(new ElevatorChaserTask());
             TimingAttackTask.Enable();
             RecallTask.Enable();
             DefenseTask.Enable();
@@ -60,7 +60,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => Lifting.Get().Detected || Bot.Bot.Frame >= 22.4 * 60 * 10 || CounterWorkerRush.Get().Detected);
+            result.If(() => Lifting.Get().Detected || Bot.Main.Frame >= 22.4 * 60 * 10 || CounterWorkerRush.Get().Detected);
             result.Building(UnitTypes.GATEWAY);
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.CYBERNETICS_CORE);
@@ -127,20 +127,20 @@ namespace Tyr.Builds.Protoss
                 return false;
             int enemyDefendingWorkers = 0;
             int enemyAttackingWorkers = 0;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!UnitTypes.WorkerTypes.Contains(enemy.UnitType))
                     continue;
-                if (SC2Util.DistanceSq(enemy.Pos, Bot.Bot.MapAnalyzer.StartLocation) <= 30 * 30)
+                if (SC2Util.DistanceSq(enemy.Pos, Bot.Main.MapAnalyzer.StartLocation) <= 30 * 30)
                     enemyAttackingWorkers++;
-                if (SC2Util.DistanceSq(enemy.Pos, Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) <= 30 * 30)
+                if (SC2Util.DistanceSq(enemy.Pos, Bot.Main.TargetManager.PotentialEnemyStartLocations[0]) <= 30 * 30)
                     enemyDefendingWorkers++;
             }
             if (Lifting.Get().Detected && enemyDefendingWorkers == 0)
                 return true;
             if (CounterWorkerRush.Get().Detected 
                 && enemyDefendingWorkers == 0
-                && Bot.Bot.Frame >= 22.4 * 60)
+                && Bot.Main.Frame >= 22.4 * 60)
                 return true;
 
             if (enemyAttackingWorkers >= 5)

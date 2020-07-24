@@ -32,7 +32,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             AirDefenseTask.Stopped = false;
-            Bot.Bot.TaskManager.Add(AirDefenseTask);
+            Bot.Main.TaskManager.Add(AirDefenseTask);
         }
 
         public override bool DoWant(Agent agent)
@@ -45,7 +45,7 @@ namespace Tyr.Tasks
                 return false;
             if (!agent.CanAttackGround() && !Air)
                 return false;
-            return SC2Util.DistanceSq(agent.Unit.Pos, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation)) <= DrawDefenderRadius * DrawDefenderRadius;
+            return SC2Util.DistanceSq(agent.Unit.Pos, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation)) <= DrawDefenderRadius * DrawDefenderRadius;
         }
 
         public override bool IsNeeded()
@@ -106,12 +106,12 @@ namespace Tyr.Tasks
 
         private void UpdateAttackers()
         {
-            if (AttackersUpdateFrame >= Bot.Bot.Frame)
+            if (AttackersUpdateFrame >= Bot.Main.Frame)
                 return;
-            AttackersUpdateFrame = Bot.Bot.Frame;
+            AttackersUpdateFrame = Bot.Main.Frame;
 
             HashSet<ulong> enemiesInRange = new HashSet<ulong>();
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
                 if (!IgnoreEnemyTypes.Contains(unit.UnitType)
                     && unit.UnitType != UnitTypes.ADEPT_PHASE_SHIFT
                     && unit.UnitType != UnitTypes.KD8_CHARGE
@@ -128,15 +128,15 @@ namespace Tyr.Tasks
                         continue;
                     if (!unit.IsFlying && Air)
                         continue;
-                    float newDist = SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
+                    float newDist = SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation));
                     if (newDist >= MaxDefenseRadius * MaxDefenseRadius)
                         continue;
 
                     bool nearBase = newDist <= MainDefenseRadius * MainDefenseRadius;
                     if (!nearBase)
                     {
-                        foreach (Base b in Bot.Bot.BaseManager.Bases)
-                            if (b.Owner == Bot.Bot.PlayerId && SC2Util.DistanceSq(unit.Pos, b.BaseLocation.Pos) <= ExpandDefenseRadius * ExpandDefenseRadius)
+                        foreach (Base b in Bot.Main.BaseManager.Bases)
+                            if (b.Owner == Bot.Main.PlayerId && SC2Util.DistanceSq(unit.Pos, b.BaseLocation.Pos) <= ExpandDefenseRadius * ExpandDefenseRadius)
                             {
                                 nearBase = true;
                                 break;
@@ -207,9 +207,9 @@ namespace Tyr.Tasks
                     continue;
                 Targetting[agent.Unit.Tag] = AssignedAttackers[Targetting[agent.Unit.Tag].Tag];
             }
-            Bot.Bot.DrawText("Defense unit count: " + Units.Count);
-            Bot.Bot.DrawText("Defense unassigned attackers count: " + UnassignedAttackers.Count);
-            Bot.Bot.DrawText("Defense assigned attackers count: " + AssignedAttackers.Count);
+            Bot.Main.DrawText("Defense unit count: " + Units.Count);
+            Bot.Main.DrawText("Defense unassigned attackers count: " + UnassignedAttackers.Count);
+            Bot.Main.DrawText("Defense assigned attackers count: " + AssignedAttackers.Count);
         }
 
         internal bool IsDefending()

@@ -68,10 +68,10 @@ namespace Tyr.Builds.Zerg
         {
             BuildList result = new BuildList();
 
-            result.If(() => Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.DARK_TEMPLAR) + Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.DARK_SHRINE) > 0);
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            result.If(() => Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.DARK_TEMPLAR) + Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.DARK_SHRINE) > 0);
+            foreach (Base b in Bot.Main.BaseManager.Bases)
                 if (b != Main && b != Natural)
-                    result.Building(UnitTypes.SPORE_CRAWLER, b, () => b.ResourceCenterFinishedFrame >= 0 && Bot.Bot.Frame - b.ResourceCenterFinishedFrame >= 224);
+                    result.Building(UnitTypes.SPORE_CRAWLER, b, () => b.ResourceCenterFinishedFrame >= 0 && Bot.Main.Frame - b.ResourceCenterFinishedFrame >= 224);
 
             return result;
         }
@@ -81,10 +81,10 @@ namespace Tyr.Builds.Zerg
             BuildList result = new BuildList();
 
             result.If(() => SuspectBanshees);
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
-                result.Building(UnitTypes.SPINE_CRAWLER, b, b.MineralSide1, () => b.ResourceCenterFinishedFrame >= 0 && Bot.Bot.Frame - b.ResourceCenterFinishedFrame >= 224);
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
-                result.Building(UnitTypes.SPINE_CRAWLER, b, b.MineralSide2, () => b.ResourceCenterFinishedFrame >= 0 && Bot.Bot.Frame - b.ResourceCenterFinishedFrame >= 224);
+            foreach (Base b in Bot.Main.BaseManager.Bases)
+                result.Building(UnitTypes.SPINE_CRAWLER, b, b.MineralSide1, () => b.ResourceCenterFinishedFrame >= 0 && Bot.Main.Frame - b.ResourceCenterFinishedFrame >= 224);
+            foreach (Base b in Bot.Main.BaseManager.Bases)
+                result.Building(UnitTypes.SPINE_CRAWLER, b, b.MineralSide2, () => b.ResourceCenterFinishedFrame >= 0 && Bot.Main.Frame - b.ResourceCenterFinishedFrame >= 224);
 
             return result;
         }
@@ -94,12 +94,12 @@ namespace Tyr.Builds.Zerg
             BuildList result = new BuildList();
 
             result.If(() => SuspectBanshees && Count(UnitTypes.OVERSEER) >= 2);
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
-                result.Building(UnitTypes.SPORE_CRAWLER, b, b.MineralLinePos, () => b.ResourceCenterFinishedFrame >= 0 && Bot.Bot.Frame - b.ResourceCenterFinishedFrame >= 224);
+            foreach (Base b in Bot.Main.BaseManager.Bases)
+                result.Building(UnitTypes.SPORE_CRAWLER, b, b.MineralLinePos, () => b.ResourceCenterFinishedFrame >= 0 && Bot.Main.Frame - b.ResourceCenterFinishedFrame >= 224);
             
             result.If(() => Completed(UnitTypes.DRONE) >= 16 && Count(UnitTypes.QUEEN) >= 8);
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
-                result.Building(UnitTypes.SPORE_CRAWLER, b, b.OppositeMineralLinePos, () => b.ResourceCenterFinishedFrame >= 0 && Bot.Bot.Frame - b.ResourceCenterFinishedFrame >= 224);
+            foreach (Base b in Bot.Main.BaseManager.Bases)
+                result.Building(UnitTypes.SPORE_CRAWLER, b, b.OppositeMineralLinePos, () => b.ResourceCenterFinishedFrame >= 0 && Bot.Main.Frame - b.ResourceCenterFinishedFrame >= 224);
             
 
             return result;
@@ -187,19 +187,19 @@ namespace Tyr.Builds.Zerg
             result.Train(UnitTypes.QUEEN, 4, () => SuspectBanshees);
             result.Train(UnitTypes.QUEEN, 2, () => !SmellCheese);
             result.Train(UnitTypes.QUEEN, 20, () => TempestDetected && Minerals() >= 450);
-            result.Morph(UnitTypes.ZERGLING, 10, () => SmellCheese && Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) < 4);
-            result.Morph(UnitTypes.ZERGLING, 10, () => SmellCheese && !ProxyCannons && Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) < 4);
+            result.Morph(UnitTypes.ZERGLING, 10, () => SmellCheese && Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) < 4);
+            result.Morph(UnitTypes.ZERGLING, 10, () => SmellCheese && !ProxyCannons && Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) < 4);
             result.Morph(UnitTypes.DRONE, 6, () => !SuspectBanshees || Count(UnitTypes.QUEEN) >= 6 || Minerals() >= 250);
             result.Building(UnitTypes.EXTRACTOR);
             result.Train(UnitTypes.QUEEN, 6, () => SuspectBanshees);
-            result.Morph(UnitTypes.ZERGLING, 10, () => !ProxyCannons && (Bot.Bot.EnemyRace == Race.Protoss || SmellCheese) && Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) < 4);
+            result.Morph(UnitTypes.ZERGLING, 10, () => !ProxyCannons && (Bot.Main.EnemyRace == Race.Protoss || SmellCheese) && Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) < 4);
             result.Train(UnitTypes.QUEEN, 2, () => SmellCheese);
             result.Building(UnitTypes.EXTRACTOR, () => SuspectBanshees && Minerals() >= 300);
             result.Train(UnitTypes.LAIR, 1);
             result.Morph(UnitTypes.OVERSEER, 2, () => SuspectBanshees);
             result.Train(UnitTypes.QUEEN, 14, () => SuspectBanshees);
-            result.Upgrade(UpgradeType.MetabolicBoost, () => SuspectBanshees && Completed(UnitTypes.QUEEN) >= 6 && Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.HELLION) == 0);
-            result.Morph(UnitTypes.ZERGLING, 4, () => SuspectBanshees && Completed(UnitTypes.QUEEN) >= 6 && Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.HELLION) == 0 && UpgradeType.LookUp[UpgradeType.MetabolicBoost].Done());
+            result.Upgrade(UpgradeType.MetabolicBoost, () => SuspectBanshees && Completed(UnitTypes.QUEEN) >= 6 && Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.HELLION) == 0);
+            result.Morph(UnitTypes.ZERGLING, 4, () => SuspectBanshees && Completed(UnitTypes.QUEEN) >= 6 && Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.HELLION) == 0 && UpgradeType.LookUp[UpgradeType.MetabolicBoost].Done());
             result.Building(UnitTypes.INFESTATION_PIT, () => SuspectBanshees);
             result.Upgrade(UpgradeType.PathogenGlands, () => SuspectBanshees);
             result.Morph(UnitTypes.INFESTOR, 4, () => Completed(UnitTypes.INFESTATION_PIT) > 0 && SuspectBanshees);
@@ -229,7 +229,7 @@ namespace Tyr.Builds.Zerg
             result.Building(UnitTypes.INFESTATION_PIT, () => UpgradeType.LookUp[UpgradeType.ZergMissileWeapons1].Started() && !SuspectBanshees);
             result.Morph(UnitTypes.INFESTOR, 4, () => Completed(UnitTypes.INFESTATION_PIT) > 0 && !SuspectBanshees);
             result.Upgrade(UpgradeType.PathogenGlands);
-            result.Upgrade(UpgradeType.NeuralParasite, () => Bot.Bot.EnemyRace != Race.Terran || (Minerals() >= 600 && Gas() >= 600));
+            result.Upgrade(UpgradeType.NeuralParasite, () => Bot.Main.EnemyRace != Race.Terran || (Minerals() >= 600 && Gas() >= 600));
             result.Train(UnitTypes.HIVE, 1, () => UpgradeType.LookUp[UpgradeType.ZergMissileWeapons2].Started());
             result.Morph(UnitTypes.HYDRALISK, 15);
             result.Morph(UnitTypes.DRONE, 10);

@@ -13,7 +13,7 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            return Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.BROOD_LORD) > 0;
+            return Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.BROOD_LORD) > 0;
         }
 
         public override string Name()

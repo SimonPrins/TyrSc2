@@ -32,7 +32,7 @@ namespace Tyr.Tasks
             int desiredWorkers = 8 - Units.Count;
             List<UnitDescriptor> result = new List<UnitDescriptor>();
             if (desiredWorkers > 0 && !CannonFinished)
-                result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = desiredWorkers, UnitTypes = UnitTypes.WorkerTypes });
+                result.Add(new UnitDescriptor() { Pos = Bot.Main.TargetManager.AttackTarget, Count = desiredWorkers, UnitTypes = UnitTypes.WorkerTypes });
             return result;
         }
 
@@ -44,16 +44,16 @@ namespace Tyr.Tasks
 
         private void UpdateAttackers()
         {
-            if (Bot.Bot.Frame == PylonUpdateFrame)
+            if (Bot.Main.Frame == PylonUpdateFrame)
                 return;
-            Point2D main = Bot.Bot.BaseManager.Main.BaseLocation.Pos;
-            Point2D natural = Bot.Bot.BaseManager.Natural.BaseLocation.Pos;
-            PylonUpdateFrame = Bot.Bot.Frame;
+            Point2D main = Bot.Main.BaseManager.Main.BaseLocation.Pos;
+            Point2D natural = Bot.Main.BaseManager.Natural.BaseLocation.Pos;
+            PylonUpdateFrame = Bot.Main.Frame;
 
             if (KillPylon != null)
             {
                 bool pylonRemains = false;
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (enemy.Tag != KillPylon.Tag)
                         continue;
@@ -66,7 +66,7 @@ namespace Tyr.Tasks
             }
             if (KillPylon == null)
             {
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.PYLON)
                         continue;
@@ -81,7 +81,7 @@ namespace Tyr.Tasks
             if (KillProbe != null)
             {
                 bool probeRemains = false;
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (enemy.Tag != KillProbe.Tag)
                         continue;
@@ -97,7 +97,7 @@ namespace Tyr.Tasks
             }
             if (KillProbe == null)
             {
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.PROBE)
                         continue;
@@ -109,7 +109,7 @@ namespace Tyr.Tasks
                 }
 
             }
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.PHOTON_CANNON)
                     continue;

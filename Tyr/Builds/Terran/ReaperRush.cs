@@ -48,10 +48,10 @@ namespace Tyr.Builds.Terran
             result.If(() =>
             {
                 return Build.FoodUsed()
-                    + Bot.Bot.UnitManager.Count(UnitTypes.COMMAND_CENTER)
-                    + Bot.Bot.UnitManager.Count(UnitTypes.BARRACKS) * 2
-                    + Bot.Bot.UnitManager.Count(UnitTypes.FACTORY) * 2
-                    + Bot.Bot.UnitManager.Count(UnitTypes.STARPORT) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.COMMAND_CENTER)
+                    + Bot.Main.UnitManager.Count(UnitTypes.BARRACKS) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.FACTORY) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.STARPORT) * 2
                     >= Build.ExpectedAvailableFood() - 2
                     && Build.ExpectedAvailableFood() < 200;
             });
@@ -71,7 +71,7 @@ namespace Tyr.Builds.Terran
             result.Train(UnitTypes.VIKING_FIGHTER, 10);
             result.If(() => Count(UnitTypes.REAPER) >= 2);
             result.Train(UnitTypes.MARINE, () => 
-                       Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0
+                       Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0
                     || Gas() < 42
                     || Lifting.Get().Detected);
             result.Train(UnitTypes.REAPER, 16);
@@ -108,12 +108,12 @@ namespace Tyr.Builds.Terran
             tyr.Surrendered = true;
             tyr.SurrenderedFrame = tyr.Frame + 1000000;
 
-            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
+            foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
                 if (agent.Unit.UnitType == UnitTypes.FACTORY)
                     agent.Order(485);
 
 
-            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
+            foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
                 if (agent.Unit.UnitType == UnitTypes.FACTORY_FLYING && tyr.Frame % 22 == 0)
                 {
                     Point2D a = SC2Util.Point(10, 10);

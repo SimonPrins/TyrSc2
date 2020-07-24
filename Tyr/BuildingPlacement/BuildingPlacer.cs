@@ -34,22 +34,22 @@ namespace Tyr.BuildingPlacement
 
         public Point2D FindPlacement(Point2D target, Point2D size, uint type)
         {
-            if (Bot.Bot.MyRace == Race.Terran)
+            if (Bot.Main.MyRace == Race.Terran)
             {
                 if (type != UnitTypes.REFINERY
                     && type != UnitTypes.COMMAND_CENTER
                     && type != UnitTypes.MISSILE_TURRET)
                     return TerranBuildingPlacement.FindPlacement(target, size, type);
             }
-            else if (Bot.Bot.MyRace == Race.Protoss)
+            else if (Bot.Main.MyRace == Race.Protoss)
             {
                 if (type != UnitTypes.ASSIMILATOR
                     && type != UnitTypes.NEXUS
                     && type != UnitTypes.PHOTON_CANNON
                     && type != UnitTypes.SHIELD_BATTERY
-                    && Bot.Bot.MapAnalyzer.StartArea[target]
+                    && Bot.Main.MapAnalyzer.StartArea[target]
                     && !BuildCompact
-                    && SC2Util.DistanceSq(target, Bot.Bot.MapAnalyzer.StartLocation) <= 25 * 25)
+                    && SC2Util.DistanceSq(target, Bot.Main.MapAnalyzer.StartLocation) <= 25 * 25)
                     return ProtossBuildingPlacement.FindPlacement(target, size, type);
             }
             Point2D result = findPlacementLocal(target, size, type, 20);
@@ -167,13 +167,13 @@ namespace Tyr.BuildingPlacement
             if (BuildInsideMainOnly)
                 for (float x = -size.X / 2f; x < size.X / 2f + 0.1f; x++)
                     for (float y = -size.Y / 2f; y < size.Y / 2f + 0.1f; y++)
-                        if (!Bot.Bot.MapAnalyzer.StartArea[(int)Math.Round(location.X + x), (int)Math.Round(location.Y + y)])
+                        if (!Bot.Main.MapAnalyzer.StartArea[(int)Math.Round(location.X + x), (int)Math.Round(location.Y + y)])
                             return false;
 
             if (!UnitTypes.ResourceCenters.Contains(type))
             {
                 float baseDistance = (type == UnitTypes.MISSILE_TURRET || type == UnitTypes.SPORE_CRAWLER || type == UnitTypes.PYLON) ? 3f : 5f;
-                foreach (Base b in Bot.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Main.BaseManager.Bases)
                 {
                     if (Math.Abs(b.BaseLocation.Pos.X - location.X) < baseDistance
                         && Math.Abs(b.BaseLocation.Pos.Y - location.Y) < baseDistance)
@@ -212,11 +212,11 @@ namespace Tyr.BuildingPlacement
                 if (request != skipRequest && !CheckDistance(location, type, request.Pos, request.Type, buildingsOnly))
                     return false;
 
-            foreach (ReservedBuilding building in Bot.Bot.buildingPlacer.ReservedLocation)
+            foreach (ReservedBuilding building in Bot.Main.buildingPlacer.ReservedLocation)
                 if (!CheckDistClose(location.X - 1.5f, location.Y - 1.5f, location.X + 1.5f, location.Y + 1.5f, building.Pos, building.Type))
                     return false;
 
-            if (Bot.Bot.MyRace == Race.Zerg && type != UnitTypes.HATCHERY && type != UnitTypes.EXTRACTOR)
+            if (Bot.Main.MyRace == Race.Zerg && type != UnitTypes.HATCHERY && type != UnitTypes.EXTRACTOR)
             {
                 BoolGrid creep = new ImageBoolGrid(bot.Observation.Observation.RawData.MapState.Creep, 1);
                 for (float dx = -size.X / 2f; dx <= size.X / 2f + 0.01f; dx++)
@@ -224,7 +224,7 @@ namespace Tyr.BuildingPlacement
                         if (!creep[(int)(location.X + dx), (int)(location.Y + dy)])
                             return false;
             }
-            if (Bot.Bot.MyRace != Race.Zerg)
+            if (Bot.Main.MyRace != Race.Zerg)
             {
                 BoolGrid creep = new ImageBoolGrid(bot.Observation.Observation.RawData.MapState.Creep, 1);
                 for (float dx = -size.X / 2f; dx <= size.X / 2f + 0.01f; dx++)
@@ -235,7 +235,7 @@ namespace Tyr.BuildingPlacement
 
             if (type == UnitTypes.PYLON)
             {
-                foreach (Agent agent in Bot.Bot.Units())
+                foreach (Agent agent in Bot.Main.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.PYLON)
                         continue;
@@ -254,7 +254,7 @@ namespace Tyr.BuildingPlacement
                     if (unit.UnitType != UnitTypes.PYLON || unit.BuildProgress < 1)
                         continue;
 
-                    if (Bot.Bot.MapAnalyzer.MapHeight((int)unit.Pos.X, (int)unit.Pos.Y) < Bot.Bot.MapAnalyzer.MapHeight((int)location.X, (int)location.Y))
+                    if (Bot.Main.MapAnalyzer.MapHeight((int)unit.Pos.X, (int)unit.Pos.Y) < Bot.Main.MapAnalyzer.MapHeight((int)location.X, (int)location.Y))
                         continue;
 
                     if (location.X - size.X / 2f >= unit.Pos.X - 6 && location.X + size.X / 2f <= unit.Pos.X + 6
@@ -298,7 +298,7 @@ namespace Tyr.BuildingPlacement
                 return SC2Util.DistanceGrid(unitPos, location) > 3;
 
             if (BuildCompact
-                    || SC2Util.DistanceSq(location, Bot.Bot.MapAnalyzer.StartLocation) > 25 * 25)
+                    || SC2Util.DistanceSq(location, Bot.Main.MapAnalyzer.StartLocation) > 25 * 25)
                 return CheckDistanceClose(location, buildingType, unitPos, unitType);
             if ((buildingType == UnitTypes.PHOTON_CANNON && !SpreadCannons)
                 || buildingType == UnitTypes.SHIELD_BATTERY
@@ -378,7 +378,7 @@ namespace Tyr.BuildingPlacement
 
         public void BuildInsideWall(WallInCreator wallIn)
         {
-            BoolGrid pathable = Bot.Bot.MapAnalyzer.Pathable;
+            BoolGrid pathable = Bot.Main.MapAnalyzer.Pathable;
             ArrayBoolGrid walledPathable = new ArrayBoolGrid(pathable.Width(), pathable.Height());
             for (int x = 0; x < pathable.Width(); x++)
                 for (int y = 0; y < pathable.Height(); y++)
@@ -400,7 +400,7 @@ namespace Tyr.BuildingPlacement
                     }
                     walledPathable[x, y] = !blocked;
                 }
-            LimitBuildArea = walledPathable.GetConnected(SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
+            LimitBuildArea = walledPathable.GetConnected(SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation));
 
             /*
             DrawGrid(pathable, "Pathable");

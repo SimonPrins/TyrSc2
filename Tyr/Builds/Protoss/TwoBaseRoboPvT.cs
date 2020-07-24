@@ -89,7 +89,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => { return expansion.Owner == Bot.Bot.PlayerId; });
+            result.If(() => { return expansion.Owner == Bot.Main.PlayerId; });
             result.Building(UnitTypes.FORGE);
             result.Building(UnitTypes.PYLON, expansion);
             result.If(() => { return Completed(expansion, UnitTypes.PYLON) > 0; });
@@ -102,7 +102,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            Point2D shieldBatteryPos = Bot.Bot.MapAnalyzer.Walk(NaturalDefensePos, Bot.Bot.MapAnalyzer.EnemyDistances, 3);
+            Point2D shieldBatteryPos = Bot.Main.MapAnalyzer.Walk(NaturalDefensePos, Bot.Main.MapAnalyzer.EnemyDistances, 3);
 
             result.Building(UnitTypes.PYLON);
             result.Building(UnitTypes.GATEWAY);
@@ -272,7 +272,7 @@ namespace Tyr.Builds.Protoss
             {
                 if (Minerals() >= 150
                     && Gas() >= 150
-                    && !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
+                    && !Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
                     && !DefendMech
                     && Count(UnitTypes.COLOSUS) > 0)
                 {
@@ -281,12 +281,12 @@ namespace Tyr.Builds.Protoss
             }
             else if (agent.Unit.UnitType == UnitTypes.TWILIGHT_COUNSEL)
             {
-                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
+                if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
                     && Minerals() >= 100
                     && Gas() >= 100
                     && !DefendMech)
                     agent.Order(1594);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
                      && Minerals() >= 150
                      && Gas() >= 150)
                     agent.Order(1593);

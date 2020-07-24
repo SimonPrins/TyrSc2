@@ -55,8 +55,8 @@ namespace Tyr.Tasks
         {
             Workers.Add(agent);
             agent.Order(Abilities.MOVE, Gas.Tag);
-            if (!Bot.Bot.UnitManager.DisappearedUnits.ContainsKey(agent.Unit.Tag))
-                Bot.Bot.UnitManager.DisappearedUnits.Add(agent.Unit.Tag, agent);
+            if (!Bot.Main.UnitManager.DisappearedUnits.ContainsKey(agent.Unit.Tag))
+                Bot.Main.UnitManager.DisappearedUnits.Add(agent.Unit.Tag, agent);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Tyr.Builds.Zerg
             tyr.TaskManager.Add(TimingAttackTask);
             tyr.TaskManager.Add(new WorkerScoutTask());
 
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 QueenInjectTask queenInjectTask = new QueenInjectTask(b);
                 tyr.TaskManager.Add(queenInjectTask);
@@ -90,7 +90,7 @@ namespace Tyr.Builds.Zerg
             result.Building(UnitTypes.HATCHERY, 2);
             result.Building(UnitTypes.SPAWNING_POOL);
             result.If(() => { return Count(UnitTypes.QUEEN) > 0; });
-            result.If(() => { return Completed(UnitTypes.HATCHERY) + Completed(UnitTypes.LAIR) >= 2 && Bot.Bot.Frame >= 22.4 * 60 * 2; });
+            result.If(() => { return Completed(UnitTypes.HATCHERY) + Completed(UnitTypes.LAIR) >= 2 && Bot.Main.Frame >= 22.4 * 60 * 2; });
             result.Building(UnitTypes.SPINE_CRAWLER, Natural, NaturalDefensePos, 2);
             result.Building(UnitTypes.SPINE_CRAWLER, Natural, NaturalDefensePos, () => { return SmellCheese; });
             result.If(() => { return Count(UnitTypes.ZERGLING) >= RequiredZerglings && Count(UnitTypes.DRONE) >= 20; });
@@ -196,9 +196,9 @@ namespace Tyr.Builds.Zerg
                         CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.HYDRALISK);
                     }
                     else if (Minerals() >= 100 && FoodUsed()
-                        + Bot.Bot.UnitManager.Count(UnitTypes.HATCHERY) * 2
-                        + Bot.Bot.UnitManager.Count(UnitTypes.LAIR) * 2
-                        + Bot.Bot.UnitManager.Count(UnitTypes.HIVE) * 2
+                        + Bot.Main.UnitManager.Count(UnitTypes.HATCHERY) * 2
+                        + Bot.Main.UnitManager.Count(UnitTypes.LAIR) * 2
+                        + Bot.Main.UnitManager.Count(UnitTypes.HIVE) * 2
                         >= ExpectedAvailableFood() - 2)
                     {
                         agent.Order(1344);

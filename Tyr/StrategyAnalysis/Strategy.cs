@@ -16,7 +16,7 @@ namespace Tyr.StrategyAnalysis
                 Detected = true;
                 if (!DetectedPreviously)
                 {
-                    Bot.Bot.EnemyStrategyAnalyzer.Set(Name());
+                    Bot.Main.EnemyStrategyAnalyzer.Set(Name());
                     DetectedPreviously = true;
                 }
             }
@@ -30,12 +30,12 @@ namespace Tyr.StrategyAnalysis
 
         public int Count(uint unitType)
         {
-            return Bot.Bot.EnemyStrategyAnalyzer.Count(unitType);
+            return Bot.Main.EnemyStrategyAnalyzer.Count(unitType);
         }
 
         public int TotalCount(uint unitType)
         {
-            return Bot.Bot.EnemyStrategyAnalyzer.TotalCount(unitType);
+            return Bot.Main.EnemyStrategyAnalyzer.TotalCount(unitType);
         }
 
     }

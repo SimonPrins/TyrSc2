@@ -55,21 +55,21 @@ namespace Tyr.Builds.BuildLists
                 return new NextItem();
 
             if (UnitTypes.LookUp[UnitType].TechRequirement != 0
-                && Bot.Bot.UnitManager.Completed(UnitTypes.LookUp[UnitType].TechRequirement) == 0
+                && Bot.Main.UnitManager.Completed(UnitTypes.LookUp[UnitType].TechRequirement) == 0
                 && UnitTypes.LookUp[UnitType].TechRequirement != UnitTypes.HATCHERY
                 && UnitTypes.LookUp[UnitType].TechRequirement != UnitTypes.TECH_LAB)
             {
-                Bot.Bot.DrawText("Tech requirement not met to train " + UnitTypes.LookUp[UnitType].Name + " requires: " + UnitTypes.LookUp[UnitType].TechRequirement);
+                Bot.Main.DrawText("Tech requirement not met to train " + UnitTypes.LookUp[UnitType].Name + " requires: " + UnitTypes.LookUp[UnitType].TechRequirement);
                 return new NextItem();
             }
 
-            int alreadyTrained = Bot.Bot.UnitManager.Count(UnitType) + state.GetTraining(UnitType);
+            int alreadyTrained = Bot.Main.UnitManager.Count(UnitType) + state.GetTraining(UnitType);
             TrainingType trainType = TrainingType.LookUp[UnitType];
             foreach (Agent agent in ProductionTask.Task.Units)
             {
                 if (Build.FoodLeft() < trainType.Food)
                 {
-                    Bot.Bot.DrawText("Not enough food to train " + UnitTypes.LookUp[UnitType].Name);
+                    Bot.Main.DrawText("Not enough food to train " + UnitTypes.LookUp[UnitType].Name);
                     break;
                 }
                 if (alreadyTrained >= Number)
@@ -93,18 +93,18 @@ namespace Tyr.Builds.BuildLists
                 if (agent.Command != null)
                     continue;
 
-                if (Bot.Bot.Frame - agent.LastOrderFrame < 5)
+                if (Bot.Main.Frame - agent.LastOrderFrame < 5)
                     continue;
 
                 if (agent.Unit.UnitType == UnitTypes.GATEWAY && UpgradeType.LookUp[UpgradeType.WarpGate].Done())
                     continue;
 
-                Bot.Bot.ReservedGas += trainType.Gas;
-                Bot.Bot.ReservedMinerals += trainType.Minerals;
+                Bot.Main.ReservedGas += trainType.Gas;
+                Bot.Main.ReservedMinerals += trainType.Minerals;
 
-                if (Bot.Bot.Build.Minerals() < 0)
+                if (Bot.Main.Build.Minerals() < 0)
                     return new NextList();
-                if (Bot.Bot.Build.Gas() < 0)
+                if (Bot.Main.Build.Gas() < 0)
                     return new NextItem();
 
                 if (agent.Unit.UnitType == UnitTypes.WARP_GATE)
@@ -116,7 +116,7 @@ namespace Tyr.Builds.BuildLists
                 else
                 {
                     agent.Order((int)trainType.Ability);
-                    Bot.Bot.UnitManager.UnitTraining(trainType.UnitType);
+                    Bot.Main.UnitManager.UnitTraining(trainType.UnitType);
                 }
 
                 state.AddTraining(UnitType, 1);
@@ -128,11 +128,11 @@ namespace Tyr.Builds.BuildLists
 
         private bool WarpIn(Agent warpGate, TrainingType trainType)
         {
-            int framesSinceLastWarpIn = Bot.Bot.Frame - LastWarpInFrame;
+            int framesSinceLastWarpIn = Bot.Main.Frame - LastWarpInFrame;
             
             if (framesSinceLastWarpIn <= 4)
             {
-                foreach (Agent agent in Bot.Bot.Units())
+                foreach (Agent agent in Bot.Main.Units())
                 {
                     if (agent.DistanceSq(LastWarpInLocation) <= 0.5f * 0.5f)
                     {
@@ -152,7 +152,7 @@ namespace Tyr.Builds.BuildLists
                 {
                     if (framesSinceLastWarpIn >= 10)
                     {
-                        LastWarpInFrame = Bot.Bot.Frame;
+                        LastWarpInFrame = Bot.Main.Frame;
                         LastWarpInLocation = placement;
                     }
                     warpGate.Order((int)trainType.WarpInAbility, placement);
@@ -160,17 +160,17 @@ namespace Tyr.Builds.BuildLists
                 }
             }
 
-            if (Bot.Bot.BaseManager.Natural.Owner == Bot.Bot.PlayerId 
-                && Bot.Bot.BaseManager.Natural.BuildingsCompleted.ContainsKey(UnitTypes.PYLON) 
-                && Bot.Bot.BaseManager.Natural.BuildingsCompleted[UnitTypes.PYLON] >= 1)
+            if (Bot.Main.BaseManager.Natural.Owner == Bot.Main.PlayerId 
+                && Bot.Main.BaseManager.Natural.BuildingsCompleted.ContainsKey(UnitTypes.PYLON) 
+                && Bot.Main.BaseManager.Natural.BuildingsCompleted[UnitTypes.PYLON] >= 1)
             {
-                aroundTile = Bot.Bot.BaseManager.Natural.OppositeMineralLinePos;
+                aroundTile = Bot.Main.BaseManager.Natural.OppositeMineralLinePos;
                 placement = WarpInPlacer.FindPlacement(aroundTile, trainType.UnitType);
                 if (placement != null)
                 {
                     if (framesSinceLastWarpIn >= 10)
                     {
-                        LastWarpInFrame = Bot.Bot.Frame;
+                        LastWarpInFrame = Bot.Main.Frame;
                         LastWarpInLocation = placement;
                     }
                     warpGate.Order((int)trainType.WarpInAbility, placement);
@@ -178,17 +178,17 @@ namespace Tyr.Builds.BuildLists
                 }
             }
 
-            aroundTile = SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation);
+            aroundTile = SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation);
             placement = WarpInPlacer.FindPlacement(aroundTile, trainType.UnitType);
             if (placement != null)
             {
                 if (framesSinceLastWarpIn >= 10)
                 {
-                    LastWarpInFrame = Bot.Bot.Frame;
+                    LastWarpInFrame = Bot.Main.Frame;
                     LastWarpInLocation = placement;
                 }
                 warpGate.Order((int)trainType.WarpInAbility, placement);
-                Bot.Bot.UnitManager.UnitTraining(trainType.UnitType);
+                Bot.Main.UnitManager.UnitTraining(trainType.UnitType);
                 return true;
             }
             return false;

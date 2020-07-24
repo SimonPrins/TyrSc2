@@ -20,7 +20,7 @@ namespace Tyr.Micro
             bool closeEnemy = false;
             if (!LastEnemyFrame.ContainsKey(agent.Unit.Tag))
                 LastEnemyFrame.Add(agent.Unit.Tag, 0);
-            else if (Bot.Bot.Frame - LastEnemyFrame[agent.Unit.Tag] <= 22.4 * KeepLiberatorSiegedTime)
+            else if (Bot.Main.Frame - LastEnemyFrame[agent.Unit.Tag] <= 22.4 * KeepLiberatorSiegedTime)
                 closeEnemy = true;
             
 
@@ -39,7 +39,7 @@ namespace Tyr.Micro
             {
                 if (alreadySieging && EnemyInSiegeRange(agent))
                 {
-                    LastEnemyFrame[agent.Unit.Tag] = Bot.Bot.Frame;
+                    LastEnemyFrame[agent.Unit.Tag] = Bot.Main.Frame;
                     agent.Order(2558, SiegeTarget[agent.Unit.Tag]);
                     return true;
                 }
@@ -47,7 +47,7 @@ namespace Tyr.Micro
                 Point2D siegeTarget = GetSiegeTarget(agent);
                 if (siegeTarget != null)
                 {
-                    LastEnemyFrame[agent.Unit.Tag] = Bot.Bot.Frame;
+                    LastEnemyFrame[agent.Unit.Tag] = Bot.Main.Frame;
                     SiegeTarget[agent.Unit.Tag] = siegeTarget;
                     agent.Order(2558, SiegeTarget[agent.Unit.Tag]);
                 }
@@ -57,7 +57,7 @@ namespace Tyr.Micro
             {
                 if (EnemyInSiegeRange(agent))
                 {
-                    LastEnemyFrame[agent.Unit.Tag] = Bot.Bot.Frame;
+                    LastEnemyFrame[agent.Unit.Tag] = Bot.Main.Frame;
                 }
                 else if (GetUnderAttack(agent) != null || !closeEnemy)
                 {
@@ -72,7 +72,7 @@ namespace Tyr.Micro
         {
             float distance = 8 * 8;
             Unit result = null;
-            foreach (Unit airDefense in Bot.Bot.Enemies())
+            foreach (Unit airDefense in Bot.Main.Enemies())
             {
                 if (airDefense.UnitType != UnitTypes.BUNKER
                     && airDefense.UnitType != UnitTypes.MISSILE_TURRET
@@ -92,7 +92,7 @@ namespace Tyr.Micro
 
         private Point2D GetSiegeTarget(Agent agent)
         {
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.IsFlying)
                     continue;
@@ -128,7 +128,7 @@ namespace Tyr.Micro
 
         private bool LiberationZoneTooClose(Agent agent, Point2D siegeTarget)
         {
-            foreach (Agent liberator in Bot.Bot.UnitManager.Agents.Values)
+            foreach (Agent liberator in Bot.Main.UnitManager.Agents.Values)
             {
                 if (liberator.Unit.UnitType != UnitTypes.LIBERATOR
                     && liberator.Unit.UnitType != UnitTypes.LIBERATOR_AG)
@@ -153,7 +153,7 @@ namespace Tyr.Micro
                 return false;
 
             Point2D siegeTarget = SiegeTarget[agent.Unit.Tag];
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.IsFlying)
                     continue;
@@ -184,7 +184,7 @@ namespace Tyr.Micro
         {
             float distance = 8 * 8;
             Unit result = null;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!UnitTypes.AirAttackTypes.Contains(enemy.UnitType))
                     continue;

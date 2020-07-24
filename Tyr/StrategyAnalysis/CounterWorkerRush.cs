@@ -17,22 +17,22 @@ namespace Tyr.StrategyAnalysis
         public override bool Detect()
         {
             float closest = 1000000;
-            foreach (Agent agent in Bot.Bot.Units())
+            foreach (Agent agent in Bot.Main.Units())
             {
                 if (!UnitTypes.WorkerTypes.Contains(agent.Unit.UnitType))
                     continue;
-                float agentDist = agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation);
+                float agentDist = agent.DistanceSq(Bot.Main.MapAnalyzer.StartLocation);
                 if (agentDist <= 60 * 60)
                     continue;
                 closest = Math.Min(closest, agentDist);
             }
 
             int closeEnemyWorkerCount = 0;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!UnitTypes.WorkerTypes.Contains(enemy.UnitType))
                     continue;
-                if (SC2Util.DistanceSq(enemy.Pos, Bot.Bot.MapAnalyzer.StartLocation) < closest - 20)
+                if (SC2Util.DistanceSq(enemy.Pos, Bot.Main.MapAnalyzer.StartLocation) < closest - 20)
                     closeEnemyWorkerCount++;
             }
             if (closeEnemyWorkerCount >= 6)

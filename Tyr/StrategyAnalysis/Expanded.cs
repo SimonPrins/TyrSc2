@@ -26,12 +26,12 @@ namespace Tyr.StrategyAnalysis
                    + Count(UnitTypes.PLANETARY_FORTRESS) >= 2)
                 return true;
 
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (UnitTypes.ResourceCenters.Contains(enemy.UnitType))
                 {
                     bool startingBase = false;
-                    foreach (Point2D loc in Bot.Bot.TargetManager.PotentialEnemyStartLocations)
+                    foreach (Point2D loc in Bot.Main.TargetManager.PotentialEnemyStartLocations)
                     {
                         if (SC2Util.DistanceSq(enemy.Pos, loc) <= 4)
                         {

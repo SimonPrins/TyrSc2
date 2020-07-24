@@ -14,7 +14,7 @@ namespace Tyr.Micro
             if (agent.Unit.WeaponCooldown == 0)
                 return false;
             
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (unit.UnitType != UnitTypes.ZERGLING)
                     continue;
@@ -22,8 +22,8 @@ namespace Tyr.Micro
                 float dist = agent.DistanceSq(unit);
                 if (agent.DistanceSq(unit) < 4 * 4)
                 {
-                    if (agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) > 10 * 10)
-                        agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
+                    if (agent.DistanceSq(Bot.Main.MapAnalyzer.StartLocation) > 10 * 10)
+                        agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation));
                     else
                         agent.Order(Abilities.MOVE, agent.From(unit, 4));
                 }
@@ -31,7 +31,7 @@ namespace Tyr.Micro
 
             float distance = 8 * 8;
             Unit killTarget = null;
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (unit.UnitType != UnitTypes.DRONE
                     && unit.UnitType != UnitTypes.SCV

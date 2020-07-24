@@ -249,7 +249,7 @@ namespace Tyr.Managers
 
             foreach (Base b in Bases)
                 if (b.Owner == -1)
-                    Bot.Bot.DrawSphere(b.BaseLocation.Pos);
+                    Bot.Main.DrawSphere(b.BaseLocation.Pos);
 
             CheckBlockedBases();
         }
@@ -258,7 +258,7 @@ namespace Tyr.Managers
         {
             foreach (Base b in Bases)
             {
-                if (b.Owner == Bot.Bot.PlayerId
+                if (b.Owner == Bot.Main.PlayerId
                     && b.ResourceCenter != null)
                 {
                     b.Blocked = false;
@@ -267,7 +267,7 @@ namespace Tyr.Managers
 
                 if (b.Blocked)
                 {
-                    foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
+                    foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
                         if (agent.DistanceSq(b.BaseLocation.Pos) <= 2 * 2)
                         {
                             b.Blocked = false;
@@ -278,7 +278,7 @@ namespace Tyr.Managers
                         continue;
                 }
 
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.WIDOW_MINE_BURROWED
                         && enemy.UnitType != UnitTypes.ZERGLING_BURROWED)
@@ -293,7 +293,7 @@ namespace Tyr.Managers
             }
             foreach (Base b in Bases)
                 if (b.Blocked)
-                    Bot.Bot.DrawSphere(b.BaseLocation.Pos);
+                    Bot.Main.DrawSphere(b.BaseLocation.Pos);
 
         }
     }

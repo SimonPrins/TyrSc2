@@ -126,7 +126,7 @@ namespace Tyr.Builds.Protoss
             }
             else if (agent.Unit.UnitType == UnitTypes.GATEWAY)
             {
-                if (Bot.Bot.EnemyRace == Race.Zerg)
+                if (Bot.Main.EnemyRace == Race.Zerg)
                 {
                     if (!stopRush && Completed(UnitTypes.DARK_SHRINE) > 0 && Count(UnitTypes.DARK_TEMPLAR) < 2)
                     {

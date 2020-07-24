@@ -56,10 +56,10 @@ namespace Tyr.Builds.Terran
             result.If(() =>
             {
                 return Build.FoodUsed()
-                    + Bot.Bot.UnitManager.Count(UnitTypes.COMMAND_CENTER)
-                    + Bot.Bot.UnitManager.Count(UnitTypes.BARRACKS) * 2
-                    + Bot.Bot.UnitManager.Count(UnitTypes.FACTORY) * 2
-                    + Bot.Bot.UnitManager.Count(UnitTypes.STARPORT) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.COMMAND_CENTER)
+                    + Bot.Main.UnitManager.Count(UnitTypes.BARRACKS) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.FACTORY) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.STARPORT) * 2
                     >= Build.ExpectedAvailableFood() - 2
                     && Build.ExpectedAvailableFood() < 200;
             });
@@ -102,7 +102,7 @@ namespace Tyr.Builds.Terran
             result.Building(UnitTypes.SUPPLY_DEPOT, Main, WallIn.Wall[2].Pos, true);
             result.Building(UnitTypes.FACTORY, () => !LingRush || Count(UnitTypes.MARINE) > 0);
             result.Building(UnitTypes.REFINERY);
-            result.If(() => Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(19) || Bot.Bot.UnitManager.ActiveOrders.Contains(761));
+            result.If(() => Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(19) || Bot.Main.UnitManager.ActiveOrders.Contains(761));
             result.Building(UnitTypes.ARMORY);
             result.If(() => Count(UnitTypes.HELLBAT) >= 16 || Minerals() >= 500 || RoachDefense);
             result.Building(UnitTypes.COMMAND_CENTER);

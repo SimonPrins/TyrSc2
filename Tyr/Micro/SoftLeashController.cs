@@ -47,14 +47,14 @@ namespace Tyr.Micro
                 return false;
 
             if (MinEnemyRange > 0
-                && agent.DistanceSq(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) <= MinEnemyRange * MinEnemyRange)
+                && agent.DistanceSq(Bot.Main.TargetManager.PotentialEnemyStartLocations[0]) <= MinEnemyRange * MinEnemyRange)
                 return false;
 
             float dist;
 
             Point2D retreatTo = null;
             dist = MaxRange * MaxRange;
-            foreach (Agent ally in Bot.Bot.UnitManager.Agents.Values)
+            foreach (Agent ally in Bot.Main.UnitManager.Agents.Values)
             {
                 if (!LeashedTo.Contains(ally.Unit.UnitType))
                     continue;

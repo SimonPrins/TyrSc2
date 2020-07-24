@@ -18,9 +18,9 @@ namespace Tyr.Micro
             if (EvadeEnemies(agent, target))
                 return true;
 
-            if (Bot.Bot.Frame % 22 == 0)
+            if (Bot.Main.Frame % 22 == 0)
             {
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (enemy.IsFlying)
                         continue;
@@ -40,9 +40,9 @@ namespace Tyr.Micro
         {
             Point mineLocation = null;
             float dist = 9 * 9;
-            foreach (UnitLocation mine in Bot.Bot.EnemyMineManager.Mines)
+            foreach (UnitLocation mine in Bot.Main.EnemyMineManager.Mines)
             {
-                if (Bot.Bot.EnemyMineManager.BurrowFrame.ContainsKey(mine.Tag) && Bot.Bot.Frame - Bot.Bot.EnemyMineManager.BurrowFrame[mine.Tag] <= 16)
+                if (Bot.Main.EnemyMineManager.BurrowFrame.ContainsKey(mine.Tag) && Bot.Main.Frame - Bot.Main.EnemyMineManager.BurrowFrame[mine.Tag] <= 16)
                     continue;
 
                 float newDist = agent.DistanceSq(mine.Pos);
@@ -55,15 +55,15 @@ namespace Tyr.Micro
 
             if (mineLocation != null)
             {
-                bool alreadyRetreating = RetreatFrame.ContainsKey(agent.Unit.Tag) && Bot.Bot.Frame - RetreatFrame[agent.Unit.Tag] <= 5;
+                bool alreadyRetreating = RetreatFrame.ContainsKey(agent.Unit.Tag) && Bot.Main.Frame - RetreatFrame[agent.Unit.Tag] <= 5;
 
                 if (dist <= 7 * 7 || alreadyRetreating)
                 {
 
                     if (RetreatFrame.ContainsKey(agent.Unit.Tag))
-                        RetreatFrame[agent.Unit.Tag] = Bot.Bot.Frame;
+                        RetreatFrame[agent.Unit.Tag] = Bot.Main.Frame;
                     else
-                        RetreatFrame.Add(agent.Unit.Tag, Bot.Bot.Frame);
+                        RetreatFrame.Add(agent.Unit.Tag, Bot.Main.Frame);
                     agent.Order(Abilities.MOVE, agent.From(mineLocation, 4));
                     return true;
                 }
@@ -82,7 +82,7 @@ namespace Tyr.Micro
         {
             Point enemyLocation = null;
             float dist = 9 * 9;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.BUNKER)
                     continue;
@@ -100,15 +100,15 @@ namespace Tyr.Micro
 
             if (enemyLocation != null)
             {
-                bool alreadyRetreating = RetreatFrame.ContainsKey(agent.Unit.Tag) && Bot.Bot.Frame - RetreatFrame[agent.Unit.Tag] <= 5;
+                bool alreadyRetreating = RetreatFrame.ContainsKey(agent.Unit.Tag) && Bot.Main.Frame - RetreatFrame[agent.Unit.Tag] <= 5;
 
                 if (dist <= 7 * 7 || alreadyRetreating)
                 {
 
                     if (RetreatFrame.ContainsKey(agent.Unit.Tag))
-                        RetreatFrame[agent.Unit.Tag] = Bot.Bot.Frame;
+                        RetreatFrame[agent.Unit.Tag] = Bot.Main.Frame;
                     else
-                        RetreatFrame.Add(agent.Unit.Tag, Bot.Bot.Frame);
+                        RetreatFrame.Add(agent.Unit.Tag, Bot.Main.Frame);
                     agent.Order(Abilities.MOVE, agent.From(enemyLocation, 4));
                     return true;
                 }

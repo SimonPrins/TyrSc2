@@ -72,9 +72,9 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => Count(UnitTypes.STALKER) >= 10 && (Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0 || Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 3));
+            result.If(() => Count(UnitTypes.STALKER) >= 10 && (Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0 || Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 3));
             result.Building(UnitTypes.FORGE);
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 result.Building(UnitTypes.PYLON, b, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95);
                 result.Building(UnitTypes.PHOTON_CANNON, b, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95 && Completed(b, UnitTypes.PYLON) >= 1);
@@ -90,7 +90,7 @@ namespace Tyr.Builds.Protoss
             BuildList result = new BuildList();
             
             result.If(() => { return Count(UnitTypes.IMMORTAL) >= 2 && Completed(UnitTypes.NEXUS) >= 3; });
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -151,8 +151,8 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.NEXUS);
             result.Upgrade(UpgradeType.WarpGate);
             result.Building(UnitTypes.GATEWAY, Main, () => Count(UnitTypes.IMMORTAL) > 0);
-            result.Building(UnitTypes.PYLON, Natural, () => Natural.Owner == Bot.Bot.PlayerId && !Natural.UnderAttack);
-            result.Building(UnitTypes.SHIELD_BATTERY, Natural, 2, () => Bot.Bot.Frame >= 3 * 60 * 22.4 && !Expanded.Get().Detected && Completed(Natural, UnitTypes.PYLON) > 0 && !Natural.UnderAttack && !CannonDefenseDetected);
+            result.Building(UnitTypes.PYLON, Natural, () => Natural.Owner == Bot.Main.PlayerId && !Natural.UnderAttack);
+            result.Building(UnitTypes.SHIELD_BATTERY, Natural, 2, () => Bot.Main.Frame >= 3 * 60 * 22.4 && !Expanded.Get().Detected && Completed(Natural, UnitTypes.PYLON) > 0 && !Natural.UnderAttack && !CannonDefenseDetected);
             result.If(() => Count(UnitTypes.STALKER) >= 5);
             result.Building(UnitTypes.GATEWAY, Main, () => !Expanded.Get().Detected);
             result.If(() => Count(UnitTypes.STALKER) >= 10);

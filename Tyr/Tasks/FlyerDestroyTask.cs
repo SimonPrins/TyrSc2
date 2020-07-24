@@ -22,7 +22,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -32,7 +32,7 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Bot.Bot.UnitManager.Completed(UnitTypes.VOID_RAY) + Bot.Bot.UnitManager.Completed(UnitTypes.CARRIER) >= RequiredSize;
+            return Bot.Main.UnitManager.Completed(UnitTypes.VOID_RAY) + Bot.Main.UnitManager.Completed(UnitTypes.CARRIER) >= RequiredSize;
         }
 
         public override void OnFrame(Bot tyr)
@@ -83,12 +83,12 @@ namespace Tyr.Tasks
         public Point2D GetTarget()
         {
             if (Search)
-                return Bot.Bot.TargetManager.PotentialEnemyStartLocations[0];
+                return Bot.Main.TargetManager.PotentialEnemyStartLocations[0];
             Unit enemyTarget = null;
-            Point2D enemyLocation = Bot.Bot.TargetManager.PotentialEnemyStartLocations[0];
+            Point2D enemyLocation = Bot.Main.TargetManager.PotentialEnemyStartLocations[0];
             float dist = 1000 * 1000;
             bool isStarport = false;
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (unit.UnitType != UnitTypes.STARPORT && isStarport)
                     continue;
@@ -113,7 +113,7 @@ namespace Tyr.Tasks
             if (enemyTarget != null)
                 return SC2Util.To2D(enemyTarget.Pos);
 
-            return Bot.Bot.TargetManager.AttackTarget;
+            return Bot.Main.TargetManager.AttackTarget;
         }
     }
 }

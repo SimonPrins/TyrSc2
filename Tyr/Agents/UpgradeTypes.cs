@@ -145,11 +145,11 @@ namespace Tyr.Agents
 
         public float Progress()
         {
-            if (Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeID))
+            if (Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeID))
                 return 1;
-            if (!Bot.Bot.UnitManager.ActiveOrders.Contains(Ability))
+            if (!Bot.Main.UnitManager.ActiveOrders.Contains(Ability))
                 return 0;
-            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
+            foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
                 if (agent.CurrentAbility() == Ability)
                     return agent.Unit.Orders[0].Progress;
             return 0;
@@ -157,12 +157,12 @@ namespace Tyr.Agents
 
         public bool Started()
         {
-            return Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeID) || Bot.Bot.UnitManager.ActiveOrders.Contains(Ability);
+            return Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeID) || Bot.Main.UnitManager.ActiveOrders.Contains(Ability);
         }
 
         public bool Done()
         {
-            return Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeID);
+            return Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeID);
         }
     }
 }

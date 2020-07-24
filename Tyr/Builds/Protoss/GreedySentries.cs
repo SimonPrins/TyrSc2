@@ -21,10 +21,10 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             MassSentriesTask.Enable();
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             HallucinationAttackTask.Enable();
             WorkerRushDefenseTask.Enable();
         }
@@ -57,7 +57,7 @@ namespace Tyr.Builds.Protoss
             result.Train(UnitTypes.PROBE, 40, () => Completed(UnitTypes.NEXUS) >= 4);
             result.Train(UnitTypes.PROBE, 48, () => Completed(UnitTypes.NEXUS) >= 5);
             result.Train(UnitTypes.SENTRY, 3);
-            result.If(() => Bot.Bot.BaseManager.Main.BaseLocation.MineralFields.Count >= 8 || Count(UnitTypes.NEXUS) >= 2);
+            result.If(() => Bot.Main.BaseManager.Main.BaseLocation.MineralFields.Count >= 8 || Count(UnitTypes.NEXUS) >= 2);
             result.Upgrade(UpgradeType.WarpGate);
             result.Train(UnitTypes.SENTRY);
 
@@ -87,7 +87,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.SHIELD_BATTERY, Natural, NaturalDefensePos, 2, () => Count(UnitTypes.PHOTON_CANNON) >= 4 && Minerals() >= 200);
             result.Upgrade(UpgradeType.ProtossGroundWeapons);
             result.Upgrade(UpgradeType.ProtossGroundArmor);
-            result.If(() => Bot.Bot.BaseManager.Main.BaseLocation.MineralFields.Count < 8 || (Minerals() >= 450 && Count(UnitTypes.WARP_GATE) >= 5));
+            result.If(() => Bot.Main.BaseManager.Main.BaseLocation.MineralFields.Count < 8 || (Minerals() >= 450 && Count(UnitTypes.WARP_GATE) >= 5));
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.FORGE);
             result.Building(UnitTypes.ASSIMILATOR, 2, () => Minerals() >= 400);

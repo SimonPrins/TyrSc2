@@ -90,8 +90,8 @@ namespace Tyr.Builds.Zerg
                 SafeZerglingsFromReapersTask.Task.Clear();
             }
 
-            if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(66)
-                && !Bot.Bot.UnitManager.ActiveOrders.Contains(1253))
+            if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(66)
+                && !Bot.Main.UnitManager.ActiveOrders.Contains(1253))
             {
                 if (Gas() < 92)
                     GasWorkerTask.WorkersPerGas = 3;
@@ -124,11 +124,11 @@ namespace Tyr.Builds.Zerg
                     return;
                 if (Minerals() >= 100
                     && Gas() >= 100
-                    && !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(66))
+                    && !Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(66))
                     agent.Order(1253);
                 else if (Minerals() >= 200
                     && Gas() >= 200
-                    && !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(65))
+                    && !Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(65))
                     agent.Order(1252);
             }
         }

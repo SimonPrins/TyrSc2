@@ -15,17 +15,17 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            if (Bot.Bot.Frame >= 22.4 * 60)
+            if (Bot.Main.Frame >= 22.4 * 60)
                 return false;
             int farWorkers = 0;
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (!UnitTypes.WorkerTypes.Contains(unit.UnitType))
                     continue;
 
                 // See if this worker is far from the enemy base.
                 bool far = true;
-                foreach (Point2D start in Bot.Bot.TargetManager.PotentialEnemyStartLocations)
+                foreach (Point2D start in Bot.Main.TargetManager.PotentialEnemyStartLocations)
                     if (SC2Util.DistanceSq(unit.Pos, start) <= 40 * 40)
                         far = false;
 

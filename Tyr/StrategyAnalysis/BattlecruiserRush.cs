@@ -20,13 +20,13 @@ namespace Tyr.StrategyAnalysis
                 return true;
             if (ApproachingBC)
                 return false;
-            if (Bot.Bot.Frame > 22.4 * 60 * 6.5)
+            if (Bot.Main.Frame > 22.4 * 60 * 6.5)
                 return false;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.BATTLECRUISER)
                     continue;
-                float dist = SC2Util.DistanceSq(enemy.Pos, Bot.Bot.MapAnalyzer.StartLocation);
+                float dist = SC2Util.DistanceSq(enemy.Pos, Bot.Main.MapAnalyzer.StartLocation);
                 if (dist < 8 * 8)
                     return true;
                 if (dist < 60 * 60)

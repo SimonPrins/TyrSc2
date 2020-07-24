@@ -13,7 +13,7 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            return Bot.Bot.Frame <= 22.4 * 60 * 3
+            return Bot.Main.Frame <= 22.4 * 60 * 3
                 && Count(UnitTypes.GATEWAY) >= 3;
         }
 

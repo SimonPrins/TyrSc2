@@ -27,7 +27,7 @@ namespace Tyr.Tasks
         {
             if (Tasks.Count == 0)
             {
-                foreach (Base b in Bot.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Main.BaseManager.Bases)
                     foreach (Gas gas in b.BaseLocation.Gasses)
                         Tasks.Add(new GasWorkerTask(SC2Util.To2D(gas.Pos), b));
             }
@@ -43,7 +43,7 @@ namespace Tyr.Tasks
         public override bool IsNeeded()
         {
             UpdateGas();
-            if (Base.ResourceCenter == null || Base.ResourceCenter.Unit.BuildProgress < 0.9 || (Base.UnderAttack && Bot.Bot.UnitManager.Completed(UnitTypes.ResourceCenters) >= 2))
+            if (Base.ResourceCenter == null || Base.ResourceCenter.Unit.BuildProgress < 0.9 || (Base.UnderAttack && Bot.Main.UnitManager.Completed(UnitTypes.ResourceCenters) >= 2))
                 return false;
             return Gas != null;
         }
@@ -66,7 +66,7 @@ namespace Tyr.Tasks
 
         private void UpdateGas()
         {
-            if (Gas != null && !Bot.Bot.UnitManager.Agents.ContainsKey(Gas.Unit.Tag))
+            if (Gas != null && !Bot.Main.UnitManager.Agents.ContainsKey(Gas.Unit.Tag))
                 Gas = null;
 
             if (Gas != null && Gas.Unit.VespeneContents == 0)
@@ -74,7 +74,7 @@ namespace Tyr.Tasks
 
             if (Gas == null)
             {
-                foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
+                foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
                     if (UnitTypes.GasGeysers.Contains(agent.Unit.UnitType) 
                         && agent.Unit.BuildProgress >= 0.99
                         && agent.Unit.VespeneContents > 0

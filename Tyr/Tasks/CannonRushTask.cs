@@ -36,7 +36,7 @@ namespace Tyr.Tasks
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
             if (Units.Count == 0)
-                result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.PROBE } });
+                result.Add(new UnitDescriptor() { Pos = Bot.Main.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.PROBE } });
             return result;
         }
 
@@ -144,10 +144,10 @@ namespace Tyr.Tasks
             if (CannonLocation != null)
                 return;
             
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count != 1)
                 return;
-            Point2D enemyMain = Bot.Bot.TargetManager.PotentialEnemyStartLocations[0];
-            Point2D enemyRamp = Bot.Bot.MapAnalyzer.GetEnemyRamp();
+            Point2D enemyMain = Bot.Main.TargetManager.PotentialEnemyStartLocations[0];
+            Point2D enemyRamp = Bot.Main.MapAnalyzer.GetEnemyRamp();
 
             for (float x = -20; x <= 20; x++)
                 for (float y = -20; y <= 20; y++)

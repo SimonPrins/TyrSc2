@@ -34,10 +34,10 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ArmyObserverTask.Enable();
-            if (Bot.Bot.EnemyRace == SC2APIProtocol.Race.Zerg || Bot.Bot.EnemyRace == SC2APIProtocol.Race.Protoss)
+            if (Bot.Main.EnemyRace == SC2APIProtocol.Race.Zerg || Bot.Main.EnemyRace == SC2APIProtocol.Race.Protoss)
                 ForceFieldRampTask.Enable();
             if (DenyScouting)
                 DenyScoutTask.Enable();

@@ -15,15 +15,15 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count != 1)
                 return false;
-            if (Bot.Bot.Frame >= 22.4 * 60 * 4.5)
+            if (Bot.Main.Frame >= 22.4 * 60 * 4.5)
                 return false;
 
-            Point2D enemyMain = Bot.Bot.TargetManager.PotentialEnemyStartLocations[0];
-            Point2D enemyNatural = Bot.Bot.MapAnalyzer.GetEnemyNatural().Pos;
+            Point2D enemyMain = Bot.Main.TargetManager.PotentialEnemyStartLocations[0];
+            Point2D enemyNatural = Bot.Main.MapAnalyzer.GetEnemyNatural().Pos;
 
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!UnitTypes.ResourceCenters.Contains(enemy.UnitType))
                     continue;

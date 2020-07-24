@@ -35,13 +35,13 @@ namespace Tyr.Tasks
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
-            result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = UnitTypes.WorkerTypes });
+            result.Add(new UnitDescriptor() { Pos = Bot.Main.TargetManager.AttackTarget, Count = 1, UnitTypes = UnitTypes.WorkerTypes });
             return result;
         }
 
         public override bool IsNeeded()
         {
-            return Bot.Bot.Frame > 1;
+            return Bot.Main.Frame > 1;
         }
 
         public override void OnFrame(Bot tyr)
@@ -49,7 +49,7 @@ namespace Tyr.Tasks
             UpdateEnemyBases();
             if (units.Count == 0)
                 return;
-            Bot.Bot.DrawText("Enemy bases for scouting: " + EnemyBases.Count);
+            Bot.Main.DrawText("Enemy bases for scouting: " + EnemyBases.Count);
             Base target = null;
             float dist = 1000000;
             foreach (Base loc in EnemyBases)
@@ -100,7 +100,7 @@ namespace Tyr.Tasks
             if (target.Owner == -1)
                 return false;
 
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.PHOTON_CANNON
                     && enemy.UnitType != UnitTypes.BUNKER
@@ -119,16 +119,16 @@ namespace Tyr.Tasks
             if (EnemyBases.Count > 0)
                 return;
 
-            if (EnemyMain == null && Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count == 1)
-                EnemyMain = Bot.Bot.TargetManager.PotentialEnemyStartLocations[0];
-            if (EnemyNatural == null && Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count == 1)
+            if (EnemyMain == null && Bot.Main.TargetManager.PotentialEnemyStartLocations.Count == 1)
+                EnemyMain = Bot.Main.TargetManager.PotentialEnemyStartLocations[0];
+            if (EnemyNatural == null && Bot.Main.TargetManager.PotentialEnemyStartLocations.Count == 1)
             {
-                BaseLocation enemyNaturalBase = Bot.Bot.MapAnalyzer.GetEnemyNatural();
+                BaseLocation enemyNaturalBase = Bot.Main.MapAnalyzer.GetEnemyNatural();
                 if (enemyNaturalBase != null)
                     EnemyNatural = enemyNaturalBase.Pos;
             }
             
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 if (b.Owner != -1)
                     continue;

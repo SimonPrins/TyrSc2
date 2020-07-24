@@ -14,7 +14,7 @@ namespace Tyr.Tasks
 
         public override bool DoWant(Agent agent)
         {
-            return Units.Count == 0 && Condition() && agent.Unit.UnitType == UnitTypes.HYDRALISK && SC2Util.DistanceGrid(agent.Unit.Pos, Bot.Bot.MapAnalyzer.StartLocation) <= 30;
+            return Units.Count == 0 && Condition() && agent.Unit.UnitType == UnitTypes.HYDRALISK && SC2Util.DistanceGrid(agent.Unit.Pos, Bot.Main.MapAnalyzer.StartLocation) <= 30;
         }
 
         public override bool IsNeeded()

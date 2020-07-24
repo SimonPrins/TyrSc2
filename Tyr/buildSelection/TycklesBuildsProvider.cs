@@ -13,7 +13,7 @@ namespace Tyr.buildSelection
             List<Build> options = new List<Build>();
 
 
-            if (Bot.Bot.EnemyRace == Race.Protoss)
+            if (Bot.Main.EnemyRace == Race.Protoss)
             {
                 if (Stalker.Get().DetectedPreviously
                     && Zealot.Get().DetectedPreviously
@@ -33,7 +33,7 @@ namespace Tyr.buildSelection
                     return options;
                 }
             }
-            if (Bot.Bot.EnemyRace == Race.Zerg)
+            if (Bot.Main.EnemyRace == Race.Zerg)
             {
                 if ((Zergling.Get().DetectedPreviously || Roach.Get().DetectedPreviously)
                     && !Hydralisk.Get().DetectedPreviously)
@@ -42,7 +42,7 @@ namespace Tyr.buildSelection
                     return options;
                 }
             }
-            if (Bot.Bot.EnemyRace == Race.Terran && Battlecruiser.Get().DetectedPreviously && !SiegeTank.Get().DetectedPreviously)
+            if (Bot.Main.EnemyRace == Race.Terran && Battlecruiser.Get().DetectedPreviously && !SiegeTank.Get().DetectedPreviously)
             {
                 options.Add(new MassSentries() { AntiBC = true });
                 return options;

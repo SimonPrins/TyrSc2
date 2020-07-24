@@ -75,7 +75,7 @@ namespace Tyr.CombatSim
         {
             Tag++;
             Unit unit = new Unit();
-            unit.Owner = player1Owned ? (int)Bot.Bot.PlayerId : (3 - (int)Bot.Bot.PlayerId);
+            unit.Owner = player1Owned ? (int)Bot.Main.PlayerId : (3 - (int)Bot.Main.PlayerId);
             unit.Pos = new SC2APIProtocol.Point() { X = x };
             unit.Health = health;
             unit.HealthMax = health;

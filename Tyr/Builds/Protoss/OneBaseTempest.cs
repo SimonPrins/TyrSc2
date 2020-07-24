@@ -29,10 +29,10 @@ namespace Tyr.Builds.Protoss
             ArmyObserverTask.Enable();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
         }
 
         public override void OnStart(Bot tyr)
@@ -49,7 +49,7 @@ namespace Tyr.Builds.Protoss
                 WallIn.Create(new List<uint>() { UnitTypes.GATEWAY, UnitTypes.PYLON, UnitTypes.GATEWAY });
                 WallIn.ReserveSpace();
                 ShieldBatteryPos = SC2Util.TowardCardinal(WallIn.Wall[1].Pos, Main.BaseLocation.Pos, 2);
-                Bot.Bot.buildingPlacer.ReservedLocation.Add(new ReservedBuilding() { Type = UnitTypes.SHIELD_BATTERY, Pos = ShieldBatteryPos });
+                Bot.Main.buildingPlacer.ReservedLocation.Add(new ReservedBuilding() { Type = UnitTypes.SHIELD_BATTERY, Pos = ShieldBatteryPos });
             }
             
             Set += ProtossBuildUtil.Pylons(() => Completed(UnitTypes.PYLON) >= 2);
@@ -86,9 +86,9 @@ namespace Tyr.Builds.Protoss
             //result.Building(UnitTypes.SHIELD_BATTERY, Main, ShieldBatteryPos, true, () => Minerals() >= 400);
             result.Building(UnitTypes.FLEET_BEACON);
             result.Building(UnitTypes.STARGATE, () => Count(UnitTypes.TEMPEST) > 0);
-            result.Building(UnitTypes.PYLON, Main, ShieldBatteryPos, true, () => Minerals() >= 400 && Bot.Bot.Frame >= 22.4 * 60 * 5);
-            result.Building(UnitTypes.PHOTON_CANNON, Main, MainDefensePos, 2, () => Minerals() >= 400 && Bot.Bot.Frame >= 22.4 * 60 * 5);
-            result.Building(UnitTypes.SHIELD_BATTERY, Main, MainDefensePos, 2, () => Minerals() >= 400 && Bot.Bot.Frame >= 22.4 * 60 * 5);
+            result.Building(UnitTypes.PYLON, Main, ShieldBatteryPos, true, () => Minerals() >= 400 && Bot.Main.Frame >= 22.4 * 60 * 5);
+            result.Building(UnitTypes.PHOTON_CANNON, Main, MainDefensePos, 2, () => Minerals() >= 400 && Bot.Main.Frame >= 22.4 * 60 * 5);
+            result.Building(UnitTypes.SHIELD_BATTERY, Main, MainDefensePos, 2, () => Minerals() >= 400 && Bot.Main.Frame >= 22.4 * 60 * 5);
 
             return result;
         }

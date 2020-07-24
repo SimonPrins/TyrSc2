@@ -14,7 +14,7 @@ namespace Tyr.Micro
         {
             if (agent.Unit.UnitType != UnitTypes.HIGH_TEMPLAR)
                 return false;
-            if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(52))
+            if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(52))
                 return false;
             if (agent.Unit.Energy < 73)
                 return false;
@@ -23,7 +23,7 @@ namespace Tyr.Micro
 
             if (StormTargets.ContainsKey(agent.Unit.Tag))
             {
-                foreach (Effect effect in Bot.Bot.Observation.Observation.RawData.Effects)
+                foreach (Effect effect in Bot.Main.Observation.Observation.RawData.Effects)
                 {
                     if (effect.EffectId != 1)
                         continue;
@@ -38,7 +38,7 @@ namespace Tyr.Micro
                 return true;
             }
 
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (UnitTypes.BuildingTypes.Contains(unit.UnitType))
                     continue;
@@ -58,7 +58,7 @@ namespace Tyr.Micro
                 if (SC2Util.DistanceSq(unit.Pos, agent.Unit.Pos) <= 11 * 11)
                 {
                     int count = 0;
-                    foreach (Unit unit2 in Bot.Bot.Enemies())
+                    foreach (Unit unit2 in Bot.Main.Enemies())
                     {
                         if (UnitTypes.BuildingTypes.Contains(unit.UnitType))
                             continue;
@@ -81,7 +81,7 @@ namespace Tyr.Micro
                     if (count >= 10)
                     {
                         agent.Order(1036, SC2Util.To2D(unit.Pos));
-                        Storm storm = new Storm() { Location = SC2Util.To2D(unit.Pos), Frame = Bot.Bot.Frame, Caster = agent.Unit.Tag };
+                        Storm storm = new Storm() { Location = SC2Util.To2D(unit.Pos), Frame = Bot.Main.Frame, Caster = agent.Unit.Tag };
                         Storms.Add(storm);
                         StormTargets.Add(agent.Unit.Tag, storm);
                         return true;
@@ -94,11 +94,11 @@ namespace Tyr.Micro
 
         private void UpdateStorms()
         {
-            if (StormUpdateFrame >= Bot.Bot.Frame)
+            if (StormUpdateFrame >= Bot.Main.Frame)
                 return;
-            StormUpdateFrame = Bot.Bot.Frame;
+            StormUpdateFrame = Bot.Main.Frame;
             for (int i = Storms.Count - 1; i >= 0; i--)
-                if (Bot.Bot.Frame - Storms[i].Frame >= 70)
+                if (Bot.Main.Frame - Storms[i].Frame >= 70)
                 {
                     if (StormTargets.ContainsKey(Storms[i].Caster))
                         StormTargets.Remove(Storms[i].Caster);

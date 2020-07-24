@@ -15,11 +15,11 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (unit.UnitType != UnitTypes.PYLON && unit.UnitType != UnitTypes.PHOTON_CANNON)
                     continue;
-                if (SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation)) <= 40 * 40)
+                if (SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation)) <= 40 * 40)
                     return true;
             }
             return false;

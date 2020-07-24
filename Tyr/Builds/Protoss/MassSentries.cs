@@ -54,8 +54,8 @@ namespace Tyr.Builds.Protoss
             WorkerScoutTask.Enable();
             ForceFieldRampTask.Enable();
             KillOwnUnitTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             WorkerRushDefenseTask.Enable();
             ArmyObserverTask.Enable();
             SentryWarpInTask.Enable();
@@ -92,7 +92,7 @@ namespace Tyr.Builds.Protoss
 
             RampDefensePos = new PotentialHelper(MainDefensePos, 4).To(tyr.MapAnalyzer.GetMainRamp()).Get();
 
-            if (Bot.Bot.EnemyRace == Race.Terran)
+            if (Bot.Main.EnemyRace == Race.Terran)
             {
                 WallIn.CreateReaperWall(new List<uint> { UnitTypes.GATEWAY, UnitTypes.PYLON, UnitTypes.CYBERNETICS_CORE });
                 WallIn.ReserveSpace();
@@ -100,7 +100,7 @@ namespace Tyr.Builds.Protoss
 
             NaturalCannonDefensePos = NaturalDefensePos;
 
-            if (Bot.Bot.EnemyRace == Race.Zerg && !SkipNatural)
+            if (Bot.Main.EnemyRace == Race.Zerg && !SkipNatural)
             {
                 NaturalWall.CreateFullNatural(new List<uint>() { UnitTypes.GATEWAY, UnitTypes.GATEWAY, UnitTypes.PYLON, UnitTypes.GATEWAY });
                 NaturalWall.ReserveSpace();
@@ -115,7 +115,7 @@ namespace Tyr.Builds.Protoss
                         NaturalWall.Wall[0] = temp;
                         NaturalCannonDefensePos = new PotentialHelper(NaturalDefensePos, 4).To(Natural.BaseLocation.Pos).Get();
                     }
-                    MainAndNatural = Bot.Bot.MapAnalyzer.FindMainAndNaturalArea(NaturalWall);
+                    MainAndNatural = Bot.Main.MapAnalyzer.FindMainAndNaturalArea(NaturalWall);
                 }
             }
 
@@ -129,7 +129,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -165,7 +165,7 @@ namespace Tyr.Builds.Protoss
             BuildList result = new BuildList();
 
             result.Building(UnitTypes.NEXUS);
-            result.If(() => { Bot.Bot.DrawText("Executing main buildlist."); return true; });
+            result.If(() => { Bot.Main.DrawText("Executing main buildlist."); return true; });
             if (NaturalWall.Wall.Count >= 4)
             {
                 result.Building(UnitTypes.PYLON, Natural, NaturalWall.Wall[2].Pos, true);
@@ -190,17 +190,17 @@ namespace Tyr.Builds.Protoss
             else
                 result.Building(UnitTypes.CYBERNETICS_CORE, Main);
             result.Building(UnitTypes.ASSIMILATOR, () => !DefenseMode || (Count(UnitTypes.CYBERNETICS_CORE) > 0 && Count(UnitTypes.FORGE) > 0));
-            result.Building(UnitTypes.GATEWAY, () => (!DefenseMode || Count(UnitTypes.PHOTON_CANNON) > 0) && (Bot.Bot.EnemyRace != Race.Zerg || Count(UnitTypes.CYBERNETICS_CORE) > 0));
+            result.Building(UnitTypes.GATEWAY, () => (!DefenseMode || Count(UnitTypes.PHOTON_CANNON) > 0) && (Bot.Main.EnemyRace != Race.Zerg || Count(UnitTypes.CYBERNETICS_CORE) > 0));
             if (NaturalWall.Wall.Count >= 4)
                 result.Building(UnitTypes.FORGE, Natural, NaturalWall.Wall[0].Pos, true, () => DefenseMode && Count(UnitTypes.FORGE) == 0);
             else
                 result.Building(UnitTypes.FORGE, () => DefenseMode);
             if (NaturalWall.Wall.Count >= 4)
             {
-                result.If(() => { Bot.Bot.DrawText("Building natural cannons. " + DefenseMode);  return true; });
-                result.Building(UnitTypes.PHOTON_CANNON, Natural, NaturalCannonDefensePos, 3, () => DefenseMode && !Bot.Bot.buildingPlacer.CannonPlacementFailed);
-                result.Building(UnitTypes.PYLON, Natural, NaturalCannonDefensePos, () => DefenseMode && !Bot.Bot.buildingPlacer.CannonPlacementFailed);
-                result.Building(UnitTypes.SHIELD_BATTERY, Natural, NaturalCannonDefensePos, 2, () => DefenseMode && !Bot.Bot.buildingPlacer.CannonPlacementFailed);
+                result.If(() => { Bot.Main.DrawText("Building natural cannons. " + DefenseMode);  return true; });
+                result.Building(UnitTypes.PHOTON_CANNON, Natural, NaturalCannonDefensePos, 3, () => DefenseMode && !Bot.Main.buildingPlacer.CannonPlacementFailed);
+                result.Building(UnitTypes.PYLON, Natural, NaturalCannonDefensePos, () => DefenseMode && !Bot.Main.buildingPlacer.CannonPlacementFailed);
+                result.Building(UnitTypes.SHIELD_BATTERY, Natural, NaturalCannonDefensePos, 2, () => DefenseMode && !Bot.Main.buildingPlacer.CannonPlacementFailed);
             }
             else
             {
@@ -208,7 +208,7 @@ namespace Tyr.Builds.Protoss
                 result.Building(UnitTypes.PHOTON_CANNON, Main, RampDefensePos, 3, () => DefenseMode);
                 result.Building(UnitTypes.SHIELD_BATTERY, Main, RampDefensePos, 2, () => DefenseMode);
             }
-            result.If(() => !DefenseMode || Completed(UnitTypes.SENTRY) >= 15 || (Bot.Bot.EnemyRace == Race.Zerg && (Completed(UnitTypes.PHOTON_CANNON) >= 3 || Minerals() >= 600 || Bot.Bot.buildingPlacer.CannonPlacementFailed)));
+            result.If(() => !DefenseMode || Completed(UnitTypes.SENTRY) >= 15 || (Bot.Main.EnemyRace == Race.Zerg && (Completed(UnitTypes.PHOTON_CANNON) >= 3 || Minerals() >= 600 || Bot.Main.buildingPlacer.CannonPlacementFailed)));
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.ASSIMILATOR, 2);
             result.Building(UnitTypes.FORGE, Main, () => !DefenseMode);
@@ -233,7 +233,7 @@ namespace Tyr.Builds.Protoss
                 result.Building(UnitTypes.GATEWAY, Main);
             }
             result.Building(UnitTypes.ROBOTICS_FACILITY, () => WarpPrismDrops);
-            result.If(() => Bot.Bot.EnemyRace != Race.Zerg || Count(Main, UnitTypes.FORGE) > 0);
+            result.If(() => Bot.Main.EnemyRace != Race.Zerg || Count(Main, UnitTypes.FORGE) > 0);
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.ASSIMILATOR, 2);
             result.If(() => Count(UnitTypes.PROBE) >= 55 || Minerals() >= 600);
@@ -244,7 +244,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.ASSIMILATOR, 2);
             result.Building(UnitTypes.GATEWAY, Main);
-            result.If(() => Bot.Bot.BaseManager.Main.BaseLocation.MineralFields.Count < 8);
+            result.If(() => Bot.Main.BaseManager.Main.BaseLocation.MineralFields.Count < 8);
             result.Building(UnitTypes.NEXUS);
             if (!SkipNatural)
                 result.Building(UnitTypes.PYLON, Natural);
@@ -302,7 +302,7 @@ namespace Tyr.Builds.Protoss
                 }
             }
 
-            if (Bot.Bot.Frame <= 2)
+            if (Bot.Main.Frame <= 2)
                 SentryWarpInTask.Task.Stopped = true;
             else if (MassSentriesTask.Task.AttackSent)
                 SentryWarpInTask.Task.Stopped = false;

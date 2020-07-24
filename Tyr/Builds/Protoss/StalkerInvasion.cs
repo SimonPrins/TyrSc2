@@ -32,8 +32,8 @@ namespace Tyr.Builds.Protoss
             TimingAttackTask.Enable();
             StalkerBlinkInMainTask.Enable();
             WorkerScoutTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ForceFieldRampTask.Enable();
         }
 
@@ -71,7 +71,7 @@ namespace Tyr.Builds.Protoss
             result.Train(UnitTypes.STALKER, 3);
             result.Upgrade(UpgradeType.Blink);
             result.If(() => UpgradeType.LookUp[UpgradeType.Blink].Started() || Completed(UnitTypes.TWILIGHT_COUNSEL) == 0);
-            result.If(() => Bot.Bot.BaseManager.Main.BaseLocation.MineralFields.Count >= 8 || Count(UnitTypes.NEXUS) >= 2);
+            result.If(() => Bot.Main.BaseManager.Main.BaseLocation.MineralFields.Count >= 8 || Count(UnitTypes.NEXUS) >= 2);
             result.Upgrade(UpgradeType.WarpGate);
             result.Train(UnitTypes.STALKER, 6);
             result.Train(UnitTypes.SENTRY, 1);
@@ -95,7 +95,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.TWILIGHT_COUNSEL);
             result.Building(UnitTypes.GATEWAY, () => Count(UnitTypes.STALKER) >= 2);
             result.Building(UnitTypes.GATEWAY, () => Minerals() >= 350 && Count(UnitTypes.STALKER) >= 8 && UpgradeType.LookUp[UpgradeType.Blink].Started());
-            result.If(() => Bot.Bot.BaseManager.Main.BaseLocation.MineralFields.Count < 8);
+            result.If(() => Bot.Main.BaseManager.Main.BaseLocation.MineralFields.Count < 8);
             result.Building(UnitTypes.GATEWAY, 2);
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.PYLON, Natural);

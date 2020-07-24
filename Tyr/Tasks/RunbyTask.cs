@@ -17,7 +17,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public RunbyTask() : base(10)
@@ -25,7 +25,7 @@ namespace Tyr.Tasks
 
         public override bool DoWant(Agent agent)
         {
-            if (DoneUnits.Contains(agent.Unit.Tag) && agent.DistanceSq(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) >= 16 * 16)
+            if (DoneUnits.Contains(agent.Unit.Tag) && agent.DistanceSq(Bot.Main.TargetManager.PotentialEnemyStartLocations[0]) >= 16 * 16)
             {
                 DoneUnits.Remove(agent.Unit.Tag);
                 return true;
@@ -39,11 +39,11 @@ namespace Tyr.Tasks
         {
             int count = 0;
             CloseUnits = new HashSet<ulong>();
-            foreach (Agent agent in Bot.Bot.Units())
+            foreach (Agent agent in Bot.Main.Units())
             {
                 if (!agent.IsCombatUnit)
                     continue;
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.BUNKER
                         && enemy.UnitType != UnitTypes.PHOTON_CANNON

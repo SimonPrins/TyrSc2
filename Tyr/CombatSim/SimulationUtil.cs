@@ -30,7 +30,7 @@ namespace Tyr.CombatSim
             result.IsAir = unit.IsFlying || unit.UnitType == UnitTypes.COLOSUS;
             result.IsGround = !unit.IsFlying || unit.UnitType == UnitTypes.COLOSUS;
             result.Armor = (int)unitType.Armor;
-            result.Owner = unit.Owner == Bot.Bot.PlayerId ? 1 : 2;
+            result.Owner = unit.Owner == Bot.Main.PlayerId ? 1 : 2;
             result.Pos = new Point(unit.Pos.X, unit.Pos.Y);
             result.Tag = (long)unit.Tag;
             result.UnitType = unit.UnitType;

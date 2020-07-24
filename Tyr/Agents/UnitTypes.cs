@@ -200,7 +200,7 @@ namespace Tyr.Agents
 
         public static void LoadData(ResponseData data)
         {
-            if (Bot.Bot.GameVersion.StartsWith("4.10."))
+            if (Bot.Main.GameVersion.StartsWith("4.10."))
             {
                 ASSIMILATOR_RICH = 1956;
                 EXTRACTOR_RICH = 1957;

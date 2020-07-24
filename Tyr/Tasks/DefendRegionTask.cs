@@ -42,16 +42,16 @@ namespace Tyr.Tasks
 
         public bool UnderAttack()
         {
-            if (TargetUpdatedFrame >= Bot.Bot.Frame)
+            if (TargetUpdatedFrame >= Bot.Main.Frame)
                 return Target != null;
 
             Target = null;
-            TargetUpdatedFrame = Bot.Bot.Frame;
+            TargetUpdatedFrame = Bot.Main.Frame;
 
             if (DefenseLocation == null)
                 return false;
             float dist = DefendRange * DefendRange;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                     continue;

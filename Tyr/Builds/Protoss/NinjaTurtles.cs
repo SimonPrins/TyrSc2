@@ -31,13 +31,13 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             DTAttackTask.Enable();
-            Bot.Bot.TaskManager.Add(new FlyerAttackTask() { RequiredSize = 4 });
-            Bot.Bot.TaskManager.Add(new ShieldBatteryTargetTask());
+            Bot.Main.TaskManager.Add(new FlyerAttackTask() { RequiredSize = 4 });
+            Bot.Main.TaskManager.Add(new ShieldBatteryTargetTask());
             KillOwnUnitTask.Enable();
 
 
-            if (Bot.Bot.BaseManager.Pocket != null)
-                Bot.Bot.TaskManager.Add(new ScoutProxyTask(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos));
+            if (Bot.Main.BaseManager.Pocket != null)
+                Bot.Main.TaskManager.Add(new ScoutProxyTask(Bot.Main.BaseManager.Pocket.BaseLocation.Pos));
         }
 
         public override void OnStart(Bot tyr)
@@ -62,7 +62,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.Building(UnitTypes.PYLON, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building3, true);
+            result.Building(UnitTypes.PYLON, Bot.Main.BaseManager.Main, Bot.Main.MapAnalyzer.building3, true);
 
             return result;
         }
@@ -72,8 +72,8 @@ namespace Tyr.Builds.Protoss
             BuildList result = new BuildList();
 
             Base reaperBase = null;
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
-                if (b != Bot.Bot.BaseManager.Main)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
+                if (b != Bot.Main.BaseManager.Main)
                     reaperBase = b;
 
             ReaperDefenseCannonStep = new BuildingStep(UnitTypes.PHOTON_CANNON, reaperBase, () => !StartExpanding);
@@ -97,21 +97,21 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            Point2D cannon1Pos = SC2Util.Point(Bot.Bot.MapAnalyzer.building1.X + (Bot.Bot.MapAnalyzer.building1.X - Bot.Bot.MapAnalyzer.building2.X) / 2, Bot.Bot.MapAnalyzer.building1.Y + (Bot.Bot.MapAnalyzer.building1.Y - Bot.Bot.MapAnalyzer.building2.Y) / 2);
-            Point2D cannon2Pos = SC2Util.Point(Bot.Bot.MapAnalyzer.building2.X + (Bot.Bot.MapAnalyzer.building2.X - Bot.Bot.MapAnalyzer.building1.X) / 2, Bot.Bot.MapAnalyzer.building2.Y + (Bot.Bot.MapAnalyzer.building2.Y - Bot.Bot.MapAnalyzer.building1.Y) / 2);
+            Point2D cannon1Pos = SC2Util.Point(Bot.Main.MapAnalyzer.building1.X + (Bot.Main.MapAnalyzer.building1.X - Bot.Main.MapAnalyzer.building2.X) / 2, Bot.Main.MapAnalyzer.building1.Y + (Bot.Main.MapAnalyzer.building1.Y - Bot.Main.MapAnalyzer.building2.Y) / 2);
+            Point2D cannon2Pos = SC2Util.Point(Bot.Main.MapAnalyzer.building2.X + (Bot.Main.MapAnalyzer.building2.X - Bot.Main.MapAnalyzer.building1.X) / 2, Bot.Main.MapAnalyzer.building2.Y + (Bot.Main.MapAnalyzer.building2.Y - Bot.Main.MapAnalyzer.building1.Y) / 2);
 
             result.Building(UnitTypes.NEXUS);
-            result.Building(UnitTypes.FORGE, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building1, true, () => !StartExpanding);
-            result.Building(UnitTypes.GATEWAY, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building2, true);
-            result.Building(UnitTypes.PHOTON_CANNON, Bot.Bot.BaseManager.Main, cannon1Pos, () => !StartExpanding);
-            result.Building(UnitTypes.PHOTON_CANNON, Bot.Bot.BaseManager.Main, cannon2Pos, () => !StartExpanding);
+            result.Building(UnitTypes.FORGE, Bot.Main.BaseManager.Main, Bot.Main.MapAnalyzer.building1, true, () => !StartExpanding);
+            result.Building(UnitTypes.GATEWAY, Bot.Main.BaseManager.Main, Bot.Main.MapAnalyzer.building2, true);
+            result.Building(UnitTypes.PHOTON_CANNON, Bot.Main.BaseManager.Main, cannon1Pos, () => !StartExpanding);
+            result.Building(UnitTypes.PHOTON_CANNON, Bot.Main.BaseManager.Main, cannon2Pos, () => !StartExpanding);
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.CYBERNETICS_CORE);
             result.Building(UnitTypes.ASSIMILATOR);
             result.If(() => { return Completed(UnitTypes.CYBERNETICS_CORE) > 0; });
-            result.Building(UnitTypes.SHIELD_BATTERY, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building1);
-            result.Building(UnitTypes.SHIELD_BATTERY, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building2);
-            result.Building(UnitTypes.PHOTON_CANNON, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building3, () => !StartExpanding);
+            result.Building(UnitTypes.SHIELD_BATTERY, Bot.Main.BaseManager.Main, Bot.Main.MapAnalyzer.building1);
+            result.Building(UnitTypes.SHIELD_BATTERY, Bot.Main.BaseManager.Main, Bot.Main.MapAnalyzer.building2);
+            result.Building(UnitTypes.PHOTON_CANNON, Bot.Main.BaseManager.Main, Bot.Main.MapAnalyzer.building3, () => !StartExpanding);
             result.Building(UnitTypes.PYLON, 3);
             result.If(() => { return !VoidrayOnly; });
             result.Building(UnitTypes.TWILIGHT_COUNSEL);
@@ -148,7 +148,7 @@ namespace Tyr.Builds.Protoss
             {
                 foreach (Agent agent in tyr.Units())
                     if (agent.Unit.UnitType == UnitTypes.FORGE
-                        && agent.DistanceSq(Bot.Bot.MapAnalyzer.building1) <= 2 * 2)
+                        && agent.DistanceSq(Bot.Main.MapAnalyzer.building1) <= 2 * 2)
                     {
                         KillOwnUnitTask.Task.TargetTag = agent.Unit.Tag;
                         break;
@@ -173,7 +173,7 @@ namespace Tyr.Builds.Protoss
                 foreach (Unit unit in tyr.Enemies())
                 {
                     if (unit.UnitType == UnitTypes.REAPER
-                        && Bot.Bot.MapAnalyzer.StartArea[(int)System.Math.Round(unit.Pos.X), (int)System.Math.Round(unit.Pos.Y)])
+                        && Bot.Main.MapAnalyzer.StartArea[(int)System.Math.Round(unit.Pos.X), (int)System.Math.Round(unit.Pos.Y)])
                     {
                         Point2D dir = SC2Util.Point(unit.Pos.X - tyr.MapAnalyzer.StartLocation.X, unit.Pos.Y - tyr.MapAnalyzer.StartLocation.Y);
                         float length = (float)System.Math.Sqrt(dir.X * dir.X + dir.Y * dir.Y);

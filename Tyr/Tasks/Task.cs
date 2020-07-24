@@ -114,14 +114,14 @@ namespace Tyr.Tasks
         public static void Enable(Task task)
         {
             task.Stopped = false;
-            Bot.Bot.TaskManager.Add(task);
+            Bot.Main.TaskManager.Add(task);
         }
 
         public void Attack(Agent agent, Point2D point)
         {
             if (MicroController.TryAttack(agent, point, BeforeControllers))
                 return;
-            if (Bot.Bot.MicroController.TryAttack(agent, point))
+            if (Bot.Main.MicroController.TryAttack(agent, point))
                 return;
             if (MicroController.TryAttack(agent, point, AfterControllers))
                 return;

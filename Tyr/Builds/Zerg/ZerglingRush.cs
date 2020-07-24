@@ -26,7 +26,7 @@ namespace Tyr.Builds.Zerg
             MicroControllers.Add(new FleeBroodlingsController());
             MicroControllers.Add(new TargetFireController(GetPrioritiesCloseRange()) { MoveWhenNoTarget = false });
             MicroControllers.Add(new TargetFireController(GetPriorities()));
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 QueenInjectTask queenInjectTask = new QueenInjectTask(b);
                 tyr.TaskManager.Add(queenInjectTask);

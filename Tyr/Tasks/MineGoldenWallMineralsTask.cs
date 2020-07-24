@@ -16,7 +16,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public MineGoldenWallMineralsTask() : base(10)
@@ -38,12 +38,12 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Bot.Bot.Map == MapAnalysis.MapEnum.GoldenWall && !Done;
+            return Bot.Main.Map == MapAnalysis.MapEnum.GoldenWall && !Done;
         }
 
         public override void OnFrame(Bot tyr)
         {
-            if (Bot.Bot.Map != MapAnalysis.MapEnum.GoldenWall)
+            if (Bot.Main.Map != MapAnalysis.MapEnum.GoldenWall)
                 return;
             Agent resourceCenter = tyr.Build.Main.ResourceCenter;
             if (FirstMineralPos == null)

@@ -32,8 +32,8 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            Bot.Bot.DrawText("Mines needed: " + (Bot.Bot.Build.Completed(UnitType) >= RequiredSize));
-            return Bot.Bot.Build.Completed(UnitType) >= RequiredSize;
+            Bot.Main.DrawText("Mines needed: " + (Bot.Main.Build.Completed(UnitType) >= RequiredSize));
+            return Bot.Main.Build.Completed(UnitType) >= RequiredSize;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -45,7 +45,7 @@ namespace Tyr.Tasks
 
         public override void OnFrame(Bot tyr)
         {
-            Bot.Bot.DrawText("Mines attacking: " + Units.Count);
+            Bot.Main.DrawText("Mines attacking: " + Units.Count);
             for (int i = Bases.Count - 1; i >= 0; i--)
             {
                 if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 1

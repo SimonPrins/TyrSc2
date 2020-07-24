@@ -25,7 +25,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -43,25 +43,25 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Bot.Bot.Frame > 0;
+            return Bot.Main.Frame > 0;
         }
 
         public Point2D GetHideLocation()
         {
             if (HideLocation == null)
             {
-                if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+                if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count != 1)
                     return null;
 
-                Point2D enemyMain = Bot.Bot.TargetManager.PotentialEnemyStartLocations[0];
-                Point2D enemyNatural = Bot.Bot.MapAnalyzer.GetEnemyNatural().Pos;
+                Point2D enemyMain = Bot.Main.TargetManager.PotentialEnemyStartLocations[0];
+                Point2D enemyNatural = Bot.Main.MapAnalyzer.GetEnemyNatural().Pos;
 
                 PotentialHelper potential = new PotentialHelper(enemyNatural, 30);
                 potential.From(enemyMain);
                 Point2D closeTo = potential.Get();
                 
                 float dist = 10000;
-                foreach (Base b in Bot.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Main.BaseManager.Bases)
                 {
                     float newDist = SC2Util.DistanceSq(closeTo, b.BaseLocation.Pos);
                     
@@ -75,10 +75,10 @@ namespace Tyr.Tasks
                     dist = newDist;
                     HideLocation = b.BaseLocation.Pos;
                 }
-                if (Bot.Bot.EnemyRace == Race.Zerg)
+                if (Bot.Main.EnemyRace == Race.Zerg)
                 {
                     potential = new PotentialHelper(HideLocation, 15);
-                    potential.To(Bot.Bot.MapAnalyzer.StartLocation);
+                    potential.To(Bot.Main.MapAnalyzer.StartLocation);
                     HideLocation = potential.Get();
                 }
             }
@@ -137,7 +137,7 @@ namespace Tyr.Tasks
             List<BuildRequest> doneRequests = new List<BuildRequest>();
             foreach (BuildRequest request in BuildRequests)
             {
-                if (request.worker != null && !Bot.Bot.UnitManager.Agents.ContainsKey(request.worker.Unit.Tag))
+                if (request.worker != null && !Bot.Main.UnitManager.Agents.ContainsKey(request.worker.Unit.Tag))
                     request.worker = null;
                 if (request.worker == null)
                 {

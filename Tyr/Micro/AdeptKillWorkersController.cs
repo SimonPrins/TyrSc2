@@ -21,7 +21,7 @@ namespace Tyr.Micro
             float dist = 10 * 10;
             bool alreadyTargeted = false;
             Unit killTarget = null;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!TargetTypes.Contains(enemy.UnitType))
                     continue;
@@ -60,15 +60,15 @@ namespace Tyr.Micro
             if (Targets.ContainsKey(agent.Unit.Tag))
             {
                 ulong target = Targets[agent.Unit.Tag];
-                if (!Bot.Bot.EnemyManager.LastSeenFrame.ContainsKey(target)
-                    || Bot.Bot.EnemyManager.LastSeenFrame[target] <= Bot.Bot.Frame - 1)
+                if (!Bot.Main.EnemyManager.LastSeenFrame.ContainsKey(target)
+                    || Bot.Main.EnemyManager.LastSeenFrame[target] <= Bot.Main.Frame - 1)
                 {
                     Targets.Remove(agent.Unit.Tag);
                     TargetCount[target]--;
                     return false;
                 }
-                if (Bot.Bot.EnemyManager.LastSeen[target] != null
-                    && agent.DistanceSq(Bot.Bot.EnemyManager.LastSeen[target]) >= 12 * 12)
+                if (Bot.Main.EnemyManager.LastSeen[target] != null
+                    && agent.DistanceSq(Bot.Main.EnemyManager.LastSeen[target]) >= 12 * 12)
                 {
                     Targets.Remove(agent.Unit.Tag);
                     TargetCount[target]--;

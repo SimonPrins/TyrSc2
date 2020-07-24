@@ -14,7 +14,7 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
                 if (unit.IsFlying && UnitTypes.BuildingTypes.Contains(unit.UnitType))
                     return true;
             return false;

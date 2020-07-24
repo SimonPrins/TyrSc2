@@ -147,7 +147,7 @@ namespace Tyr.Tasks
         {
             Unit broodling = null;
             float dist = 6 * 6;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.BROODLING)
                     continue;

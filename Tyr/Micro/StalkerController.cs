@@ -11,11 +11,11 @@ namespace Tyr.Micro
             if (agent.Unit.UnitType != UnitTypes.STALKER)
                 return false;
 
-            if (agent.Unit.Shield <= 1 && !agent.Unit.BuffIds.Contains(3687) && Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(87))
+            if (agent.Unit.Shield <= 1 && !agent.Unit.BuffIds.Contains(3687) && Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(87))
             {
                 Unit closestEnemy = null;
                 float dist = 12 * 12;
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                         continue;

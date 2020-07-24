@@ -33,7 +33,7 @@ namespace Tyr.Tasks
                     continue;
                 result.Add(new UnitDescriptor()
                 {
-                    Pos = SC2Util.To2D(Bot.Bot.UnitManager.Agents[building].Unit.Pos),
+                    Pos = SC2Util.To2D(Bot.Main.UnitManager.Agents[building].Unit.Pos),
                     Count = 1,
                     UnitTypes = new HashSet<uint>() { UnitTypes.SCV },
                     Marker = building
@@ -64,13 +64,13 @@ namespace Tyr.Tasks
 
         private void UpdateNeedsRepairing()
         {
-            if (NeedsRepairingUpdateFrame >= Bot.Bot.Frame)
+            if (NeedsRepairingUpdateFrame >= Bot.Main.Frame)
                 return;
-            NeedsRepairingUpdateFrame = Bot.Bot.Frame;
+            NeedsRepairingUpdateFrame = Bot.Main.Frame;
 
             AlreadyRepairing = new HashSet<ulong>();
             NeedsRepairing = new List<ulong>();
-            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
+            foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
             {
                 if (!UnitTypes.BuildingTypes.Contains(agent.Unit.UnitType))
                     continue;

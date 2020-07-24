@@ -17,7 +17,7 @@ using Tyr.Util;
 
 namespace Tyr
 {
-    public class Tyr : Bot
+    public class Bot : SC2API_CSharp.Bot
     {
         public GameConnection GameConnection;
         public ResponseData Data;
@@ -67,7 +67,7 @@ namespace Tyr
 
         public MapEnum Map;
 
-        public static Tyr Bot { get; internal set; }
+        public static Bot Main { get; internal set; }
 
         public Build Build;
 
@@ -106,10 +106,10 @@ namespace Tyr
         private int SendTempestText = -1;
         public bool ArchonMode = false;
 
-        public Tyr()
+        public Bot()
         {
             buildingPlacer = new BuildingPlacer(this);
-            Bot = this;
+            Main = this;
         }
 
         public IEnumerable<Action> onFrame(ResponseObservation observation)

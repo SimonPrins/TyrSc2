@@ -13,7 +13,7 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            return Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.VIKING_FIGHTER) + Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.VIKING_ASSUALT) > 0;
+            return Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.VIKING_FIGHTER) + Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.VIKING_ASSUALT) > 0;
         }
 
         public override string Name()

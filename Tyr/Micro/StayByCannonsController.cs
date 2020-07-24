@@ -11,7 +11,7 @@ namespace Tyr.Micro
         {
             Unit fleeEnemy = null;
             float enemyDist = 14 * 14;
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
 
                 if (unit.UnitType == UnitTypes.OVERLORD
@@ -33,7 +33,7 @@ namespace Tyr.Micro
 
                 float dist = 14 * 14;
                 bool cannonClose = false;
-                foreach (Agent cannon in Bot.Bot.Units())
+                foreach (Agent cannon in Bot.Main.Units())
                 {
                     if (cannon.Unit.UnitType != UnitTypes.PHOTON_CANNON)
                         continue;
@@ -46,7 +46,7 @@ namespace Tyr.Micro
                     cannonClose = true;
                     if (dist <= 8 * 8)
                     {
-                        Bot.Bot.DrawSphere(agent.Unit.Pos);
+                        Bot.Main.DrawSphere(agent.Unit.Pos);
                         return false;
                     }
                 }

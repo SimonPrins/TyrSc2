@@ -36,11 +36,11 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
             ArmyObserverTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ArchonMergeTask.Enable();
             ShieldRegenTask.Enable();
             WorkerRushDefenseTask.Enable();
@@ -84,7 +84,7 @@ namespace Tyr.Builds.Protoss
             BuildList result = new BuildList();
 
             result.If(() => { return !EarlyPool.Get().Detected; });
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -133,7 +133,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.CYBERNETICS_CORE, () => !StrategyAnalysis.WorkerRush.Get().Detected || Count(UnitTypes.ZEALOT) >= 2);
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.ROBOTICS_FACILITY);
-            result.Building(UnitTypes.ROBOTICS_FACILITY, () => (FourGateDetected && Bot.Bot.Frame >= 22.4 * 60 * 4) || DoubleRoboAllIn);
+            result.Building(UnitTypes.ROBOTICS_FACILITY, () => (FourGateDetected && Bot.Main.Frame >= 22.4 * 60 * 4) || DoubleRoboAllIn);
             result.Upgrade(UpgradeType.WarpGate);
             result.If(() => (!FourGateDetected && !DoubleRoboAllIn) || Completed(UnitTypes.IMMORTAL) >= 3);
             result.Building(UnitTypes.NEXUS);
@@ -142,7 +142,7 @@ namespace Tyr.Builds.Protoss
             result.Upgrade(UpgradeType.ProtossGroundWeapons, () => EarlyForge);
             result.Building(UnitTypes.PHOTON_CANNON, () => EarlyForge);
             result.Building(UnitTypes.ROBOTICS_FACILITY, () => SecondRobo && !FourGateDetected);
-            result.Building(UnitTypes.ROBOTICS_FACILITY, () => !SecondRobo && !FourGateDetected && Bot.Bot.Frame >= 22.4 * 60 * 6
+            result.Building(UnitTypes.ROBOTICS_FACILITY, () => !SecondRobo && !FourGateDetected && Bot.Main.Frame >= 22.4 * 60 * 6
                 && TotalEnemyCount(UnitTypes.STARGATE) + TotalEnemyCount(UnitTypes.VOID_RAY) + TotalEnemyCount(UnitTypes.ORACLE) == 0);
             result.Building(UnitTypes.ASSIMILATOR, () => SecondRobo);
             result.Building(UnitTypes.SHIELD_BATTERY, Natural, NaturalDefensePos, 2, () => Completed(Natural, UnitTypes.PYLON) > 0);
@@ -346,7 +346,7 @@ namespace Tyr.Builds.Protoss
             {
                 if (Minerals() >= 150
                     && Gas() >= 150
-                    && !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
+                    && !Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
                     && Count(UnitTypes.COLOSUS) > 0)
                 {
                     agent.Order(1097);
@@ -355,17 +355,17 @@ namespace Tyr.Builds.Protoss
             else if (agent.Unit.UnitType == UnitTypes.TWILIGHT_COUNSEL)
             {
 
-                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
+                if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
                      && Minerals() >= 150
                      && Gas() >= 150
                     && Completed(UnitTypes.STALKER) > 0)
                     agent.Order(1593);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
                     && Minerals() >= 100
                     && Gas() >= 100
                     && Completed(UnitTypes.ADEPT) > 0)
                     agent.Order(1594);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
                          && Minerals() >= 100
                          && Gas() >= 100
                          && Completed(UnitTypes.ZEALOT) > 0)

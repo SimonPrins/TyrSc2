@@ -31,7 +31,7 @@ namespace Tyr.Tasks
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
-            int desired = Bot.Bot.UnitManager.Completed(UnitTypes.OVERLORD) + Bot.Bot.UnitManager.Completed(UnitTypes.OVERSEER) - KeepForOverseers - Units.Count;
+            int desired = Bot.Main.UnitManager.Completed(UnitTypes.OVERLORD) + Bot.Main.UnitManager.Completed(UnitTypes.OVERSEER) - KeepForOverseers - Units.Count;
             if (desired > 0)
                 result.Add(new UnitDescriptor() { Count = desired, UnitTypes = new HashSet<uint>() { UnitTypes.OVERLORD } });
             return result;

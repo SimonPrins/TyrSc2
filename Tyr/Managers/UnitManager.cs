@@ -178,9 +178,9 @@ namespace Tyr.Managers
                 foreach (ulong deadUnit in tyr.Observation.Observation.RawData.Event.DeadUnits)
                     Agents.Remove(deadUnit);
 
-            Bot.Bot.DrawText("Direct nexus count: " + directCountNexus);
-            Bot.Bot.DrawText("Ability nexus count: " + abilityCountNexus);
-            Bot.Bot.DrawText("Build request nexus count: " + buildRequestNexusCounts);
+            Bot.Main.DrawText("Direct nexus count: " + directCountNexus);
+            Bot.Main.DrawText("Ability nexus count: " + abilityCountNexus);
+            Bot.Main.DrawText("Build request nexus count: " + buildRequestNexusCounts);
         }
 
         public int Count(uint type)
@@ -219,7 +219,7 @@ namespace Tyr.Managers
         {
             foreach (KeyValuePair<ulong, Agent> pair in Agents)
             {
-                if (Bot.Bot.ArchonMode && pair.Value.Unit.IsSelected)
+                if (Bot.Main.ArchonMode && pair.Value.Unit.IsSelected)
                     continue;
                 if (pair.Value.Command != null)
                 {

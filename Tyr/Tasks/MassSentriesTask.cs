@@ -25,7 +25,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public MassSentriesTask() : base(5)
@@ -43,9 +43,9 @@ namespace Tyr.Tasks
             if (Stopped)
                 return false;
 
-            int sentryCount = Bot.Bot.UnitManager.Completed(UnitTypes.SENTRY);
-            Bot.Bot.DrawText("Needed Sentries: " + sentryCount + "/" + Math.Max(StretchGoal + 5, RequiredSize));
-            if (LastAttackingFrame >= Bot.Bot.Frame - 1)
+            int sentryCount = Bot.Main.UnitManager.Completed(UnitTypes.SENTRY);
+            Bot.Main.DrawText("Needed Sentries: " + sentryCount + "/" + Math.Max(StretchGoal + 5, RequiredSize));
+            if (LastAttackingFrame >= Bot.Main.Frame - 1)
             {
                 if (sentryCount >= RequiredSize)
                 {
@@ -74,7 +74,7 @@ namespace Tyr.Tasks
 
             if (Units.Count > 0)
             {
-                if (LastAttackingFrame >= Bot.Bot.Frame - 1 && tyr.Frame - LastStretchFrame >= 22.3 * 60)
+                if (LastAttackingFrame >= Bot.Main.Frame - 1 && tyr.Frame - LastStretchFrame >= 22.3 * 60)
                 {
                     LastStretchFrame = tyr.Frame;
                     StretchGoal = Math.Max(Math.Min(Units.Count, StretchGoal + 5), StretchGoal);
@@ -93,7 +93,7 @@ namespace Tyr.Tasks
                     continue;
                 bool closeMeleeEnemy = false;
                 bool closeRangedEnemy = false;
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (UnitTypes.BuildingTypes.Contains(enemy.UnitType))
                         continue;
@@ -137,7 +137,7 @@ namespace Tyr.Tasks
                     closeForceField = forceField;
                 }
 
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (closeForceField == null)
                         break;

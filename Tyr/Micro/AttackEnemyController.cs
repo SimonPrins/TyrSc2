@@ -57,7 +57,7 @@ namespace Tyr.Micro
 
             Unit attack = null;
             dist = Range * Range;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!Targets.Contains(enemy.UnitType))
                     continue;

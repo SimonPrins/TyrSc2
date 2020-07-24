@@ -32,7 +32,7 @@ namespace Tyr.Tasks
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
-            result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.ORACLE } });
+            result.Add(new UnitDescriptor() { Pos = Bot.Main.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.ORACLE } });
             return result;
         }
 
@@ -125,16 +125,16 @@ namespace Tyr.Tasks
 
         private bool Revelation(Agent oracle)
         {
-            if (Bot.Bot.Frame - RevelatorFrame <= 10)
+            if (Bot.Main.Frame - RevelatorFrame <= 10)
                 return oracle.Unit.Tag == Revelator;
             
-            if (Bot.Bot.Frame % 5 != 0)
+            if (Bot.Main.Frame % 5 != 0)
                 return false;
             if (oracle.Unit.Energy < 50)
                 return false;
             Unit followEnemy = null;
             float dist = 15 * 15;
-            foreach (Unit enemy in Bot.Bot.CloakedEnemies())
+            foreach (Unit enemy in Bot.Main.CloakedEnemies())
             {
                 if (enemy.Cloak != CloakState.Cloaked)
                     continue;
@@ -156,7 +156,7 @@ namespace Tyr.Tasks
 
                 oracle.Order(2146, target);
                 Revelator = oracle.Unit.Tag;
-                RevelatorFrame = Bot.Bot.Frame;
+                RevelatorFrame = Bot.Main.Frame;
                 return true;
             }
             return false;

@@ -32,10 +32,10 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
                 if (b.Blocked)
                     return true;
-            Bot.Bot.DrawText("All bases clear.");
+            Bot.Main.DrawText("All bases clear.");
             return false;
         }
 
@@ -44,7 +44,7 @@ namespace Tyr.Tasks
             CheckBaseCleared();
             if (ClearBase == null)
             {
-                foreach (Base b in Bot.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Main.BaseManager.Bases)
                     if (b.Blocked)
                     {
                         ClearBase = b;
@@ -56,7 +56,7 @@ namespace Tyr.Tasks
                     return;
                 }
             }
-            Bot.Bot.DrawText("Clearing base.");
+            Bot.Main.DrawText("Clearing base.");
 
             foreach (Agent agent in units)
                 tyr.MicroController.Attack(agent, ClearBase.BaseLocation.Pos);
@@ -77,7 +77,7 @@ namespace Tyr.Tasks
             }
             if (!close)
                 return;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
                 if (SC2Util.DistanceSq(enemy.Pos, ClearBase.BaseLocation.Pos) <= 10 * 10)
                     return;
             ClearBase = null;

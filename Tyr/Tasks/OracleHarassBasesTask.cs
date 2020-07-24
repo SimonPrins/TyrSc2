@@ -21,7 +21,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public OracleHarassBasesTask() : base(8)
@@ -34,7 +34,7 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Bot.Bot.UnitManager.Completed(UnitTypes.ORACLE) >= RequiredSize;
+            return Bot.Main.UnitManager.Completed(UnitTypes.ORACLE) >= RequiredSize;
         }
 
         public override void OnFrame(Bot tyr)
@@ -107,14 +107,14 @@ namespace Tyr.Tasks
             if (SideTarget != null)
                 return;
 
-            Point2D enemyNatural = Bot.Bot.MapAnalyzer.GetEnemyNatural().Pos;
+            Point2D enemyNatural = Bot.Main.MapAnalyzer.GetEnemyNatural().Pos;
             if (enemyNatural == null)
                 return;
             Point2D target = null;
             float dist = 0;
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
-                if (SC2Util.DistanceSq(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0], b.BaseLocation.Pos) >= 60 * 60)
+                if (SC2Util.DistanceSq(Bot.Main.TargetManager.PotentialEnemyStartLocations[0], b.BaseLocation.Pos) >= 60 * 60)
                     continue;
                 float newDist = SC2Util.DistanceSq(enemyNatural, b.BaseLocation.Pos);
                 if (newDist > dist)

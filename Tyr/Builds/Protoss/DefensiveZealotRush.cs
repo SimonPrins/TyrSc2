@@ -21,7 +21,7 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
             WorkerRushDefenseTask.Enable();
             ArmyObserverTask.Enable();
@@ -49,7 +49,7 @@ namespace Tyr.Builds.Protoss
             result.Upgrade(UpgradeType.WarpGate);
             result.Train(UnitTypes.OBSERVER, 1);
             result.Train(UnitTypes.IMMORTAL);
-            result.Train(UnitTypes.ZEALOT, 10, () => Bot.Bot.Frame < 22.4 * 130 || Minerals() >= 250);
+            result.Train(UnitTypes.ZEALOT, 10, () => Bot.Main.Frame < 22.4 * 130 || Minerals() >= 250);
             result.Train(UnitTypes.STALKER, () => Gas() >= 150 || Count(UnitTypes.ROBOTICS_FACILITY) > 0);
             return result;
         }
@@ -63,17 +63,17 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.GATEWAY, 1, () => Count(UnitTypes.ZEALOT) > 0);
             //result.Building(UnitTypes.GATEWAY, 1, () => Count(UnitTypes.ZEALOT) > 4);
 
-            result.Building(UnitTypes.PYLON, Main, DefensePoint, () => Bot.Bot.Frame >= 22.4 * 100);
-            result.Building(UnitTypes.ASSIMILATOR, () => Bot.Bot.Frame >= 22.4 * 130);
-            result.Building(UnitTypes.FORGE, () => Bot.Bot.Frame >= 22.4 * 130);
+            result.Building(UnitTypes.PYLON, Main, DefensePoint, () => Bot.Main.Frame >= 22.4 * 100);
+            result.Building(UnitTypes.ASSIMILATOR, () => Bot.Main.Frame >= 22.4 * 130);
+            result.Building(UnitTypes.FORGE, () => Bot.Main.Frame >= 22.4 * 130);
             result.Upgrade(UpgradeType.ProtossGroundWeapons);
             result.Upgrade(UpgradeType.ProtossGroundArmor);
-            result.Building(UnitTypes.CYBERNETICS_CORE, () => Bot.Bot.Frame >= 22.4 * 130);
-            result.Building(UnitTypes.PHOTON_CANNON, Main, DefensePoint, 5, () => Bot.Bot.Frame >= 22.4 * 130);
-            result.Building(UnitTypes.ROBOTICS_FACILITY, () => Bot.Bot.Frame >= 22.4 * 130);
-            result.Building(UnitTypes.SHIELD_BATTERY, Main, DefensePoint, 2, () => Bot.Bot.Frame >= 22.4 * 130);
-            result.Building(UnitTypes.ASSIMILATOR, () => Bot.Bot.Frame >= 22.4 * 130);
-            result.Building(UnitTypes.TWILIGHT_COUNSEL, () => Bot.Bot.Frame >= 22.4 * 130);
+            result.Building(UnitTypes.CYBERNETICS_CORE, () => Bot.Main.Frame >= 22.4 * 130);
+            result.Building(UnitTypes.PHOTON_CANNON, Main, DefensePoint, 5, () => Bot.Main.Frame >= 22.4 * 130);
+            result.Building(UnitTypes.ROBOTICS_FACILITY, () => Bot.Main.Frame >= 22.4 * 130);
+            result.Building(UnitTypes.SHIELD_BATTERY, Main, DefensePoint, 2, () => Bot.Main.Frame >= 22.4 * 130);
+            result.Building(UnitTypes.ASSIMILATOR, () => Bot.Main.Frame >= 22.4 * 130);
+            result.Building(UnitTypes.TWILIGHT_COUNSEL, () => Bot.Main.Frame >= 22.4 * 130);
             result.Building(UnitTypes.GATEWAY, 1, () => Count(UnitTypes.NEXUS) >= 2);
             return result;
         }

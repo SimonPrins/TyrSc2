@@ -28,7 +28,7 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Bot.Bot.Build.Completed(UnitTypes.ADEPT) >= RequiredSize;
+            return Bot.Main.Build.Completed(UnitTypes.ADEPT) >= RequiredSize;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -105,10 +105,10 @@ namespace Tyr.Tasks
 
             foreach (Agent agent in units)
             {
-                if (Bot.Bot.Frame % 48 == 0)
+                if (Bot.Main.Frame % 48 == 0)
                 {
                     bool closeEnemy = false;
-                    foreach (Unit enemy in Bot.Bot.Enemies())
+                    foreach (Unit enemy in Bot.Main.Enemies())
                     {
                         if (agent.DistanceSq(enemy) <= 8 * 8)
                         {

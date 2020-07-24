@@ -20,7 +20,7 @@ namespace Tyr.Managers
                     continue;
                 bool cycloneClose = false;
                 int enemiesClose = 0;
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                         continue;

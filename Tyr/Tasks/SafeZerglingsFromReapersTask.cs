@@ -16,13 +16,13 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
         {
             bool speedDone = UpgradeType.LookUp[UpgradeType.MetabolicBoost].Done();
-            bool multipleReapers = Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2;
+            bool multipleReapers = Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2;
             
             if (!CloseReaper(agent))
                 return false;
@@ -44,7 +44,7 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) > 0;
+            return Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) > 0;
         }
 
         public override void OnFrame(Bot tyr)
@@ -67,7 +67,7 @@ namespace Tyr.Tasks
 
         public bool CloseReaper(Agent agent)
         {
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.REAPER)
                     continue;

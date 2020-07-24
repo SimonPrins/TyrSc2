@@ -11,11 +11,11 @@ namespace Tyr.Micro
             if (agent.Unit.UnitType != UnitTypes.STALKER)
                 return false;
 
-            if (agent.Unit.BuffIds.Contains(3687) || !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(87))
+            if (agent.Unit.BuffIds.Contains(3687) || !Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(87))
                 return false;
 
             int closeAllyCount = 0;
-            foreach (Agent ally in Bot.Bot.UnitManager.Agents.Values)
+            foreach (Agent ally in Bot.Main.UnitManager.Agents.Values)
             {
                 if (ally.Unit.UnitType != UnitTypes.STALKER)
                     continue;
@@ -27,7 +27,7 @@ namespace Tyr.Micro
 
             Unit closestEnemy = null;
             float dist = 8 * 8;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.BANSHEE
                     && enemy.UnitType != UnitTypes.CYCLONE

@@ -13,8 +13,8 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            return Bot.Bot.Frame <= 22.4 * 60 * 3
-                && Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.BARRACKS) + Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.BARRACKS_FLYING) >= 3;
+            return Bot.Main.Frame <= 22.4 * 60 * 3
+                && Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.BARRACKS) + Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.BARRACKS_FLYING) >= 3;
         }
 
         public override string Name()

@@ -19,17 +19,17 @@ namespace Tyr.Managers
                 if (observer.Unit.UnitType != UnitTypes.OBSERVER)
                     continue;
                 if (BansheeLocation != null
-                    && Bot.Bot.Frame - BansheeSeenFrame < 22.4 * 10
+                    && Bot.Main.Frame - BansheeSeenFrame < 22.4 * 10
                     && observer.DistanceSq(BansheeLocation) <= 4 * 4)
                     BansheeSeenFrame = -1000000;
                 if (LastHitLocation != null
-                    && Bot.Bot.Frame - LastHitFrame < 22.4 * 20
+                    && Bot.Main.Frame - LastHitFrame < 22.4 * 20
                     && observer.DistanceSq(LastHitLocation) <= 4 * 4)
                     LastHitFrame = -1000000;
             }
 
             float dist = 40 * 40;
-            if (Bot.Bot.Frame - BansheeSeenFrame < 22.4 * 10)
+            if (Bot.Main.Frame - BansheeSeenFrame < 22.4 * 10)
                 dist = SC2Util.DistanceSq(BansheeLocation, tyr.MapAnalyzer.StartLocation);
             foreach (Unit enemy in tyr.Enemies())
             {
@@ -50,10 +50,10 @@ namespace Tyr.Managers
                 float damageTaken = agent.PreviousUnit.Health + agent.PreviousUnit.Shield - agent.Unit.Health - agent.Unit.Shield;
                 if (damageTaken < 9)
                     continue;
-                if (agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) > 50 * 50)
+                if (agent.DistanceSq(Bot.Main.MapAnalyzer.StartLocation) > 50 * 50)
                     continue;
                 bool enemyClose = false;
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                         continue;

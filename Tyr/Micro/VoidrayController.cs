@@ -12,7 +12,7 @@ namespace Tyr.Micro
                 return false;
             if (agent.Unit.BuffIds.Contains(122))
                 return false;
-            foreach (Unit unit in Bot.Bot.Observation.Observation.RawData.Units)
+            foreach (Unit unit in Bot.Main.Observation.Observation.RawData.Units)
             {
                 if (unit.Alliance != Alliance.Enemy)
                     continue;

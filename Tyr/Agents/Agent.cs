@@ -53,10 +53,10 @@ namespace Tyr.Agents
         public void Order(int ability, Point2D target, bool queue)
         {
             // Make sure blink doesn't get cancelled.
-            if (LastAbility == Abilities.BLINK && Bot.Bot.Frame - LastOrderFrame <= 20)
+            if (LastAbility == Abilities.BLINK && Bot.Main.Frame - LastOrderFrame <= 20)
                 return;
             // Short delay between orders to prevent order spam.
-            if (!queue && LastAbility == ability && Bot.Bot.Frame - LastOrderFrame <= 5)
+            if (!queue && LastAbility == ability && Bot.Main.Frame - LastOrderFrame <= 5)
                 return;
 
             LastAbility = ability;
@@ -69,7 +69,7 @@ namespace Tyr.Agents
                 && Unit.Orders[0].AbilityId == ability)
                 return;
 
-            LastOrderFrame = Bot.Bot.Frame;
+            LastOrderFrame = Bot.Main.Frame;
             Command = new ActionRawUnitCommand();
             Command.AbilityId = ability;
             Command.TargetWorldSpacePos = target;
@@ -88,7 +88,7 @@ namespace Tyr.Agents
             Point2D retreatFrom = null;
             Unit retreatUnit = null;
             float dist = fleeDistance * fleeDistance;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType == UnitTypes.CREEP_TUMOR
                     || enemy.UnitType == UnitTypes.CREEP_TUMOR_BURROWED
@@ -108,7 +108,7 @@ namespace Tyr.Agents
                     dist = newDist;
                 }
             }
-            foreach (UnitLocation enemy in Bot.Bot.EnemyMineManager.Mines)
+            foreach (UnitLocation enemy in Bot.Main.EnemyMineManager.Mines)
             {
                 float newDist = DistanceSq(enemy.Pos);
                 if (newDist < dist)
@@ -117,7 +117,7 @@ namespace Tyr.Agents
                     dist = newDist;
                 }
             }
-            foreach (UnitLocation enemy in Bot.Bot.EnemyTankManager.Tanks)
+            foreach (UnitLocation enemy in Bot.Main.EnemyTankManager.Tanks)
             {
                 float newDist = DistanceSq(enemy.Pos);
                 if (newDist < dist)
@@ -154,9 +154,9 @@ namespace Tyr.Agents
             potential.From(retreatFrom);
             Point2D fleeTo;
             if (Unit.IsFlying)
-                fleeTo = SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation);
+                fleeTo = SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation);
             else
-                fleeTo = Bot.Bot.MapAnalyzer.Walk(SC2Util.To2D(Unit.Pos), Bot.Bot.MapAnalyzer.MainDistances, 6);
+                fleeTo = Bot.Main.MapAnalyzer.Walk(SC2Util.To2D(Unit.Pos), Bot.Main.MapAnalyzer.MainDistances, 6);
             potential.To(fleeTo);
             Order(Abilities.MOVE, potential.Get());
         }
@@ -187,12 +187,12 @@ namespace Tyr.Agents
         internal void ArchonMerge(Agent agent)
         {
             // Short delay between orders to prevent order spam.
-            if (Bot.Bot.Frame - LastOrderFrame <= 5)
+            if (Bot.Main.Frame - LastOrderFrame <= 5)
                 return;
 
             agent.Command = null;
 
-            LastOrderFrame = Bot.Bot.Frame;
+            LastOrderFrame = Bot.Main.Frame;
             Command = new ActionRawUnitCommand();
             Command.AbilityId = 1766;
             Command.UnitTags.Add(Unit.Tag);
@@ -201,9 +201,9 @@ namespace Tyr.Agents
 
         public Agent GetAddOn()
         {
-            if (!Bot.Bot.UnitManager.Agents.ContainsKey(Unit.AddOnTag))
+            if (!Bot.Main.UnitManager.Agents.ContainsKey(Unit.AddOnTag))
                 return null;
-            return Bot.Bot.UnitManager.Agents[Unit.AddOnTag];
+            return Bot.Main.UnitManager.Agents[Unit.AddOnTag];
         }
 
         public uint CurrentAbility()
@@ -245,7 +245,7 @@ namespace Tyr.Agents
         public void Order(int ability, ulong targetTag)
         {
             // Make sure blink doesn't get cancelled.
-            if (LastAbility == Abilities.BLINK && Bot.Bot.Frame - LastOrderFrame <= 20)
+            if (LastAbility == Abilities.BLINK && Bot.Main.Frame - LastOrderFrame <= 20)
                 return;
             // Ignore orders that are the same or similar to existing orders.
             if (Unit.Orders.Count != 0 && Unit.Orders[0].TargetUnitTag == targetTag && Unit.Orders[0].AbilityId == ability)

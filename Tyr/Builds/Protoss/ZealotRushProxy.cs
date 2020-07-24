@@ -21,10 +21,10 @@ namespace Tyr.Builds.Protoss
             ArmyObserverTask.Enable();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ProxyTwoGateTask.Enable();
         }
 
@@ -35,7 +35,7 @@ namespace Tyr.Builds.Protoss
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.OnlyDefendInsideMain = true;
 
-            Set += ProtossBuildUtil.Pylons(() => Bot.Bot.Frame >= 22.4 * 90);
+            Set += ProtossBuildUtil.Pylons(() => Bot.Main.Frame >= 22.4 * 90);
             Set += MainBuildList();
         }
 

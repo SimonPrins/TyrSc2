@@ -67,7 +67,7 @@ namespace Tyr.Builds.Protoss
             }
             else if (agent.Unit.UnitType == UnitTypes.GATEWAY)
             {
-                if (Bot.Bot.EnemyRace == Race.Zerg)
+                if (Bot.Main.EnemyRace == Race.Zerg)
                 {
                     if (Minerals() >= 50
                         && Gas() >= 150
@@ -100,18 +100,18 @@ namespace Tyr.Builds.Protoss
             }
             else if (agent.Unit.UnitType == UnitTypes.TEMPLAR_ARCHIVE)
             {
-                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(52)
+                if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(52)
                     && Minerals() >= 200
                     && Gas() >= 200)
                     agent.Order(1126);
             }
             else if (agent.Unit.UnitType == UnitTypes.TWILIGHT_COUNSEL)
             {
-                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
+                if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
                     && Minerals() >= 100
                     && Gas() >= 100)
                     agent.Order(1594);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
                      && Minerals() >= 100
                      && Gas() >= 100)
                     agent.Order(1592);

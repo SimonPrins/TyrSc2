@@ -39,9 +39,9 @@ namespace Tyr.Tasks
             if (Cancelled)
                 return result;
             if (Sentry == null)
-                result.Add(new UnitDescriptor(UnitTypes.SENTRY) { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1});
-            result.Add(new UnitDescriptor(UnitTypes.STALKER) { Pos = Bot.Bot.TargetManager.AttackTarget });
-            result.Add(new UnitDescriptor(UnitTypes.COLOSUS) { Pos = Bot.Bot.TargetManager.AttackTarget });
+                result.Add(new UnitDescriptor(UnitTypes.SENTRY) { Pos = Bot.Main.TargetManager.AttackTarget, Count = 1});
+            result.Add(new UnitDescriptor(UnitTypes.STALKER) { Pos = Bot.Main.TargetManager.AttackTarget });
+            result.Add(new UnitDescriptor(UnitTypes.COLOSUS) { Pos = Bot.Main.TargetManager.AttackTarget });
             return result;
         }
 
@@ -176,7 +176,7 @@ namespace Tyr.Tasks
             sentryInPlace = false;
             if (Sentry == null)
             {
-                Bot.Bot.DrawText("No sentry.");
+                Bot.Main.DrawText("No sentry.");
                 return;
             }
             float distance = Sentry.DistanceSq(EnemyThird);
@@ -184,12 +184,12 @@ namespace Tyr.Tasks
                 sentryInPlace = true;
             if (distance >= 9 * 9)
             {
-                Bot.Bot.DrawText("Sentry moving.");
+                Bot.Main.DrawText("Sentry moving.");
                 Sentry.Order(Abilities.MOVE, EnemyThird);
                 return;
             }
-            Bot.Bot.DrawText("Sentry hallucinating.");
-            if (Bot.Bot.Frame % 5 == 0)
+            Bot.Main.DrawText("Sentry hallucinating.");
+            if (Bot.Main.Frame % 5 == 0)
                 Sentry.Order(148);
         }
     }

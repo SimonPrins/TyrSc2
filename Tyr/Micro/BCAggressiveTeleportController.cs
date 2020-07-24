@@ -12,7 +12,7 @@ namespace Tyr.Micro
 
             if (agent.DistanceSq(target) < 30 * 30)
                 return false;
-            if (Bot.Bot.Frame % 10 == 0)
+            if (Bot.Main.Frame % 10 == 0)
             {
                 agent.Order(2358, target);
                 return true;

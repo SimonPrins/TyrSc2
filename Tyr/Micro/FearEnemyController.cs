@@ -48,22 +48,22 @@ namespace Tyr.Micro
             if (!Scared.Contains(agent.Unit.UnitType))
                 return false;
 
-            if (EnemyBaseRange > 0 && agent.DistanceSq(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) <= EnemyBaseRange * EnemyBaseRange)
+            if (EnemyBaseRange > 0 && agent.DistanceSq(Bot.Main.TargetManager.PotentialEnemyStartLocations[0]) <= EnemyBaseRange * EnemyBaseRange)
                 return false;
 
             int totalUnits = 0;
             foreach (uint type in Scared)
-                totalUnits += Bot.Bot.UnitManager.Completed(type);
+                totalUnits += Bot.Main.UnitManager.Completed(type);
             if (totalUnits >= CourageCount)
                 return false;
 
-            if (agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) < 40 * 40 && DefendHome)
+            if (agent.DistanceSq(Bot.Main.MapAnalyzer.StartLocation) < 40 * 40 && DefendHome)
                 return false;
             float dist;
 
             Point2D retreatFrom = null;
             dist = Range * Range;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!Terror.Contains(enemy.UnitType))
                     continue;
@@ -78,7 +78,7 @@ namespace Tyr.Micro
             if (retreatFrom != null && dist < Range * Range)
             {
                 if (MoveToMain)
-                    agent.Order(Abilities.MOVE, Bot.Bot.MapAnalyzer.StartLocation);
+                    agent.Order(Abilities.MOVE, Bot.Main.MapAnalyzer.StartLocation);
                 else
                     agent.Order(Abilities.MOVE, agent.From(retreatFrom, 4));
                 return true;

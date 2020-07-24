@@ -68,7 +68,7 @@ namespace Tyr.buildSelection
             else if (tyr.EnemyRace == Race.Zerg)
             {
                 options.Add(new PvZStalkerImmortal() { BlockExpand = false });
-                options.Add(new OneBaseStalkerImmortal() { StartZealots = true, ExpandCondition = () => Bot.Bot.Frame >= 22.4 * 60 * 5, Scouting = false });
+                options.Add(new OneBaseStalkerImmortal() { StartZealots = true, ExpandCondition = () => Bot.Main.Frame >= 22.4 * 60 * 5, Scouting = false });
             }
             else if (tyr.EnemyRace == Race.Protoss)
             {

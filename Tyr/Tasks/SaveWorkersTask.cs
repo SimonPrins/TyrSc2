@@ -19,10 +19,10 @@ namespace Tyr.Tasks
 
         public override bool DoWant(Agent agent)
         {
-            if (!agent.IsWorker || agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) < 15 * 15)
+            if (!agent.IsWorker || agent.DistanceSq(Bot.Main.MapAnalyzer.StartLocation) < 15 * 15)
                 return false;
 
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.CYCLONE)
                     continue;

@@ -19,7 +19,7 @@ namespace Tyr.Micro
             if (scvTarget == null || agent.DistanceSq(scvTarget) >= 12 * 12)
                 return false;
 
-            Bot.Bot.DrawLine(agent.Unit.Pos, scvTarget.Pos);
+            Bot.Main.DrawLine(agent.Unit.Pos, scvTarget.Pos);
             agent.Order(Abilities.ATTACK, TargetTag);
 
             return true;
@@ -27,12 +27,12 @@ namespace Tyr.Micro
 
         private Unit GetTarget(Agent agent)
         {
-            if (UpdateFrame == Bot.Bot.Frame)
+            if (UpdateFrame == Bot.Main.Frame)
                 return ScvTarget;
-            UpdateFrame = Bot.Bot.Frame;
+            UpdateFrame = Bot.Main.Frame;
             if (TargetTag != 0)
             {
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (enemy.Tag != TargetTag)
                         continue;
@@ -47,7 +47,7 @@ namespace Tyr.Micro
             }
 
 
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.SCV)
                     continue;
@@ -66,7 +66,7 @@ namespace Tyr.Micro
         private bool BunkerInRange(Unit scv)
         {
 
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.BUNKER)
                     continue;

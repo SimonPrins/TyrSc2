@@ -39,7 +39,7 @@ namespace Tyr.Builds.Protoss
 
         public override void OnFrame(Bot tyr)
         {
-            foreach (SC2APIProtocol.Action action in Bot.Bot.Observation.Actions)
+            foreach (SC2APIProtocol.Action action in Bot.Main.Observation.Actions)
             {
                 if (action.ActionRaw == null)
                     continue;

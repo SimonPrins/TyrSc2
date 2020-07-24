@@ -52,10 +52,10 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1 || !HuntProxies)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count > 1 || !HuntProxies)
                 WorkerScoutTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ArmyObserverTask.Enable();
             ForceFieldRampTask.Enable();
             //ObserverScoutTask.Enable();
@@ -80,7 +80,7 @@ namespace Tyr.Builds.Protoss
             PerUnitDefenseTask.GroundDefenseTask.IgnoreEnemyTypes.Add(UnitTypes.SIEGE_TANK_SIEGED);
             PerUnitDefenseTask.GroundDefenseTask.IgnoreEnemyTypes.Add(UnitTypes.AUTO_TURRET);
 
-            RampDefensePoint = new PotentialHelper(Bot.Bot.MapAnalyzer.GetMainRamp(), 5).To(MainDefensePos).Get();
+            RampDefensePoint = new PotentialHelper(Bot.Main.MapAnalyzer.GetMainRamp(), 5).To(MainDefensePos).Get();
         }
 
         public override void OnStart(Bot tyr)
@@ -147,9 +147,9 @@ namespace Tyr.Builds.Protoss
             string[] debugLines = Util.FileUtil.ReadDebugFile();
             List<Point2D> fromCurrentStart = new List<Point2D>();
             List<Point2D> fromOtherStart = new List<Point2D>();
-            string mapName = Bot.Bot.GameInfo.MapName;
+            string mapName = Bot.Main.GameInfo.MapName;
 
-            string mapStartString = mapName + "(" + Bot.Bot.MapAnalyzer.StartLocation.X + ", " + Bot.Bot.MapAnalyzer.StartLocation.Y + "):";
+            string mapStartString = mapName + "(" + Bot.Main.MapAnalyzer.StartLocation.X + ", " + Bot.Main.MapAnalyzer.StartLocation.Y + "):";
             float dist;
             foreach (string line in scoutingLocations)
             {
@@ -364,7 +364,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.GATEWAY, () => TotalEnemyCount(UnitTypes.MARAUDER) == 0 || Count(UnitTypes.IMMORTAL) >= 5);
             result.Building(UnitTypes.ROBOTICS_FACILITY, () => ProxyMarauderSuspected);
             result.Building(UnitTypes.STARGATE, () => !ProxyMarauderSuspected);
-            result.Building(UnitTypes.SHIELD_BATTERY, Main, new PotentialHelper(Bot.Bot.MapAnalyzer.GetMainRamp(), 7).To(MainDefensePos).Get(), 2, () => ProxyMarauderSuspected);
+            result.Building(UnitTypes.SHIELD_BATTERY, Main, new PotentialHelper(Bot.Main.MapAnalyzer.GetMainRamp(), 7).To(MainDefensePos).Get(), 2, () => ProxyMarauderSuspected);
             //result.If(() => Count(UnitTypes.IMMORTAL) > 0);
             result.If(() => Count(UnitTypes.PHOENIX)  + Count(UnitTypes.IMMORTAL) >= 2);
             result.If(() => TimingAttackTask.Task.AttackSent);
@@ -388,7 +388,7 @@ namespace Tyr.Builds.Protoss
             if (ProxySuspected
                 && CounterProxyMarauder
                 && EnemyCount(UnitTypes.REFINERY) == 1
-                && Bot.Bot.Frame < 22.4 * 60 * 2.5)
+                && Bot.Main.Frame < 22.4 * 60 * 2.5)
                 ProxyMarauderSuspected = true;
             if (ProxyMarauderSuspected
                 && Count(UnitTypes.NEXUS) < 2
@@ -518,7 +518,7 @@ namespace Tyr.Builds.Protoss
                         HuntProxyTask2.ScoutBases = new List<Point2D>() { newLocation };
                         HuntProxyTask2.ClearNextRoundBases();
                     }
-                    Bot.Bot.DrawText("ScoutLocations: " + ScoutLocations.Count);
+                    Bot.Main.DrawText("ScoutLocations: " + ScoutLocations.Count);
                 }
             }
 
@@ -559,12 +559,12 @@ namespace Tyr.Builds.Protoss
         }
         private void DrawMap(string name, List<Point2D> locations)
         {
-            BoolGrid pathable = Bot.Bot.MapAnalyzer.Pathable;
+            BoolGrid pathable = Bot.Main.MapAnalyzer.Pathable;
             if (!Bot.Debug)
                 return;
 
-            int width = Bot.Bot.GameInfo.StartRaw.PathingGrid.Size.X;
-            int height = Bot.Bot.GameInfo.StartRaw.PathingGrid.Size.Y;
+            int width = Bot.Main.GameInfo.StartRaw.PathingGrid.Size.X;
+            int height = Bot.Main.GameInfo.StartRaw.PathingGrid.Size.Y;
 
             System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height);
             for (int x = 0; x < width; x++)
@@ -576,7 +576,7 @@ namespace Tyr.Builds.Protoss
                         bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Black);
                 }
 
-            foreach (Managers.Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Managers.Base b in Bot.Main.BaseManager.Bases)
                 bmp.SetPixel((int)b.BaseLocation.Pos.X, height - 1 - (int)b.BaseLocation.Pos.Y, System.Drawing.Color.Blue);
 
             foreach(Point2D location in locations)

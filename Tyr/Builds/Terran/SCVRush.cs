@@ -20,7 +20,7 @@ namespace Tyr.Builds.Protoss
         public override void InitializeTasks()
         {
             base.InitializeTasks();
-            Bot.Bot.TaskManager.Add(WorkerRushTask);
+            Bot.Main.TaskManager.Add(WorkerRushTask);
             WorkerRushTask.Stopped = false;
         }
 
@@ -36,7 +36,7 @@ namespace Tyr.Builds.Protoss
             result.If(() =>
             {
                 return Build.FoodUsed()
-                    + Bot.Bot.UnitManager.Count(UnitTypes.COMMAND_CENTER)
+                    + Bot.Main.UnitManager.Count(UnitTypes.COMMAND_CENTER)
                     >= Build.ExpectedAvailableFood() - 1
                     && Build.ExpectedAvailableFood() < 200;
             });

@@ -37,7 +37,7 @@ namespace Tyr
             foreach (string line in lines)
                 lineSet.Add(line);
 
-            foreach (Strategy strategy in Bot.Bot.EnemyStrategyAnalyzer.Strategies)
+            foreach (Strategy strategy in Bot.Main.EnemyStrategyAnalyzer.Strategies)
                 strategy.Load(lineSet);
         }
 

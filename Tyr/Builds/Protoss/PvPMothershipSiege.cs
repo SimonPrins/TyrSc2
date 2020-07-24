@@ -35,10 +35,10 @@ namespace Tyr.Builds.Protoss
 
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ArmyObserverTask.Enable();
             ObserverScoutTask.Enable();
             ArmyOracleTask.Enable();
@@ -109,7 +109,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => Minerals() >= 600 && Completed(UnitTypes.NEXUS) >= 3 && Gas() < 100 && Bot.Bot.Frame % 10 == 0);
+            result.If(() => Minerals() >= 600 && Completed(UnitTypes.NEXUS) >= 3 && Gas() < 100 && Bot.Main.Frame % 10 == 0);
             result.Building(UnitTypes.ASSIMILATOR, 6);
             result.If(() => Minerals() >= 800);
             result.Building(UnitTypes.ASSIMILATOR, 7);

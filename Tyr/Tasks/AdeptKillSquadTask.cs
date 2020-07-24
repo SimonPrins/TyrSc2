@@ -18,10 +18,10 @@ namespace Tyr.Tasks
             if (agent.Unit.UnitType != UnitTypes.ADEPT)
                 return false;
 
-            if (SC2Util.DistanceSq(agent.Unit.Pos, Bot.Bot.MapAnalyzer.StartLocation) <= 40 * 40)
+            if (SC2Util.DistanceSq(agent.Unit.Pos, Bot.Main.MapAnalyzer.StartLocation) <= 40 * 40)
                 return false;
 
-            foreach (Unit enemy in Bot.Bot.Observation.Observation.RawData.Units)
+            foreach (Unit enemy in Bot.Main.Observation.Observation.RawData.Units)
             {
                 if (enemy.Alliance != Alliance.Enemy)
                     continue;
@@ -38,7 +38,7 @@ namespace Tyr.Tasks
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
-            result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = MaxUnits - units.Count, UnitTypes = new HashSet<uint>() { UnitTypes.ADEPT } });
+            result.Add(new UnitDescriptor() { Pos = Bot.Main.TargetManager.AttackTarget, Count = MaxUnits - units.Count, UnitTypes = new HashSet<uint>() { UnitTypes.ADEPT } });
             return result;
         }
 
@@ -50,7 +50,7 @@ namespace Tyr.Tasks
         public override void OnFrame(Bot tyr)
         {
             bool workersRemain = false;
-            foreach (Unit enemy in Bot.Bot.Observation.Observation.RawData.Units)
+            foreach (Unit enemy in Bot.Main.Observation.Observation.RawData.Units)
             {
                 if (enemy.Alliance != Alliance.Enemy)
                     continue;
@@ -73,7 +73,7 @@ namespace Tyr.Tasks
                 Unit target = null;
                 float dist = 10 * 10;
                 bool underThreat = false;
-                foreach (Unit enemy in Bot.Bot.Observation.Observation.RawData.Units)
+                foreach (Unit enemy in Bot.Main.Observation.Observation.RawData.Units)
                 {
                     if (enemy.Alliance != Alliance.Enemy)
                         continue;

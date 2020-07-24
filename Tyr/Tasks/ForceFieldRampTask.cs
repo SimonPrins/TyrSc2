@@ -28,7 +28,7 @@ namespace Tyr.Tasks
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
             if (units.Count == 0)
-                result.Add(new UnitDescriptor() { Pos = Bot.Bot.MapAnalyzer.GetMainRamp(), Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.SENTRY } });
+                result.Add(new UnitDescriptor() { Pos = Bot.Main.MapAnalyzer.GetMainRamp(), Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.SENTRY } });
             return result;
         }
 
@@ -53,7 +53,7 @@ namespace Tyr.Tasks
                 return;
             int enemyCount = 0;
             bool enemyAtRamp = false;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.MARINE
                     && enemy.UnitType != UnitTypes.SCV

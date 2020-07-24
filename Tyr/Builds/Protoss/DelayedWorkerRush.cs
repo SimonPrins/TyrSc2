@@ -25,7 +25,7 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             WorkerRushTask = new WorkerRushTask() { TakeWorkers = 0};
             TimingAttackTask.Enable();
-            Bot.Bot.TaskManager.Add(WorkerRushTask);
+            Bot.Main.TaskManager.Add(WorkerRushTask);
         }
 
         public override void OnStart(Bot tyr)

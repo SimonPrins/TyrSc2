@@ -51,10 +51,10 @@ namespace Tyr.Builds.Protoss
 
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1 || SendScout)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count > 1 || SendScout)
                 WorkerScoutTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ArmyObserverTask.Enable();
             TimedObserverTask.Enable();
             ObserverScoutTask.Enable();
@@ -109,12 +109,12 @@ namespace Tyr.Builds.Protoss
             Point2D main = Main.BaseLocation.Pos;
             Point2D natural = Natural.BaseLocation.Pos;
             float dist = 1000000;
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 float topDist = b.BaseLocation.Pos.Y;
                 float leftDist = b.BaseLocation.Pos.X;
-                float bottomDist = Bot.Bot.GameInfo.StartRaw.MapSize.Y - b.BaseLocation.Pos.Y;
-                float rightDist = Bot.Bot.GameInfo.StartRaw.MapSize.X - b.BaseLocation.Pos.X;
+                float bottomDist = Bot.Main.GameInfo.StartRaw.MapSize.Y - b.BaseLocation.Pos.Y;
+                float rightDist = Bot.Main.GameInfo.StartRaw.MapSize.X - b.BaseLocation.Pos.X;
                 float edgeDist = System.Math.Min(System.Math.Min(topDist, leftDist), System.Math.Min(bottomDist, rightDist));
                 if (edgeDist >= 50)
                     continue;
@@ -129,7 +129,7 @@ namespace Tyr.Builds.Protoss
                 dist = mainDist;
                 DefendDropsPos = new PotentialHelper(main, 15).To(b.BaseLocation.Pos).Get();
                 Point2D waypoint = new PotentialHelper(main, 50).To(b.BaseLocation.Pos).Get();
-                ScoutingPylonPos = new PotentialHelper(waypoint, 40).To(Bot.Bot.MapAnalyzer.GetEnemyNatural().Pos).Get();
+                ScoutingPylonPos = new PotentialHelper(waypoint, 40).To(Bot.Main.MapAnalyzer.GetEnemyNatural().Pos).Get();
                 ScoutingPylonBase = b;
             }
         }
@@ -140,7 +140,7 @@ namespace Tyr.Builds.Protoss
 
             result.If(() => BansheesDetected && Count(UnitTypes.PHOENIX) > 0);
             result.Building(UnitTypes.FORGE);
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -156,7 +156,7 @@ namespace Tyr.Builds.Protoss
             BuildList result = new BuildList();
 
             result.If(() => Count(UnitTypes.NEXUS) >= 3);
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -171,7 +171,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => Minerals() >= 600 && Completed(UnitTypes.NEXUS) >= 3 && Gas() < 100 && Bot.Bot.Frame % 10 == 0);
+            result.If(() => Minerals() >= 600 && Completed(UnitTypes.NEXUS) >= 3 && Gas() < 100 && Bot.Main.Frame % 10 == 0);
             result.Building(UnitTypes.ASSIMILATOR, 6);
             result.If(() => Minerals() >= 800);
             result.Building(UnitTypes.ASSIMILATOR, 7);
@@ -198,7 +198,7 @@ namespace Tyr.Builds.Protoss
             result.Train(UnitTypes.OBSERVER, 1, () => !DelayObserver);
             result.Train(UnitTypes.STALKER, 1);
             result.Train(UnitTypes.VOID_RAY, 10, () => FourRaxSuspected && Completed(UnitTypes.STALKER) >= 20);
-            result.Train(UnitTypes.OBSERVER, 2, () => BansheesDetected || (Count(UnitTypes.IMMORTAL) > 0 && TotalEnemyCount(UnitTypes.CYCLONE) > 0) || Bot.Bot.Frame >= 22.4 * 60 * 8);
+            result.Train(UnitTypes.OBSERVER, 2, () => BansheesDetected || (Count(UnitTypes.IMMORTAL) > 0 && TotalEnemyCount(UnitTypes.CYCLONE) > 0) || Bot.Main.Frame >= 22.4 * 60 * 8);
             //result.Train(UnitTypes.MOTHERSHIP, 1, () => Completed(UnitTypes.FLEET_BEACON) > 0);
             result.Train(UnitTypes.TEMPEST, 10, () => Gas() >= 150 || Count(UnitTypes.NEXUS) >= 5);
             result.Train(UnitTypes.PHOENIX, 10, () => BansheesDetected);
@@ -252,7 +252,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.ROBOTICS_FACILITY);
             result.Building(UnitTypes.STARGATE, () => BansheesDetected || (Count(UnitTypes.STALKER) >= 20 || FourRaxSuspected));
             result.Building(UnitTypes.FLEET_BEACON, () => Completed(UnitTypes.STARGATE) > 0 && BuildTempest);
-            result.Building(UnitTypes.GATEWAY, () => Completed(UnitTypes.IMMORTAL) > 0 || Bot.Bot.Frame >= 22.4 * 60 * 4);
+            result.Building(UnitTypes.GATEWAY, () => Completed(UnitTypes.IMMORTAL) > 0 || Bot.Main.Frame >= 22.4 * 60 * 4);
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.PYLON, Natural, NaturalDefensePos);
             if(UseColosus)
@@ -401,10 +401,10 @@ namespace Tyr.Builds.Protoss
             }
             else
             {
-                if (Bot.Bot.Frame - tyr.EnemyBansheesManager.BansheeSeenFrame <= 22.4 * 10
+                if (Bot.Main.Frame - tyr.EnemyBansheesManager.BansheeSeenFrame <= 22.4 * 10
                     && tyr.EnemyBansheesManager.BansheeLocation != null)
                     TimedObserverTask.Task.Target = tyr.EnemyBansheesManager.BansheeLocation;
-                else if (Bot.Bot.Frame - tyr.EnemyBansheesManager.LastHitFrame <= 22.4 * 20)
+                else if (Bot.Main.Frame - tyr.EnemyBansheesManager.LastHitFrame <= 22.4 * 20)
                     TimedObserverTask.Task.Target = tyr.EnemyBansheesManager.LastHitLocation;
                 else
                     TimedObserverTask.Task.Target = SC2Util.To2D(tyr.MapAnalyzer.StartLocation);

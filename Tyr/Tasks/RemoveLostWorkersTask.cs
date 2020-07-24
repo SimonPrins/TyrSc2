@@ -10,7 +10,7 @@ namespace Tyr.Tasks
 
         public override bool DoWant(Agent agent)
         {
-            return agent.IsWorker && !Bot.Bot.MapAnalyzer.MainAndPocketArea[SC2Util.To2D(agent.Unit.Pos)] && Bot.Bot.MapAnalyzer.Placement[SC2Util.To2D(agent.Unit.Pos)];
+            return agent.IsWorker && !Bot.Main.MapAnalyzer.MainAndPocketArea[SC2Util.To2D(agent.Unit.Pos)] && Bot.Main.MapAnalyzer.Placement[SC2Util.To2D(agent.Unit.Pos)];
         }
 
         public override bool IsNeeded()

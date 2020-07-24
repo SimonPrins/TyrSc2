@@ -22,10 +22,10 @@ namespace Tyr.Micro
 
             if (RegeneratingReapers.Contains(agent.Unit.Tag))
             {
-                agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
+                agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation));
                 return true;
             }
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (unit.UnitType != UnitTypes.BUNKER
                     && unit.UnitType != UnitTypes.MARAUDER
@@ -49,7 +49,7 @@ namespace Tyr.Micro
                     if (unit.UnitType == UnitTypes.ZERGLING && agent.Unit.WeaponCooldown == 0)
                         return false;
 
-                    agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
+                    agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation));
                     return true;
                 }
             }
@@ -59,7 +59,7 @@ namespace Tyr.Micro
 
             float distance = 12 * 12;
             Unit killTarget = null;
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (!UnitTypes.WorkerTypes.Contains(unit.UnitType))
                     continue;
@@ -79,7 +79,7 @@ namespace Tyr.Micro
                 return true;
             }
 
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (UnitTypes.CanAttackGround(unit.UnitType)
                     && agent.DistanceSq(unit) <= 5 * 5)
@@ -87,16 +87,16 @@ namespace Tyr.Micro
             }
 
             
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (!UnitTypes.ResourceCenters.Contains(unit.UnitType))
                     continue;
-                if (SC2Util.DistanceSq(unit.Pos, Bot.Bot.MapAnalyzer.StartLocation) > 4)
+                if (SC2Util.DistanceSq(unit.Pos, Bot.Main.MapAnalyzer.StartLocation) > 4)
                     continue;
                 
                 PotentialHelper potential = new PotentialHelper(unit.Pos);
                 potential.Magnitude = 4;
-                potential.From(Bot.Bot.MapAnalyzer.StartLocation);
+                potential.From(Bot.Main.MapAnalyzer.StartLocation);
                 Point2D targetLoc = potential.Get();
 
                 if (agent.DistanceSq(targetLoc) < 4 * 4)

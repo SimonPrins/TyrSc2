@@ -33,10 +33,10 @@ namespace Tyr.Builds.Protoss
             ArmyObserverTask.Enable();
             DefenseTask.Enable();
             //TimingAttackTask.Enable();
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ProxyTask.Enable(new List<ProxyBuilding>() {
                 new ProxyBuilding() { UnitType = UnitTypes.PYLON },
                 new ProxyBuilding() { UnitType = UnitTypes.ROBOTICS_FACILITY, Number = 2 }
@@ -131,7 +131,7 @@ namespace Tyr.Builds.Protoss
                 TrainStep.WarpInLocation = ProxyTask.Task.GetHideLocation();
             
             if (!printed)
-            foreach (Agent agent in Bot.Bot.Units())
+            foreach (Agent agent in Bot.Main.Units())
             {
                 if (agent.Unit.UnitType != UnitTypes.PYLON)
                     continue;

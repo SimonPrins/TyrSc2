@@ -15,9 +15,9 @@ namespace Tyr.Builds.Protoss
     {
         private Point2D OverrideDefenseTarget;
         private bool CannonRush = false;
-        private OneBaseStalkerImmortal CannonDefenseBuild = new OneBaseStalkerImmortal() { RequiredSize = 6, AggressiveMicro = true, ExpandCondition = () => Bot.Bot.Frame >= 22.4 * 60 * 8 , Scouting = false };
+        private OneBaseStalkerImmortal CannonDefenseBuild = new OneBaseStalkerImmortal() { RequiredSize = 6, AggressiveMicro = true, ExpandCondition = () => Bot.Main.Frame >= 22.4 * 60 * 8 , Scouting = false };
         private bool StalkerRushDetected;
-        private OneBaseStalkerImmortal StalkerDefenseBuild = new OneBaseStalkerImmortal() { ObserverScout = true, RequiredSize = 16, UseSentry = true, UsePhoenixScout = false, AggressiveMicro = true, ExpandCondition = () => Bot.Bot.Frame >= 22.4 * 60 * 6, Scouting = false };
+        private OneBaseStalkerImmortal StalkerDefenseBuild = new OneBaseStalkerImmortal() { ObserverScout = true, RequiredSize = 16, UseSentry = true, UsePhoenixScout = false, AggressiveMicro = true, ExpandCondition = () => Bot.Main.Frame >= 22.4 * 60 * 6, Scouting = false };
 
         public override string Name()
         {
@@ -29,38 +29,38 @@ namespace Tyr.Builds.Protoss
             if (!StalkerRushDetected)
             {
                 if (EnemyCount(UnitTypes.GATEWAY) >= 3
-                    && Bot.Bot.Frame <= 22.4 * 60 * 2.5
+                    && Bot.Main.Frame <= 22.4 * 60 * 2.5
                     && !Expanded.Get().Detected
                     && TotalEnemyCount(UnitTypes.ROBOTICS_FACILITY) == 0)
                 {
                     StalkerRushDetected = true;
-                    StalkerDefenseBuild.OnStart(Bot.Bot);
+                    StalkerDefenseBuild.OnStart(Bot.Main);
                     CancelBuilding(UnitTypes.NEXUS);
                 }
             }
             if (!CannonRush
-                && Bot.Bot.Frame <= 22.4 * 60 * 2
+                && Bot.Main.Frame <= 22.4 * 60 * 2
                 && EnemyCount(UnitTypes.FORGE) + EnemyCount(UnitTypes.PHOTON_CANNON) > 0)
             {
                 CannonRush = true;
-                CannonDefenseBuild.OnStart(Bot.Bot);
+                CannonDefenseBuild.OnStart(Bot.Main);
             }
             if (!CannonRush)
             {
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.PYLON)
                         continue;
                     if (SC2Util.DistanceSq(enemy.Pos, Main.BaseLocation.Pos) <= 30 * 30)
                     {
                         CannonRush = true;
-                        CannonDefenseBuild.OnStart(Bot.Bot);
+                        CannonDefenseBuild.OnStart(Bot.Main);
                         break;
                     }
                     if (SC2Util.DistanceSq(enemy.Pos, Natural.BaseLocation.Pos) <= 25 * 25)
                     {
                         CannonRush = true;
-                        CannonDefenseBuild.OnStart(Bot.Bot);
+                        CannonDefenseBuild.OnStart(Bot.Main);
                         break;
                     }
                 }
@@ -103,7 +103,7 @@ namespace Tyr.Builds.Protoss
             BuildList result = new BuildList();
 
             result.If(() => Count(UnitTypes.IMMORTAL) > 1);
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -185,7 +185,7 @@ namespace Tyr.Builds.Protoss
 
             if (!WarpPrismTask.Task.WarpInObjectiveSet()
                 && TimingAttackTask.Task.Units.Count > 0
-                && Bot.Bot.Frame % 22 == 0)
+                && Bot.Main.Frame % 22 == 0)
             {
 
                 int warpInsReady = 0;

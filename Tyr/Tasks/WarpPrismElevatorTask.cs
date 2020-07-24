@@ -41,8 +41,8 @@ namespace Tyr.Tasks
             if (Cancelled)
                 return result;
             if (WarpPrism == null)
-                result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.WARP_PRISM } });
-            result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, UnitTypes = UnitTypes.CombatUnitTypes });
+                result.Add(new UnitDescriptor() { Pos = Bot.Main.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.WARP_PRISM } });
+            result.Add(new UnitDescriptor() { Pos = Bot.Main.TargetManager.AttackTarget, UnitTypes = UnitTypes.CombatUnitTypes });
             return result;
         }
 
@@ -178,7 +178,7 @@ namespace Tyr.Tasks
         {
             Unit closeEnemy = null;
             float dist = 8 * 8;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.PHOTON_CANNON)
                     continue;
@@ -194,7 +194,7 @@ namespace Tyr.Tasks
             {
                 PotentialHelper potential = new PotentialHelper(StagingArea, 2);
                 potential.From(closeEnemy.Pos, 2);
-                potential.To(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]);
+                potential.To(Bot.Main.TargetManager.PotentialEnemyStartLocations[0]);
                 stagingAreaFinal = potential.Get();
             }
             else

@@ -29,7 +29,7 @@ namespace Tyr.BuildSelection
                 if (line.StartsWith("result "))
                 {
                     string[] words = line.Split(' ');
-                    if (words[1] != Bot.Bot.EnemyRace.ToString())
+                    if (words[1] != Bot.Main.EnemyRace.ToString())
                         continue;
                     if (!probabilities.ContainsKey(words[2]))
                         continue;
@@ -45,7 +45,7 @@ namespace Tyr.BuildSelection
                 else if (line.StartsWith("started"))
                 {
                     string[] words = line.Split(' ');
-                    if (words[1] != Bot.Bot.EnemyRace.ToString())
+                    if (words[1] != Bot.Main.EnemyRace.ToString())
                         continue;
                     if (!probabilities.ContainsKey(words[2]))
                         continue;

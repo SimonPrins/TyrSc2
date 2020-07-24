@@ -42,19 +42,19 @@ namespace Tyr.Managers
         {
             if (nexus.Unit.Energy < 50)
                 return;
-            if (Bot.Bot.UnitManager.Completed(UnitTypes.PYLON) == 0)
+            if (Bot.Main.UnitManager.Completed(UnitTypes.PYLON) == 0)
                 return;
 
-            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
-                if (agent.IsProductionStructure && agent.Unit.Orders.Count > 0 && PriotitizedAbilities.Contains(agent.Unit.Orders[0].AbilityId) && Bot.Bot.Frame - lastChrono(agent) >= 20 * 22.4)
+            foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
+                if (agent.IsProductionStructure && agent.Unit.Orders.Count > 0 && PriotitizedAbilities.Contains(agent.Unit.Orders[0].AbilityId) && Bot.Main.Frame - lastChrono(agent) >= 20 * 22.4)
                 {
                     nexus.Order(3755, agent.Unit.Tag);
                     recordFrame(agent);
                     return;
                 }
             if (!OnlyChronoPrioritizedUnits)
-                foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
-                    if (agent.IsProductionStructure && agent.Unit.Orders.Count > 0 && Bot.Bot.Frame - lastChrono(agent) >= 20 * 22.4)
+                foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
+                    if (agent.IsProductionStructure && agent.Unit.Orders.Count > 0 && Bot.Main.Frame - lastChrono(agent) >= 20 * 22.4)
                     {
                         nexus.Order(3755, agent.Unit.Tag);
                         recordFrame(agent);
@@ -73,9 +73,9 @@ namespace Tyr.Managers
         private void recordFrame(Agent target)
         {
             if (!lastChronoFrame.ContainsKey(target.Unit.Tag))
-                lastChronoFrame.Add(target.Unit.Tag, Bot.Bot.Frame);
+                lastChronoFrame.Add(target.Unit.Tag, Bot.Main.Frame);
             else
-                lastChronoFrame[target.Unit.Tag] = Bot.Bot.Frame;
+                lastChronoFrame[target.Unit.Tag] = Bot.Main.Frame;
         }
     }
 }

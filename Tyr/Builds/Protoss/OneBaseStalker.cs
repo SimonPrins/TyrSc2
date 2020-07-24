@@ -41,10 +41,10 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             if (ProxyPylon && !PylonPlaced)
                 PlacePylonTask.Enable();
             ScoutTask.Enable();
@@ -76,7 +76,7 @@ namespace Tyr.Builds.Protoss
             tyr.TargetManager.PrefferDistant = false;
 
 
-            if (Bot.Bot.EnemyRace == Race.Terran)
+            if (Bot.Main.EnemyRace == Race.Terran)
             {
                 WallIn.CreateReaperWall(new List<uint> { UnitTypes.GATEWAY, UnitTypes.PYLON, UnitTypes.CYBERNETICS_CORE });
                 WallIn.ReserveSpace();
@@ -119,7 +119,7 @@ namespace Tyr.Builds.Protoss
 
                     Point2D basePos = null;
                     float dist = 1000000;
-                    foreach (Base b in Bot.Bot.BaseManager.Bases)
+                    foreach (Base b in Bot.Main.BaseManager.Bases)
                     {
                         float newDist = SC2Util.DistanceSq(b.BaseLocation.Pos, point);
                         if (newDist > dist)
@@ -163,7 +163,7 @@ namespace Tyr.Builds.Protoss
             result.Train(UnitTypes.STALKER, 3);
             result.Upgrade(UpgradeType.Blink);
             result.If(() => UpgradeType.LookUp[UpgradeType.Blink].Started() || Completed(UnitTypes.TWILIGHT_COUNSEL) == 0);
-            result.If(() => Bot.Bot.BaseManager.Main.BaseLocation.MineralFields.Count >= 8 || Count(UnitTypes.NEXUS) >= 2);
+            result.If(() => Bot.Main.BaseManager.Main.BaseLocation.MineralFields.Count >= 8 || Count(UnitTypes.NEXUS) >= 2);
             result.Train(UnitTypes.VOID_RAY);
             result.Upgrade(UpgradeType.WarpGate);
             result.If(() => Count(UnitTypes.STARGATE) > 0 || TotalEnemyCount(UnitTypes.ROBOTICS_FACILITY) == 0 || !VoidrayTransition);
@@ -201,7 +201,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.TWILIGHT_COUNSEL);
             result.Building(UnitTypes.GATEWAY, () => Count(UnitTypes.STALKER) >= 2);
             result.Building(UnitTypes.GATEWAY, () => Minerals() >= 250 && Count(UnitTypes.STALKER) >= 8 && UpgradeType.LookUp[UpgradeType.Blink].Started());
-            result.If(() => Bot.Bot.BaseManager.Main.BaseLocation.MineralFields.Count < 8);
+            result.If(() => Bot.Main.BaseManager.Main.BaseLocation.MineralFields.Count < 8);
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.PYLON, Natural);
             result.Building(UnitTypes.ASSIMILATOR, 2, () => Minerals() >= 400);

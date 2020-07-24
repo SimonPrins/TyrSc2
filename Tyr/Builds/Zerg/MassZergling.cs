@@ -42,11 +42,11 @@ namespace Tyr.Builds.Zerg
             OverlordSuicideTask.Enable();
             SafeZerglingsFromReapersTask.Enable();
 
-            BaseLocation enemyNatural = Bot.Bot.MapAnalyzer.GetEnemyNatural();
+            BaseLocation enemyNatural = Bot.Main.MapAnalyzer.GetEnemyNatural();
             if (enemyNatural != null)
             {
                 Base enemyNaturalBase = null;
-                foreach (Base b in Bot.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Main.BaseManager.Bases)
                     if (SC2Util.DistanceSq(b.BaseLocation.Pos, enemyNatural.Pos) <= 2 * 2)
                     {
                         enemyNaturalBase = b;
@@ -61,12 +61,12 @@ namespace Tyr.Builds.Zerg
 
                 PotentialHelper potential = new PotentialHelper(enemyNatural.Pos);
                 potential.Magnitude = 10;
-                potential.From(Bot.Bot.MapAnalyzer.GetEnemyRamp());
+                potential.From(Bot.Main.MapAnalyzer.GetEnemyRamp());
                 DefendEnemyNaturalTask.OverrideIdleLocation = potential.Get();
 
                 potential = new PotentialHelper(enemyNatural.Pos);
                 potential.Magnitude = 5;
-                potential.From(Bot.Bot.MapAnalyzer.GetEnemyRamp());
+                potential.From(Bot.Main.MapAnalyzer.GetEnemyRamp());
                 DefendEnemyNaturalTask.OverrideDefenseLocation = potential.Get();
                 DefenseSquadTask.Enable(DefendEnemyNaturalTask);
             }
@@ -128,24 +128,24 @@ namespace Tyr.Builds.Zerg
         private BuildList Hydralisks()
         {
             BuildList result = new BuildList();
-            result.If(() => Bot.Bot.Frame >= HydraTransitionFrame);
+            result.If(() => Bot.Main.Frame >= HydraTransitionFrame);
             result.Morph(UnitTypes.DRONE, 14);
             result.Building(UnitTypes.HATCHERY, 2);
             result.Morph(UnitTypes.DRONE, 6);
             result.Train(UnitTypes.QUEEN, 2);
             result.Building(UnitTypes.EXTRACTOR);
-            result.Building(UnitTypes.EXTRACTOR, () => Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2);
+            result.Building(UnitTypes.EXTRACTOR, () => Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2);
             result.Train(UnitTypes.LAIR, 1);
-            result.Building(UnitTypes.EXTRACTOR, () => Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) < 2);
-            result.Morph(UnitTypes.DRONE, 6, () => Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2);
-            result.Building(UnitTypes.HYDRALISK_DEN, () => Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2 && Completed(UnitTypes.LAIR) > 0);
-            result.Morph(UnitTypes.HYDRALISK, 5, () => Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2 && Completed(UnitTypes.HYDRALISK_DEN) > 0);
+            result.Building(UnitTypes.EXTRACTOR, () => Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) < 2);
+            result.Morph(UnitTypes.DRONE, 6, () => Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2);
+            result.Building(UnitTypes.HYDRALISK_DEN, () => Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2 && Completed(UnitTypes.LAIR) > 0);
+            result.Morph(UnitTypes.HYDRALISK, 5, () => Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2 && Completed(UnitTypes.HYDRALISK_DEN) > 0);
             result.Building(UnitTypes.HATCHERY);
             result.Train(UnitTypes.QUEEN, 3);
             result.Morph(UnitTypes.DRONE, 5);
-            result.Building(UnitTypes.HYDRALISK_DEN, () => Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) < 2);
+            result.Building(UnitTypes.HYDRALISK_DEN, () => Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) < 2);
             result.Morph(UnitTypes.DRONE, 8);
-            result.Morph(UnitTypes.HYDRALISK, 5, () => Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) < 2);
+            result.Morph(UnitTypes.HYDRALISK, 5, () => Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) < 2);
             result.Morph(UnitTypes.OVERSEER, 2);
             result.Building(UnitTypes.EXTRACTOR, 2);
             result.Morph(UnitTypes.DRONE, 5);
@@ -154,8 +154,8 @@ namespace Tyr.Builds.Zerg
             result.Morph(UnitTypes.DRONE, 20);
             result.Upgrade(UpgradeType.GroovedSpines);
             result.Upgrade(UpgradeType.MuscularAugments);
-            result.Building(UnitTypes.INFESTATION_PIT, () => Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS) > 0);
-            result.Building(UnitTypes.EXTRACTOR, 2, () => Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS) > 0);
+            result.Building(UnitTypes.INFESTATION_PIT, () => Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS) > 0);
+            result.Building(UnitTypes.EXTRACTOR, 2, () => Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS) > 0);
             result.Upgrade(UpgradeType.PathogenGlands);
             result.Upgrade(UpgradeType.NeuralParasite);
             result.Morph(UnitTypes.HYDRALISK, 10);
@@ -172,7 +172,7 @@ namespace Tyr.Builds.Zerg
         private BuildList Zerglings()
         {
             BuildList result = new BuildList();
-            result.If(() => Bot.Bot.Frame < HydraTransitionFrame);
+            result.If(() => Bot.Main.Frame < HydraTransitionFrame);
             result.If(() => Count(UnitTypes.HATCHERY) >= 2 && Count(UnitTypes.EXTRACTOR) > 0 && Count(UnitTypes.DRONE) >= 20 && Count(UnitTypes.QUEEN) >= 2 && (!SpineDefense || Count(UnitTypes.SPINE_CRAWLER) >= 2));
             result.Morph(UnitTypes.ZERGLING, 8);
             result.If(() => AvailableMineralPatches() > 12 || Count(UnitTypes.HATCHERY) >= 3);
@@ -293,27 +293,27 @@ namespace Tyr.Builds.Zerg
                 SafeZerglingsFromReapersTask.Task.Clear();
             }
 
-            if (MeleeUpgrade == 0 && Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(53))
+            if (MeleeUpgrade == 0 && Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(53))
                 MeleeUpgrade = 1;
-            else if (MeleeUpgrade == 1 && Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(54))
+            else if (MeleeUpgrade == 1 && Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(54))
                 MeleeUpgrade = 2;
-            else if (MeleeUpgrade == 2 && Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(55))
+            else if (MeleeUpgrade == 2 && Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(55))
                 MeleeUpgrade = 3;
 
-            if (ArmorUpgrade == 0 && Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(56))
+            if (ArmorUpgrade == 0 && Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(56))
                 ArmorUpgrade = 1;
-            else if (ArmorUpgrade == 1 && Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(57))
+            else if (ArmorUpgrade == 1 && Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(57))
                 ArmorUpgrade = 2;
-            else if (ArmorUpgrade == 2 && Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(58))
+            else if (ArmorUpgrade == 2 && Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(58))
                 ArmorUpgrade = 3;
 
             ResearchingUpgrades = 0;
             for (uint ability = 1186; ability <= 1191; ability++)
-                if (Bot.Bot.UnitManager.ActiveOrders.Contains(ability))
+                if (Bot.Main.UnitManager.ActiveOrders.Contains(ability))
                     ResearchingUpgrades++;
             
-            if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(66)
-                && !Bot.Bot.UnitManager.ActiveOrders.Contains(1253))
+            if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(66)
+                && !Bot.Main.UnitManager.ActiveOrders.Contains(1253))
             {
                 if (Gas() < 92)
                     GasWorkerTask.WorkersPerGas = 3;
@@ -397,34 +397,34 @@ namespace Tyr.Builds.Zerg
                     return;
                 if (Minerals() >= 100
                     && Gas() >= 100
-                    && !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(66))
+                    && !Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(66))
                     agent.Order(1253);
                 else if (Minerals() >= 200
                     && Gas() >= 200
-                    && !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(65))
+                    && !Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(65))
                     agent.Order(1252);
             }
             else if (agent.Unit.UnitType == UnitTypes.EVOLUTION_CHAMBER)
             {
                 if (HydraTransitionFrame < tyr.Frame)
                     return;
-                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(53)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1186))
+                if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(53)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1186))
                     agent.Order(1186);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(56)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1189))
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(56)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1189))
                     agent.Order(1189);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(54)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1187))
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(54)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1187))
                     agent.Order(1187);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(57)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1190))
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(57)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1190))
                     agent.Order(1190);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(55)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1188))
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(55)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1188))
                     agent.Order(1188);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(58)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1191))
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(58)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1191))
                     agent.Order(1191);
             }
         }

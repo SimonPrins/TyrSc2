@@ -21,7 +21,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -35,13 +35,13 @@ namespace Tyr.Tasks
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
             if (Units.Count < 3)
-                result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 3 - Units.Count, UnitTypes = UnitTypes.WorkerTypes });
+                result.Add(new UnitDescriptor() { Pos = Bot.Main.TargetManager.AttackTarget, Count = 3 - Units.Count, UnitTypes = UnitTypes.WorkerTypes });
             return result;
         }
 
         public override bool IsNeeded()
         {
-            return Bot.Bot.Frame >= StartFrame && !Done;
+            return Bot.Main.Frame >= StartFrame && !Done;
         }
 
         public override void OnFrame(Bot tyr)
@@ -85,7 +85,7 @@ namespace Tyr.Tasks
                 if (proxyPylon == null && deceased.UnitType == UnitTypes.PROBE)
                 {
                     if (!Done)
-                        Bot.Bot.Chat("ERROR 403: ACCESS DENIED");
+                        Bot.Main.Chat("ERROR 403: ACCESS DENIED");
                     Done = true;
                 }
             }

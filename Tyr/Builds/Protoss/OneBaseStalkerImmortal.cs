@@ -52,15 +52,15 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1 || Scouting)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count > 1 || Scouting)
                 WorkerScoutTask.Enable();
-            if (Bot.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Main.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
             ScoutTask.Enable();
             ArmyObserverTask.Enable();
             if (ObserverScout)
                 ObserverScoutTask.Enable();
-            if (Bot.Bot.EnemyRace == SC2APIProtocol.Race.Zerg || Bot.Bot.EnemyRace == SC2APIProtocol.Race.Protoss)
+            if (Bot.Main.EnemyRace == SC2APIProtocol.Race.Zerg || Bot.Main.EnemyRace == SC2APIProtocol.Race.Protoss)
                 ForceFieldRampTask.Enable();
             if (DenyScouting)
                 DenyScoutTask.Enable();
@@ -109,12 +109,12 @@ namespace Tyr.Builds.Protoss
             result.Train(UnitTypes.PROBE, 40, () => Count(UnitTypes.NEXUS) >= 2);
             result.If(() => !StartExpanding || Count(UnitTypes.IMMORTAL) < 2 || Count(UnitTypes.STALKER) + Count(UnitTypes.ZEALOT) + Count(UnitTypes.IMMORTAL) < 8 || Count(UnitTypes.NEXUS) >= 2);
             result.Train(UnitTypes.ZEALOT, 4, () => TotalEnemyCount(UnitTypes.ROACH) == 0 && StartZealots);
-            result.Train(UnitTypes.OBSERVER, 1, () => Bot.Bot.EnemyRace == SC2APIProtocol.Race.Terran || Count(UnitTypes.IMMORTAL) >= (DoubleRobo ? 4 : 3) || Observer);
+            result.Train(UnitTypes.OBSERVER, 1, () => Bot.Main.EnemyRace == SC2APIProtocol.Race.Terran || Count(UnitTypes.IMMORTAL) >= (DoubleRobo ? 4 : 3) || Observer);
             result.If(() => Count(UnitTypes.STALKER) + Count(UnitTypes.IMMORTAL) < 5 || !StartExpanding || Count(UnitTypes.NEXUS) >= 2);
             result.Train(UnitTypes.OBSERVER, 2, () => TotalEnemyCount(UnitTypes.BANSHEE) > 0);
             result.Train(UnitTypes.IMMORTAL, () => TotalEnemyCount(UnitTypes.BANSHEE) == 0 && TotalEnemyCount(UnitTypes.BATTLECRUISER) == 0);
             result.Train(UnitTypes.STALKER, 1, () => !StartZealots);
-            if (Bot.Bot.EnemyRace != SC2APIProtocol.Race.Zerg && UseSentry)
+            if (Bot.Main.EnemyRace != SC2APIProtocol.Race.Zerg && UseSentry)
                 result.Train(UnitTypes.SENTRY, 1, () => !PhoenixScoutSent && EarlySentry && !StrategyAnalysis.CannonRush.Get().Detected && TotalEnemyCount(UnitTypes.FORGE) + TotalEnemyCount(UnitTypes.PHOTON_CANNON) == 0);
             result.Upgrade(UpgradeType.WarpGate, () => !DoubleRobo || Count(UnitTypes.IMMORTAL) >= 4);
             result.Train(UnitTypes.STALKER, () => (!StartZealots || TotalEnemyCount(UnitTypes.ROACH) + TotalEnemyCount(UnitTypes.MUTALISK) > 0) && (!DoubleRobo || Count(UnitTypes.STALKER) < 3 || Gas() >= 125));

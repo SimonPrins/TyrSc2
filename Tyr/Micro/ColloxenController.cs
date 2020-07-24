@@ -12,9 +12,9 @@ namespace Tyr.Micro
                 return false;
 
             int count = 0;
-            Point2D retreatTo = SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation);
+            Point2D retreatTo = SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation);
             float dist = 1000000000f;
-            foreach (Agent ally in Bot.Bot.UnitManager.Agents.Values)
+            foreach (Agent ally in Bot.Main.UnitManager.Agents.Values)
             {
                 if (ally.Unit.UnitType == UnitTypes.COLOSUS)
                     continue;

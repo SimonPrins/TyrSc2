@@ -12,7 +12,7 @@ namespace Tyr.Micro
 
             float dist = 10 * 10;
             Unit detectTarget = null;
-            foreach (Unit enemy in Bot.Bot.CloakedEnemies())
+            foreach (Unit enemy in Bot.Main.CloakedEnemies())
             {
                 if (enemy.UnitType != UnitTypes.OBSERVER)
                     continue;
@@ -25,7 +25,7 @@ namespace Tyr.Micro
                     dist = newDist;
                 }
             }
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.PHOTON_CANNON)
                     continue;
@@ -43,7 +43,7 @@ namespace Tyr.Micro
 
             dist = 10 * 10;
             Unit fleeTarget = null;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!UnitTypes.CanAttackGround(enemy.UnitType))
                     continue;

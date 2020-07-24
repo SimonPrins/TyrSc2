@@ -19,7 +19,7 @@ namespace Tyr.BuildingPlacement
 
         public static Point2D FindPlacement(Point2D target, Point2D size, uint type)
         {
-            Point2D reference = SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation);
+            Point2D reference = SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation);
 
             if (type == UnitTypes.PYLON)
                 return FindPlacementPylon(reference, target, size, type);
@@ -55,17 +55,17 @@ namespace Tyr.BuildingPlacement
                     float newScore = 0;
                     if (Pylons.Count == 0)
                     {
-                        if (!Tyr.Bot.MapAnalyzer.StartArea[(int)x, (int)y])
+                        if (!Bot.Main.MapAnalyzer.StartArea[(int)x, (int)y])
                             continue;
 
-                        if (Tyr.Bot.MapAnalyzer.WallDistances[(int)x, (int)y] < 8
-                            || SC2Util.DistanceSq(new Point2D() { X = x, Y = y }, Tyr.Bot.MapAnalyzer.StartLocation) <= 7 * 7)
+                        if (Bot.Main.MapAnalyzer.WallDistances[(int)x, (int)y] < 8
+                            || SC2Util.DistanceSq(new Point2D() { X = x, Y = y }, Bot.Main.MapAnalyzer.StartLocation) <= 7 * 7)
                             newScore += 100000;
                         if (newScore > score)
                             continue;
                     }
-                    if (Tyr.Bot.MapAnalyzer.StartArea[(int)x, (int)y]
-                        && Tyr.Bot.MapAnalyzer.WallDistances[(int)x, (int)y] < 4)
+                    if (Bot.Main.MapAnalyzer.StartArea[(int)x, (int)y]
+                        && Bot.Main.MapAnalyzer.WallDistances[(int)x, (int)y] < 4)
                         newScore += 1000;
 
                     float closestPylonDist = 8 * 8;
@@ -74,7 +74,7 @@ namespace Tyr.BuildingPlacement
 
                     newScore += SC2Util.DistanceSq(target, SC2Util.Point(x, y)) - closestPylonDist * 4;
 
-                    foreach (Unit gas in Tyr.Bot.Observation.Observation.RawData.Units)
+                    foreach (Unit gas in Bot.Main.Observation.Observation.RawData.Units)
                     {
                         if (!UnitTypes.GasGeysers.Contains(gas.UnitType))
                             continue;
@@ -87,7 +87,7 @@ namespace Tyr.BuildingPlacement
                         continue;
 
                     bool blocked = false;
-                    foreach (Unit unit in Tyr.Bot.Observation.Observation.RawData.Units)
+                    foreach (Unit unit in Bot.Main.Observation.Observation.RawData.Units)
                         if (!BuildingPlacer.CheckDistClose(x - 1f, y - 1f, x + 1f, y + 1f, SC2Util.To2D(unit.Pos), unit.UnitType))
                         {
                             blocked = true;
@@ -108,7 +108,7 @@ namespace Tyr.BuildingPlacement
                             break;
                         }
 
-                    foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                    foreach (Base b in Bot.Main.BaseManager.Bases)
                         if (!BuildingPlacer.CheckDistClose(x - 1f, y - 1f, x + 1f, y + 1f, b.BaseLocation.Pos, UnitTypes.NEXUS))
                         {
                             blocked = true;
@@ -143,20 +143,20 @@ namespace Tyr.BuildingPlacement
                         continue;
 
                     bool blocked = false;
-                    foreach (Unit unit in Tyr.Bot.Observation.Observation.RawData.Units)
+                    foreach (Unit unit in Bot.Main.Observation.Observation.RawData.Units)
                         if (!BuildingPlacer.CheckDistClose(x - 1.5f, y - 1.5f, x + 1.5f, y + 1.5f, SC2Util.To2D(unit.Pos), unit.UnitType))
                         {
                             blocked = true;
                             break;
                         }
-                    foreach (ReservedBuilding building in Tyr.Bot.buildingPlacer.ReservedLocation)
+                    foreach (ReservedBuilding building in Bot.Main.buildingPlacer.ReservedLocation)
                         if (!BuildingPlacer.CheckDistClose(x - 1.5f, y - 1.5f, x + 1.5f, y + 1.5f, building.Pos, building.Type))
                         {
                             blocked = true;
                             break;
                         }
 
-                    foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                    foreach (Base b in Bot.Main.BaseManager.Bases)
                         if (!BuildingPlacer.CheckDistClose(x - 1.5f, y - 1.5f, x + 1.5f, y + 1.5f, b.BaseLocation.Pos, UnitTypes.NEXUS))
                         {
                             blocked = true;
@@ -174,10 +174,10 @@ namespace Tyr.BuildingPlacement
                     bool hasPower = false;
                     foreach (Agent pylon in Pylons)
                     {
-                        if (pylon.Unit.BuildProgress < (Tyr.Bot.Build.Completed(UnitTypes.GATEWAY) == 0 ? 0.3 : 0.70))
+                        if (pylon.Unit.BuildProgress < (Bot.Main.Build.Completed(UnitTypes.GATEWAY) == 0 ? 0.3 : 0.70))
                             continue;
 
-                        if (Tyr.Bot.MapAnalyzer.MapHeight((int)pylon.Unit.Pos.X, (int)pylon.Unit.Pos.Y) < Tyr.Bot.MapAnalyzer.MapHeight((int)x, (int)y))
+                        if (Bot.Main.MapAnalyzer.MapHeight((int)pylon.Unit.Pos.X, (int)pylon.Unit.Pos.Y) < Bot.Main.MapAnalyzer.MapHeight((int)x, (int)y))
                             continue;
 
                         if (IsBuildingInPowerField(new Point2D() { X = x, Y = y }, size, SC2Util.To2D(pylon.Unit.Pos)))
@@ -200,12 +200,12 @@ namespace Tyr.BuildingPlacement
 
         public static void UpdatePylonList()
         {
-            if (Tyr.Bot.Frame == UpdateFrame)
+            if (Bot.Main.Frame == UpdateFrame)
                 return;
-            UpdateFrame = Tyr.Bot.Frame;
+            UpdateFrame = Bot.Main.Frame;
 
             Pylons = new List<Agent>();
-            foreach (Agent agent in Tyr.Bot.Units())
+            foreach (Agent agent in Bot.Main.Units())
                 if (agent.Unit.UnitType == UnitTypes.PYLON)
                     Pylons.Add(agent);
         }
@@ -219,7 +219,7 @@ namespace Tyr.BuildingPlacement
 
         public static bool RectBuildable(float x1, float y1, float x2, float y2)
         {
-            BoolGrid creep = new ImageBoolGrid(Tyr.Bot.Observation.Observation.RawData.MapState.Creep, 1);
+            BoolGrid creep = new ImageBoolGrid(Bot.Main.Observation.Observation.RawData.MapState.Creep, 1);
             for (float x = x1; x <= x2; x++)
                 for (float y = y1; y <= y2; y++)
                 {
@@ -227,8 +227,8 @@ namespace Tyr.BuildingPlacement
                     {
                         return false;
                     }
-                    if (Tyr.Bot.buildingPlacer.LimitBuildArea != null
-                        && !Tyr.Bot.buildingPlacer.LimitBuildArea[(int)x, (int)y])
+                    if (Bot.Main.buildingPlacer.LimitBuildArea != null
+                        && !Bot.Main.buildingPlacer.LimitBuildArea[(int)x, (int)y])
                         return false;
                 }
             return true;

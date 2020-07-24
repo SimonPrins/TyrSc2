@@ -10,7 +10,7 @@ namespace Tyr.Micro
         public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (agent.CombatSimulationDecision != CombatSimulationDecision.None
-                || Bot.Bot.Frame - agent.CombatSimulationDecisionFrame >= 10)
+                || Bot.Main.Frame - agent.CombatSimulationDecisionFrame >= 10)
                 return false;
 
             if (agent.Unit.WeaponCooldown == 0)
@@ -26,7 +26,7 @@ namespace Tyr.Micro
             float dist = 10 * 10;
             int priority = -1;
 
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.IsFlying && !agent.CanAttackAir())
                     continue;

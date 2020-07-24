@@ -55,10 +55,10 @@ namespace Tyr.Builds.Terran
             result.If(() =>
             {
                 return Build.FoodUsed()
-                    + Bot.Bot.UnitManager.Count(UnitTypes.COMMAND_CENTER)
-                    + Bot.Bot.UnitManager.Count(UnitTypes.BARRACKS) * 2
-                    + Bot.Bot.UnitManager.Count(UnitTypes.FACTORY) * 2
-                    + Bot.Bot.UnitManager.Count(UnitTypes.STARPORT) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.COMMAND_CENTER)
+                    + Bot.Main.UnitManager.Count(UnitTypes.BARRACKS) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.FACTORY) * 2
+                    + Bot.Main.UnitManager.Count(UnitTypes.STARPORT) * 2
                     >= Build.ExpectedAvailableFood() - 2
                     && Build.ExpectedAvailableFood() < 200;
             });
@@ -90,7 +90,7 @@ namespace Tyr.Builds.Terran
             result.Train(UnitTypes.VIKING_FIGHTER, 10, () => Lifting.Get().Detected);
             result.Train(UnitTypes.LIBERATOR, 10);
             result.Train(UnitTypes.MARINE, () => 
-                       Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0
+                       Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0
                     || Gas() < 42
                     || Lifting.Get().Detected);
             result.Train(UnitTypes.REAPER, 16);
@@ -140,7 +140,7 @@ namespace Tyr.Builds.Terran
                             continue;
 
                         Unit scanTarget = null;
-                        foreach (Unit enemy in Bot.Bot.Enemies())
+                        foreach (Unit enemy in Bot.Main.Enemies())
                         {
                             if (!UnitTypes.CanAttackGround(enemy.UnitType))
                                 continue;

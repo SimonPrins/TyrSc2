@@ -27,7 +27,7 @@ namespace Tyr.Tasks
             else
                 Task.Target = target;
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -44,7 +44,7 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Bot.Bot.Frame >= StartFrame;
+            return Bot.Main.Frame >= StartFrame;
         }
 
         public override void OnFrame(Bot tyr)

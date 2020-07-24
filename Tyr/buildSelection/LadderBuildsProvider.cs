@@ -216,7 +216,7 @@ namespace Tyr.buildSelection
             }
             else if (tyr.EnemyRace == Race.Zerg)
             {
-                if (Bot.Bot.OpponentID == "eed44128-f488-4e31-b457-8e55f8a95628")
+                if (Bot.Main.OpponentID == "eed44128-f488-4e31-b457-8e55f8a95628")
                 {
                     options.Add(new PvZHjax() { CounterRoaches = false, DefendNydus = false });
                     return options;

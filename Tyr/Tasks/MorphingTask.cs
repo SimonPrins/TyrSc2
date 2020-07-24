@@ -19,7 +19,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Bot.Bot.TaskManager.Add(Task);
+            Bot.Main.TaskManager.Add(Task);
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -31,13 +31,13 @@ namespace Tyr.Tasks
                     continue;
                 if (desired != UnitTypes.DRONE)
                 {
-                    result.Add(new UnitDescriptor() { Pos = SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation), Count = 1, UnitTypes = new HashSet<uint>() { MorphingType.LookUpToType[desired].FromType }, Marker = desired });
+                    result.Add(new UnitDescriptor() { Pos = SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation), Count = 1, UnitTypes = new HashSet<uint>() { MorphingType.LookUpToType[desired].FromType }, Marker = desired });
                     continue;
                 }
 
-                Point2D pos = SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation);
+                Point2D pos = SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation);
                 int alreadyMining = 100;
-                foreach (Base b in Bot.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Main.BaseManager.Bases)
                 {
                     if (b.ResourceCenter == null)
                         continue;
@@ -112,13 +112,13 @@ namespace Tyr.Tasks
 
         public void Morph(uint unitType)
         {
-            Bot.Bot.UnitManager.UnitTraining(unitType);
+            Bot.Main.UnitManager.UnitTraining(unitType);
             MorphingType morphingType = MorphingType.LookUpToType[unitType];
-            if (Bot.Bot.Gas() >= morphingType.Gas && Bot.Bot.Minerals() >= morphingType.Minerals)
+            if (Bot.Main.Gas() >= morphingType.Gas && Bot.Main.Minerals() >= morphingType.Minerals)
             {
                 UnitsDesired.Add(unitType);
-                Bot.Bot.ReservedGas += morphingType.Gas;
-                Bot.Bot.ReservedMinerals += morphingType.Minerals;
+                Bot.Main.ReservedGas += morphingType.Gas;
+                Bot.Main.ReservedMinerals += morphingType.Minerals;
             }
         }
     }

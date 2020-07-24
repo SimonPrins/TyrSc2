@@ -77,14 +77,14 @@ namespace Tyr.Builds.Zerg
 
         private BuildList MainBuild()
         {
-            Point2D spinePos = Bot.Bot.MapAnalyzer.Walk(NaturalDefensePos, Bot.Bot.MapAnalyzer.EnemyDistances, 5);
+            Point2D spinePos = Bot.Main.MapAnalyzer.Walk(NaturalDefensePos, Bot.Main.MapAnalyzer.EnemyDistances, 5);
 
             BuildList result = new BuildList();
             //result.If(() => { return !SmellCheese; });
             result.Building(UnitTypes.HATCHERY, 2, () => { return Count(UnitTypes.HATCHERY) + Count(UnitTypes.LAIR) + Count(UnitTypes.HIVE) < 2; });
             result.Building(UnitTypes.SPAWNING_POOL);
             result.If(() => { return Count(UnitTypes.QUEEN) > 0; });
-            result.If(() => { return Completed(UnitTypes.HATCHERY) + Completed(UnitTypes.LAIR) >= 2 && Bot.Bot.Frame >= 22.4 * 60 * 2; });
+            result.If(() => { return Completed(UnitTypes.HATCHERY) + Completed(UnitTypes.LAIR) >= 2 && Bot.Main.Frame >= 22.4 * 60 * 2; });
             result.Building(UnitTypes.SPINE_CRAWLER, Natural, spinePos, 2);
             result.Building(UnitTypes.SPINE_CRAWLER, Natural, spinePos, 2, () => { return StalkerDefense; });
             result.Building(UnitTypes.ROACH_WARREN);
@@ -236,9 +236,9 @@ namespace Tyr.Builds.Zerg
                         CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.CORRUPTOR);
                     }
                     else if (Minerals() >= 100 && FoodUsed()
-                        + Bot.Bot.UnitManager.Count(UnitTypes.HATCHERY) * 2
-                        + Bot.Bot.UnitManager.Count(UnitTypes.LAIR) * 2
-                        + Bot.Bot.UnitManager.Count(UnitTypes.HIVE) * 2
+                        + Bot.Main.UnitManager.Count(UnitTypes.HATCHERY) * 2
+                        + Bot.Main.UnitManager.Count(UnitTypes.LAIR) * 2
+                        + Bot.Main.UnitManager.Count(UnitTypes.HIVE) * 2
                         >= ExpectedAvailableFood() - 2)
                     {
                         agent.Order(1344);

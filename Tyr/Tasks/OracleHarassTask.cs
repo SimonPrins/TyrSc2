@@ -30,7 +30,7 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Bot.Bot.UnitManager.Completed(UnitTypes.ORACLE)  >= RequiredSize;
+            return Bot.Main.UnitManager.Completed(UnitTypes.ORACLE)  >= RequiredSize;
         }
 
         public override void OnFrame(Bot tyr)

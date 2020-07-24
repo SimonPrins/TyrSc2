@@ -17,7 +17,7 @@ namespace Tyr.Micro
 
             float dist = 12 * 12;
             Unit fleeTarget = null;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (!UnitTypes.CanAttackAir(enemy.UnitType))
                     continue;
@@ -34,7 +34,7 @@ namespace Tyr.Micro
 
             if (fleeTarget != null)
             {
-                Bot.Bot.DrawLine(agent, fleeTarget.Pos);
+                Bot.Main.DrawLine(agent, fleeTarget.Pos);
                 if (RetreatPos != null)
                     agent.Flee(fleeTarget.Pos, RetreatPos);
                 else

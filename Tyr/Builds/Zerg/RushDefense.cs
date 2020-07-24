@@ -87,7 +87,7 @@ namespace Tyr.Builds.Zerg
                 if (!Lifting.Get().Detected)
                     return false;
                 // First destroy non-lifted buildings.
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                     if (UnitTypes.BuildingTypes.Contains(enemy.UnitType) && !enemy.IsFlying)
                         return false;
                 return true;
@@ -203,30 +203,30 @@ namespace Tyr.Builds.Zerg
             }
             else if (agent.Unit.UnitType == UnitTypes.HYDRALISK_DEN)
             {
-                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(134)
+                if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(134)
                     && Gas() >= 100
                     && Minerals() >= 100)
                     agent.Order(1282);
             }
             else if (agent.Unit.UnitType == UnitTypes.EVOLUTION_CHAMBER)
             {
-                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(59)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1192))
+                if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(59)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1192))
                     agent.Order(1192);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(56)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1189))
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(56)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1189))
                     agent.Order(1189);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(60)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1193))
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(60)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1193))
                     agent.Order(1193);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(57)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1190))
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(57)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1190))
                     agent.Order(1190);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(61)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1194))
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(61)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1194))
                     agent.Order(1194);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(58)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1191))
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(58)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1191))
                     agent.Order(1191);
             }
         }

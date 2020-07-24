@@ -28,8 +28,8 @@ namespace Tyr.Builds.Protoss
             string[] scoutingLocations = Util.FileUtil.ReadScoutLocationFile();
             HashSet<string> existingLocations = new HashSet<string>();
 
-            string mapName = Bot.Bot.GameInfo.MapName;
-            string mapStartString = mapName + "(" + Bot.Bot.MapAnalyzer.StartLocation.X + ", " + Bot.Bot.MapAnalyzer.StartLocation.Y + "):";
+            string mapName = Bot.Main.GameInfo.MapName;
+            string mapStartString = mapName + "(" + Bot.Main.MapAnalyzer.StartLocation.X + ", " + Bot.Main.MapAnalyzer.StartLocation.Y + "):";
             foreach (string line in scoutingLocations)
             {
                 if (!line.StartsWith(mapName))
@@ -148,7 +148,7 @@ namespace Tyr.Builds.Protoss
                     }
                     if (!alreadyRegisterd)
                     {
-                        string mapStartString = tyr.GameInfo.MapName + "(" + Bot.Bot.MapAnalyzer.StartLocation.X + ", " + Bot.Bot.MapAnalyzer.StartLocation.Y + "):";
+                        string mapStartString = tyr.GameInfo.MapName + "(" + Bot.Main.MapAnalyzer.StartLocation.X + ", " + Bot.Main.MapAnalyzer.StartLocation.Y + "):";
                         string locationString = mapStartString + "(" + pos.X + "," + pos.Y + ")";
                         ScoutLocations.Add(pos);
                         FileUtil.WriteScoutLocation(locationString);

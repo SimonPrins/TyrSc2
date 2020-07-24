@@ -153,11 +153,11 @@ namespace Tyr.Builds.Protoss
             if (WallIn.Wall.Count < 5)
                 return null;
 
-            if (Bot.Bot.Map == MapEnum.DiscoBloodbath
+            if (Bot.Main.Map == MapEnum.DiscoBloodbath
                 && Main.BaseLocation.Pos.X <= 100)
                 return new Point2D() { X = WallIn.Wall[4].Pos.X, Y = WallIn.Wall[4].Pos.Y + 2 };
 
-            if (Bot.Bot.Map == MapEnum.Zen)
+            if (Bot.Main.Map == MapEnum.Zen)
             {
                 if (Main.BaseLocation.Pos.X <= 100)
                     return new Point2D() { X = 64, Y = 58 };
@@ -169,7 +169,7 @@ namespace Tyr.Builds.Protoss
             if (Math.Abs(pos.X - Natural.BaseLocation.Pos.X) <= 3
                 && Math.Abs(pos.Y - Natural.BaseLocation.Pos.Y) <= 3)
                 return null;
-            if (Bot.Bot.buildingPlacer.CheckPlacement(pos, SC2Util.Point(2, 2), UnitTypes.PYLON, null, true))
+            if (Bot.Main.buildingPlacer.CheckPlacement(pos, SC2Util.Point(2, 2), UnitTypes.PYLON, null, true))
                 return pos;
             return null;
         }
@@ -188,7 +188,7 @@ namespace Tyr.Builds.Protoss
 
             if (!WarpPrismTask.Task.WarpInObjectiveSet()
                 && TimingAttackTask.Task.Units.Count > 0
-                && Bot.Bot.Frame % 22 == 0)
+                && Bot.Main.Frame % 22 == 0)
             {
                 int warpInsReady = 0;
                 RequestQuery query = new RequestQuery();
@@ -232,7 +232,7 @@ namespace Tyr.Builds.Protoss
                 GasWorkerTask.WorkersPerGas = 2;
 
             bool gatewayExists = false;
-            foreach (Agent agent in Bot.Bot.Units())
+            foreach (Agent agent in Bot.Main.Units())
                 if (agent.Unit.UnitType == UnitTypes.GATEWAY
                     || agent.Unit.UnitType == UnitTypes.WARP_GATE)
                     gatewayExists = true;

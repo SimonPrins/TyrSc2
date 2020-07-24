@@ -19,9 +19,9 @@ namespace Tyr.Builds.Protoss
             TimingAttackTask.Enable();
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
-            Set += ProtossBuildUtil.Pylons(() => Count(UnitTypes.PYLON) > 0 && (Count(UnitTypes.PHOTON_CANNON) >= 2 || Tyr.Bot.Frame >= 22.4 * 60 * 2));
+            Set += ProtossBuildUtil.Pylons(() => Count(UnitTypes.PYLON) > 0 && (Count(UnitTypes.PHOTON_CANNON) >= 2 || Bot.Main.Frame >= 22.4 * 60 * 2));
             Set += MainBuild();
         }
 
@@ -37,15 +37,15 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             TimingAttackTask.Task.RequiredSize = 6;
 
-            if (Tyr.Bot.Frame >= 22.4 * 30)
+            if (Bot.Main.Frame >= 22.4 * 30)
                 CannonRushTask.Task.Stopped = true;
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

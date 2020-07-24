@@ -84,7 +84,7 @@ namespace Tyr.Builds.Zerg
             result.Building(UnitTypes.EXTRACTOR, () => !SmellCheese);
             result.Morph(UnitTypes.DRONE, 5, () => !SmellCheese || Count(UnitTypes.ROACH) >= 20);
             result.Morph(UnitTypes.ROACH, 4);
-            result.Building(UnitTypes.SPINE_CRAWLER, Main, MainDefensePos, () => SmellCheese && Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.SPINE_CRAWLER) == 0);
+            result.Building(UnitTypes.SPINE_CRAWLER, Main, MainDefensePos, () => SmellCheese && Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.SPINE_CRAWLER) == 0);
             result.Morph(UnitTypes.DRONE, 5);
             result.Building(UnitTypes.EVOLUTION_CHAMBER, 2, () => !SmellCheese || Count(UnitTypes.ROACH) >= 10);
             result.Upgrade(UpgradeType.ZergMissileWeapons, () => !SmellCheese || Count(UnitTypes.ROACH) >= 10);
@@ -189,9 +189,9 @@ namespace Tyr.Builds.Zerg
                 BalanceGas();
 
             //SmellCheese = EarlyPool.Get().Detected && !Expanded.Get().Detected && Completed(UnitTypes.ROACH) < 2;
-            if (Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 5 && tyr.Frame <= 22.4 * 60 * 2)
+            if (Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 5 && tyr.Frame <= 22.4 * 60 * 2)
                 SmellCheese = true;
-            if (Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.SPAWNING_POOL) > 0 && tyr.Frame <= 22.4 * 60 * 1.4 && !Expanded.Get().Detected)
+            if (Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.SPAWNING_POOL) > 0 && tyr.Frame <= 22.4 * 60 * 1.4 && !Expanded.Get().Detected)
                 SmellCheese = true;
             if (SmellCheese && Count(UnitTypes.ROACH) + Count(UnitTypes.RAVAGER) < 13)
             {
@@ -232,12 +232,12 @@ namespace Tyr.Builds.Zerg
                 && Minerals() < 200
                 && Gas() < 200
                 && Count(UnitTypes.ROACH) >= 5
-                && ((!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(57)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1190)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1189))
-                    || (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(60)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1192)
-                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1193)));
+                && ((!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(57)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1190)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1189))
+                    || (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(60)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1192)
+                    && !Bot.Main.UnitManager.ActiveOrders.Contains(1193)));
         }
 
         public override void Produce(Bot tyr, Agent agent)
@@ -265,7 +265,7 @@ namespace Tyr.Builds.Zerg
             }
             else if (agent.Unit.UnitType == UnitTypes.ROACH_WARREN)
             {
-                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(2)
+                if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(2)
                     && Gas() >= 100
                     && Minerals() >= 100)
                     agent.Order(216);

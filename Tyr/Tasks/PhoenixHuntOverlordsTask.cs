@@ -47,11 +47,11 @@ namespace Tyr.Tasks
         {
             float dist = 80 * 80;
             Unit target = null;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.OVERLORD && enemy.UnitType != UnitTypes.OVERSEER)
                     continue;
-                float newDist = SC2Util.DistanceSq(enemy.Pos, Bot.Bot.MapAnalyzer.StartLocation);
+                float newDist = SC2Util.DistanceSq(enemy.Pos, Bot.Main.MapAnalyzer.StartLocation);
 
                 if (newDist < dist)
                 {

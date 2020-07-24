@@ -10,7 +10,7 @@ namespace Tyr.Util
     {
         public static int GetDataValue(ImageData data, int x, int y)
         {
-            if (Bot.Bot.OldMapData)
+            if (Bot.Main.OldMapData)
                 return GetDataValueOld(data, x, y);
 
             if (data.BitsPerPixel == 1)
@@ -38,16 +38,16 @@ namespace Tyr.Util
 
         public static bool GetTilePlacable(int x, int y)
         {
-            if (x < 0 || y < 0 || x >= Bot.Bot.GameInfo.StartRaw.PlacementGrid.Size.X || y >= Bot.Bot.GameInfo.StartRaw.PlacementGrid.Size.Y)
+            if (x < 0 || y < 0 || x >= Bot.Main.GameInfo.StartRaw.PlacementGrid.Size.X || y >= Bot.Main.GameInfo.StartRaw.PlacementGrid.Size.Y)
                 return false;
-            return SC2Util.GetDataValue(Bot.Bot.GameInfo.StartRaw.PlacementGrid, x, y) != 0;
+            return SC2Util.GetDataValue(Bot.Main.GameInfo.StartRaw.PlacementGrid, x, y) != 0;
         }
 
         public static bool GetTileVisible(int x, int y)
         {
-            if (x < 0 || y < 0 || x >= Bot.Bot.Observation.Observation.FeatureLayerData.Renders.VisibilityMap.Size.X || y >= Bot.Bot.Observation.Observation.FeatureLayerData.Renders.VisibilityMap.Size.Y)
+            if (x < 0 || y < 0 || x >= Bot.Main.Observation.Observation.FeatureLayerData.Renders.VisibilityMap.Size.X || y >= Bot.Main.Observation.Observation.FeatureLayerData.Renders.VisibilityMap.Size.Y)
                 return false;
-            return GetDataValue(Bot.Bot.Observation.Observation.FeatureLayerData.Renders.VisibilityMap, x, y) != 0;
+            return GetDataValue(Bot.Main.Observation.Observation.FeatureLayerData.Renders.VisibilityMap, x, y) != 0;
         }
 
         public static Point2D Point(float x, float y)
@@ -118,7 +118,7 @@ namespace Tyr.Util
 
         public static Point To3D(Point2D pos)
         {
-            return Point(pos.X, pos.Y, Bot.Bot.MapAnalyzer.MapHeight((int)pos.X, (int)pos.Y));
+            return Point(pos.X, pos.Y, Bot.Main.MapAnalyzer.MapHeight((int)pos.X, (int)pos.Y));
         }
 
         public static Point2D Normalize(Point2D point)
@@ -164,7 +164,7 @@ namespace Tyr.Util
 
         public static bool IsVersionBefore(string version)
         {
-            string[] currentVersionParts = Bot.Bot.GameVersion.Split('.');
+            string[] currentVersionParts = Bot.Main.GameVersion.Split('.');
             string[] compareVersionParts = version.Split('.');
 
             for (int i = 0; i < compareVersionParts.Length; i++)

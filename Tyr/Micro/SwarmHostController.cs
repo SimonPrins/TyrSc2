@@ -21,7 +21,7 @@ namespace Tyr.Micro
 
             float distance = 15 * 15;
             Unit closeEnemy = null;
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (!UnitTypes.CanAttackGround(unit.UnitType))
                     continue;
@@ -40,11 +40,11 @@ namespace Tyr.Micro
                 return true;
             }
 
-            if (Bot.Bot.Frame - LastLocustFrame < 22.4 || Bot.Bot.Frame - LastLocustFrame > 40 * 22.4 + 11)
+            if (Bot.Main.Frame - LastLocustFrame < 22.4 || Bot.Main.Frame - LastLocustFrame > 40 * 22.4 + 11)
             {
                 float targetDistance = 15 * 15;
                 Unit targetEnemy = null;
-                foreach (Unit unit in Bot.Bot.Enemies())
+                foreach (Unit unit in Bot.Main.Enemies())
                 {
                     if (unit.IsFlying)
                         continue;
@@ -79,15 +79,15 @@ namespace Tyr.Micro
 
         private void UpdateLocusts()
         {
-            if (LocustUpdateFrame == Bot.Bot.Frame)
+            if (LocustUpdateFrame == Bot.Main.Frame)
                 return;
-            LocustUpdateFrame = Bot.Bot.Frame;
+            LocustUpdateFrame = Bot.Main.Frame;
 
-            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
+            foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
                 if (agent.Unit.UnitType == UnitTypes.LOCUST_FLYING && !SeenLocusts.Contains(agent.Unit.Tag))
                 {
                     SeenLocusts.Add(agent.Unit.Tag);
-                    LastLocustFrame = Bot.Bot.Frame;
+                    LastLocustFrame = Bot.Main.Frame;
                 }
         }
     }

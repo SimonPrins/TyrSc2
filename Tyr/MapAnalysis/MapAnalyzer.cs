@@ -108,14 +108,14 @@ namespace Tyr.MapAnalysis
 
             Stopwatch stopWatch = Stopwatch.StartNew();
 
-            int width = Bot.Bot.GameInfo.StartRaw.MapSize.X;
-            int height = Bot.Bot.GameInfo.StartRaw.MapSize.Y;
+            int width = Bot.Main.GameInfo.StartRaw.MapSize.X;
+            int height = Bot.Main.GameInfo.StartRaw.MapSize.Y;
 
             Placement = new ImageBoolGrid(tyr.GameInfo.StartRaw.PlacementGrid);
             StartArea = Placement.GetConnected(SC2Util.To2D(StartLocation));
 
             ArrayBoolGrid startLocations = new ArrayBoolGrid(Placement.Width(), Placement.Height());
-            foreach (Point2D startLoc in Bot.Bot.GameInfo.StartRaw.StartLocations)
+            foreach (Point2D startLoc in Bot.Main.GameInfo.StartRaw.StartLocations)
                 for (int x = -2; x <= 2; x++)
                     for (int y = -2; y <= 2; y++)
                         startLocations[(int)startLoc.X + x, (int)startLoc.Y + y] = true;
@@ -124,14 +124,14 @@ namespace Tyr.MapAnalysis
                     startLocations[(int)StartLocation.X + x, (int)StartLocation.Y + y] = true;
 
             BoolGrid unPathable;
-            if (Bot.Bot.OldMapData)
+            if (Bot.Main.OldMapData)
             {
-                unPathable = new ImageBoolGrid(Bot.Bot.GameInfo.StartRaw.PathingGrid).GetAnd(startLocations.Invert());
+                unPathable = new ImageBoolGrid(Bot.Main.GameInfo.StartRaw.PathingGrid).GetAnd(startLocations.Invert());
                 Pathable = unPathable.Invert();
             }
             else
             {
-                Pathable = new ImageBoolGrid(Bot.Bot.GameInfo.StartRaw.PathingGrid).GetOr(startLocations);
+                Pathable = new ImageBoolGrid(Bot.Main.GameInfo.StartRaw.PathingGrid).GetOr(startLocations);
                 unPathable = Pathable.Invert();
             }
 
@@ -161,7 +161,7 @@ namespace Tyr.MapAnalysis
             BoolGrid pathingWithoutRamp = Pathable.GetAnd(Ramp.Invert());
             MainAndPocketArea = pathingWithoutRamp.GetConnected(SC2Util.To2D(StartLocation));
 
-            if (Bot.Bot.MyRace == Race.Protoss)
+            if (Bot.Main.MyRace == Race.Protoss)
                 DetermineWall(Ramp, unPathable);
 
             WallDistances = Distances(unPathable);
@@ -506,7 +506,7 @@ namespace Tyr.MapAnalysis
 
         public int MapHeight(int x, int y)
         {
-            return SC2Util.GetDataValue(Bot.Bot.GameInfo.StartRaw.TerrainHeight, x, y);
+            return SC2Util.GetDataValue(Bot.Main.GameInfo.StartRaw.TerrainHeight, x, y);
         }
 
         private void DetermineWall(BoolGrid ramp, BoolGrid unPathable)
@@ -647,7 +647,7 @@ namespace Tyr.MapAnalysis
         {
             int dist = 0;
             Point2D crossSpawn = null;
-            foreach (Point2D enemy in Bot.Bot.GameInfo.StartRaw.StartLocations)
+            foreach (Point2D enemy in Bot.Main.GameInfo.StartRaw.StartLocations)
             {
                 int enemyDist = (int)SC2Util.DistanceSq(enemy, StartLocation);
                 if (enemyDist > dist)
@@ -681,8 +681,8 @@ namespace Tyr.MapAnalysis
 
         public int[,] Distances(Point2D pos)
         {
-            int width = Bot.Bot.GameInfo.StartRaw.MapSize.X;
-            int height = Bot.Bot.GameInfo.StartRaw.MapSize.Y;
+            int width = Bot.Main.GameInfo.StartRaw.MapSize.X;
+            int height = Bot.Main.GameInfo.StartRaw.MapSize.Y;
             int[,] distances = new int[width, height];
 
             for (int x = 0; x < width; x++)
@@ -707,8 +707,8 @@ namespace Tyr.MapAnalysis
 
         public int[,] Distances(BoolGrid start)
         {
-            int width = Bot.Bot.GameInfo.StartRaw.MapSize.X;
-            int height = Bot.Bot.GameInfo.StartRaw.MapSize.Y;
+            int width = Bot.Main.GameInfo.StartRaw.MapSize.X;
+            int height = Bot.Main.GameInfo.StartRaw.MapSize.Y;
             int[,] distances = new int[width, height];
 
             for (int x = 0; x < width; x++)
@@ -755,7 +755,7 @@ namespace Tyr.MapAnalysis
             if (pathingData[pos])
                 return true;
 
-            foreach (Point2D p in Bot.Bot.GameInfo.StartRaw.StartLocations)
+            foreach (Point2D p in Bot.Main.GameInfo.StartRaw.StartLocations)
                 if (SC2Util.DistanceGrid(pos, p) <= 3)
                     return true;
             if (SC2Util.DistanceGrid(pos, StartLocation) <= 3)
@@ -767,13 +767,13 @@ namespace Tyr.MapAnalysis
         {
             if (EnemyRamp != null)
                 return EnemyRamp;
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count != 1)
                 return null;
 
-            int width = Bot.Bot.GameInfo.StartRaw.MapSize.X;
-            int height = Bot.Bot.GameInfo.StartRaw.MapSize.Y;
+            int width = Bot.Main.GameInfo.StartRaw.MapSize.X;
+            int height = Bot.Main.GameInfo.StartRaw.MapSize.Y;
 
-            Point2D start = Bot.Bot.TargetManager.PotentialEnemyStartLocations[0];
+            Point2D start = Bot.Main.TargetManager.PotentialEnemyStartLocations[0];
             BoolGrid enemyStartArea = Placement.GetConnected(start);
 
             
@@ -860,12 +860,12 @@ namespace Tyr.MapAnalysis
 
         public BaseLocation GetEnemyNatural()
         {
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count != 1)
                 return null;
-            int[,] distances = Distances(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]);
+            int[,] distances = Distances(Bot.Main.TargetManager.PotentialEnemyStartLocations[0]);
             int dist = 1000000000;
             BaseLocation enemyNatural = null;
-            foreach (BaseLocation loc in Bot.Bot.MapAnalyzer.BaseLocations)
+            foreach (BaseLocation loc in Bot.Main.MapAnalyzer.BaseLocations)
             {
                 int distanceToMain = distances[(int)loc.Pos.X, (int)loc.Pos.Y];
 
@@ -883,14 +883,14 @@ namespace Tyr.MapAnalysis
 
         public BaseLocation GetEnemyThird()
         {
-            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+            if (Bot.Main.TargetManager.PotentialEnemyStartLocations.Count != 1)
                 return null;
             float dist = 1000000000;
             BaseLocation enemyNatural = GetEnemyNatural();
             BaseLocation enemyThird = null;
-            foreach (BaseLocation loc in Bot.Bot.MapAnalyzer.BaseLocations)
+            foreach (BaseLocation loc in Bot.Main.MapAnalyzer.BaseLocations)
             {
-                float distanceToMain = SC2Util.DistanceSq(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0], loc.Pos);
+                float distanceToMain = SC2Util.DistanceSq(Bot.Main.TargetManager.PotentialEnemyStartLocations[0], loc.Pos);
 
                 if (distanceToMain <= 4)
                     continue;

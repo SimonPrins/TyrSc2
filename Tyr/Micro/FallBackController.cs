@@ -10,10 +10,10 @@ namespace Tyr.Micro
         public float MainDist = 0;
         public override bool DetermineAction(Agent agent, Point2D target)
         {
-            if (MainDist > 0 && agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) < MainDist * MainDist)
+            if (MainDist > 0 && agent.DistanceSq(Bot.Main.MapAnalyzer.StartLocation) < MainDist * MainDist)
                 return false;
             if (agent.CombatSimulationDecision != CombatSimulationDecision.FallBack
-                || Bot.Bot.Frame - agent.CombatSimulationDecisionFrame >= 10)
+                || Bot.Main.Frame - agent.CombatSimulationDecisionFrame >= 10)
                 return false;
 
             return agent.FleeEnemies(ReturnFire);

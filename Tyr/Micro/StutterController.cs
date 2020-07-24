@@ -39,7 +39,7 @@ namespace Tyr.Micro
             if (agent.Unit.WeaponCooldown == 0 && agent.Unit.UnitType != UnitTypes.CYCLONE)
                 return false;
 
-            foreach (Unit unit in Bot.Bot.Enemies())
+            foreach (Unit unit in Bot.Main.Enemies())
             {
                 if (agent.Unit.UnitType == UnitTypes.HELLBAT
                     && (UnitTypes.RangedTypes.Contains(unit.UnitType)
@@ -75,7 +75,7 @@ namespace Tyr.Micro
                 else maxDist = Range * Range;
                 if (SC2Util.DistanceSq(unit.Pos, agent.Unit.Pos) <= maxDist)
                 {
-                    Point2D stutterTarget = Toward == null ? SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation) : Toward;
+                    Point2D stutterTarget = Toward == null ? SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation) : Toward;
                     if (agent.DistanceSq(stutterTarget) > 10 * 10)
                         agent.Order(Abilities.MOVE, stutterTarget);
                     else

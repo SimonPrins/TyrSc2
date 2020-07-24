@@ -99,10 +99,10 @@ namespace Tyr.Util
         {
             if (ResultsFile == null)
             {
-                if (Bot.Bot.OpponentID == null)
-                    ResultsFile = DataFolder + Settings.ResultsFilePrefix() + Bot.Bot.EnemyRace + ".txt";
+                if (Bot.Main.OpponentID == null)
+                    ResultsFile = DataFolder + Settings.ResultsFilePrefix() + Bot.Main.EnemyRace + ".txt";
                 else
-                    ResultsFile = DataFolder + Settings.ResultsFilePrefix() + Bot.Bot.OpponentID + ".txt";
+                    ResultsFile = DataFolder + Settings.ResultsFilePrefix() + Bot.Main.OpponentID + ".txt";
 
                 if (AllowWritingFiles && !File.Exists(ResultsFile))
                 {

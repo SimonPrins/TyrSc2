@@ -16,7 +16,7 @@ namespace Tyr.Micro
             
             Unit closeBanshee = null;
             float dist = 6.5f * 6.5f;
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.BANSHEE)
                     continue;
@@ -33,7 +33,7 @@ namespace Tyr.Micro
 
             dist = 12 * 12;
             Agent fleeTarget = null;
-            foreach (Agent turret in Bot.Bot.UnitManager.Agents.Values)
+            foreach (Agent turret in Bot.Main.UnitManager.Agents.Values)
             {
                 if (turret.Unit.UnitType != UnitTypes.MISSILE_TURRET || turret.Unit.BuildProgress < 0.99)
                     continue;

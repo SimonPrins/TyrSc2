@@ -73,9 +73,9 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => Count(UnitTypes.STALKER) >= 10 && (Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0 || Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 3 || Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOENIX) > 0) );
+            result.If(() => Count(UnitTypes.STALKER) >= 10 && (Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0 || Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 3 || Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOENIX) > 0) );
             result.Building(UnitTypes.FORGE);
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 result.Building(UnitTypes.PYLON, b, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95);
                 result.Building(UnitTypes.PHOTON_CANNON, b, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95 && Completed(b, UnitTypes.PYLON) >= 1);
@@ -91,7 +91,7 @@ namespace Tyr.Builds.Protoss
             BuildList result = new BuildList();
             
             result.If(() => { return Count(UnitTypes.VOID_RAY) >= 3 && Completed(UnitTypes.NEXUS) >= 3; });
-            foreach (Base b in Bot.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -116,9 +116,9 @@ namespace Tyr.Builds.Protoss
             result.If(() => Count(UnitTypes.STALKER) > 0 || Minerals() >= 550);
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.STARGATE);
-            result.Building(UnitTypes.PYLON, Natural, () => Natural.Owner == Bot.Bot.PlayerId && !Natural.UnderAttack);
+            result.Building(UnitTypes.PYLON, Natural, () => Natural.Owner == Bot.Main.PlayerId && !Natural.UnderAttack);
             result.Building(UnitTypes.ASSIMILATOR);
-            result.Building(UnitTypes.SHIELD_BATTERY, Natural, 2, () => Bot.Bot.Frame >= 3 * 60 * 22.4 && !Expanded.Get().Detected && Completed(Natural, UnitTypes.PYLON) > 0 && !Natural.UnderAttack && !CannonDefenseDetected);
+            result.Building(UnitTypes.SHIELD_BATTERY, Natural, 2, () => Bot.Main.Frame >= 3 * 60 * 22.4 && !Expanded.Get().Detected && Completed(Natural, UnitTypes.PYLON) > 0 && !Natural.UnderAttack && !CannonDefenseDetected);
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.STARGATE);
@@ -283,7 +283,7 @@ namespace Tyr.Builds.Protoss
             {
                 if (Minerals() >= 150
                     && Gas() >= 150
-                    && !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
+                    && !Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
                     && Count(UnitTypes.COLOSUS) > 0)
                 {
                     agent.Order(1097);
@@ -348,12 +348,12 @@ namespace Tyr.Builds.Protoss
             else if (agent.Unit.UnitType == UnitTypes.TWILIGHT_COUNSEL)
             {
 
-                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
+                if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
                      && Minerals() >= 150
                      && Gas() >= 150
                     && Completed(UnitTypes.STALKER) > 0)
                     agent.Order(1593);
-                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
+                else if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
                     && Minerals() >= 100
                     && Gas() >= 100
                     && Completed(UnitTypes.ADEPT) > 0)

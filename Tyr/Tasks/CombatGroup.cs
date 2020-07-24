@@ -34,7 +34,7 @@ namespace Tyr.Tasks
                     enemyMeleeUnits++;
             }
 
-            Bot.Bot.DrawText("totalResources: " + totalResources + " enemyResources: " + enemyResources);
+            Bot.Main.DrawText("totalResources: " + totalResources + " enemyResources: " + enemyResources);
 
             if (State == Charge)
             {
@@ -57,13 +57,13 @@ namespace Tyr.Tasks
             }
 
 
-            Bot.Bot.DrawText("CombatState: " + State);
+            Bot.Main.DrawText("CombatState: " + State);
 
             foreach (Agent agent in Units)
             {
                 if (agent.Unit.UnitType == UnitTypes.MEDIVAC)
                 {
-                    UpdateMedivacRetreatTarget(Bot.Bot);
+                    UpdateMedivacRetreatTarget(Bot.Main);
                     if (MedivacRetreatTarget != null)
                     {
                         task.Attack(agent, SC2Util.To2D(MedivacRetreatTarget.Unit.Pos));
@@ -111,9 +111,9 @@ namespace Tyr.Tasks
                     if (!close)
                         task.Attack(agent, target);
                     if (agent.Unit.WeaponCooldown < 3)
-                        task.Attack(agent, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
+                        task.Attack(agent, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation));
                     else
-                        agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
+                        agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation));
                 }
             }
         }
@@ -143,7 +143,7 @@ namespace Tyr.Tasks
         {
             HashSet<ulong> alreadyInList = new HashSet<ulong>();
             List<Unit> enemies = new List<Unit>();
-            foreach (Unit enemy in Bot.Bot.Enemies())
+            foreach (Unit enemy in Bot.Main.Enemies())
                 foreach (Agent agent in Units)
                     if ((UnitTypes.CombatUnitTypes.Contains(enemy.UnitType) || UnitTypes.WorkerTypes.Contains(enemy.UnitType))
                         && agent.DistanceSq(enemy) <= 10 * 10)
@@ -156,7 +156,7 @@ namespace Tyr.Tasks
             for (int i = 0; i < enemies.Count; i++)
             {
                 Unit closeEnemy = enemies[i];
-                foreach (Unit enemy in Bot.Bot.Enemies())
+                foreach (Unit enemy in Bot.Main.Enemies())
                     if (!alreadyInList.Contains(enemy.Tag) && (UnitTypes.CombatUnitTypes.Contains(enemy.UnitType) || UnitTypes.WorkerTypes.Contains(enemy.UnitType))
                         && SC2Util.DistanceSq(closeEnemy.Pos, enemy.Pos) <= 4 * 4)
                     {

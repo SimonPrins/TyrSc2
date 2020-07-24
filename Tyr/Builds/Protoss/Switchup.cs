@@ -19,11 +19,11 @@ namespace Tyr.Builds.Protoss
         public override Build OverrideBuild()
         {
             if (EnemyMain == null)
-                EnemyMain = Bot.Bot.TargetManager.PotentialEnemyStartLocations[0];
+                EnemyMain = Bot.Main.TargetManager.PotentialEnemyStartLocations[0];
             if (!InBaseBarracks
                 && !Proxy)
             {
-                foreach (Unit unit in Bot.Bot.Enemies())
+                foreach (Unit unit in Bot.Main.Enemies())
                 {
                     if (unit.UnitType != UnitTypes.BARRACKS
                         && unit.UnitType != UnitTypes.FACTORY)
@@ -39,7 +39,7 @@ namespace Tyr.Builds.Protoss
                 if (PvTStalkerImmortal == null)
                 {
                     PvTStalkerImmortal = new PvTStalkerImmortal();
-                    PvTStalkerImmortal.OnStart(Bot.Bot);
+                    PvTStalkerImmortal.OnStart(Bot.Main);
                     PvTStalkerImmortal.InitializeTasks();
                 }
                 return PvTStalkerImmortal;
@@ -49,7 +49,7 @@ namespace Tyr.Builds.Protoss
                 if (OneBaseStalkerImmortal == null)
                 {
                     OneBaseStalkerImmortal = new OneBaseStalkerImmortal() { Scouting = true };
-                    OneBaseStalkerImmortal.OnStart(Bot.Bot);
+                    OneBaseStalkerImmortal.OnStart(Bot.Main);
                     OneBaseStalkerImmortal.InitializeTasks();
                 }
                 return OneBaseStalkerImmortal;
