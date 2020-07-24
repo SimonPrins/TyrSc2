@@ -28,11 +28,11 @@ namespace Tyr.Builds.Protoss
             OracleHarassBasesTask.Enable();
             WorkerScoutTask.Enable();
             ArmyObserverTask.Enable();
-            if (Tyr.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Tyr.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Bot.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new OracleController());
             MicroControllers.Add(new StutterController());
@@ -50,7 +50,7 @@ namespace Tyr.Builds.Protoss
             BuildList result = new BuildList();
 
             result.If(() => { return Minerals() >= 550 || OraclesDone || Count(UnitTypes.ORACLE) >= 6; });
-            foreach (Base b in Tyr.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Bot.BaseManager.Bases)
             {
                 result.Building(UnitTypes.PYLON, b, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95);
                 result.Building(UnitTypes.GATEWAY, b, 2, () => b.ResourceCenter != null && b.ResourceCenter.Unit.BuildProgress >= 0.95 && Completed(b, UnitTypes.PYLON) >= 1 && Minerals() >= 350);
@@ -69,7 +69,7 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.CYBERNETICS_CORE);
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.NEXUS);
-            if (Tyr.Bot.EnemyRace == Race.Zerg)
+            if (Bot.Bot.EnemyRace == Race.Zerg)
                 result.Train(UnitTypes.ZEALOT, 1);
             else
                 result.Train(UnitTypes.STALKER, 1);
@@ -84,7 +84,7 @@ namespace Tyr.Builds.Protoss
             result.Train(UnitTypes.IMMORTAL);
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.ASSIMILATOR);
-            if (Tyr.Bot.EnemyRace == Race.Zerg)
+            if (Bot.Bot.EnemyRace == Race.Zerg)
                 result.Train(UnitTypes.ZEALOT);
             else
                 result.Train(UnitTypes.STALKER, () => OraclesDone);
@@ -92,7 +92,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             TimingAttackTask.Task.RequiredSize = RequiredSize;
 
@@ -109,7 +109,7 @@ namespace Tyr.Builds.Protoss
             HideUnitsTask.Task.Target = SC2Util.To2D(tyr.MapAnalyzer.StartLocation);
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

@@ -6,7 +6,7 @@ namespace Tyr.Managers
     {
         public List<Effect> Effects = new List<Effect>();
         
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
             Update(tyr);
 
@@ -21,12 +21,12 @@ namespace Tyr.Managers
             }
         }
 
-        public void Update(Tyr tyr)
+        public void Update(Bot tyr)
         {
-            if (Tyr.Bot.Observation.Observation.RawData.Effects == null)
+            if (Bot.Bot.Observation.Observation.RawData.Effects == null)
                 return;
 
-            foreach (SC2APIProtocol.Effect effect in Tyr.Bot.Observation.Observation.RawData.Effects)
+            foreach (SC2APIProtocol.Effect effect in Bot.Bot.Observation.Observation.RawData.Effects)
                 if (effect.EffectId == 11)
                 {
                     bool found = false;

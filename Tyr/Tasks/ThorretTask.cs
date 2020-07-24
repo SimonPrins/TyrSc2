@@ -15,13 +15,13 @@ namespace Tyr.Tasks
 
         public static void Enable()
         {
-            Point2D startLocation = SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation);
+            Point2D startLocation = SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation);
             AddTask(SC2Util.Point(startLocation.X + 6, startLocation.Y + 6));
             AddTask(SC2Util.Point(startLocation.X - 6, startLocation.Y + 6));
             AddTask(SC2Util.Point(startLocation.X + 6, startLocation.Y - 6));
             AddTask(SC2Util.Point(startLocation.X - 6, startLocation.Y - 6));
 
-            Tasks.Sort((a, b) => (int)(SC2Util.DistanceSq(a.IdleLocation, Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]) - SC2Util.DistanceSq(b.IdleLocation, Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0])));
+            Tasks.Sort((a, b) => (int)(SC2Util.DistanceSq(a.IdleLocation, Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) - SC2Util.DistanceSq(b.IdleLocation, Bot.Bot.TargetManager.PotentialEnemyStartLocations[0])));
             int i = 0;
             foreach (Task task in Tasks)
             {
@@ -35,7 +35,7 @@ namespace Tyr.Tasks
         {
             ThorretTask task = new ThorretTask() { IdleLocation = idleLocation };
             Tasks.Add(task);
-            Tyr.Bot.TaskManager.Add(task);
+            Bot.Bot.TaskManager.Add(task);
             task.Stopped = false;
         }
 
@@ -43,7 +43,7 @@ namespace Tyr.Tasks
         {
             return (agent.Unit.UnitType == UnitTypes.THOR_SINGLE_TARGET)
                 && units.Count == 0
-                && agent.DistanceSq(Tyr.Bot.MapAnalyzer.StartLocation) <= 55 * 55;
+                && agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) <= 55 * 55;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -59,7 +59,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (Stopped)
             {
@@ -69,7 +69,7 @@ namespace Tyr.Tasks
             
             float distance = 15 * 15;
             Unit target = null;
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (unit.UnitType == UnitTypes.ADEPT_PHASE_SHIFT
                     || unit.UnitType == UnitTypes.KD8_CHARGE)

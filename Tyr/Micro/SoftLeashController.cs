@@ -10,6 +10,7 @@ namespace Tyr.Micro
         private HashSet<uint> LeashedFrom = new HashSet<uint>();
         private HashSet<uint> LeashedTo = new HashSet<uint>();
         private readonly float Range;
+        public float MaxRange = 1000;
         public float MinEnemyRange = 0;
 
         public SoftLeashController(uint from, uint to, float range)
@@ -46,14 +47,14 @@ namespace Tyr.Micro
                 return false;
 
             if (MinEnemyRange > 0
-                && agent.DistanceSq(Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]) <= MinEnemyRange * MinEnemyRange)
+                && agent.DistanceSq(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) <= MinEnemyRange * MinEnemyRange)
                 return false;
 
             float dist;
 
             Point2D retreatTo = null;
-            dist = 1000 * 1000;
-            foreach (Agent ally in Tyr.Bot.UnitManager.Agents.Values)
+            dist = MaxRange * MaxRange;
+            foreach (Agent ally in Bot.Bot.UnitManager.Agents.Values)
             {
                 if (!LeashedTo.Contains(ally.Unit.UnitType))
                     continue;
@@ -67,7 +68,8 @@ namespace Tyr.Micro
             }
             if (retreatTo != null && dist >= Range * Range)
             {
-                if (agent.Unit.WeaponCooldown == 0)
+                if (agent.Unit.WeaponCooldown == 0
+                    || (agent.Unit.UnitType == UnitTypes.ZEALOT))
                     agent.Order(Abilities.ATTACK, retreatTo);
                 else
                     agent.Order(Abilities.MOVE, retreatTo);

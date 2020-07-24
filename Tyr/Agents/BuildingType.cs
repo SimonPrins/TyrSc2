@@ -55,6 +55,7 @@ namespace Tyr.Agents
             lookUp.Add(92, new BuildingType() { Type = 92, Ability = 1158, Size = SC2Util.Point(3, 3), Name = "Spire", Minerals = 200, Gas = 200 });
             lookUp.Add(93, new BuildingType() { Type = 93, Ability = 1159, Size = SC2Util.Point(3, 3), Name = "UltraliskCavern", Minerals = 150, Gas = 200 });
             lookUp.Add(94, new BuildingType() { Type = 94, Ability = 1160, Size = SC2Util.Point(3, 3), Name = "InfestationPit", Minerals = 100, Gas = 100 });
+            lookUp.Add(96, new BuildingType() { Type = 96, Ability = 1162, Size = SC2Util.Point(3, 3), Name = "BanelingNest", Minerals = 100, Gas = 50 });
             lookUp.Add(97, new BuildingType() { Type = 97, Ability = 1165, Size = SC2Util.Point(3, 3), Name = "RoachWarren", Minerals = 150 });
             lookUp.Add(98, new BuildingType() { Type = 98, Ability = 1166, Size = SC2Util.Point(2, 2), Name = "SpineCrawler", Minerals = 100 });
             lookUp.Add(99, new BuildingType() { Type = 99, Ability = 1167, Size = SC2Util.Point(2, 2), Name = "SporeCrawler", Minerals = 75 });
@@ -64,6 +65,10 @@ namespace Tyr.Agents
             lookUp.Add(504, new BuildingType() { Type = 504, Ability = 1163, Size = SC2Util.Point(3, 3), Name = "LurkerDen", Minerals = 100, Gas = 150 });
             lookUp.Add(1910, new BuildingType() { Type = 1910, Ability = 895, Size = SC2Util.Point(2, 2), Name = "ShieldBattery", Minerals = 100 });
             lookUp.Add(639, new BuildingType() { Type = 639, Size = SC2Util.Point(6, 6), Name = "DestructibleRocks" });
+            lookUp.Add(376, new BuildingType() { Type = 376, Size = SC2Util.Point(6, 6), Name = "DestructibleDebris" });
+            lookUp.Add(377, new BuildingType() { Type = 377, Size = SC2Util.Point(6, 6), Name = "DestructibleDebris" });
+            //foreach (uint mineralField in UnitTypes.MineralFields)
+            //    lookUp.Add(mineralField, new BuildingType() { Type = mineralField, Size = SC2Util.Point(3, 3), Name = "MineralField" });
 
             return lookUp;
         }

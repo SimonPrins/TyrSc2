@@ -150,11 +150,26 @@ namespace Tyr.Builds.BuildLists
                 return new NextItem();
 
             if (UnitTypes.LookUp[UnitType].TechRequirement != 0
-                && Tyr.Bot.UnitManager.Completed(UnitTypes.LookUp[UnitType].TechRequirement) == 0
-                && UnitTypes.LookUp[UnitType].TechRequirement != UnitTypes.HATCHERY)
+                && Bot.Bot.UnitManager.Completed(UnitTypes.LookUp[UnitType].TechRequirement) == 0
+                && UnitTypes.LookUp[UnitType].TechRequirement != UnitTypes.HATCHERY
+                && UnitType != UnitTypes.GATEWAY)
             {
-                Tyr.Bot.DrawText("Skipping list. Build tech for " + UnitTypes.LookUp[UnitType].Name + " not available: " + UnitTypes.LookUp[UnitType].TechRequirement);
-                return new NextList();
+
+                bool almostReady = false;
+                if (UnitType == UnitTypes.CYBERNETICS_CORE)
+                {
+                    foreach (Agent agent in Bot.Bot.Units())
+                    {
+                        if (agent.Unit.UnitType == UnitTypes.GATEWAY
+                            && agent.Unit.BuildProgress >= 0.8)
+                            almostReady = true;
+                    }
+                }
+                if (!almostReady)
+                {
+                    Bot.Bot.DrawText("Skipping list. Build tech for " + UnitTypes.LookUp[UnitType].Name + " not available: " + UnitTypes.LookUp[UnitType].TechRequirement);
+                    return new NextList();
+                }
             }
 
             state.AddDesired(UnitType, Number);
@@ -174,7 +189,7 @@ namespace Tyr.Builds.BuildLists
                         break;
                     }
                 if (!built)
-                    foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+                    foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
                         if (CheckTypeMatches(UnitType, agent.Unit.UnitType) && agent.Exact == Exact && agent.AroundLocation == DesiredPos)
                         {
                             built = true;
@@ -187,9 +202,9 @@ namespace Tyr.Builds.BuildLists
                 }
             }
 
-            if (DesiredBase == null && state.Desired[UnitType] > Tyr.Bot.UnitManager.Count(UnitType)
+            if (DesiredBase == null && state.Desired[UnitType] > Bot.Bot.UnitManager.Count(UnitType)
                 && !Exact)
-                if (!Construct(state, state.Desired[UnitType] - Tyr.Bot.UnitManager.Count(UnitType)))
+                if (!Construct(state, state.Desired[UnitType] - Bot.Bot.UnitManager.Count(UnitType)))
                     return new WaitForResources();
             if (DesiredBase != null)
             {
@@ -222,25 +237,32 @@ namespace Tyr.Builds.BuildLists
 
                 int requiredMinerals;
                 if (isCenter)
-                    requiredMinerals = BuildingType.LookUp[UnitType].Minerals - 75;
+                    requiredMinerals = BuildingType.LookUp[UnitType].Minerals - (UnitType == UnitTypes.HATCHERY ? 75 : 90);
                 else if (DesiredBase != null
-                    && DesiredBase == Tyr.Bot.BaseManager.Natural
-                    && (Tyr.Bot.BaseManager.Natural.ResourceCenter == null || Tyr.Bot.BaseManager.Natural.ResourceCenter.Unit.BuildProgress >= 0.99))
+                    && DesiredBase == Bot.Bot.BaseManager.Natural
+                    && (Bot.Bot.BaseManager.Natural.ResourceCenter == null || Bot.Bot.BaseManager.Natural.ResourceCenter.Unit.BuildProgress >= 0.99))
                     requiredMinerals = BuildingType.LookUp[UnitType].Minerals - 50;
+                else if (UnitType == UnitTypes.PYLON && Bot.Bot.UnitManager.Completed(UnitTypes.PYLON) == 0)
+                    requiredMinerals = BuildingType.LookUp[UnitType].Minerals - 45;
+                else if (UnitType == UnitTypes.GATEWAY && Bot.Bot.UnitManager.Completed(UnitTypes.GATEWAY) == 0)
+                    requiredMinerals = BuildingType.LookUp[UnitType].Minerals - 70;
                 else
                     requiredMinerals = BuildingType.LookUp[UnitType].Minerals - 25;
                 int requiredGas = BuildingType.LookUp[UnitType].Gas - 16;
-                if (Tyr.Bot.Minerals() < requiredMinerals
-                    || (Tyr.Bot.Gas() < requiredGas && BuildingType.LookUp[UnitType].Gas > 0))
+                if (Bot.Bot.Minerals() < requiredMinerals
+                    || (Bot.Bot.Gas() < requiredGas && BuildingType.LookUp[UnitType].Gas > 0))
                 {
-                    Tyr.Bot.DrawText("Not enough resources for " + UnitTypes.LookUp[UnitType].Name + ".");
+                    Bot.Bot.DrawText("Not enough resources for " + UnitTypes.LookUp[UnitType].Name + ".");
                     return false;
                 }
 
                 if (UnitTypes.GasGeysers.Contains(UnitType))
                 {
-                    if (Tyr.Bot.BaseManager.AvailableGasses == 0)
+                    if (Bot.Bot.BaseManager.AvailableGasses == 0)
+                    {
+                        Bot.Bot.DrawText("No gasses available.");
                         return true;
+                    }
                     if (DesiredBase != null)
                     {
                         bool available = false;
@@ -261,7 +283,7 @@ namespace Tyr.Builds.BuildLists
                     if (!Build.Construct(UnitType))
                     {
                         if (isCenter
-                            && Tyr.Bot.UnitManager.Count(UnitTypes.COMMAND_CENTER) + Tyr.Bot.UnitManager.Count(UnitTypes.NEXUS) + Tyr.Bot.UnitManager.Count(UnitTypes.HATCHERY) > Tyr.Bot.UnitManager.Completed(UnitTypes.COMMAND_CENTER) + Tyr.Bot.UnitManager.Completed(UnitTypes.NEXUS) + Tyr.Bot.UnitManager.Completed(UnitTypes.HATCHERY))
+                            && Bot.Bot.UnitManager.Count(UnitTypes.COMMAND_CENTER) + Bot.Bot.UnitManager.Count(UnitTypes.NEXUS) + Bot.Bot.UnitManager.Count(UnitTypes.HATCHERY) > Bot.Bot.UnitManager.Completed(UnitTypes.COMMAND_CENTER) + Bot.Bot.UnitManager.Completed(UnitTypes.NEXUS) + Bot.Bot.UnitManager.Completed(UnitTypes.HATCHERY))
                             return true;
                         return !UnitTypes.DefensiveBuildingsTypes.Contains(UnitType);
                     }

@@ -2,6 +2,7 @@
 using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Micro;
+using Tyr.StrategyAnalysis;
 using Tyr.Tasks;
 using Tyr.Util;
 
@@ -32,7 +33,7 @@ namespace Tyr.Builds.Zerg
             return priorities;
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new StutterController());
             //MicroControllers.Add(new TargetFireController(GetPriorities()));
@@ -58,24 +59,24 @@ namespace Tyr.Builds.Zerg
         private BuildList AntiLifting()
         {
             BuildList result = new BuildList();
-            result.If(() => { return Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected; });
+            result.If(() => { return Lifting.Get().Detected; });
             result.Building(UnitTypes.EXTRACTOR, 2);
             result.Building(UnitTypes.SPIRE);
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             /*
-            if (tyr.EnemyStrategyAnalyzer.FourRaxDetected
+            if (FourRax.Get().Detected
                 || (tyr.Frame >= 22.4 * 85 && !tyr.EnemyStrategyAnalyzer.NoProxyTerranConfirmed && tyr.TargetManager.PotentialEnemyStartLocations.Count == 1)
-                || tyr.EnemyStrategyAnalyzer.ReaperRushDetected)
+                || ReaperRush.Get().Detected)
             {
                 SmellCheese = true;
             }
 
             if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) >= 8
-                || tyr.EnemyStrategyAnalyzer.FourRaxDetected
+                || FourRax.Get().Detected
                 || SmellCheese)
             {
                 TimingAttackTask.RequiredSize = 20;
@@ -111,7 +112,7 @@ namespace Tyr.Builds.Zerg
                         agent.Order(1346);
                         CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.MUTALISK);
                     }
-                    else if (tyr.EnemyStrategyAnalyzer.LiftingDetected
+                    else if (Lifting.Get().Detected
                         && Count(UnitTypes.ROACH) >= 35)
                         break;
                     else if (Minerals() >= 75 && Gas() >= 25 && ExpectedAvailableFood() > FoodUsed() + 6)
@@ -129,14 +130,14 @@ namespace Tyr.Builds.Zerg
             }
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))
             {
                 if (Minerals() >= 100 && Completed(UnitTypes.QUEEN) == 0
                     && Completed(UnitTypes.SPAWNING_POOL) > 0)
                     agent.Order(1632);
-                else if (Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected
+                else if (Lifting.Get().Detected
                     && Minerals() >= 150 && Gas() >= 100)
                     agent.Order(1216);
             }

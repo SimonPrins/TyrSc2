@@ -9,7 +9,7 @@ namespace Tyr.Tasks
     {
         public static DTAttackTask Task = new DTAttackTask();
 
-        public DTAttackTask() : base(5)
+        public DTAttackTask() : base(10)
         { }
 
         public static void Enable()
@@ -27,13 +27,13 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             foreach (Agent agent in units)
             {
                 bool detected = false;
                 bool underAttack = false;
-                foreach (Unit unit in Tyr.Bot.Observation.Observation.RawData.Units)
+                foreach (Unit unit in Bot.Bot.Observation.Observation.RawData.Units)
                 {
                     if (unit.Alliance != Alliance.Enemy)
                         continue;
@@ -46,7 +46,7 @@ namespace Tyr.Tasks
                         && (UnitTypes.CombatUnitTypes.Contains(unit.UnitType) || unit.UnitType == UnitTypes.SPINE_CRAWLER || unit.UnitType == UnitTypes.PHOTON_CANNON || unit.UnitType == UnitTypes.BUNKER))
                         underAttack = true;
                 }
-                foreach (BuildingLocation building in Tyr.Bot.EnemyManager.EnemyBuildings.Values)
+                foreach (BuildingLocation building in Bot.Bot.EnemyManager.EnemyBuildings.Values)
                 {
                     if (SC2Util.DistanceSq(building.Pos, agent.Unit.Pos) <= 12 * 12
                         && (building.Type == UnitTypes.MISSILE_TURRET || building.Type == UnitTypes.PHOTON_CANNON || building.Type == UnitTypes.SPORE_CRAWLER))
@@ -57,7 +57,7 @@ namespace Tyr.Tasks
                 }
                 bool retreat = detected && underAttack;
                 if (retreat)
-                    agent.Order(Abilities.MOVE, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation));
+                    agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
                 else
                     agent.Order(Abilities.ATTACK, tyr.TargetManager.AttackTarget);
             }

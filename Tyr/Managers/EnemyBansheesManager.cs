@@ -12,24 +12,24 @@ namespace Tyr.Managers
         public Point2D BansheeLocation;
         public int BansheeSeenFrame = -1000000;
 
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
             foreach (Agent observer in tyr.Units())
             {
                 if (observer.Unit.UnitType != UnitTypes.OBSERVER)
                     continue;
                 if (BansheeLocation != null
-                    && Tyr.Bot.Frame - BansheeSeenFrame < 22.4 * 10
+                    && Bot.Bot.Frame - BansheeSeenFrame < 22.4 * 10
                     && observer.DistanceSq(BansheeLocation) <= 4 * 4)
                     BansheeSeenFrame = -1000000;
                 if (LastHitLocation != null
-                    && Tyr.Bot.Frame - LastHitFrame < 22.4 * 20
+                    && Bot.Bot.Frame - LastHitFrame < 22.4 * 20
                     && observer.DistanceSq(LastHitLocation) <= 4 * 4)
                     LastHitFrame = -1000000;
             }
 
             float dist = 40 * 40;
-            if (Tyr.Bot.Frame - BansheeSeenFrame < 22.4 * 10)
+            if (Bot.Bot.Frame - BansheeSeenFrame < 22.4 * 10)
                 dist = SC2Util.DistanceSq(BansheeLocation, tyr.MapAnalyzer.StartLocation);
             foreach (Unit enemy in tyr.Enemies())
             {
@@ -50,10 +50,10 @@ namespace Tyr.Managers
                 float damageTaken = agent.PreviousUnit.Health + agent.PreviousUnit.Shield - agent.Unit.Health - agent.Unit.Shield;
                 if (damageTaken < 9)
                     continue;
-                if (agent.DistanceSq(Tyr.Bot.MapAnalyzer.StartLocation) > 50 * 50)
+                if (agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) > 50 * 50)
                     continue;
                 bool enemyClose = false;
-                foreach (Unit enemy in Tyr.Bot.Enemies())
+                foreach (Unit enemy in Bot.Bot.Enemies())
                 {
                     if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                         continue;

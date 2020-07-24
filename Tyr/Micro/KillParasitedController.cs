@@ -11,7 +11,7 @@ namespace Tyr.Micro
             if (agent.Unit.WeaponCooldown > 0)
                 return false;
 
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (UnitTypes.BuildingTypes.Contains(unit.UnitType))
                     continue;
@@ -22,9 +22,9 @@ namespace Tyr.Micro
 
             foreach (ulong tag in InfestorController.NeuralControllers.Keys)
             {
-                if (!Tyr.Bot.UnitManager.Agents.ContainsKey(tag))
+                if (!Bot.Bot.UnitManager.Agents.ContainsKey(tag))
                     continue;
-                Agent killTarget = Tyr.Bot.UnitManager.Agents[tag];
+                Agent killTarget = Bot.Bot.UnitManager.Agents[tag];
                 if (agent.DistanceSq(killTarget) <= 8 * 8)
                 {
                     agent.Order(Abilities.ATTACK, tag);

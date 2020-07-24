@@ -14,12 +14,15 @@ namespace Tyr.Builds
     public abstract class Build
     {
         public abstract string Name();
-        public abstract void OnStart(Tyr tyr);
-        public abstract void OnFrame(Tyr tyr);
-        public virtual void Produce(Tyr tyr, Agent agent) { }
+        public abstract void OnStart(Bot tyr);
+        public abstract void OnFrame(Bot tyr);
+        public virtual void Produce(Bot tyr, Agent agent) { }
         private Build PreviousOverrideBuild = null;
 
         protected List<CustomController> MicroControllers = new List<CustomController>();
+
+        public static HashSet<uint> IgnoreExpansionBlockingUnitTypes = new HashSet<uint>();
+
         public List<CustomController> GetMicroControllers()
         {
             if (PreviousOverrideBuild != null)
@@ -27,7 +30,7 @@ namespace Tyr.Builds
             return MicroControllers;
         }
 
-        public void ProduceOverride(Tyr tyr, Agent agent)
+        public void ProduceOverride(Bot tyr, Agent agent)
         {
             if (PreviousOverrideBuild != null)
                 PreviousOverrideBuild.Produce(tyr, agent);
@@ -35,9 +38,9 @@ namespace Tyr.Builds
                 Produce(tyr, agent);
         }
 
-        public void OnFrameBase(Tyr tyr)
+        public void OnFrameBase(Bot tyr)
         {
-            Tyr.Bot.DrawText("Executing Build: " + Name());
+            Bot.Bot.DrawText("Executing Build: " + Name());
             Build actualBuild = null;
             Build overrideBuild = this;
             while (overrideBuild != null)
@@ -65,7 +68,7 @@ namespace Tyr.Builds
             ConstructionTask.Enable();
             MorphingTask.Enable();
             WorkerDefenseTask.Enable();
-            if (Tyr.Bot.MyRace == Race.Terran)
+            if (Bot.Bot.MyRace == Race.Terran)
                 ConstructingSCVsTask.Enable();
             GasWorkerTask.Enable();
         }
@@ -80,7 +83,7 @@ namespace Tyr.Builds
         {
             get
             {
-                return Tyr.Bot.BaseManager.Natural;
+                return Bot.Bot.BaseManager.Natural;
             }
         }
 
@@ -88,7 +91,7 @@ namespace Tyr.Builds
         {
             get
             {
-                return Tyr.Bot.BaseManager.Main;
+                return Bot.Bot.BaseManager.Main;
             }
         }
 
@@ -96,7 +99,7 @@ namespace Tyr.Builds
         {
             get
             {
-                return Tyr.Bot.BaseManager.NaturalDefensePos;
+                return Bot.Bot.BaseManager.NaturalDefensePos;
             }
         }
 
@@ -104,28 +107,28 @@ namespace Tyr.Builds
         {
             get
             {
-                return Tyr.Bot.BaseManager.MainDefensePos;
+                return Bot.Bot.BaseManager.MainDefensePos;
             }
         }
 
         public int Minerals()
         {
-            return (int)Tyr.Bot.Observation.Observation.PlayerCommon.Minerals - Tyr.Bot.ReservedMinerals;
+            return (int)Bot.Bot.Observation.Observation.PlayerCommon.Minerals - Bot.Bot.ReservedMinerals;
         }
 
         public int Gas()
         {
-            return (int)Tyr.Bot.Observation.Observation.PlayerCommon.Vespene - Tyr.Bot.ReservedGas;
+            return (int)Bot.Bot.Observation.Observation.PlayerCommon.Vespene - Bot.Bot.ReservedGas;
         }
 
         public static uint FoodUsed()
         {
-            return Tyr.Bot.Observation.Observation.PlayerCommon.FoodUsed;
+            return Bot.Bot.Observation.Observation.PlayerCommon.FoodUsed;
         }
 
         public static uint AvailableFood()
         {
-            return Tyr.Bot.Observation.Observation.PlayerCommon.FoodCap;
+            return Bot.Bot.Observation.Observation.PlayerCommon.FoodCap;
         }
 
         public static uint FoodLeft()
@@ -135,27 +138,27 @@ namespace Tyr.Builds
 
         public static uint ExpectedAvailableFood()
         {
-            return Tyr.Bot.Observation.Observation.PlayerCommon.FoodCap + Tyr.Bot.UnitManager.FoodExpected;
+            return Bot.Bot.Observation.Observation.PlayerCommon.FoodCap + Bot.Bot.UnitManager.FoodExpected;
         }
 
         public int Count(uint type)
         {
-            return Tyr.Bot.UnitManager.Count(type);
+            return Bot.Bot.UnitManager.Count(type);
         }
 
         public int Completed(uint type)
         {
-            return Tyr.Bot.UnitManager.Completed(type);
+            return Bot.Bot.UnitManager.Completed(type);
         }
 
         public int EnemyCount(uint type)
         {
-            return Tyr.Bot.EnemyStrategyAnalyzer.Count(type);
+            return Bot.Bot.EnemyStrategyAnalyzer.Count(type);
         }
 
         public int TotalEnemyCount(uint type)
         {
-            return Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(type);
+            return Bot.Bot.EnemyStrategyAnalyzer.TotalCount(type);
         }
 
         public static int Count(Base b, uint type)
@@ -177,20 +180,20 @@ namespace Tyr.Builds
         public static int AvailableMineralPatches()
         {
             int result = 0;
-            foreach (Base b in Tyr.Bot.BaseManager.Bases)
-                if (b.Owner == Tyr.Bot.PlayerId)
+            foreach (Base b in Bot.Bot.BaseManager.Bases)
+                if (b.Owner == Bot.Bot.PlayerId)
                     result += b.BaseLocation.MineralFields.Count;
             return result;
         }
 
         public static bool ConstructGas(uint unitType)
         {
-            if (Tyr.Bot.Minerals() < BuildingType.LookUp[unitType].Minerals || Tyr.Bot.BaseManager.AvailableGasses == 0 || Tyr.Bot.Frame - gasConstructingFrame < 5)
+            if (Bot.Bot.Minerals() < BuildingType.LookUp[unitType].Minerals || Bot.Bot.BaseManager.AvailableGasses == 0 || Bot.Bot.Frame - gasConstructingFrame < 5)
                 return false;
             
-            foreach (Base loc in Tyr.Bot.BaseManager.Bases)
+            foreach (Base loc in Bot.Bot.BaseManager.Bases)
             {
-                if (loc.Owner != Tyr.Bot.PlayerId)
+                if (loc.Owner != Bot.Bot.PlayerId)
                     continue;
 
                 if (loc.ResourceCenter == null || loc.ResourceCenter.Unit.BuildProgress <= 0.7)
@@ -201,7 +204,7 @@ namespace Tyr.Builds
                     if (!gas.Available)
                         continue;
 
-                    gasConstructingFrame = Tyr.Bot.Frame;
+                    gasConstructingFrame = Bot.Bot.Frame;
                     Construct(unitType, SC2Util.To2D(gas.Pos), loc, gas);
                     return true;
                 }
@@ -223,16 +226,16 @@ namespace Tyr.Builds
                     if (!gas.Available)
                         continue;
 
-                    gasConstructingFrame = Tyr.Bot.Frame;
+                    gasConstructingFrame = Bot.Bot.Frame;
                     Construct(type, SC2Util.To2D(gas.Pos), b, gas);
                     return true;
                 }
                 return false;
             }
-            Point2D buildLocation = Tyr.Bot.buildingPlacer.FindPlacement(b.BaseLocation.Pos, BuildingType.LookUp[type].Size, type);
+            Point2D buildLocation = Bot.Bot.buildingPlacer.FindPlacement(b.BaseLocation.Pos, BuildingType.LookUp[type].Size, type);
             if (buildLocation == null)
                 return false;
-            Tyr.Bot.DrawText("Building " + UnitTypes.LookUp[type].Name + ".");
+            Bot.Bot.DrawText("Building " + UnitTypes.LookUp[type].Name + ".");
             ConstructionTask.Task.Build(type, b, buildLocation, null, false);
             return true;
         }
@@ -243,7 +246,7 @@ namespace Tyr.Builds
             if (exact)
                 buildLocation = pos;
             else
-                buildLocation = Tyr.Bot.buildingPlacer.FindPlacement(pos, BuildingType.LookUp[type].Size, type, type == UnitTypes.SPINE_CRAWLER ? 5 : 15);
+                buildLocation = Bot.Bot.buildingPlacer.FindPlacement(pos, BuildingType.LookUp[type].Size, type, type == UnitTypes.SPINE_CRAWLER ? 5 : 15);
             
             if (buildLocation == null)
                 return false;
@@ -263,28 +266,34 @@ namespace Tyr.Builds
                 return ConstructResourceCenter(unitType);
             if (UnitTypes.GasGeysers.Contains(unitType))
                 return ConstructGas(unitType);
-            return Construct(unitType, Tyr.Bot.BaseManager.Main);
+            return Construct(unitType, Bot.Bot.BaseManager.Main);
         }
 
         public static bool ConstructResourceCenter(uint unitType)
         {
             // Check if there is already a Resource center constructing.
-            foreach (Agent unit in Tyr.Bot.UnitManager.Agents.Values)
+            foreach (Agent unit in Bot.Bot.UnitManager.Agents.Values)
                 if (unit.IsWorker && unit.Unit.Orders != null && unit.Unit.Orders.Count > 0 && unit.Unit.Orders[0].AbilityId == BuildingType.LookUp[unitType].Ability)
                     return false;
 
             Base picked = null;
             float dist = 1000000000;
-            bool natural = Tyr.Bot.UnitManager.Count(unitType) == 1;
+            bool natural = Bot.Bot.UnitManager.Count(unitType) == 1;
             
-            foreach (Base loc in Tyr.Bot.BaseManager.Bases)
+            foreach (Base loc in Bot.Bot.BaseManager.Bases)
             {
                 if (loc.Owner != -1)
                     continue;
                 bool blocked = false;
-                foreach (Unit enemy in Tyr.Bot.Enemies())
+                foreach (Unit enemy in Bot.Bot.Enemies())
                 {
-                    if (SC2Util.DistanceSq(enemy.Pos, loc.BaseLocation.Pos) <= 6 * 6)
+                    if (enemy.IsFlying)
+                        continue;
+                    if (UnitTypes.WorkerTypes.Contains(enemy.UnitType))
+                        continue;
+                    if (IgnoreExpansionBlockingUnitTypes.Contains(enemy.UnitType))
+                    continue;
+                        if (SC2Util.DistanceSq(enemy.Pos, loc.BaseLocation.Pos) <= 6 * 6)
                     {
                         blocked = true;
                         break;
@@ -296,7 +305,7 @@ namespace Tyr.Builds
                 if (unitType != UnitTypes.HATCHERY)
                 {
                     // Check for creep.
-                    BoolGrid creep = new ImageBoolGrid(Tyr.Bot.Observation.Observation.RawData.MapState.Creep, 1);
+                    BoolGrid creep = new ImageBoolGrid(Bot.Bot.Observation.Observation.RawData.MapState.Creep, 1);
                     for (float dx = -2.5f; !blocked && dx <= 2.51f; dx++)
                         for (float dy = -2.5f; !blocked && dy <= 2.51f; dy++)
                             if (creep[(int)(loc.BaseLocation.Pos.X + dx), (int)(loc.BaseLocation.Pos.Y + dy)])
@@ -305,11 +314,22 @@ namespace Tyr.Builds
                         continue;
                 }
 
-                foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+                foreach (BuildingPlacement.ReservedBuilding reservedBuilding in Bot.Bot.buildingPlacer.ReservedLocation)
+                {
+                    if (SC2Util.DistanceSq(reservedBuilding.Pos, loc.BaseLocation.Pos) <= 3 * 3)
+                    {
+                        blocked = true;
+                        break;
+                    }
+                }
+                if (blocked)
+                    continue;
+
+                foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
                 {
                     if (!agent.IsBuilding)
                         continue;
-                    blocked = !Tyr.Bot.buildingPlacer.CheckDistanceClose(loc.BaseLocation.Pos, unitType, SC2Util.To2D(agent.Unit.Pos), agent.Unit.UnitType);
+                    blocked = !Bot.Bot.buildingPlacer.CheckDistanceClose(loc.BaseLocation.Pos, unitType, SC2Util.To2D(agent.Unit.Pos), agent.Unit.UnitType);
                     //blocked = System.Math.Abs(agent.Unit.Pos.X - loc.BaseLocation.Pos.X) < 5
                     //    && System.Math.Abs(agent.Unit.Pos.Y - loc.BaseLocation.Pos.Y) < 5;
                     if (blocked)
@@ -319,9 +339,9 @@ namespace Tyr.Builds
                     continue;
 
                 // Ignore the pocket expand as a first base.
-                if (natural && Tyr.Bot.MapAnalyzer.EnemyDistances[(int)loc.BaseLocation.Pos.X, (int)loc.BaseLocation.Pos.Y] > Tyr.Bot.MapAnalyzer.EnemyDistances[(int)Tyr.Bot.MapAnalyzer.StartLocation.X, (int)Tyr.Bot.MapAnalyzer.StartLocation.Y])
+                if (natural && Bot.Bot.MapAnalyzer.EnemyDistances[(int)loc.BaseLocation.Pos.X, (int)loc.BaseLocation.Pos.Y] > Bot.Bot.MapAnalyzer.EnemyDistances[(int)Bot.Bot.MapAnalyzer.StartLocation.X, (int)Bot.Bot.MapAnalyzer.StartLocation.Y])
                     continue;
-                int newdist = loc.DistanceToMain - Tyr.Bot.MapAnalyzer.EnemyDistances[(int)loc.BaseLocation.Pos.X, (int)loc.BaseLocation.Pos.Y];
+                int newdist = loc.DistanceToMain - Bot.Bot.MapAnalyzer.EnemyDistances[(int)loc.BaseLocation.Pos.X, (int)loc.BaseLocation.Pos.Y];
                 if (newdist < dist)
                 {
                     dist = newdist;
@@ -330,7 +350,7 @@ namespace Tyr.Builds
             }
             if (picked == null)
             {
-                ConstructionTask.Task.ExpandingBlockedUntilFrame = Tyr.Bot.Frame + 112;
+                ConstructionTask.Task.ExpandingBlockedUntilFrame = Bot.Bot.Frame + 112;
                 return false;
             }
             
@@ -360,6 +380,36 @@ namespace Tyr.Builds
             {
                 if (Gas() < 500)
                     GasWorkerTask.WorkersPerGas = 2;
+            }
+
+        }
+
+        public void CancelBuilding(uint unitType)
+        {
+            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
+                if (agent.Unit.UnitType == unitType
+                    && agent.Unit.BuildProgress < 0.99)
+                    agent.Order(Abilities.CANCEL);
+            for (int i = ConstructionTask.Task.BuildRequests.Count - 1; i >= 0; i--)
+            {
+                BuildRequest request = ConstructionTask.Task.BuildRequests[i];
+                if (request.Type != unitType)
+                    continue;
+
+                ConstructionTask.Task.BuildRequests.RemoveAt(i);
+                if (ConstructionTask.Task.NaturalProbe != request.worker)
+                {
+                    IdleTask.Task.Add(request.worker);
+                    ConstructionTask.Task.Units.Remove(request.worker);
+                }
+            }
+            for (int i = ConstructionTask.Task.UnassignedRequests.Count - 1; i >= 0; i--)
+            {
+                BuildRequest request = ConstructionTask.Task.UnassignedRequests[i];
+                if (request.Type != unitType)
+                    continue;
+
+                ConstructionTask.Task.UnassignedRequests.RemoveAt(i);
             }
 
         }

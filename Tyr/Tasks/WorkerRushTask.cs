@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
 using Tyr.Agents;
+using Tyr.Micro;
 using Tyr.Util;
 
 namespace Tyr.Tasks
@@ -10,10 +11,12 @@ namespace Tyr.Tasks
         public static WorkerRushTask Task = new WorkerRushTask();
 
         public int TakeWorkers = 12;
-        private HashSet<ulong> regenerating = new HashSet<ulong>();
+        protected HashSet<ulong> regenerating = new HashSet<ulong>();
         PriorityTargetting RangedTargetting = new PriorityTargetting();
         PriorityTargetting CloseTargetting = new PriorityTargetting();
-        private bool Close = false;
+        protected bool Close = false;
+        public bool MoveCommandWhenSafe = false;
+        private MoveWhenSafeController MoveWhenSafeController = new MoveWhenSafeController();
 
         public WorkerRushTask() : base(9)
         {
@@ -21,6 +24,8 @@ namespace Tyr.Tasks
             RangedTargetting.DefaultPriorities[UnitTypes.LARVA] = -1;
             RangedTargetting.DefaultPriorities[UnitTypes.EGG] = -1;
             RangedTargetting.DefaultPriorities[UnitTypes.OVERLORD] = -1;
+            RangedTargetting.DefaultPriorities[UnitTypes.HATCHERY] = -1;
+            RangedTargetting.DefaultPriorities[UnitTypes.SPAWNING_POOL] = -1;
 
             foreach (uint t in UnitTypes.BuildingTypes)
                 RangedTargetting.DefaultPriorities[t] = -1;
@@ -29,6 +34,8 @@ namespace Tyr.Tasks
             CloseTargetting.DefaultPriorities[UnitTypes.LARVA] = -1;
             CloseTargetting.DefaultPriorities[UnitTypes.EGG] = -1;
             CloseTargetting.DefaultPriorities[UnitTypes.OVERLORD] = -1;
+            CloseTargetting.DefaultPriorities[UnitTypes.HATCHERY] = -1;
+            CloseTargetting.DefaultPriorities[UnitTypes.SPAWNING_POOL] = -1;
 
             foreach (uint t in UnitTypes.BuildingTypes)
                 CloseTargetting.DefaultPriorities[t] = -1;
@@ -42,7 +49,7 @@ namespace Tyr.Tasks
         public override bool DoWant(Agent agent)
         {
             return agent.IsWorker && (TakeWorkers > 0 || 
-                SC2Util.DistanceSq(agent.Unit.Pos, Tyr.Bot.MapAnalyzer.StartLocation) >= 20 * 20 && SC2Util.DistanceSq(agent.Unit.Pos, Tyr.Bot.MapAnalyzer.StartLocation) <= 41 * 41);
+                SC2Util.DistanceSq(agent.Unit.Pos, Bot.Bot.MapAnalyzer.StartLocation) >= 20 * 20 && SC2Util.DistanceSq(agent.Unit.Pos, Bot.Bot.MapAnalyzer.StartLocation) <= 41 * 41);
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -63,7 +70,7 @@ namespace Tyr.Tasks
             TakeWorkers--;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             ulong mineral = 0;
             if (tyr.BaseManager.Main.BaseLocation.MineralFields.Count > 0)
@@ -75,6 +82,14 @@ namespace Tyr.Tasks
                 {
                     agent.Order(Abilities.MOVE, tyr.TargetManager.AttackTarget);
                     if (agent.DistanceSq(tyr.TargetManager.AttackTarget) <= 15 * 15)
+                        Close = true;
+                    int closeEnemies = 0;
+                    foreach (Unit enemy in tyr.Enemies())
+                    {
+                        if (agent.DistanceSq(enemy) <= 10 * 10)
+                            closeEnemies++;
+                    }
+                    if (closeEnemies > 3)
                         Close = true;
                 }
                 return;
@@ -117,7 +132,7 @@ namespace Tyr.Tasks
                 else
                 {
                     Unit broodling = GetBroodling(agent);
-                    if (broodling != null)
+                    if (broodling != null || agent.Unit.WeaponCooldown > 6)
                     {
                         if (mineral == 0)
                             agent.Order(Abilities.MOVE, SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
@@ -127,18 +142,25 @@ namespace Tyr.Tasks
                     }
 
                     Unit closeTarget = CloseTargetting.GetTarget(agent);
-                    if (closeTarget != null)
+                    if (closeTarget != null
+                        && !UnitTypes.BuildingTypes.Contains(closeTarget.UnitType))
                     {
-                        agent.Order(Abilities.ATTACK, closeTarget.Tag);
+                        //agent.Order(Abilities.ATTACK, closeTarget.Tag);
+                        agent.Order(Abilities.ATTACK, tyr.TargetManager.AttackTarget);
                         continue;
                     }
 
                     Unit rangeTarget = RangedTargetting.GetTarget(agent);
-                    if (rangeTarget != null)
+                    if (rangeTarget != null
+                        && !UnitTypes.BuildingTypes.Contains(rangeTarget.UnitType))
                     {
                         agent.Order(Abilities.ATTACK, rangeTarget.Tag);
                         continue;
                     }
+                    if (MoveCommandWhenSafe
+                       && MoveWhenSafeController.DetermineAction(agent, tyr.TargetManager.AttackTarget))
+                        continue;
+
                     agent.Order(Abilities.ATTACK, tyr.TargetManager.AttackTarget);
                 }
             }
@@ -148,7 +170,7 @@ namespace Tyr.Tasks
         {
             Unit broodling = null;
             float dist = 6 * 6;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.BROODLING)
                     continue;

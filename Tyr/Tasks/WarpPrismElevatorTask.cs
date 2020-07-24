@@ -20,6 +20,8 @@ namespace Tyr.Tasks
 
         public bool Cancelled = false;
 
+        public ulong PickupUnitTag;
+
         public WarpPrismElevatorTask() : base(5)
         { }
 
@@ -39,8 +41,8 @@ namespace Tyr.Tasks
             if (Cancelled)
                 return result;
             if (WarpPrism == null)
-                result.Add(new UnitDescriptor() { Pos = Tyr.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.WARP_PRISM } });
-            result.Add(new UnitDescriptor() { Pos = Tyr.Bot.TargetManager.AttackTarget, UnitTypes = UnitTypes.CombatUnitTypes });
+                result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.WARP_PRISM } });
+            result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, UnitTypes = UnitTypes.CombatUnitTypes });
             return result;
         }
 
@@ -49,7 +51,7 @@ namespace Tyr.Tasks
             return EnemyThird != null;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (WarpPrism != null)
             {
@@ -109,14 +111,27 @@ namespace Tyr.Tasks
                             continue;
                         dist = newDist;
                         
-                        StagingArea = new PotentialHelper(point, 1)
+                        StagingArea = new PotentialHelper(point, 0.5f)
                             .To(tyr.TargetManager.PotentialEnemyStartLocations[0])
                             .Get();
                     }
                 
-                potential = new PotentialHelper(StagingArea, 7f);
+                potential = new PotentialHelper(StagingArea, 6.5f);
                 potential.From(tyr.TargetManager.PotentialEnemyStartLocations[0]);
                 LoadArea = potential.Get();
+
+                if (tyr.Map == MapEnum.Simulacrum)
+                {
+                    if (tyr.MapAnalyzer.StartLocation.X < 100)
+                    {
+                        StagingArea = new Point2D() { X = 136.5f, Y = 51.2f};
+                        LoadArea = new Point2D() { X = 134.5f, Y = 55.2f };
+                    } else
+                    {
+                        StagingArea = new Point2D() { X = 79, Y = 133f };
+                        LoadArea = new Point2D() { X = 82f, Y = 130.5f };
+                    }
+                }
             }
 
             if (StagingArea != null)
@@ -134,7 +149,10 @@ namespace Tyr.Tasks
                         break;
                     }
             }
+            PickupUnitTag = 0;
+            tyr.DrawText("Pickup unit: " + PickupUnitTag);
             OrderWarpPrism();
+            
             foreach (Agent agent in units)
             {
                 if (WarpPrism != null && agent.Unit.Tag == WarpPrism.Unit.Tag)
@@ -143,6 +161,12 @@ namespace Tyr.Tasks
                     DroppedUnits.Add(agent.Unit.Tag);
                 if (DroppedUnits.Contains(agent.Unit.Tag))
                     Attack(agent, tyr.TargetManager.AttackTarget);
+                else if (PickupUnitTag == agent.Unit.Tag)
+                {
+                    if (PickupUnitTag != 0)
+                        tyr.DrawLine(agent.Unit.Pos, WarpPrism.Unit.Pos);
+                    agent.Order(Abilities.MOVE, WarpPrism.Unit.Tag);
+                }
                 else if (WarpPrismInPlace)
                     Attack(agent, LoadArea);
                 else
@@ -154,7 +178,7 @@ namespace Tyr.Tasks
         {
             Unit closeEnemy = null;
             float dist = 8 * 8;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.PHOTON_CANNON)
                     continue;
@@ -170,7 +194,7 @@ namespace Tyr.Tasks
             {
                 PotentialHelper potential = new PotentialHelper(StagingArea, 2);
                 potential.From(closeEnemy.Pos, 2);
-                potential.To(Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]);
+                potential.To(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]);
                 stagingAreaFinal = potential.Get();
             }
             else
@@ -203,12 +227,19 @@ namespace Tyr.Tasks
                     continue;
                 if (DroppedUnits.Contains(agent.Unit.Tag))
                     continue;
-                if (agent.DistanceSq(WarpPrism) > 6 * 6)
+                if (agent.DistanceSq(WarpPrism) > 7 * 7)
                     continue;
                 WarpPrism.Order(911, agent.Unit.Tag);
+                PickupUnitTag = agent.Unit.Tag;
                 return;
             }
-            WarpPrism.Order(Abilities.MOVE, LoadArea);
+            if (WarpPrism.DistanceSq(stagingAreaFinal) <= 0.5 * 0.5
+                    && WarpPrism.Unit.UnitType == UnitTypes.WARP_PRISM)
+            {
+                WarpPrism.Order(Abilities.WarpPrismPhasingMode);
+                return;
+            }
+            WarpPrism.Order(Abilities.MOVE, stagingAreaFinal);
         }
     }
 }

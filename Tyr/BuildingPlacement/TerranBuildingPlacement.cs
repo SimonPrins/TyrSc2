@@ -14,7 +14,7 @@ namespace Tyr.BuildingPlacement
     {
         public static Point2D FindPlacement(Point2D target, Point2D size, uint type)
         {
-            Point2D reference = SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation);
+            Point2D reference = SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation);
 
             if (type == UnitTypes.MISSILE_TURRET)
                 return FindPlacementSupplyDepot(reference, target, size, type);
@@ -40,7 +40,7 @@ namespace Tyr.BuildingPlacement
                         continue;
 
                     bool blocked = false;
-                    foreach (Unit unit in Tyr.Bot.Observation.Observation.RawData.Units)
+                    foreach (Unit unit in Bot.Bot.Observation.Observation.RawData.Units)
                         if (!BuildingPlacer.CheckDistClose(x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f, SC2Util.To2D(unit.Pos), unit.UnitType))
                         {
                             blocked = true;
@@ -61,7 +61,7 @@ namespace Tyr.BuildingPlacement
                             break;
                         }
 
-                    foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                    foreach (Base b in Bot.Bot.BaseManager.Bases)
                         if (!BuildingPlacer.CheckDistClose(x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f, b.BaseLocation.Pos, UnitTypes.COMMAND_CENTER))
                         {
                             blocked = true;
@@ -93,20 +93,20 @@ namespace Tyr.BuildingPlacement
                         continue;
 
                     bool blocked = false;
-                    foreach (Unit unit in Tyr.Bot.Observation.Observation.RawData.Units)
+                    foreach (Unit unit in Bot.Bot.Observation.Observation.RawData.Units)
                         if (!BuildingPlacer.CheckDistClose(x - 2.5f, y - 1.5f, x + 2.5f, y + 1.5f, SC2Util.To2D(unit.Pos), unit.UnitType))
                         {
                             blocked = true;
                             break;
                         }
-                    foreach (ReservedBuilding building in Tyr.Bot.buildingPlacer.ReservedLocation)
+                    foreach (ReservedBuilding building in Bot.Bot.buildingPlacer.ReservedLocation)
                         if (!BuildingPlacer.CheckDistClose(x - 2.5f, y - 1.5f, x + 2.5f, y + 1.5f, building.Pos, building.Type))
                         {
                             blocked = true;
                             break;
                         }
 
-                    foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                    foreach (Base b in Bot.Bot.BaseManager.Bases)
                         if (!BuildingPlacer.CheckDistClose(x - 2.5f, y - 1.5f, x + 2.5f, y + 1.5f, b.BaseLocation.Pos, UnitTypes.COMMAND_CENTER))
                         {
                             blocked = true;
@@ -125,7 +125,7 @@ namespace Tyr.BuildingPlacement
 
         public static bool RectBuildable(float x1, float y1, float x2, float y2)
         {
-            BoolGrid creep = new ImageBoolGrid(Tyr.Bot.Observation.Observation.RawData.MapState.Creep, 1);
+            BoolGrid creep = new ImageBoolGrid(Bot.Bot.Observation.Observation.RawData.MapState.Creep, 1);
             for (float x = x1; x <= x2; x++)
                 for (float y = y1; y <= y2; y++)
                     if (!SC2Util.GetTilePlacable((int)x, (int)y) || creep[(int)(x), (int)(y)])

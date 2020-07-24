@@ -19,13 +19,13 @@ namespace Tyr.Micro
             if (agent.Unit.UnitType != UnitTypes.INFESTOR)
                 return false;
 
-            if (Tyr.Bot.Frame != CleanFungalTargetsFrame)
+            if (Bot.Bot.Frame != CleanFungalTargetsFrame)
             {
-                CleanFungalTargetsFrame = Tyr.Bot.Frame;
+                CleanFungalTargetsFrame = Bot.Bot.Frame;
 
                 List<ulong> clearTags = new List<ulong>();
                 foreach (FungalTarget fungal in FungalTargets.Values)
-                    if (Tyr.Bot.Frame - fungal.Frame >= 22.4 * 3)
+                    if (Bot.Bot.Frame - fungal.Frame >= 22.4 * 3)
                         clearTags.Add(fungal.InfestorTag);
 
                 foreach (ulong tag in clearTags)
@@ -33,7 +33,7 @@ namespace Tyr.Micro
             }
 
 
-            if (NeuralFrame.ContainsKey(agent.Unit.Tag) && Tyr.Bot.Frame - NeuralFrame[agent.Unit.Tag] < 22)
+            if (NeuralFrame.ContainsKey(agent.Unit.Tag) && Bot.Bot.Frame - NeuralFrame[agent.Unit.Tag] < 22)
                 return true;
 
             if (Fungal(agent))
@@ -44,7 +44,7 @@ namespace Tyr.Micro
 
             Unit closestEnemy = null;
             float distance = agent.Unit.Energy < 70 ? 12 * 12 : 9 * 9;
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (!UnitTypes.CanAttackGround(unit.UnitType))
                     continue;
@@ -71,7 +71,7 @@ namespace Tyr.Micro
             if (agent.Unit.Energy < 100 || !UpgradeType.LookUp[UpgradeType.NeuralParasite].Done())
                 return false;
 
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (unit.UnitType != UnitTypes.BATTLECRUISER
                     && unit.UnitType != UnitTypes.TEMPEST
@@ -92,8 +92,8 @@ namespace Tyr.Micro
                     else NeuralControllers[unit.Tag] = agent.Unit.Tag;
 
                     if (!NeuralFrame.ContainsKey(agent.Unit.Tag))
-                        NeuralFrame.Add(agent.Unit.Tag, Tyr.Bot.Frame);
-                    else NeuralFrame[agent.Unit.Tag] = Tyr.Bot.Frame;
+                        NeuralFrame.Add(agent.Unit.Tag, Bot.Bot.Frame);
+                    else NeuralFrame[agent.Unit.Tag] = Bot.Bot.Frame;
 
                     return true;
                 }
@@ -106,10 +106,10 @@ namespace Tyr.Micro
             if (agent.Unit.Energy < 75)
                 return false;
 
-            if (FungalTargets.ContainsKey(agent.Unit.Tag) && Tyr.Bot.Frame - FungalTargets[agent.Unit.Tag].Frame <= 22)
+            if (FungalTargets.ContainsKey(agent.Unit.Tag) && Bot.Bot.Frame - FungalTargets[agent.Unit.Tag].Frame <= 22)
                 return true;
 
-            foreach (UnitLocation mine in Tyr.Bot.EnemyMineManager.Mines)
+            foreach (UnitLocation mine in Bot.Bot.EnemyMineManager.Mines)
             {
                 bool closeFungal = false;
                 foreach (FungalTarget fungal in FungalTargets.Values)
@@ -124,13 +124,13 @@ namespace Tyr.Micro
                     continue;
                 if (SC2Util.DistanceSq(mine.Pos, agent.Unit.Pos) <= 10 * 10)
                 {
-                    CollectionUtil.Add(FungalTargets, agent.Unit.Tag, new FungalTarget() { Pos = SC2Util.To2D(mine.Pos), Frame = Tyr.Bot.Frame, InfestorTag = agent.Unit.Tag });
+                    CollectionUtil.Add(FungalTargets, agent.Unit.Tag, new FungalTarget() { Pos = SC2Util.To2D(mine.Pos), Frame = Bot.Bot.Frame, InfestorTag = agent.Unit.Tag });
                     agent.Order(74, SC2Util.To2D(mine.Pos));
                     return true;
                 }
             }
 
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (UnitTypes.BuildingTypes.Contains(unit.UnitType))
                     continue;
@@ -154,7 +154,7 @@ namespace Tyr.Micro
 
                 if (unit.UnitType == UnitTypes.BANSHEE || unit.UnitType == UnitTypes.TEMPEST || (unit.UnitType == UnitTypes.BATTLECRUISER && unit.Health < 200))
                 {
-                    CollectionUtil.Add(FungalTargets, agent.Unit.Tag, new FungalTarget() { Pos = SC2Util.To2D(unit.Pos), Frame = Tyr.Bot.Frame, InfestorTag = agent.Unit.Tag });
+                    CollectionUtil.Add(FungalTargets, agent.Unit.Tag, new FungalTarget() { Pos = SC2Util.To2D(unit.Pos), Frame = Bot.Bot.Frame, InfestorTag = agent.Unit.Tag });
                     agent.Order(74, SC2Util.To2D(unit.Pos));
                     return true;
                 }
@@ -162,7 +162,7 @@ namespace Tyr.Micro
                 if (SC2Util.DistanceSq(unit.Pos, agent.Unit.Pos) <= 10 * 10)
                 {
                     int count = 0;
-                    foreach (Unit unit2 in Tyr.Bot.Enemies())
+                    foreach (Unit unit2 in Bot.Bot.Enemies())
                     {
                         if (UnitTypes.BuildingTypes.Contains(unit.UnitType))
                             continue;
@@ -177,7 +177,7 @@ namespace Tyr.Micro
                     }
                     if (count >= 6)
                     {
-                        CollectionUtil.Add(FungalTargets, agent.Unit.Tag, new FungalTarget() { Pos = SC2Util.To2D(unit.Pos), Frame = Tyr.Bot.Frame, InfestorTag = agent.Unit.Tag });
+                        CollectionUtil.Add(FungalTargets, agent.Unit.Tag, new FungalTarget() { Pos = SC2Util.To2D(unit.Pos), Frame = Bot.Bot.Frame, InfestorTag = agent.Unit.Tag });
                         agent.Order(74, SC2Util.To2D(unit.Pos));
                         return true;
                     }

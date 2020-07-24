@@ -19,12 +19,12 @@ namespace Tyr.Builds.BuildLists
             {
                 if (!list.Construct())
                 {
-                    Tyr.Bot.DrawText("Final list: " + i);
+                    Bot.Bot.DrawText("Final list: " + i);
                     break;
                 }
                 i++;
                 if (i == BuildLists.Count)
-                    Tyr.Bot.DrawText("Final list: " + (i - 1));
+                    Bot.Bot.DrawText("Final list: " + (i - 1));
             }
         }
     }

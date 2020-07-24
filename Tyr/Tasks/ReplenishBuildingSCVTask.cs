@@ -33,7 +33,7 @@ namespace Tyr.Tasks
                     continue;
                 result.Add(new UnitDescriptor()
                 {
-                    Pos = SC2Util.To2D(Tyr.Bot.UnitManager.Agents[building].Unit.Pos),
+                    Pos = SC2Util.To2D(Bot.Bot.UnitManager.Agents[building].Unit.Pos),
                     Count = 1,
                     UnitTypes = new HashSet<uint>() { UnitTypes.SCV },
                     Marker = building
@@ -64,13 +64,13 @@ namespace Tyr.Tasks
 
         private void UpdateNeedsRepairing()
         {
-            if (NeedsRepairingUpdateFrame >= Tyr.Bot.Frame)
+            if (NeedsRepairingUpdateFrame >= Bot.Bot.Frame)
                 return;
-            NeedsRepairingUpdateFrame = Tyr.Bot.Frame;
+            NeedsRepairingUpdateFrame = Bot.Bot.Frame;
 
             AlreadyRepairing = new HashSet<ulong>();
             NeedsRepairing = new List<ulong>();
-            foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
             {
                 if (!UnitTypes.BuildingTypes.Contains(agent.Unit.UnitType))
                     continue;
@@ -103,7 +103,7 @@ namespace Tyr.Tasks
                     AlreadyRepairing.Add(RepairMap[scv.Unit.Tag]);
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             tyr.DrawText("Replenishing scvs: " + Units.Count);
             List<Agent> unassignedSCVs = new List<Agent>();

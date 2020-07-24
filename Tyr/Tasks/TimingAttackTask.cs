@@ -16,7 +16,7 @@ namespace Tyr.Tasks
         public HashSet<uint> ExcludeUnitTypes = new HashSet<uint>();
 
         public bool AttackSent = false;
-        public bool DefendOtherAgents = true;
+        public bool DefendOtherAgents = false;
 
         private Agent MedivacRetreatTarget = null;
         private int MedivacRetreatTargetUpdateFrame = 0;
@@ -24,7 +24,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public TimingAttackTask() : base(5)
@@ -44,12 +44,12 @@ namespace Tyr.Tasks
         public override bool IsNeeded()
         {
             if (UnitType != 0)
-                return Tyr.Bot.UnitManager.Completed(UnitType) >= RequiredSize;
+                return Bot.Bot.UnitManager.Completed(UnitType) >= RequiredSize;
             int combatUnits = 0;
             foreach (uint combatType in UnitTypes.CombatUnitTypes)
                 if (!UnitTypes.EquivalentTypes.ContainsKey(combatType)
                     && !ExcludeUnitTypes.Contains(combatType))
-                    combatUnits += Tyr.Bot.UnitManager.Completed(combatType);
+                    combatUnits += Bot.Bot.UnitManager.Completed(combatType);
             if (combatUnits >= RequiredSize)
             {
                 AttackSent = true;
@@ -58,7 +58,7 @@ namespace Tyr.Tasks
             if (Build.FoodUsed() > 194)
             {
                 bool producing = false;
-                foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+                foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
                 {
                     if (agent.Unit.UnitType == UnitTypes.FACTORY
                         || agent.Unit.UnitType == UnitTypes.BARRACKS
@@ -86,13 +86,15 @@ namespace Tyr.Tasks
             return false;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (units.Count <= RetreatSize && Units.Count > 0)
             {
                 Clear();
                 return;
             }
+
+            tyr.DrawText("Army size: " + Units.Count);
 
             bool canAttackGround = false;
             foreach (Agent agent in Units)
@@ -101,6 +103,7 @@ namespace Tyr.Tasks
 
             if (!canAttackGround && Units.Count > 0)
             {
+                DebugUtil.WriteLine("No anti grounnd units. Ending attack.");
                 Clear();
                 return;
             }
@@ -145,7 +148,7 @@ namespace Tyr.Tasks
             }
         }
 
-        private void UpdateMedivacRetreatTarget(Tyr tyr)
+        private void UpdateMedivacRetreatTarget(Bot tyr)
         {
             if (MedivacRetreatTargetUpdateFrame == tyr.Frame)
                 return;

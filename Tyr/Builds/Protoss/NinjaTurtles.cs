@@ -3,6 +3,7 @@ using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Managers;
 using Tyr.Micro;
+using Tyr.StrategyAnalysis;
 using Tyr.Tasks;
 using Tyr.Util;
 
@@ -10,29 +11,38 @@ namespace Tyr.Builds.Protoss
 {
     public class NinjaTurtles : Build
     {
-        private DTAttackTask DTAttackTask = new DTAttackTask();
         private bool gatewayBuilt;
-        private DefenseTask DefenseTask = new DefenseTask();
 
         private BuildingStep ReaperDefenseCannonStep;
         private bool ChasingLiftedBuildings = false;
 
         public bool VoidrayOnly = false;
 
+        public bool Expand = false;
+        private bool StartExpanding = false;
+
         public override string Name()
         {
             return "NinjaTurtles";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void InitializeTasks()
         {
-            tyr.TaskManager.Add(DefenseTask);
-            tyr.TaskManager.Add(DTAttackTask);
-            tyr.TaskManager.Add(new FlyerAttackTask() { RequiredSize = 4 });
-            //tyr.TaskManager.Add(new RemoveLostWorkersTask());
-            tyr.TaskManager.Add(new ShieldBatteryTargetTask());
-            if (tyr.BaseManager.Pocket != null)
-                tyr.TaskManager.Add(new ScoutProxyTask(tyr.BaseManager.Pocket.BaseLocation.Pos));
+            base.InitializeTasks();
+            DefenseTask.Enable();
+            DTAttackTask.Enable();
+            Bot.Bot.TaskManager.Add(new FlyerAttackTask() { RequiredSize = 4 });
+            Bot.Bot.TaskManager.Add(new ShieldBatteryTargetTask());
+            KillOwnUnitTask.Enable();
+
+
+            if (Bot.Bot.BaseManager.Pocket != null)
+                Bot.Bot.TaskManager.Add(new ScoutProxyTask(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos));
+        }
+
+        public override void OnStart(Bot tyr)
+        {
+            MicroControllers.Add(new TempestController());
             MicroControllers.Add(new VoidrayController());
             MicroControllers.Add(new StutterController());
             ConstructionTask.Task.OnlyWorkersFromMain = true;
@@ -43,6 +53,7 @@ namespace Tyr.Builds.Protoss
             Set += BuildWallPylon();
             Set += ProtossBuildUtil.Pylons();
             Set += BuildReaperDefenseCannon();
+            Set += Units();
             Set += MainBuild();
             Set += StargatesAgainstCannons();
         }
@@ -51,24 +62,33 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.Building(UnitTypes.PYLON, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building3, true);
+            result.Building(UnitTypes.PYLON, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building3, true);
 
             return result;
         }
-        
+
         private BuildList BuildReaperDefenseCannon()
         {
             BuildList result = new BuildList();
 
             Base reaperBase = null;
-            foreach (Base b in Tyr.Bot.BaseManager.Bases)
-                if (b != Tyr.Bot.BaseManager.Main)
+            foreach (Base b in Bot.Bot.BaseManager.Bases)
+                if (b != Bot.Bot.BaseManager.Main)
                     reaperBase = b;
 
-            ReaperDefenseCannonStep = new BuildingStep(UnitTypes.PHOTON_CANNON, reaperBase);
+            ReaperDefenseCannonStep = new BuildingStep(UnitTypes.PHOTON_CANNON, reaperBase, () => !StartExpanding);
 
             result.If(() => { return ReaperDefenseCannonStep.DesiredPos != null && Count(UnitTypes.FORGE) > 0; });
             result += ReaperDefenseCannonStep;
+
+            return result;
+        }
+
+        private BuildList Units()
+        {
+            BuildList result = new BuildList();
+
+            result.Train(UnitTypes.TEMPEST, () => Gas() >= 175);
 
             return result;
         }
@@ -77,25 +97,34 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            Point2D cannon1Pos = SC2Util.Point(Tyr.Bot.MapAnalyzer.building1.X + (Tyr.Bot.MapAnalyzer.building1.X - Tyr.Bot.MapAnalyzer.building2.X) / 2, Tyr.Bot.MapAnalyzer.building1.Y + (Tyr.Bot.MapAnalyzer.building1.Y - Tyr.Bot.MapAnalyzer.building2.Y) / 2);
-            Point2D cannon2Pos = SC2Util.Point(Tyr.Bot.MapAnalyzer.building2.X + (Tyr.Bot.MapAnalyzer.building2.X - Tyr.Bot.MapAnalyzer.building1.X) / 2, Tyr.Bot.MapAnalyzer.building2.Y + (Tyr.Bot.MapAnalyzer.building2.Y - Tyr.Bot.MapAnalyzer.building1.Y) / 2);
+            Point2D cannon1Pos = SC2Util.Point(Bot.Bot.MapAnalyzer.building1.X + (Bot.Bot.MapAnalyzer.building1.X - Bot.Bot.MapAnalyzer.building2.X) / 2, Bot.Bot.MapAnalyzer.building1.Y + (Bot.Bot.MapAnalyzer.building1.Y - Bot.Bot.MapAnalyzer.building2.Y) / 2);
+            Point2D cannon2Pos = SC2Util.Point(Bot.Bot.MapAnalyzer.building2.X + (Bot.Bot.MapAnalyzer.building2.X - Bot.Bot.MapAnalyzer.building1.X) / 2, Bot.Bot.MapAnalyzer.building2.Y + (Bot.Bot.MapAnalyzer.building2.Y - Bot.Bot.MapAnalyzer.building1.Y) / 2);
 
-            result.Building(UnitTypes.FORGE, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building1, true);
-            result.Building(UnitTypes.GATEWAY, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building2, true);
-            result.Building(UnitTypes.PHOTON_CANNON, Tyr.Bot.BaseManager.Main, cannon1Pos);
-            result.Building(UnitTypes.PHOTON_CANNON, Tyr.Bot.BaseManager.Main, cannon2Pos);
+            result.Building(UnitTypes.NEXUS);
+            result.Building(UnitTypes.FORGE, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building1, true, () => !StartExpanding);
+            result.Building(UnitTypes.GATEWAY, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building2, true);
+            result.Building(UnitTypes.PHOTON_CANNON, Bot.Bot.BaseManager.Main, cannon1Pos, () => !StartExpanding);
+            result.Building(UnitTypes.PHOTON_CANNON, Bot.Bot.BaseManager.Main, cannon2Pos, () => !StartExpanding);
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.CYBERNETICS_CORE);
             result.Building(UnitTypes.ASSIMILATOR);
             result.If(() => { return Completed(UnitTypes.CYBERNETICS_CORE) > 0; });
-            result.Building(UnitTypes.SHIELD_BATTERY, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building1);
-            result.Building(UnitTypes.SHIELD_BATTERY, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building2);
-            result.Building(UnitTypes.PHOTON_CANNON, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building3);
+            result.Building(UnitTypes.SHIELD_BATTERY, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building1);
+            result.Building(UnitTypes.SHIELD_BATTERY, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building2);
+            result.Building(UnitTypes.PHOTON_CANNON, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building3, () => !StartExpanding);
             result.Building(UnitTypes.PYLON, 3);
             result.If(() => { return !VoidrayOnly; });
             result.Building(UnitTypes.TWILIGHT_COUNSEL);
             result.Building(UnitTypes.STARGATE);
             result.Building(UnitTypes.DARK_SHRINE);
+            result.If(() => StartExpanding);
+            result.Building(UnitTypes.NEXUS);
+            result.Building(UnitTypes.FLEET_BEACON);
+            result.Building(UnitTypes.ASSIMILATOR, 2);
+            result.If(() => Count(UnitTypes.TEMPEST) > 0);
+            result.Building(UnitTypes.STARGATE);
+            result.Building(UnitTypes.NEXUS);
+            result.Building(UnitTypes.ASSIMILATOR, 2);
 
             return result;
         }
@@ -110,15 +139,33 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
+            if (Expand && Main.BaseLocation.MineralFields.Count < 8)
+                StartExpanding = true;
+
+            if (StartExpanding)
+            {
+                foreach (Agent agent in tyr.Units())
+                    if (agent.Unit.UnitType == UnitTypes.FORGE
+                        && agent.DistanceSq(Bot.Bot.MapAnalyzer.building1) <= 2 * 2)
+                    {
+                        KillOwnUnitTask.Task.TargetTag = agent.Unit.Tag;
+                        break;
+                    }
+            }
+
+
             tyr.buildingPlacer.BuildCompact = true;
 
-            if (tyr.EnemyStrategyAnalyzer.CannonRushDetected)
+            if (StrategyAnalysis.CannonRush.Get().Detected)
                 VoidrayOnly = true;
 
             if (VoidrayOnly)
-                DefenseTask.Stopped = true;
+            {
+                DefenseTask.AirDefenseTask.Stopped = true;
+                DefenseTask.GroundDefenseTask.Stopped = true;
+            }
             
             if ((tyr.EnemyRace == Race.Terran || tyr.EnemyRace == Race.Random)
                 && ReaperDefenseCannonStep.DesiredPos == null)
@@ -126,7 +173,7 @@ namespace Tyr.Builds.Protoss
                 foreach (Unit unit in tyr.Enemies())
                 {
                     if (unit.UnitType == UnitTypes.REAPER
-                        && Tyr.Bot.MapAnalyzer.StartArea[(int)System.Math.Round(unit.Pos.X), (int)System.Math.Round(unit.Pos.Y)])
+                        && Bot.Bot.MapAnalyzer.StartArea[(int)System.Math.Round(unit.Pos.X), (int)System.Math.Round(unit.Pos.Y)])
                     {
                         Point2D dir = SC2Util.Point(unit.Pos.X - tyr.MapAnalyzer.StartLocation.X, unit.Pos.Y - tyr.MapAnalyzer.StartLocation.Y);
                         float length = (float)System.Math.Sqrt(dir.X * dir.X + dir.Y * dir.Y);
@@ -138,7 +185,7 @@ namespace Tyr.Builds.Protoss
                 }
             }
             
-            if (tyr.EnemyStrategyAnalyzer.LiftingDetected && tyr.EnemyManager.EnemyBuildings.Count == 0 && !ChasingLiftedBuildings)
+            if (Lifting.Get().Detected && tyr.EnemyManager.EnemyBuildings.Count == 0 && !ChasingLiftedBuildings)
             {
                 ChasingLiftedBuildings = true;
                 tyr.TaskManager.Add(new ElevatorChaserTask());
@@ -158,16 +205,24 @@ namespace Tyr.Builds.Protoss
             }
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50
-                && Count(UnitTypes.PROBE) < 22 - Completed(UnitTypes.ASSIMILATOR))
+                && (Count(UnitTypes.PROBE) < 22 - Completed(UnitTypes.ASSIMILATOR) || Count(UnitTypes.NEXUS) >= 2)
+                && (Count(UnitTypes.PROBE) < 44 - Completed(UnitTypes.ASSIMILATOR) || Count(UnitTypes.NEXUS) >= 3)
+                && Count(UnitTypes.PROBE) < 66 - Completed(UnitTypes.ASSIMILATOR))
             {
                 if (Count(UnitTypes.PROBE) < 13 || Count(UnitTypes.PYLON) > 0)
                     agent.Order(1006);
+                return;
             }
-            else if (agent.Unit.UnitType == UnitTypes.GATEWAY)
+
+            if (StartExpanding
+                && (Count(UnitTypes.NEXUS) < 2 || Count(UnitTypes.FLEET_BEACON) == 0))
+                return;
+
+            if (agent.Unit.UnitType == UnitTypes.GATEWAY)
             {
                 if (Completed(UnitTypes.DARK_SHRINE) > 0 && !VoidrayOnly)
                 {
@@ -181,7 +236,8 @@ namespace Tyr.Builds.Protoss
                 && Gas() >= 150
                 && (Minerals() >= 300 || VoidrayOnly)
                 && (Gas() >= 250 || VoidrayOnly)
-                && FoodUsed() + 4 <= 200)
+                && FoodUsed() + 4 <= 200
+                && !StartExpanding)
                 agent.Order(950);
         }
     }

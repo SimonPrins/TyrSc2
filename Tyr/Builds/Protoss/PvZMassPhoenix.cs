@@ -4,6 +4,7 @@ using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Managers;
 using Tyr.Micro;
+using Tyr.StrategyAnalysis;
 using Tyr.Tasks;
 
 namespace Tyr.Builds.Protoss
@@ -25,17 +26,18 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
             ArmyObserverTask.Enable();
-            if (Tyr.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Tyr.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Bot.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
             ArchonMergeTask.Enable();
             WorkerRushDefenseTask.Enable();
             PhoenixHarassTask.Enable();
+            PhoenixHuntOverlordsTask.Enable();
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
             OverrideMainDefenseTarget = new PotentialHelper(tyr.MapAnalyzer.GetMainRamp(), 6).
@@ -63,8 +65,8 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => { return !Tyr.Bot.EnemyStrategyAnalyzer.EarlyPool; });
-            foreach (Base b in Tyr.Bot.BaseManager.Bases)
+            result.If(() => { return !EarlyPool.Get().Detected; });
+            foreach (Base b in Bot.Bot.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -80,10 +82,11 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.Train(UnitTypes.PHOENIX, 20);
+            result.Train(UnitTypes.PHOENIX, 20, () => TotalEnemyCount(UnitTypes.HYDRALISK) < 3);
+            result.Train(UnitTypes.VOID_RAY, 20, () => TotalEnemyCount(UnitTypes.HYDRALISK) >= 3);
             result.If(() => Count(UnitTypes.NEXUS) >= 2 && Count(UnitTypes.STARGATE) >= 1);
             result.Train(UnitTypes.ZEALOT, 1);
-            result.If(() => Count(UnitTypes.PHOENIX) >= 3);
+            result.If(() => Count(UnitTypes.PHOENIX) + Count(UnitTypes.VOID_RAY) >= 3);
             result.Train(UnitTypes.ZEALOT, 2);
             result.Train(UnitTypes.STALKER, () => Gas() >= 150 && Minerals() >= 250);
             result.Train(UnitTypes.ZEALOT, () => Minerals() >= 200);
@@ -106,16 +109,22 @@ namespace Tyr.Builds.Protoss
             result.Upgrade(UpgradeType.WarpGate, () => Count(UnitTypes.PHOENIX) >= 5);
             result.Building(UnitTypes.STARGATE, () => Count(UnitTypes.PHOENIX) > 0);
             result.Building(UnitTypes.ASSIMILATOR, 2, () => Count(UnitTypes.PHOENIX) > 2);
-            result.If(() => Count(UnitTypes.PHOENIX) >= 20);
+            result.If(() => Count(UnitTypes.PHOENIX) + Count(UnitTypes.VOID_RAY) >= 7);
             result.Building(UnitTypes.NEXUS);
+            result.Building(UnitTypes.GATEWAY, Main, 2, () => Minerals() >= 250);
+            result.Building(UnitTypes.NEXUS);
+            result.Building(UnitTypes.ASSIMILATOR, 2);
+            result.Building(UnitTypes.ROBOTICS_FACILITY);
+            result.Building(UnitTypes.NEXUS);
+            result.Building(UnitTypes.ASSIMILATOR, 2);
             result.Building(UnitTypes.GATEWAY, Main, 2, () => Minerals() >= 250);
 
             return result;
         }
         
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
-            if (Tyr.Bot.Frame == (int)(45 * 22.4))
+            if (Bot.Bot.Frame == (int)(45 * 22.4))
                 tyr.Chat("This build was requested by Infy!");
             foreach (Agent agent in tyr.UnitManager.Agents.Values)
             {
@@ -176,7 +185,7 @@ namespace Tyr.Builds.Protoss
 
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (Count(UnitTypes.PROBE) >= 24
                 && Count(UnitTypes.NEXUS) < 2

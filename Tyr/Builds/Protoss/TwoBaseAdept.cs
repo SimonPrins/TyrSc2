@@ -13,7 +13,7 @@ namespace Tyr.Builds.Protoss
             return "TwoBaseAdept";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             tyr.TaskManager.Add(new DefenseTask());
             tyr.TaskManager.Add(attackTask);
@@ -43,10 +43,10 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         { }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50
@@ -67,11 +67,11 @@ namespace Tyr.Builds.Protoss
             }
             else if (agent.Unit.UnitType == UnitTypes.TWILIGHT_COUNSEL)
             {
-                if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
+                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
                     && Minerals() >= 100
                     && Gas() >= 100)
                     agent.Order(1594);
-                else if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
+                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
                      && Minerals() >= 100
                      && Gas() >= 100)
                     agent.Order(1592);

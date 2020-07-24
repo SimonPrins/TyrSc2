@@ -24,13 +24,13 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
-            if (Tyr.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Tyr.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Bot.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new FleeCyclonesController());
             MicroControllers.Add(new TempestController());
@@ -112,7 +112,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             TimingAttackTask.Task.RequiredSize = RequiredSize;
             TimingAttackTask.Task.UnitType = UnitTypes.TEMPEST;

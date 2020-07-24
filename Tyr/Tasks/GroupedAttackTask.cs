@@ -20,7 +20,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public GroupedAttackTask() : base(5)
@@ -38,12 +38,12 @@ namespace Tyr.Tasks
         public override bool IsNeeded()
         {
             if (UnitType != 0)
-                return Tyr.Bot.UnitManager.Completed(UnitType) >= RequiredSize;
+                return Bot.Bot.UnitManager.Completed(UnitType) >= RequiredSize;
             int combatUnits = 0;
             foreach (uint combatType in UnitTypes.CombatUnitTypes)
                 if (!UnitTypes.EquivalentTypes.ContainsKey(combatType)
                     && !ExcludeUnitTypes.Contains(combatType))
-                    combatUnits += Tyr.Bot.UnitManager.Completed(combatType);
+                    combatUnits += Bot.Bot.UnitManager.Completed(combatType);
             if (combatUnits >= RequiredSize)
             {
                 AttackSent = true;
@@ -52,7 +52,7 @@ namespace Tyr.Tasks
             if (Build.FoodUsed() > 194)
             {
                 bool producing = false;
-                foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+                foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
                 {
                     if (agent.Unit.UnitType == UnitTypes.FACTORY
                         || agent.Unit.UnitType == UnitTypes.BARRACKS
@@ -80,7 +80,7 @@ namespace Tyr.Tasks
             return false;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (units.Count <= RetreatSize)
             {

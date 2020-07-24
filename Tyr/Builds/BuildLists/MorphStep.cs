@@ -41,10 +41,10 @@ namespace Tyr.Builds.BuildLists
                 return new NextItem();
 
             if (UnitTypes.LookUp[UnitType].TechRequirement != 0
-                && Tyr.Bot.UnitManager.Completed(UnitTypes.LookUp[UnitType].TechRequirement) == 0
+                && Bot.Bot.UnitManager.Completed(UnitTypes.LookUp[UnitType].TechRequirement) == 0
                 && UnitTypes.LookUp[UnitType].TechRequirement != UnitTypes.HATCHERY)
             {
-                Tyr.Bot.DrawText("Skipping list. Morph tech for " + UnitTypes.LookUp[UnitType].Name + " not available: " + UnitTypes.LookUp[UnitType].TechRequirement);
+                Bot.Bot.DrawText("Skipping list. Morph tech for " + UnitTypes.LookUp[UnitType].Name + " not available: " + UnitTypes.LookUp[UnitType].TechRequirement);
                 return new NextList();
             }
 
@@ -53,8 +53,8 @@ namespace Tyr.Builds.BuildLists
 
             state.AddDesired(UnitType, Number);
 
-            if (state.Desired[UnitType] > Tyr.Bot.UnitManager.Count(UnitType))
-                if (!Morph(state, state.Desired[UnitType] - Tyr.Bot.UnitManager.Count(UnitType)))
+            if (state.Desired[UnitType] > Bot.Bot.UnitManager.Count(UnitType))
+                if (!Morph(state, state.Desired[UnitType] - Bot.Bot.UnitManager.Count(UnitType)))
                     return new WaitForResources();
             return new NextItem();
         }
@@ -68,15 +68,15 @@ namespace Tyr.Builds.BuildLists
                 return true;
 
 
-            if (Tyr.Bot.UnitManager.Count(UnitTypes.LARVA) < 0)
+            if (Bot.Bot.UnitManager.Count(UnitTypes.LARVA) < 0)
                 return true;
 
-            if (Tyr.Bot.Minerals() < MorphingType.LookUpToType[UnitType].Minerals
-                || Tyr.Bot.Gas() < MorphingType.LookUpToType[UnitType].Gas)
+            if (Bot.Bot.Minerals() < MorphingType.LookUpToType[UnitType].Minerals
+                || Bot.Bot.Gas() < MorphingType.LookUpToType[UnitType].Gas)
                 return false;
 
             state.BuiltThisFrame = true;
-            Tyr.Bot.DrawText("Morphing: " + UnitTypes.LookUp[UnitType].Name);
+            Bot.Bot.DrawText("Morphing: " + UnitTypes.LookUp[UnitType].Name);
             MorphingTask.Task.Morph(UnitType);
 
             return number == 1;

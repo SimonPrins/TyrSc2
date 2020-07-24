@@ -9,6 +9,7 @@ namespace Tyr.Tasks
     class ArmyOverseerTask : Task
     {
         public static ArmyOverseerTask Task = new ArmyOverseerTask();
+        public HashSet<uint> IgnoreUnitTypes = new HashSet<uint>();
 
         public ArmyOverseerTask() : base(7)
         { }
@@ -16,7 +17,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -27,7 +28,7 @@ namespace Tyr.Tasks
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
-            result.Add(new UnitDescriptor() { Pos = Tyr.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.OVERSEER } });
+            result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.OVERSEER } });
             return result;
         }
 
@@ -36,7 +37,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (units.Count == 0)
                 return;
@@ -70,6 +71,8 @@ namespace Tyr.Tasks
             dist = 1000000;
             foreach (Agent agent in tyr.UnitManager.Agents.Values)
             {
+                if (IgnoreUnitTypes.Contains(agent.Unit.UnitType))
+                    continue;
                 if (!UnitTypes.CombatUnitTypes.Contains(agent.Unit.UnitType))
                     continue;
 

@@ -6,6 +6,7 @@ using Tyr.Builds.BuildLists;
 using Tyr.Managers;
 using Tyr.MapAnalysis;
 using Tyr.Micro;
+using Tyr.StrategyAnalysis;
 using Tyr.Tasks;
 
 namespace Tyr.Builds.Protoss
@@ -35,11 +36,11 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
             ArmyObserverTask.Enable();
-            if (Tyr.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Tyr.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Bot.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
             ArchonMergeTask.Enable();
             ShieldRegenTask.Enable();
             WorkerRushDefenseTask.Enable();
@@ -48,7 +49,7 @@ namespace Tyr.Builds.Protoss
             ForceFieldRampTask.Enable();
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
             OverrideMainDefenseTarget = new PotentialHelper(tyr.MapAnalyzer.GetMainRamp(), 6).
@@ -72,7 +73,7 @@ namespace Tyr.Builds.Protoss
                 WallIn.ReserveSpace();
             }
 
-            Set += ProtossBuildUtil.Pylons(() => Completed(UnitTypes.PYLON) > 0 && (Count(UnitTypes.CYBERNETICS_CORE) > 0 || tyr.EnemyStrategyAnalyzer.WorkerRushDetected));
+            Set += ProtossBuildUtil.Pylons(() => Completed(UnitTypes.PYLON) > 0 && (Count(UnitTypes.CYBERNETICS_CORE) > 0 || StrategyAnalysis.WorkerRush.Get().Detected));
             Set += ExpandBuildings();
             Set += Units();
             Set += MainBuild();
@@ -82,8 +83,8 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => { return !Tyr.Bot.EnemyStrategyAnalyzer.EarlyPool; });
-            foreach (Base b in Tyr.Bot.BaseManager.Bases)
+            result.If(() => { return !EarlyPool.Get().Detected; });
+            foreach (Base b in Bot.Bot.BaseManager.Bases)
             {
                 if (b == Main)
                     continue;
@@ -102,7 +103,7 @@ namespace Tyr.Builds.Protoss
             result.If(() => DoubleRoboAllIn || FourGateDetected || Count(UnitTypes.STALKER) < 5 || Count(UnitTypes.IMMORTAL) < 2 || Count(UnitTypes.NEXUS) >= 2);
             result.If(() => !EarlyForge || Count(UnitTypes.FORGE) > 0);
             result.If(() => !EarlyForge || Completed(UnitTypes.FORGE) == 0 || Count(UnitTypes.PHOTON_CANNON) > 0);
-            result.Train(UnitTypes.ZEALOT, 4, () => Tyr.Bot.EnemyStrategyAnalyzer.WorkerRushDetected);
+            result.Train(UnitTypes.ZEALOT, 4, () => StrategyAnalysis.WorkerRush.Get().Detected);
             result.Train(UnitTypes.SENTRY, 1);
             result.Train(UnitTypes.STALKER, 3);
             result.Train(UnitTypes.TEMPEST);
@@ -126,13 +127,13 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.NEXUS);
             result.Building(UnitTypes.PYLON, Main);
             result.Building(UnitTypes.GATEWAY, Main, () => Completed(UnitTypes.PYLON) > 0);
-            result.Building(UnitTypes.ASSIMILATOR, () => !Tyr.Bot.EnemyStrategyAnalyzer.WorkerRushDetected || Count(UnitTypes.ZEALOT) >= 2);
+            result.Building(UnitTypes.ASSIMILATOR, () => !StrategyAnalysis.WorkerRush.Get().Detected || Count(UnitTypes.ZEALOT) >= 2);
             result.Building(UnitTypes.PYLON, Main, WallIn.Wall[1].Pos, true);
             result.Building(UnitTypes.GATEWAY, Main, WallIn.Wall[0].Pos, true, () => Completed(UnitTypes.PYLON) >= 2);
-            result.Building(UnitTypes.CYBERNETICS_CORE, () => !Tyr.Bot.EnemyStrategyAnalyzer.WorkerRushDetected || Count(UnitTypes.ZEALOT) >= 2);
+            result.Building(UnitTypes.CYBERNETICS_CORE, () => !StrategyAnalysis.WorkerRush.Get().Detected || Count(UnitTypes.ZEALOT) >= 2);
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.ROBOTICS_FACILITY);
-            result.Building(UnitTypes.ROBOTICS_FACILITY, () => (FourGateDetected && Tyr.Bot.Frame >= 22.4 * 60 * 4) || DoubleRoboAllIn);
+            result.Building(UnitTypes.ROBOTICS_FACILITY, () => (FourGateDetected && Bot.Bot.Frame >= 22.4 * 60 * 4) || DoubleRoboAllIn);
             result.Upgrade(UpgradeType.WarpGate);
             result.If(() => (!FourGateDetected && !DoubleRoboAllIn) || Completed(UnitTypes.IMMORTAL) >= 3);
             result.Building(UnitTypes.NEXUS);
@@ -141,7 +142,7 @@ namespace Tyr.Builds.Protoss
             result.Upgrade(UpgradeType.ProtossGroundWeapons, () => EarlyForge);
             result.Building(UnitTypes.PHOTON_CANNON, () => EarlyForge);
             result.Building(UnitTypes.ROBOTICS_FACILITY, () => SecondRobo && !FourGateDetected);
-            result.Building(UnitTypes.ROBOTICS_FACILITY, () => !SecondRobo && !FourGateDetected && Tyr.Bot.Frame >= 22.4 * 60 * 6
+            result.Building(UnitTypes.ROBOTICS_FACILITY, () => !SecondRobo && !FourGateDetected && Bot.Bot.Frame >= 22.4 * 60 * 6
                 && TotalEnemyCount(UnitTypes.STARGATE) + TotalEnemyCount(UnitTypes.VOID_RAY) + TotalEnemyCount(UnitTypes.ORACLE) == 0);
             result.Building(UnitTypes.ASSIMILATOR, () => SecondRobo);
             result.Building(UnitTypes.SHIELD_BATTERY, Natural, NaturalDefensePos, 2, () => Completed(Natural, UnitTypes.PYLON) > 0);
@@ -172,7 +173,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             WorkerTask.Task.EvacuateThreatenedBases = true;
 
@@ -210,7 +211,7 @@ namespace Tyr.Builds.Protoss
             else
                 DefenseTask.AirDefenseTask.IgnoreEnemyTypes.Remove(UnitTypes.PHOENIX);
 
-            if (tyr.EnemyStrategyAnalyzer.WorkerRushDetected
+            if (StrategyAnalysis.WorkerRush.Get().Detected
                 && Count(UnitTypes.ZEALOT) < 2)
                 GasWorkerTask.WorkersPerGas = 0;
             else
@@ -248,7 +249,7 @@ namespace Tyr.Builds.Protoss
                 }
             }
 
-            if (tyr.EnemyStrategyAnalyzer.WorkerRushDetected
+            if (StrategyAnalysis.WorkerRush.Get().Detected
                 && Count(UnitTypes.ZEALOT) < 2)
             {
                 foreach (Agent agent in tyr.UnitManager.Agents.Values)
@@ -279,7 +280,7 @@ namespace Tyr.Builds.Protoss
             tyr.NexusAbilityManager.PriotitizedAbilities.Add(917);
 
             if (EnemyExpandFrame >= 1000000
-                && tyr.EnemyStrategyAnalyzer.Expanded)
+                && Expanded.Get().Detected)
                 EnemyExpandFrame = tyr.Frame;
             
             if ((DoubleRoboAllIn || FourGateDetected)
@@ -327,7 +328,7 @@ namespace Tyr.Builds.Protoss
             }
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (Count(UnitTypes.PROBE) >= 24
                 && Count(UnitTypes.NEXUS) < 2
@@ -345,7 +346,7 @@ namespace Tyr.Builds.Protoss
             {
                 if (Minerals() >= 150
                     && Gas() >= 150
-                    && !Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
+                    && !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
                     && Count(UnitTypes.COLOSUS) > 0)
                 {
                     agent.Order(1097);
@@ -354,17 +355,17 @@ namespace Tyr.Builds.Protoss
             else if (agent.Unit.UnitType == UnitTypes.TWILIGHT_COUNSEL)
             {
 
-                if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
+                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
                      && Minerals() >= 150
                      && Gas() >= 150
                     && Completed(UnitTypes.STALKER) > 0)
                     agent.Order(1593);
-                else if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
+                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
                     && Minerals() >= 100
                     && Gas() >= 100
                     && Completed(UnitTypes.ADEPT) > 0)
                     agent.Order(1594);
-                else if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
+                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
                          && Minerals() >= 100
                          && Gas() >= 100
                          && Completed(UnitTypes.ZEALOT) > 0)

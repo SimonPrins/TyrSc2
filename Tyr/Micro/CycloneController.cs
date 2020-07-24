@@ -14,33 +14,33 @@ namespace Tyr.Micro
             if (agent.Unit.UnitType != UnitTypes.CYCLONE)
                 return false;
 
-            if (agent.Unit.Orders != null && agent.Unit.Orders.Count >= 2 && (!LockOnFrame.ContainsKey(agent.Unit.Tag) || Tyr.Bot.Frame - LockOnFrame[agent.Unit.Tag] >= 22.4 * 15))
+            if (agent.Unit.Orders != null && agent.Unit.Orders.Count >= 2 && (!LockOnFrame.ContainsKey(agent.Unit.Tag) || Bot.Bot.Frame - LockOnFrame[agent.Unit.Tag] >= 22.4 * 15))
             {
                 if (!LockOnFrame.ContainsKey(agent.Unit.Tag))
-                    LockOnFrame.Add(agent.Unit.Tag, Tyr.Bot.Frame);
+                    LockOnFrame.Add(agent.Unit.Tag, Bot.Bot.Frame);
                 else
-                    LockOnFrame[agent.Unit.Tag] = Tyr.Bot.Frame;
+                    LockOnFrame[agent.Unit.Tag] = Bot.Bot.Frame;
             }
 
-            if (LockOnFrame.ContainsKey(agent.Unit.Tag) && Tyr.Bot.Frame - LockOnFrame[agent.Unit.Tag] < 22.4 * 16)
-                Tyr.Bot.DrawSphere(agent.Unit.Pos);
+            if (LockOnFrame.ContainsKey(agent.Unit.Tag) && Bot.Bot.Frame - LockOnFrame[agent.Unit.Tag] < 22.4 * 16)
+                Bot.Bot.DrawSphere(agent.Unit.Pos);
 
-            if (LockOnFrame.ContainsKey(agent.Unit.Tag) && Tyr.Bot.Frame - LockOnFrame[agent.Unit.Tag] < 11)
+            if (LockOnFrame.ContainsKey(agent.Unit.Tag) && Bot.Bot.Frame - LockOnFrame[agent.Unit.Tag] < 11)
                 return true;
-            bool lockedOn = LockOnFrame.ContainsKey(agent.Unit.Tag) && Tyr.Bot.Frame - LockOnFrame[agent.Unit.Tag] < 22.4 * 16;
+            bool lockedOn = LockOnFrame.ContainsKey(agent.Unit.Tag) && Bot.Bot.Frame - LockOnFrame[agent.Unit.Tag] < 22.4 * 16;
 
             if (!lockedOn)
                 return false;
 
 
 
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (!UnitTypes.CanAttackGround(enemy.UnitType))
                     continue;
                 if (agent.DistanceSq(enemy) <= 12 * 12)
                 {
-                    agent.Order(Abilities.MOVE, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation));
+                    agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
                     return true;
                 }
             }

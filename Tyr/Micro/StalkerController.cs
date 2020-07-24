@@ -11,11 +11,11 @@ namespace Tyr.Micro
             if (agent.Unit.UnitType != UnitTypes.STALKER)
                 return false;
 
-            if (agent.Unit.Shield <= 1 && !agent.Unit.BuffIds.Contains(3687) && Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(87))
+            if (agent.Unit.Shield <= 1 && !agent.Unit.BuffIds.Contains(3687) && Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(87))
             {
                 Unit closestEnemy = null;
                 float dist = 12 * 12;
-                foreach (Unit enemy in Tyr.Bot.Enemies())
+                foreach (Unit enemy in Bot.Bot.Enemies())
                 {
                     if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                         continue;
@@ -30,7 +30,7 @@ namespace Tyr.Micro
 
                 if (closestEnemy != null)
                 {
-                    PotentialHelper potential = new PotentialHelper(agent.Unit.Pos, 2);
+                    PotentialHelper potential = new PotentialHelper(agent.Unit.Pos, 7);
                     potential.From(closestEnemy.Pos);
                     agent.Order(Abilities.BLINK, potential.Get());
                     return true;

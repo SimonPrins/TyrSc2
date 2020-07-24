@@ -15,14 +15,14 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            if (Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ADEPT) >= 2 && Tyr.Bot.Frame <= 22.4 * 60 * 4)
+            if (Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ADEPT) >= 2 && Bot.Bot.Frame <= 22.4 * 60 * 4)
             {
                 int closeAdepts = 0;
-                foreach (Unit enemy in Tyr.Bot.Enemies())
+                foreach (Unit enemy in Bot.Bot.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.ADEPT)
                         continue;
-                    if (SC2Util.DistanceSq(enemy.Pos, Tyr.Bot.MapAnalyzer.StartLocation) >= 50 * 50)
+                    if (SC2Util.DistanceSq(enemy.Pos, Bot.Bot.MapAnalyzer.StartLocation) >= 50 * 50)
                         continue;
                     closeAdepts++;
                 }

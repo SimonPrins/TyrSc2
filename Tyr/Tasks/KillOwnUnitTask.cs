@@ -22,12 +22,12 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.UnitManager.Agents.ContainsKey(TargetTag);
+            return Bot.Bot.UnitManager.Agents.ContainsKey(TargetTag);
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
-            if (!Tyr.Bot.UnitManager.Agents.ContainsKey(TargetTag))
+            if (!Bot.Bot.UnitManager.Agents.ContainsKey(TargetTag))
             {
                 Clear();
                 return;

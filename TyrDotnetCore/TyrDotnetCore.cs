@@ -6,7 +6,7 @@ namespace TyrDotnetCore
     {
         static void Main(string[] args)
         {
-            Program.MyRace = SC2APIProtocol.Race.Protoss;
+            Program.MyRace = SC2APIProtocol.Race.Terran;
             Program.Run(args);
         }
     }

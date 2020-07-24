@@ -44,13 +44,13 @@ namespace Tyr.Micro
             if (!LeashedFrom.Contains(agent.Unit.UnitType))
                 return false;
 
-            if (agent.DistanceSq(Tyr.Bot.MapAnalyzer.StartLocation) < 40 * 40)
+            if (agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) < 40 * 40)
                 return false;
             float dist;
 
             Point2D retreatTo = null;
             dist = 15 * 15;
-            foreach (Agent ally in Tyr.Bot.UnitManager.Agents.Values)
+            foreach (Agent ally in Bot.Bot.UnitManager.Agents.Values)
             {
                 if (!LeashedTo.Contains(ally.Unit.UnitType))
                     continue;

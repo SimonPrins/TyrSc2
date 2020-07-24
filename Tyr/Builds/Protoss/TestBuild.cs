@@ -17,7 +17,7 @@ namespace Tyr.Builds.Protoss
         {
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             /*
             FileUtil.Debug("Zealot: \n" + UnitTypes.LookUp[UnitTypes.ZEALOT]);
@@ -37,8 +37,20 @@ namespace Tyr.Builds.Protoss
         float LastEnergy;
         string buffs = "";
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
+            foreach (SC2APIProtocol.Action action in Bot.Bot.Observation.Actions)
+            {
+                if (action.ActionRaw == null)
+                    continue;
+                if (action.ActionRaw.UnitCommand == null)
+                    continue;
+                //if (action.ActionRaw.UnitCommand.TargetWorldSpacePos == null)
+                //    continue;
+                DebugUtil.WriteLine(action.ActionRaw.UnitCommand.ToString());
+                //DebugUtil.WriteLine("Pos: " + action.ActionRaw.UnitCommand.TargetWorldSpacePos + " ability: " + action.ActionRaw.UnitCommand.AbilityId);
+            }
+            /*
             foreach (Agent agent in tyr.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType == UnitTypes.IMMORTAL)
@@ -71,6 +83,7 @@ namespace Tyr.Builds.Protoss
                     }
                 }
             }
+            */
         }
     }
 }

@@ -3,6 +3,7 @@ using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Managers;
 using Tyr.Micro;
+using Tyr.StrategyAnalysis;
 using Tyr.Tasks;
 
 namespace Tyr.Builds.Protoss
@@ -22,7 +23,7 @@ namespace Tyr.Builds.Protoss
             return "TwoBaseRobo";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             tyr.TaskManager.Add(defenseTask);
             tyr.TaskManager.Add(attackTask);
@@ -62,7 +63,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => { return Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected; });
+            result.If(() => { return Lifting.Get().Detected; });
             result += new BuildingStep(UnitTypes.GATEWAY);
             result += new BuildingStep(UnitTypes.ASSIMILATOR);
             result += new BuildingStep(UnitTypes.CYBERNETICS_CORE);
@@ -88,7 +89,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => { return expansion.Owner == Tyr.Bot.PlayerId; });
+            result.If(() => { return expansion.Owner == Bot.Bot.PlayerId; });
             result.Building(UnitTypes.FORGE);
             result.Building(UnitTypes.PYLON, expansion);
             result.If(() => { return Completed(expansion, UnitTypes.PYLON) > 0; });
@@ -101,7 +102,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            Point2D shieldBatteryPos = Tyr.Bot.MapAnalyzer.Walk(NaturalDefensePos, Tyr.Bot.MapAnalyzer.EnemyDistances, 3);
+            Point2D shieldBatteryPos = Bot.Bot.MapAnalyzer.Walk(NaturalDefensePos, Bot.Bot.MapAnalyzer.EnemyDistances, 3);
 
             result.Building(UnitTypes.PYLON);
             result.Building(UnitTypes.GATEWAY);
@@ -132,21 +133,21 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (Count(UnitTypes.ZEALOT) + Count(UnitTypes.ADEPT) + Count(UnitTypes.STALKER) + Count(UnitTypes.COLOSUS) + Count(UnitTypes.IMMORTAL) >= attackTask.RequiredSize)
                 Attacking = true;
 
-            if (tyr.EnemyStrategyAnalyzer.FourRaxDetected
+            if (FourRax.Get().Detected
                 || (tyr.Frame >= 22.4 * 85 && !tyr.EnemyStrategyAnalyzer.NoProxyTerranConfirmed && tyr.TargetManager.PotentialEnemyStartLocations.Count == 1)
-                || tyr.EnemyStrategyAnalyzer.ReaperRushDetected)
+                || ReaperRush.Get().Detected)
             {
                 SmellCheese = true;
                 defenseTask.MainDefenseRadius = 21;
             }
 
-            if (!tyr.PreviousEnemyStrategies.TerranTech 
-                && (tyr.PreviousEnemyStrategies.ReaperRush || tyr.PreviousEnemyStrategies.FourRax))
+            if (!TerranTech.Get().DetectedPreviously
+                && (ReaperRush.Get().DetectedPreviously || FourRax.Get().DetectedPreviously))
                 SmellCheese = true;
 
             if (tyr.EnemyRace == Race.Zerg && !PokeTask.Stopped)
@@ -174,18 +175,18 @@ namespace Tyr.Builds.Protoss
                         agent.Order(Abilities.CANCEL);
             }
 
-            if (tyr.EnemyStrategyAnalyzer.BioDetected)
+            if (Bio.Get().Detected)
                 DefendMech = false;
-            else if (tyr.EnemyStrategyAnalyzer.MechDetected)
+            else if (Mech.Get().Detected)
                 DefendMech = true;
-            else if (tyr.PreviousEnemyStrategies.Bio)
+            else if (Bio.Get().DetectedPreviously)
                 DefendMech = false;
-            else if (tyr.PreviousEnemyStrategies.Mech)
+            else if (Mech.Get().DetectedPreviously)
                 DefendMech = true;
             else DefendMech = false;
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (Count(UnitTypes.PROBE) >= 24
                 && Count(UnitTypes.NEXUS) < 2
@@ -271,7 +272,7 @@ namespace Tyr.Builds.Protoss
             {
                 if (Minerals() >= 150
                     && Gas() >= 150
-                    && !Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
+                    && !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(50)
                     && !DefendMech
                     && Count(UnitTypes.COLOSUS) > 0)
                 {
@@ -280,12 +281,12 @@ namespace Tyr.Builds.Protoss
             }
             else if (agent.Unit.UnitType == UnitTypes.TWILIGHT_COUNSEL)
             {
-                if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
+                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
                     && Minerals() >= 100
                     && Gas() >= 100
                     && !DefendMech)
                     agent.Order(1594);
-                else if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
+                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(87)
                      && Minerals() >= 150
                      && Gas() >= 150)
                     agent.Order(1593);

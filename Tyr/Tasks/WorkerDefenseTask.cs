@@ -19,6 +19,7 @@ namespace Tyr.Tasks
         private Unit target;
         public bool OnlyDefendInsideMain = false;
         private bool DefendProxy;
+        private bool DefendNydus;
         private bool CannonsFinished;
 
         public WorkerDefenseTask(Base b) : base(7)
@@ -30,7 +31,7 @@ namespace Tyr.Tasks
         {
             if (Tasks.Count == 0)
             {
-                foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Bot.BaseManager.Bases)
                 {
                     WorkerDefenseTask task = new WorkerDefenseTask(b);
                     Tasks.Add(task);
@@ -40,7 +41,7 @@ namespace Tyr.Tasks
             foreach (Task task in Tasks)
             {
                 task.Stopped = false;
-                Tyr.Bot.TaskManager.Add(task);
+                Bot.Bot.TaskManager.Add(task);
             }
         }
 
@@ -68,7 +69,7 @@ namespace Tyr.Tasks
             int combatEnemies = 0;
             float distance = DefenseRadius * DefenseRadius + 1;
 
-            bool mainDefense = Base == Tyr.Bot.BaseManager.Main;
+            bool mainDefense = Base == Bot.Bot.BaseManager.Main;
             if (mainDefense)
                 distance = 1000 * 1000;
             else if (Base.ResourceCenter != null && Base.ResourceCenter.Unit.UnitType == UnitTypes.PLANETARY_FORTRESS)
@@ -77,19 +78,20 @@ namespace Tyr.Tasks
             Dictionary<uint, int> enemyCounts = new Dictionary<uint, int>();
 
             DefendProxy = false;
+            DefendNydus = false;
 
             int combatUnits = 0;
-            foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
                 if (UnitTypes.CombatUnitTypes.Contains(agent.Unit.UnitType))
                     combatUnits++;
             bool alreadyDefended = combatUnits >= 5;
 
-            if (Base.Owner != Tyr.Bot.PlayerId)
+            if (Base.Owner != Bot.Bot.PlayerId)
             {
                 Clear();
                 return false;
             }
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (unit.IsFlying)
                     continue;
@@ -106,7 +108,7 @@ namespace Tyr.Tasks
                     || unit.UnitType == UnitTypes.CHANGELING_ZERGLING_WINGS)
                     continue;
 
-                bool enemyInMain = Tyr.Bot.MapAnalyzer.MainAndPocketArea[(int)unit.Pos.X, (int)unit.Pos.Y];
+                bool enemyInMain = Bot.Bot.MapAnalyzer.MainAndPocketArea[(int)unit.Pos.X, (int)unit.Pos.Y];
 
                 if ((OnlyDefendInsideMain || mainDefense) && !enemyInMain)
                     continue;
@@ -114,14 +116,19 @@ namespace Tyr.Tasks
                 float newDist = SC2Util.DistanceSq(unit.Pos, Base.BaseLocation.Pos);
                 
 
-                if (Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZEALOT) + Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER) == 0 && !alreadyDefended && (newDist < CannonDefenseRadius * CannonDefenseRadius + 1 || (enemyInMain && mainDefense)))
+                if (Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZEALOT) + Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER) == 0 && !alreadyDefended && (newDist < CannonDefenseRadius * CannonDefenseRadius + 1 || (enemyInMain && mainDefense)))
                 {
-                    if (UnitTypes.BuildingTypes.Contains(unit.UnitType))
+                    if (UnitTypes.BuildingTypes.Contains(unit.UnitType)
+                            || unit.UnitType == UnitTypes.NYDUS_CANAL)
                     {
                         DefendProxy = true;
+                        if (unit.UnitType == UnitTypes.NYDUS_CANAL)
+                            DefendNydus = true;
                         totalEnemies++;
                         if (unit.BuildProgress >= 0.95 
-                            && (unit.UnitType == UnitTypes.PHOTON_CANNON || unit.UnitType == UnitTypes.SPINE_CRAWLER))
+                            && (unit.UnitType == UnitTypes.PHOTON_CANNON 
+                            || unit.UnitType == UnitTypes.SPINE_CRAWLER
+                            || unit.UnitType == UnitTypes.NYDUS_CANAL))
                         {
                             Clear();
                             return false;
@@ -177,7 +184,7 @@ namespace Tyr.Tasks
             {
                 int myCombatUnits = 0;
                 bool enoughDefenses = false;
-                foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+                foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
                     if (UnitTypes.CombatUnitTypes.Contains(agent.Unit.UnitType))
                     {
                         myCombatUnits++;
@@ -198,8 +205,10 @@ namespace Tyr.Tasks
 
             if (target != null && totalEnemies == 1 && UnitTypes.WorkerTypes.Contains(target.UnitType))
                 desiredDefenders = 1;
-            else if (Tyr.Bot.EnemyStrategyAnalyzer.WorkerRushDetected)
+            else if (StrategyAnalysis.WorkerRush.Get().Detected)
                 desiredDefenders = totalEnemies;
+            else if (DefendNydus)
+                desiredDefenders = 3 * totalEnemies + 5;
             else
                 desiredDefenders = 3 * totalEnemies + (DefendProxy ? 2 : 0);
 
@@ -223,7 +232,7 @@ namespace Tyr.Tasks
             return enemyCounts[unitType];
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (Units.Count > 0)
                 tyr.DrawText("Defending workers: " + Units.Count);

@@ -16,16 +16,16 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.Frame >= 800;
+            return Bot.Bot.Frame >= 800;
         }
 
         public override void Add(Agent agent)
         {
             base.Add(agent);
-            agent.Order(Abilities.MOVE, SC2Util.Point(Tyr.Bot.GameInfo.StartRaw.MapSize.X / 2, Tyr.Bot.GameInfo.StartRaw.MapSize.Y / 2));
+            agent.Order(Abilities.MOVE, SC2Util.Point(Bot.Bot.GameInfo.StartRaw.MapSize.X / 2, Bot.Bot.GameInfo.StartRaw.MapSize.Y / 2));
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
         }
     }

@@ -15,26 +15,26 @@ namespace Tyr.Micro
             if (agent.Unit.WeaponCooldown == 0)
                 return false;
 
-            float dist = 11 * 11;
+            float dist = 12 * 12;
             Unit fleeTarget = null;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (!UnitTypes.CanAttackAir(enemy.UnitType))
                     continue;
 
                 float newDist = agent.DistanceSq(enemy);
 
-                if (!enemy.IsFlying && newDist >= 9 * 9)
+                if (!enemy.IsFlying && newDist >= 10.5 * 10.5)
                     continue;
-                if (newDist < dist)
-                {
-                    fleeTarget = enemy;
-                    dist = newDist;
-                }
+                if (newDist >= dist)
+                    continue;
+                fleeTarget = enemy;
+                dist = newDist;
             }
 
             if (fleeTarget != null)
             {
+                Bot.Bot.DrawLine(agent, fleeTarget.Pos);
                 if (RetreatPos != null)
                     agent.Flee(fleeTarget.Pos, RetreatPos);
                 else

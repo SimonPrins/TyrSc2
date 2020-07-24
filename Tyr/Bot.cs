@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using SC2API_CSharp;
 using SC2APIProtocol;
 using Tyr.Agents;
 using Tyr.BuildingPlacement;
 using Tyr.Builds;
 using Tyr.Builds.Protoss;
-using Tyr.Builds.Terran;
-using Tyr.Builds.Zerg;
+using Tyr.buildSelection;
 using Tyr.BuildSelection;
 using Tyr.Managers;
 using Tyr.MapAnalysis;
 using Tyr.Micro;
+using Tyr.Plugins;
 using Tyr.Util;
 
 namespace Tyr
@@ -37,7 +38,8 @@ namespace Tyr
         public int Frame { get; private set; }
         public MapAnalyzer MapAnalyzer { get; internal set; } = new MapAnalyzer();
         public EnemyStrategyAnalyzer EnemyStrategyAnalyzer = new EnemyStrategyAnalyzer();
-        public PreviousEnemyStrategies PreviousEnemyStrategies = new PreviousEnemyStrategies();
+
+        public List<Plugin> Plugins = new List<Plugin>();
 
         public int ReservedMinerals;
         public int ReservedGas;
@@ -63,10 +65,11 @@ namespace Tyr
         public NexusAbilityManager NexusAbilityManager = new NexusAbilityManager();
         public OrbitalAbilityManager OrbitalAbilityManager = new OrbitalAbilityManager();
 
+        public MapEnum Map;
 
         public static Tyr Bot { get; internal set; }
 
-        public Build Build { get; internal set; }
+        public Build Build;
 
         public bool Monday { get; set; }
         private bool Day9Sent = false;
@@ -89,13 +92,19 @@ namespace Tyr
 
         List<long> Times = new List<long>();
 
-        private BuildSelector BuildSelector = new ProbabilitySelector();
+        public BuildsProvider BuildsProvider = new ProbotsBuildsProvider();
+        public BuildSelector BuildSelector = new RotateSelector();
 
-        public int TournamentRound;
+        public int VersionNumber = 1;
 
         public string GameVersion;
+        public bool AllowChat = true;
+        public bool AllowGG = true;
+        public bool ProbotsChatMessages = false;
 
         public bool OldMapData;
+        private int SendTempestText = -1;
+        public bool ArchonMode = false;
 
         public Tyr()
         {
@@ -120,13 +129,50 @@ namespace Tyr
                 if (observation.Observation == null)
                     return actions;
 
-                if (Frame == 1)
+                if (ProbotsChatMessages)
+                {
+
+                    if (Observation.Chat != null && SendTempestText == -1)
+                    {
+                        foreach (ChatReceived chat in Observation.Chat)
+                        {
+                            if (chat.PlayerId == PlayerId)
+                                continue;
+                            if (chat.Message.ToLower().Contains("op strat detected"))
+                                SendTempestText = Frame + 67;
+                        }
+                    }
+                    if (Frame == (int)(22.4 * 30))
+                    {
+                        if (EnemyRace == Race.Terran
+                            && !StrategyAnalysis.Cyclone.Get().DetectedPreviously
+                            && !StrategyAnalysis.Banshee.Get().DetectedPreviously
+                            && !StrategyAnalysis.Marauder.Get().DetectedPreviously)
+                        {
+                            Chat("Tempests are not OP. They are perfectly balanced, as all things should be.");
+                        }
+                        else
+                        {
+                            List<string> messages = new List<string>() {
+                        "Fun isn't something one considers when balancing the universe.",
+                        "I am inevitable.",
+                        "The hardeset choices require the strongest wills."};
+                            int message = new System.Random().Next(messages.Count);
+                            Chat(messages[message]);
+                        }
+                    }
+                }
+                else if (Frame == 1)
                     Chat(Monday ? "Happy monday! :D" : "Good luck, have fun! :D");
-                
+
+
                 Observation = observation;
 
                 ReservedMinerals = 0;
                 ReservedGas = 0;
+
+                foreach (Plugin plugin in Plugins)
+                    plugin.OnFrame();
 
                 EnemyStrategyAnalyzer.OnFrame(this);
 
@@ -292,6 +338,8 @@ namespace Tyr
 
         private bool CheckSurrender()
         {
+            if (!AllowGG)
+                return false;
             int buildings = 0;
             int health = 0;
             int shield = 0;
@@ -332,7 +380,8 @@ namespace Tyr
         {
             Action action = new Action();
             action.ActionChat = new ActionChat() { Message = message };
-            actions.Add(action);
+            if (AllowChat)
+                actions.Add(action);
         }
 
         private void printActions()
@@ -367,17 +416,53 @@ namespace Tyr
             }
         }
 
+        public void OnInitialize()
+        {
+            foreach (System.Type pluginType in typeof(Plugin).Assembly.GetTypes().Where(type => typeof(Plugin).IsAssignableFrom(type)))
+            {
+                if (pluginType.IsAbstract)
+                    continue;
+                Plugin plugin = (Plugin)pluginType.GetConstructor(new System.Type[0]).Invoke(new object[0]);
+                Plugins.Add(plugin);
+            }
+            foreach (Plugin plugin in Plugins)
+                plugin.OnInitialize();
+        }
+
         public void OnStart(ResponseGameInfo gameInfo, ResponseData data, ResponsePing pingResponse, ResponseObservation observation, uint playerId, string opponentID)
         {
+            ArchonMode = Settings.ArchonMode();
+            
             Observation = observation;
             GameInfo = gameInfo;
+
+
+            foreach (MapEnum map in System.Enum.GetValues(typeof(MapEnum)))
+            {
+                if (MapNameMatches(map))
+                {
+                    System.Console.WriteLine("Setting map name to: " + map.ToString());
+                    GameInfo.MapName = map.ToString();
+                    Map = map;
+                    break;
+                }
+            }
+
             PlayerId = playerId;
             Data = data;
-            UnitTypes.LoadData(data);
+
+            if (!Settings.MapAllowed(GameInfo.MapName))
+            {
+                DebugUtil.WriteLine("Tyr does not support the map " + GameInfo.MapName + ". If Tyr should accept this map as well, you can add the line 'map " + GameInfo.MapName + "' to the settings.txt file.");
+                FileUtil.Log("Tyr does not support the map " + GameInfo.MapName + ". If Tyr should accept this map as well, you can add the line 'map " + GameInfo.MapName + "' to the settings.txt file.");
+                System.Console.ReadLine();
+                throw new System.Exception("Tyr does not support the map " + GameInfo.MapName + ". If Tyr should accept this map as well, you can add the line 'map " + GameInfo.MapName + "' to the settings.txt file.");
+            }
 
             GameVersion = pingResponse.GameVersion;
             OldMapData = SC2Util.IsVersionBefore("4.9.3");
             DebugUtil.WriteLine("Game version: " + pingResponse.GameVersion);
+            UnitTypes.LoadData(data);
 
             OpponentID = opponentID;
 
@@ -394,12 +479,14 @@ namespace Tyr
             TargetManager.OnStart(this);
             BaseManager.OnStart(this);
 
+            foreach (Plugin plugin in Plugins)
+                plugin.OnStart();
+
             Build = DetermineBuild();
             Build.InitializeTasks();
             Build.OnStart(this);
 
             FileUtil.Register("started " + EnemyRace + " " + Build.Name());
-
 
             Managers.Add(UnitManager);
             Managers.Add(EnemyManager);
@@ -419,6 +506,34 @@ namespace Tyr
                 Managers.Add(OrbitalAbilityManager);
         }
 
+        private bool MapNameMatches(MapEnum map)
+        {
+            string enumName = map.ToString();
+            List<string> mapWords = new List<string>();
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            for (int i = 0; i < enumName.Length; i++)
+            {
+                if (enumName[i] >= 'A' && enumName[i] <= 'Z')
+                {
+                    if (sb.Length > 0)
+                        mapWords.Add(sb.ToString());
+                    sb = new System.Text.StringBuilder();
+                    sb.Append((char)(enumName[i] - 'A' + 'a'));
+                }
+                else
+                    sb.Append(enumName[i]);
+            }
+            if (sb.Length > 0)
+                mapWords.Add(sb.ToString());
+
+            string lowercaseMapName = GameInfo.MapName.ToLower();
+
+            foreach (string mapWord in mapWords)
+                if (!lowercaseMapName.Contains(mapWord))
+                    return false;
+            return true;
+        }
+
         private Build DetermineBuild()
         {
             if (FixedBuild != null)
@@ -429,266 +544,20 @@ namespace Tyr
 
 
             string[] lines = FileUtil.ReadResultsFile();
-            PreviousEnemyStrategies.Load(lines);
+            EnemyStrategyAnalyzer.Load(lines);
 
-            List<Build> options;
-
-            if (MyRace == Race.Protoss)
-                options = ProtossBuilds();
-            else if (MyRace == Race.Zerg)
-                options = ZergBuilds();
-            else if (MyRace == Race.Terran)
-                options = TerranBuilds();
-            else
-                options = null;
-
+            List<Build> options = BuildsProvider.GetBuilds(this, lines);
             return BuildSelector.Select(options, lines);
-        }
-
-        public List<Build> ZergBuilds()
-        {
-            List<Build> options = new List<Build>();
-
-            if (EnemyRace == Race.Protoss)
-            {
-                options.Add(new MassZergling() { AllowHydraTransition = true });
-                options.Add(new MacroHydra());
-                options.Add(new RushDefense());
-            }
-            else if (EnemyRace == Race.Terran)
-            {
-                options.Add(new MassZergling() { AllowHydraTransition = true });
-                options.Add(new MacroHydra());
-                options.Add(new RushDefense());
-            }
-            else if (EnemyRace == Race.Zerg)
-            {
-                options.Add(new RoachRavager());
-                options.Add(new MacroHydra());
-                options.Add(new RushDefense());
-            }
-            else
-            {
-                options.Add(new MassZergling() { AllowHydraTransition = true });
-                options.Add(new MacroHydra());
-                options.Add(new RushDefense());
-            }
-
-            return options;
-        }
-
-        public List<Build> ProtossBuilds()
-        {
-            List<Build> options = new List<Build>();
-            if (EnemyRace == Race.Terran)
-            {
-                options.Add(new PvTStalkerImmortal());
-                options.Add(new TempestProxy() { UseCloseHideLocation = false, DefendingStalker = true });
-                options.Add(new PvPAdeptAllIn());
-                options.Add(new DoubleRoboProxy());
-            }
-            else if (EnemyRace == Race.Zerg)
-            {
-                options.Add(new PvZStalkerImmortal());
-                options.Add(new TempestProxy() { UseCloseHideLocation = false, DefendingStalker = true });
-                options.Add(new PvPAdeptAllIn());
-                options.Add(new DoubleRoboProxy());
-            }
-            else if (EnemyRace == Race.Protoss)
-            {
-                options.Add(new PvPStalkerImmortal());
-                options.Add(new TempestProxy() { UseCloseHideLocation = false, DefendingStalker = true });
-                options.Add(new PvPAdeptAllIn());
-                options.Add(new DoubleRoboProxy());
-            }
-            else
-            {
-                options.Add(new OneBaseStalker());
-                options.Add(new TempestProxy() { UseCloseHideLocation = false, DefendingStalker = true });
-                options.Add(new PvPAdeptAllIn());
-                options.Add(new DoubleRoboProxy());
-            }
-
-            /*
-            List<Build> options = new List<Build>();
-            if (EnemyRace == Race.Terran)
-            {
-                bool microMachineSigns = StrategyAnalysis.Banshee.Get().DetectedPreviously || StrategyAnalysis.Battlecruiser.Get().DetectedPreviously;
-                bool tychusSigns = StrategyAnalysis.Marauder.Get().DetectedPreviously || StrategyAnalysis.Medivac.Get().DetectedPreviously;
-                if (!tychusSigns && (microMachineSigns || TournamentRound == 2))
-                {
-                    options.Add(new OneBaseStalkerImmortal());
-                    options.Add(new AntiMicro());
-                } else
-                {
-                    options.Add(new OneBaseStalkerImmortal());
-                    options.Add(new DoubleRoboProxy());
-                }
-            }
-            else if (EnemyRace == Race.Zerg)
-            {
-                options.Add(new OneBaseStalkerImmortal() { StartZealots = true });
-            }
-            else if (EnemyRace == Race.Protoss)
-            {
-                if (TournamentRound == 1)
-                {
-                    options.Add(new PvPRushDefense());
-                }
-                else if (TournamentRound == 2)
-                {
-                    options.Add(new OneBaseStalkerImmortal() { DoubleRobo = true, EarlySentry = false, UseCombatSim = false, AggressiveMicro = true });
-                    options.Add(new MassTempest());
-                } else if (TournamentRound == 3)
-                {
-                    options.Add(new OneBaseStalkerImmortal() { DoubleRobo = true, EarlySentry = false, UseCombatSim = false, AggressiveMicro = true });
-                    options.Add(new DoubleRoboProxy());
-                    options.Add(new MassTempest());
-                }
-            }
-            else
-            {
-                options.Add(new OneBaseStalker());
-            }
-            */
-
-            return options;
-        }
-
-        public List<Build> TerranBuilds()
-        {
-            List<Build> options = new List<Build>();
-
-            if (EnemyRace == Race.Terran)
-            {
-                options.Add(new BunkerRush());
-                options.Add(new TankPushProbots());
-                options.Add(new MarineRush());
-            }
-            else if (EnemyRace == Race.Zerg)
-            {
-                options.Add(new BunkerRush());
-                options.Add(new MechTvZ());
-                options.Add(new MarineRush());
-            }
-            else if (EnemyRace == Race.Protoss)
-            {
-                options.Add(new BunkerRush());
-                options.Add(new TankPushTvPProbots());
-                options.Add(new MarineRush());
-            }
-            else
-            {
-                options.Add(new BunkerRush());
-                options.Add(new TankPushProbots());
-                options.Add(new MarineRush());
-            }
-
-            return options;
-        }
-
-        private void ProcessTournamentFile()
-        {
-            string[] tournamentLines = FileUtil.ReadTournamentFile();
-            Dictionary<string, int> gamesPlayed = new Dictionary<string, int>();
-            Dictionary<string, string> races = new Dictionary<string, string>();
-
-            if (EnemyRace == Race.Protoss || tournamentLines.Length >= 2)
-                FileUtil.LogTournament("started " + OpponentID + " " + EnemyRace);
-
-            for (int i = tournamentLines.Length - 1; i >= 0; i--)
-            {
-                string line = tournamentLines[i];
-                if (!line.StartsWith("started"))
-                    continue;
-                string[] words = line.Split(' ');
-                if (!races.ContainsKey(words[1]))
-                    races.Add(words[1], words[2]);
-                if (gamesPlayed.ContainsKey(words[1]))
-                    continue;
-
-                int count = 1;
-                for (int j = i - 1; j >= 0; j--)
-                {
-                    string line2 = tournamentLines[j];
-                    if (!line2.StartsWith("started"))
-                        continue;
-
-                    string[] words2 = line2.Split(' ');
-                    if (gamesPlayed.ContainsKey(words[1]))
-                        continue;
-
-                    if (words[1] != words2[1])
-                        break;
-                    count++;
-                }
-                gamesPlayed.Add(words[1], count);
-            }
-
-            bool previousZergOpponent = false;
-            foreach (string id in gamesPlayed.Keys)
-            {
-                if (id == OpponentID)
-                    continue;
-                if (races.ContainsKey(id) && races[id] != "Zerg")
-                    continue;
-                if (gamesPlayed[id] >= 3)
-                {
-                    previousZergOpponent = true;
-                    break;
-                }
-            }
-
-            bool previousTerranOpponent = false;
-            foreach (string id in gamesPlayed.Keys)
-            {
-                if (id == OpponentID)
-                    continue;
-                if (races.ContainsKey(id) && races[id] != "Terran")
-                    continue;
-                DebugUtil.WriteLine("Terran games played: " + gamesPlayed[id]);
-                if (gamesPlayed[id] >= 3)
-                {
-                    previousTerranOpponent = true;
-                    break;
-                }
-            }
-            bool previousProtossOpponent2 = false;
-            bool previousProtossOpponent3 = false;
-            foreach (string id in gamesPlayed.Keys)
-            {
-                if (id == OpponentID)
-                    continue;
-                if (races.ContainsKey(id) && races[id] != "Protoss")
-                    continue;
-                if (gamesPlayed[id] >= 3)
-                {
-                    if (previousProtossOpponent3)
-                        previousProtossOpponent2 = true;
-                    else
-                        previousProtossOpponent3 = true;
-                } else if (gamesPlayed[id] >= 2)
-                    previousProtossOpponent2 = true;
-            }
-
-            if (EnemyRace == Race.Zerg)
-                TournamentRound = 3;
-            else if (previousTerranOpponent)
-                TournamentRound = 3;
-            else if (previousProtossOpponent2 && previousProtossOpponent3)
-                TournamentRound = 3;
-            else if (previousProtossOpponent2 || previousProtossOpponent3)
-                TournamentRound = 2;
-            else
-                TournamentRound = 1;
-
-            DebugUtil.WriteLine("Tournament round: " + TournamentRound);
-
         }
 
         public List<Unit> Enemies()
         {
             return EnemyManager.GetEnemies();
+        }
+
+        public List<Unit> CloakedEnemies()
+        {
+            return EnemyManager.GetCloakedEnemies();
         }
 
         public Dictionary<ulong, Agent>.ValueCollection Units()

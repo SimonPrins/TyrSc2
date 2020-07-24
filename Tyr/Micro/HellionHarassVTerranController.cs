@@ -11,15 +11,15 @@ namespace Tyr.Micro
             if (agent.Unit.UnitType != UnitTypes.HELLION)
                 return false;
             
-            if (agent.DistanceSq(Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]) >= 12 * 12)
+            if (agent.DistanceSq(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) >= 12 * 12)
             {
-                agent.Order(Abilities.MOVE, Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]);
+                agent.Order(Abilities.MOVE, Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]);
                 return true;
             }
 
             float distance = 8 * 8;
             Unit killTarget = null;
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (unit.UnitType != UnitTypes.SCV
                     && unit.UnitType != UnitTypes.MARINE
@@ -37,12 +37,12 @@ namespace Tyr.Micro
                 if (agent.Unit.WeaponCooldown == 0)
                     return false;
                 else if (distance <= 4 * 4)
-                    agent.Order(Abilities.MOVE, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation));
+                    agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
                 agent.Order(Abilities.MOVE, agent.Toward(killTarget, 4));
                 return true;
             }
 
-            agent.Order(Abilities.MOVE, Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]);
+            agent.Order(Abilities.MOVE, Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]);
             return true;
         }
     }

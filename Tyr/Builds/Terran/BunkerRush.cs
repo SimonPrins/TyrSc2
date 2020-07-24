@@ -36,7 +36,7 @@ namespace Tyr.Builds.Terran
             return "BunkerRush";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new YamatoController());
@@ -62,10 +62,10 @@ namespace Tyr.Builds.Terran
             result.If(() =>
             {
                 return Build.FoodUsed()
-                    + Tyr.Bot.UnitManager.Completed(UnitTypes.COMMAND_CENTER)
-                    + Tyr.Bot.UnitManager.Completed(UnitTypes.BARRACKS) * 2
-                    + Tyr.Bot.UnitManager.Completed(UnitTypes.FACTORY) * 2
-                    + Tyr.Bot.UnitManager.Completed(UnitTypes.STARPORT) * 2
+                    + Bot.Bot.UnitManager.Completed(UnitTypes.COMMAND_CENTER)
+                    + Bot.Bot.UnitManager.Completed(UnitTypes.BARRACKS) * 2
+                    + Bot.Bot.UnitManager.Completed(UnitTypes.FACTORY) * 2
+                    + Bot.Bot.UnitManager.Completed(UnitTypes.STARPORT) * 2
                     >= Build.ExpectedAvailableFood() - 2;
             });
             result.If(() => Count(UnitTypes.SUPPLY_DEPOT) >= 1);
@@ -100,7 +100,7 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             BunkerRushTask.Task.Stopped = tyr.Frame < 22.4 * 10;
             BunkerRushTask.Task.DesiredWorkers = Count(UnitTypes.BARRACKS) >= 2 || Count(UnitTypes.BUNKER) > 0 ? 3 : 2;
@@ -147,7 +147,7 @@ namespace Tyr.Builds.Terran
                     task.Stopped = tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 10;
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.BARRACKS)
             {

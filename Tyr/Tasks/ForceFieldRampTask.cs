@@ -21,14 +21,14 @@ namespace Tyr.Tasks
 
         public override bool DoWant(Agent agent)
         {
-            return true;
+            return agent.Unit.Energy >= 50;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
             if (units.Count == 0)
-                result.Add(new UnitDescriptor() { Pos = Tyr.Bot.MapAnalyzer.GetMainRamp(), Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.SENTRY } });
+                result.Add(new UnitDescriptor() { Pos = Bot.Bot.MapAnalyzer.GetMainRamp(), Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.SENTRY } });
             return result;
         }
 
@@ -37,8 +37,12 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
+            for (int i = Units.Count - 1; i >= 0; i--)
+                if (Units[i].Unit.Energy < 50)
+                    ClearAt(i);
+
             if (IdlePos == null)
                 IdlePos = new PotentialHelper(tyr.MapAnalyzer.GetMainRamp(), 6)
                     .To(tyr.MapAnalyzer.StartLocation)
@@ -49,20 +53,26 @@ namespace Tyr.Tasks
                 return;
             int enemyCount = 0;
             bool enemyAtRamp = false;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.MARINE
                     && enemy.UnitType != UnitTypes.SCV
                     && enemy.UnitType != UnitTypes.ZEALOT
                     && enemy.UnitType != UnitTypes.STALKER
-                    && enemy.UnitType != UnitTypes.ZERGLING)
+                    && enemy.UnitType != UnitTypes.ZERGLING
+                    && enemy.UnitType != UnitTypes.ROACH
+                    && enemy.UnitType != UnitTypes.HYDRALISK
+                    && enemy.UnitType != UnitTypes.MARAUDER)
                     continue;
                 if (SC2Util.DistanceSq(enemy.Pos, ramp) > 40 * 40)
                     continue;
                 if (SC2Util.DistanceSq(enemy.Pos, ramp) < 8 * 8)
                     enemyAtRamp = true;
                 if (enemy.UnitType == UnitTypes.ZEALOT
-                    || enemy.UnitType == UnitTypes.STALKER)
+                    || enemy.UnitType == UnitTypes.STALKER
+                    || enemy.UnitType == UnitTypes.ROACH
+                    || enemy.UnitType == UnitTypes.HYDRALISK
+                    || enemy.UnitType == UnitTypes.MARAUDER)
                     enemyCount += 2;
                 else
                     enemyCount++;
@@ -70,7 +80,10 @@ namespace Tyr.Tasks
             if (enemyCount < 6 || !enemyAtRamp)
             {
                 foreach (Agent agent in units)
-                    agent.Order(Abilities.MOVE, IdlePos);
+                {
+                    if (agent.DistanceSq(IdlePos) >= 4 * 4)
+                        agent.Order(Abilities.MOVE, IdlePos);
+                }
                 return;
             }
             if (tyr.Frame - PreviousForceFieldFrame < 22.4 * 10)

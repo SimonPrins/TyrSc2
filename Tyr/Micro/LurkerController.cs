@@ -18,11 +18,11 @@ namespace Tyr.Micro
             bool closeEnemy = false;
             if (!LastEnemyFrame.ContainsKey(agent.Unit.Tag))
                 LastEnemyFrame.Add(agent.Unit.Tag, 0);
-            else if (Tyr.Bot.Frame - LastEnemyFrame[agent.Unit.Tag] <= 22.4 * KeepLurkerBurrowedTime)
+            else if (Bot.Bot.Frame - LastEnemyFrame[agent.Unit.Tag] <= 22.4 * KeepLurkerBurrowedTime)
                 closeEnemy = true;
 
 
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (enemy.IsFlying)
                     continue;
@@ -35,7 +35,7 @@ namespace Tyr.Micro
                 if (agent.DistanceSq(enemy) <= 8 * 8)
                 {
                     closeEnemy = true;
-                    LastEnemyFrame[agent.Unit.Tag] = Tyr.Bot.Frame;
+                    LastEnemyFrame[agent.Unit.Tag] = Bot.Bot.Frame;
                     break;
                 }
             }

@@ -25,7 +25,7 @@ namespace Tyr.Util
             Unit target = null;
             int priority = -2;
             float health = 0;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (SC2Util.DistanceSq(enemy.Pos, agent.Unit.Pos) > maxRangeSq)
                     continue;
@@ -62,14 +62,14 @@ namespace Tyr.Util
 
         public int GetDamageDealt(ulong tag)
         {
-            if (FrameUpdated < Tyr.Bot.Frame || !DamageDealt.ContainsKey(tag))
+            if (FrameUpdated < Bot.Bot.Frame || !DamageDealt.ContainsKey(tag))
                 return 0;
             else return DamageDealt[tag];
         }
 
         public void AddDamageDealt(ulong tag, int damage)
         {
-            if (FrameUpdated < Tyr.Bot.Frame)
+            if (FrameUpdated < Bot.Bot.Frame)
                 DamageDealt = new Dictionary<ulong, int>();
 
             if (!DamageDealt.ContainsKey(tag))

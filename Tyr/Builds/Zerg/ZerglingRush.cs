@@ -17,7 +17,7 @@ namespace Tyr.Builds.Zerg
             return "ZerglingRush";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             tyr.TaskManager.Add(new TimingAttackTask() { RequiredSize = 6 });
             tyr.TaskManager.Add(WorkerScoutTask);
@@ -26,7 +26,7 @@ namespace Tyr.Builds.Zerg
             MicroControllers.Add(new FleeBroodlingsController());
             MicroControllers.Add(new TargetFireController(GetPrioritiesCloseRange()) { MoveWhenNoTarget = false });
             MicroControllers.Add(new TargetFireController(GetPriorities()));
-            foreach (Base b in Tyr.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Bot.BaseManager.Bases)
             {
                 QueenInjectTask queenInjectTask = new QueenInjectTask(b);
                 tyr.TaskManager.Add(queenInjectTask);
@@ -75,7 +75,7 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (tyr.TargetManager.PotentialEnemyStartLocations.Count <= 1)
             {
@@ -107,7 +107,7 @@ namespace Tyr.Builds.Zerg
             }
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             /*
             if (UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))

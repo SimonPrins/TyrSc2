@@ -3,6 +3,7 @@ using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Managers;
 using Tyr.Micro;
+using Tyr.StrategyAnalysis;
 using Tyr.Tasks;
 using Tyr.Util;
 
@@ -17,7 +18,7 @@ namespace Tyr.Builds.Zerg
 
         private bool GoingUltras = false;
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new TargetFireController(GetPriorities()));
@@ -55,15 +56,15 @@ namespace Tyr.Builds.Zerg
         {
             BuildList result = new BuildList();
 
-            result.If(() => Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.DARK_TEMPLAR)
-                + Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.DARK_SHRINE)
-                + Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MEDIVAC)
-                + Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.LIBERATOR)
-                + Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.LIBERATOR_AG)
-                + Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0);
-            foreach (Base b in Tyr.Bot.BaseManager.Bases)
+            result.If(() => Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.DARK_TEMPLAR)
+                + Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.DARK_SHRINE)
+                + Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MEDIVAC)
+                + Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.LIBERATOR)
+                + Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.LIBERATOR_AG)
+                + Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0);
+            foreach (Base b in Bot.Bot.BaseManager.Bases)
                 if (b != Main && b != Natural)
-                    result.Building(UnitTypes.SPORE_CRAWLER, b, () => b.ResourceCenterFinishedFrame >= 0 && Tyr.Bot.Frame - b.ResourceCenterFinishedFrame >= 224);
+                    result.Building(UnitTypes.SPORE_CRAWLER, b, () => b.ResourceCenterFinishedFrame >= 0 && Bot.Bot.Frame - b.ResourceCenterFinishedFrame >= 224);
 
             return result;
         }
@@ -75,7 +76,7 @@ namespace Tyr.Builds.Zerg
             result.If(() => !GoingUltras);
             result.If(() => Count(UnitTypes.DRONE) >= 55 && Count(UnitTypes.HATCHERY) >= 4 && Count(UnitTypes.EVOLUTION_CHAMBER) >= 2);
             result.Morph(UnitTypes.ZERGLING, 130);
-            result.If(() => !Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeType.AdrenalGlands));
+            result.If(() => !Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeType.AdrenalGlands));
             result.Morph(UnitTypes.ZERGLING, 30);
 
             return result;
@@ -150,13 +151,13 @@ namespace Tyr.Builds.Zerg
         private BuildList AntiLifting()
         {
             BuildList result = new BuildList();
-            result.If(() => { return Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected; });
+            result.If(() => { return Lifting.Get().Detected; });
             result.Building(UnitTypes.EXTRACTOR, 2);
             result.Building(UnitTypes.SPIRE);
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             DefenseTask.AirDefenseTask.MaxDefenseRadius = 100;
             DefenseTask.AirDefenseTask.ExpandDefenseRadius = 25;
@@ -174,7 +175,7 @@ namespace Tyr.Builds.Zerg
                 TimingAttackTask.Task.RequiredSize = 12;
                 TimingAttackTask.Task.RetreatSize = 4;
             }
-            else if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeType.AdrenalGlands))
+            else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(UpgradeType.AdrenalGlands))
             {
                 TimingAttackTask.Task.RequiredSize = 160;
                 TimingAttackTask.Task.RetreatSize = 0;

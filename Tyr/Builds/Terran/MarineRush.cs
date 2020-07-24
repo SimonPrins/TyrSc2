@@ -28,7 +28,7 @@ namespace Tyr.Builds.Terran
             return "MarineRush";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new DodgeBallController());
@@ -51,10 +51,10 @@ namespace Tyr.Builds.Terran
             result.If(() =>
             {
                 return Build.FoodUsed()
-                    + Tyr.Bot.UnitManager.Completed(UnitTypes.COMMAND_CENTER)
-                    + Tyr.Bot.UnitManager.Completed(UnitTypes.BARRACKS) * 2
-                    + Tyr.Bot.UnitManager.Completed(UnitTypes.FACTORY) * 2
-                    + Tyr.Bot.UnitManager.Completed(UnitTypes.STARPORT) * 2
+                    + Bot.Bot.UnitManager.Completed(UnitTypes.COMMAND_CENTER)
+                    + Bot.Bot.UnitManager.Completed(UnitTypes.BARRACKS) * 2
+                    + Bot.Bot.UnitManager.Completed(UnitTypes.FACTORY) * 2
+                    + Bot.Bot.UnitManager.Completed(UnitTypes.STARPORT) * 2
                     >= Build.ExpectedAvailableFood() - 2;
             });
             result.If(() => Count(UnitTypes.SUPPLY_DEPOT) >= 2);
@@ -77,7 +77,7 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             RepairTask.Task.WallIn = WallIn;
             if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 20)
@@ -88,7 +88,7 @@ namespace Tyr.Builds.Terran
                 task.Stopped = tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 10;
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))
             {

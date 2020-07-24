@@ -26,7 +26,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             HashSet<ulong> deadAgents = new HashSet<ulong>();
             foreach (ulong tag in PhasedFrame.Keys)

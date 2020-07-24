@@ -25,7 +25,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -43,25 +43,25 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.Frame > 100;
+            return Bot.Bot.Frame > 0;
         }
 
         public Point2D GetHideLocation()
         {
             if (HideLocation == null)
             {
-                if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+                if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
                     return null;
 
-                Point2D enemyMain = Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0];
-                Point2D enemyNatural = Tyr.Bot.MapAnalyzer.GetEnemyNatural().Pos;
+                Point2D enemyMain = Bot.Bot.TargetManager.PotentialEnemyStartLocations[0];
+                Point2D enemyNatural = Bot.Bot.MapAnalyzer.GetEnemyNatural().Pos;
 
                 PotentialHelper potential = new PotentialHelper(enemyNatural, 30);
                 potential.From(enemyMain);
                 Point2D closeTo = potential.Get();
                 
                 float dist = 10000;
-                foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Bot.BaseManager.Bases)
                 {
                     float newDist = SC2Util.DistanceSq(closeTo, b.BaseLocation.Pos);
                     
@@ -75,23 +75,32 @@ namespace Tyr.Tasks
                     dist = newDist;
                     HideLocation = b.BaseLocation.Pos;
                 }
-                if (Tyr.Bot.EnemyRace == Race.Zerg)
+                if (Bot.Bot.EnemyRace == Race.Zerg)
                 {
                     potential = new PotentialHelper(HideLocation, 15);
-                    potential.To(Tyr.Bot.MapAnalyzer.StartLocation);
+                    potential.To(Bot.Bot.MapAnalyzer.StartLocation);
                     HideLocation = potential.Get();
                 }
             }
             return HideLocation;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
+
             BuildingType pylonType = BuildingType.LookUp[UnitTypes.PYLON];
             BuildingType gatewayType = BuildingType.LookUp[UnitTypes.GATEWAY];
             Point2D hideLocation = GetHideLocation();
             if (hideLocation == null)
                 return;
+            foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
+            {
+                if (unit.Alliance != Alliance.Neutral)
+                    continue;
+                if (SC2Util.DistanceSq(unit.Pos, hideLocation) > 20 * 20)
+                    continue;
+                tyr.DrawText("Neutral structure: "  + unit.UnitType);
+            }
             Agent pylon = null;
             Agent gateway = null;
             int gatewayCount = 0;
@@ -128,7 +137,7 @@ namespace Tyr.Tasks
             List<BuildRequest> doneRequests = new List<BuildRequest>();
             foreach (BuildRequest request in BuildRequests)
             {
-                if (request.worker != null && !Tyr.Bot.UnitManager.Agents.ContainsKey(request.worker.Unit.Tag))
+                if (request.worker != null && !Bot.Bot.UnitManager.Agents.ContainsKey(request.worker.Unit.Tag))
                     request.worker = null;
                 if (request.worker == null)
                 {

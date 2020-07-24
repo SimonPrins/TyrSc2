@@ -21,12 +21,12 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
         {
-            return agent.IsWorker && units.Count == 0 && Tyr.Bot.Frame >= MoveOutFrame;
+            return agent.IsWorker && units.Count == 0 && Bot.Bot.Frame >= MoveOutFrame;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -41,7 +41,7 @@ namespace Tyr.Tasks
             return HideLocation != null;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (CurrentOrder < RequiredBuildings.Count)
             {

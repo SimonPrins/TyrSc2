@@ -16,7 +16,7 @@ namespace Tyr.Micro
             {
                 Unit targetBaneling = null;
                 float distance = 9;
-                foreach (Unit enemy in Tyr.Bot.Enemies())
+                foreach (Unit enemy in Bot.Bot.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.BANELING)
                         continue;
@@ -31,7 +31,7 @@ namespace Tyr.Micro
                 {
                     agent.Order(Abilities.ATTACK, targetBaneling.Tag);
                     BanelingHunter = agent.Unit.Tag;
-                    BanelingHunterFrame = Tyr.Bot.Frame;
+                    BanelingHunterFrame = Bot.Bot.Frame;
                     return true;
                 }
                 BanelingHunterFrame = 0;
@@ -41,16 +41,16 @@ namespace Tyr.Micro
             PotentialHelper potential = new PotentialHelper(agent.Unit.Pos);
             potential.Magnitude = 4;
             bool flee = false;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
                 if (enemy.UnitType == UnitTypes.BANELING && agent.DistanceSq(enemy) <= 3 * 3)
                 {
                     potential.From(enemy.Pos);
                     flee = true;
-                    if (Tyr.Bot.Frame - BanelingHunterFrame >= 2)
+                    if (Bot.Bot.Frame - BanelingHunterFrame >= 2)
                     {
                         agent.Order(Abilities.ATTACK, enemy.Tag);
                         BanelingHunter = agent.Unit.Tag;
-                        BanelingHunterFrame = Tyr.Bot.Frame;
+                        BanelingHunterFrame = Bot.Bot.Frame;
                     }
                 }
 

@@ -11,12 +11,12 @@ namespace Tyr.Tasks
 
         public TrippleScoutTask() : base(10)
         {
-            done = Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count == 1;
+            done = Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count == 1;
         }
 
         public override bool DoWant(Agent agent)
         {
-            return agent.IsWorker && units.Count < Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count && Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1;
+            return agent.IsWorker && units.Count < Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count && Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1;
         }
 
         public override bool IsNeeded()
@@ -24,7 +24,7 @@ namespace Tyr.Tasks
             return !done;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 0)
             {

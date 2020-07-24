@@ -27,7 +27,7 @@ namespace Tyr.Tasks
             else
                 Task.Target = target;
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -44,10 +44,10 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.Frame >= StartFrame;
+            return Bot.Bot.Frame >= StartFrame;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (NeedsScouting == null)
                 NeedsScouting = (ArrayBoolGrid)tyr.MapAnalyzer.MainAndPocketArea.GetAnd(tyr.MapAnalyzer.StartArea.Invert());

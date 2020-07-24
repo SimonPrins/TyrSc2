@@ -19,7 +19,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -32,7 +32,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (baseWorkers == null)
             {
@@ -101,6 +101,25 @@ namespace Tyr.Tasks
 
         private void TransferWorkers(List<BaseWorkers> myBases)
         {
+            if (myBases.Count > 0)
+            {
+                while (unassignedWorkers.Count > 0)
+                {
+                    float dist = 10000000;
+                    BaseWorkers picked = null;
+                    foreach (BaseWorkers myBase in myBases)
+                    {
+                        float newDist = unassignedWorkers[unassignedWorkers.Count - 1].DistanceSq(myBase.Base.BaseLocation.Pos);
+                        if (newDist >= dist)
+                            continue;
+                        dist = newDist;
+                        picked = myBase;
+                    }
+                    picked.Add(unassignedWorkers[unassignedWorkers.Count - 1]);
+                    unassignedWorkers.RemoveAt(unassignedWorkers.Count - 1);
+                }
+            }
+
             int workersPerBase;
             if (myBases.Count == 0)
                 workersPerBase = 0;
@@ -143,7 +162,7 @@ namespace Tyr.Tasks
             foreach (BaseWorkers workers in myBases)
             {
                 while (workers.MineralWorkers.Count > 0 &&
-                    (workers.Count > workersPerBase + 1
+                    (workers.Count > workersPerBase + 2
                     || (workers.Count > workers.Base.BaseLocation.MineralFields.Count * 2 && !saturated)))
                 {
                     unassignedWorkers.Add(workers.MineralWorkers[workers.Count - 1]);
@@ -162,11 +181,13 @@ namespace Tyr.Tasks
                 }
             }
             
+            /*
             for (int i = 0; myBases.Count > 0 && unassignedWorkers.Count > 0; i++)
             {
                 myBases[i % myBases.Count].Add(unassignedWorkers[unassignedWorkers.Count - 1]);
                 unassignedWorkers.RemoveAt(unassignedWorkers.Count - 1);
             }
+            */
         }
 
 

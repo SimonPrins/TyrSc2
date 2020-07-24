@@ -10,6 +10,8 @@ namespace Tyr.Tasks
     {
         public static ArmyObserverTask Task = new ArmyObserverTask();
 
+        public HashSet<uint> IgnoreAllyUnitTypes = new HashSet<uint>();
+
         public ArmyObserverTask() : base(7)
         { }
 
@@ -26,7 +28,7 @@ namespace Tyr.Tasks
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
-            result.Add(new UnitDescriptor() { Pos = Tyr.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.OBSERVER } });
+            result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.OBSERVER } });
             return result;
         }
 
@@ -35,10 +37,12 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (units.Count == 0)
                 return;
+
+
 
             Agent observer = Units[0];
 
@@ -65,6 +69,25 @@ namespace Tyr.Tasks
                 return;
             }
 
+            Unit followEnemy = null;
+            dist = 12 * 12;
+            foreach (Unit enemy in tyr.CloakedEnemies())
+            {
+                float newDist = units[0].DistanceSq(enemy);
+
+                if (newDist < dist)
+                {
+                    followEnemy = enemy;
+                    dist = newDist;
+                }
+            }
+            if (followEnemy != null)
+            {
+                tyr.DrawLine(observer.Unit.Pos, followEnemy.Pos);
+                observer.Order(Abilities.MOVE, followEnemy.Pos);
+                return;
+            }
+
             if (tyr.Frame % 5 == 0)
                 return;
 
@@ -75,6 +98,9 @@ namespace Tyr.Tasks
             foreach (Agent agent in tyr.UnitManager.Agents.Values)
             {
                 if (agent.Unit.Tag == observer.Unit.Tag)
+                    continue;
+
+                if (IgnoreAllyUnitTypes.Contains(agent.Unit.UnitType))
                     continue;
 
                 if (!UnitTypes.CombatUnitTypes.Contains(agent.Unit.UnitType))

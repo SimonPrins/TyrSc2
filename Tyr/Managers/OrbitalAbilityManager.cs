@@ -10,7 +10,7 @@ namespace Tyr.Managers
 
         public int SaveEnergy = 0;
 
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
             if (tyr.GameInfo.PlayerInfo[(int)tyr.PlayerId - 1].RaceActual != Race.Terran)
                 return;
@@ -26,7 +26,7 @@ namespace Tyr.Managers
 
             ScanCommand scanCommand = null;
             foreach (ScanCommand potentialScan in ScanCommands)
-                if (potentialScan.FromFrame <= Tyr.Bot.Frame)
+                if (potentialScan.FromFrame <= Bot.Bot.Frame)
                 {
                     scanCommand = potentialScan;
                     break;
@@ -42,12 +42,12 @@ namespace Tyr.Managers
             if (orbital.Unit.Energy < 50 + SaveEnergy)
                 return;
 
-            if (Tyr.Bot.Frame % 4 != 0)
+            if (Bot.Bot.Frame % 4 != 0)
                 return;
 
             float distance = 1000000;
             Unit target = null;
-            foreach (Unit mineral in Tyr.Bot.Observation.Observation.RawData.Units)
+            foreach (Unit mineral in Bot.Bot.Observation.Observation.RawData.Units)
             {
                 if (!UnitTypes.MineralFields.Contains(mineral.UnitType))
                     continue;

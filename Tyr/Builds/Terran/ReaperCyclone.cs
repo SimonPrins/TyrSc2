@@ -2,6 +2,7 @@
 using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Micro;
+using Tyr.StrategyAnalysis;
 using Tyr.Tasks;
 using Tyr.Util;
 
@@ -30,7 +31,7 @@ namespace Tyr.Builds.Terran
             return "ReaperCyclone";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new YamatoController());
             MicroControllers.Add(new TankController());
@@ -54,10 +55,10 @@ namespace Tyr.Builds.Terran
             result.If(() =>
             {
                 return Build.FoodUsed()
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.COMMAND_CENTER)
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.BARRACKS) * 2
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.FACTORY) * 2
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.STARPORT) * 2
+                    + Bot.Bot.UnitManager.Count(UnitTypes.COMMAND_CENTER)
+                    + Bot.Bot.UnitManager.Count(UnitTypes.BARRACKS) * 2
+                    + Bot.Bot.UnitManager.Count(UnitTypes.FACTORY) * 2
+                    + Bot.Bot.UnitManager.Count(UnitTypes.STARPORT) * 2
                     >= Build.ExpectedAvailableFood() - 2
                     && Build.ExpectedAvailableFood() < 200;
             });
@@ -85,13 +86,13 @@ namespace Tyr.Builds.Terran
             result.Train(UnitTypes.RAVEN, 1, () => Completed(UnitTypes.BATTLECRUISER) >= 2);
             result.Train(UnitTypes.BATTLECRUISER, () => Completed(UnitTypes.FUSION_CORE) > 0);
             result.Upgrade(UpgradeType.YamatoCannon, () => Completed(UnitTypes.BATTLECRUISER) >= 2);
-            result.Train(UnitTypes.VIKING_FIGHTER, 10, () => Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected);
-            result.Train(UnitTypes.VIKING_FIGHTER, 10, () => Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected);
+            result.Train(UnitTypes.VIKING_FIGHTER, 10, () => Lifting.Get().Detected);
+            result.Train(UnitTypes.VIKING_FIGHTER, 10, () => Lifting.Get().Detected);
             result.Train(UnitTypes.LIBERATOR, 10);
             result.Train(UnitTypes.MARINE, () => 
-                       Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0
+                       Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0
                     || Gas() < 42
-                    || Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected);
+                    || Lifting.Get().Detected);
             result.Train(UnitTypes.REAPER, 16);
             result.Train(UnitTypes.MARINE);
 
@@ -111,12 +112,12 @@ namespace Tyr.Builds.Terran
             result.Building(UnitTypes.REFINERY);
             result.Building(UnitTypes.COMMAND_CENTER, () => Minerals() >= 550);
             result.Building(UnitTypes.REFINERY, 2);
-            result.If(() => Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected || Count(UnitTypes.REAPER) >= 5 || Gas() >= 150);
+            result.If(() => Lifting.Get().Detected || Count(UnitTypes.REAPER) >= 5 || Gas() >= 150);
             result.Building(UnitTypes.FACTORY);
             result.Building(UnitTypes.COMMAND_CENTER, () => Minerals() >= 550);
             result.Building(UnitTypes.COMMAND_CENTER, () => Minerals() >= 550);
             result.Building(UnitTypes.REFINERY, 4);
-            result.If(() => Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected || (Gas() >= 150 && Count(UnitTypes.COMMAND_CENTER) >= 2));
+            result.If(() => Lifting.Get().Detected || (Gas() >= 150 && Count(UnitTypes.COMMAND_CENTER) >= 2));
             result.Building(UnitTypes.STARPORT);
             result.Building(UnitTypes.FUSION_CORE, () => Completed(UnitTypes.STARPORT) > 0 && Gas() >= 300 && Minerals() >= 300);
             result.Building(UnitTypes.STARPORT, () => Count(UnitTypes.COMMAND_CENTER) >= 4 && Count(UnitTypes.FUSION_CORE) > 0 && Count(UnitTypes.BATTLECRUISER) > 0);
@@ -124,7 +125,7 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             tyr.OrbitalAbilityManager.SaveEnergy = 200;
 
@@ -139,7 +140,7 @@ namespace Tyr.Builds.Terran
                             continue;
 
                         Unit scanTarget = null;
-                        foreach (Unit enemy in Tyr.Bot.Enemies())
+                        foreach (Unit enemy in Bot.Bot.Enemies())
                         {
                             if (!UnitTypes.CanAttackGround(enemy.UnitType))
                                 continue;

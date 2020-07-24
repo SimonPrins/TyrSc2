@@ -13,7 +13,10 @@ namespace Tyr.BuildSelection
         public Build Select(List<Build> builds, string[] lines)
         {
             if (builds.Count == 1)
+            {
+                DebugUtil.WriteLine("Chosen build: " + builds[0].Name());
                 return builds[0];
+            }
 
             Dictionary<string, double> probabilities = new Dictionary<string, double>();
             foreach (Build option in builds)
@@ -26,7 +29,7 @@ namespace Tyr.BuildSelection
                 if (line.StartsWith("result "))
                 {
                     string[] words = line.Split(' ');
-                    if (words[1] != Tyr.Bot.EnemyRace.ToString())
+                    if (words[1] != Bot.Bot.EnemyRace.ToString())
                         continue;
                     if (!probabilities.ContainsKey(words[2]))
                         continue;
@@ -42,7 +45,7 @@ namespace Tyr.BuildSelection
                 else if (line.StartsWith("started"))
                 {
                     string[] words = line.Split(' ');
-                    if (words[1] != Tyr.Bot.EnemyRace.ToString())
+                    if (words[1] != Bot.Bot.EnemyRace.ToString())
                         continue;
                     if (!probabilities.ContainsKey(words[2]))
                         continue;

@@ -2,6 +2,7 @@
 using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Micro;
+using Tyr.StrategyAnalysis;
 using Tyr.Tasks;
 using Tyr.Util;
 
@@ -28,7 +29,7 @@ namespace Tyr.Builds.Terran
             return "ReaperRush";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new ReaperHarassController());
@@ -47,10 +48,10 @@ namespace Tyr.Builds.Terran
             result.If(() =>
             {
                 return Build.FoodUsed()
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.COMMAND_CENTER)
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.BARRACKS) * 2
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.FACTORY) * 2
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.STARPORT) * 2
+                    + Bot.Bot.UnitManager.Count(UnitTypes.COMMAND_CENTER)
+                    + Bot.Bot.UnitManager.Count(UnitTypes.BARRACKS) * 2
+                    + Bot.Bot.UnitManager.Count(UnitTypes.FACTORY) * 2
+                    + Bot.Bot.UnitManager.Count(UnitTypes.STARPORT) * 2
                     >= Build.ExpectedAvailableFood() - 2
                     && Build.ExpectedAvailableFood() < 200;
             });
@@ -70,9 +71,9 @@ namespace Tyr.Builds.Terran
             result.Train(UnitTypes.VIKING_FIGHTER, 10);
             result.If(() => Count(UnitTypes.REAPER) >= 2);
             result.Train(UnitTypes.MARINE, () => 
-                       Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0
+                       Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0
                     || Gas() < 42
-                    || Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected);
+                    || Lifting.Get().Detected);
             result.Train(UnitTypes.REAPER, 16);
             result.Train(UnitTypes.MARINE);
 
@@ -92,14 +93,14 @@ namespace Tyr.Builds.Terran
             result.Building(UnitTypes.REFINERY);
             result.Building(UnitTypes.BARRACKS);
             result.Building(UnitTypes.BARRACKS);
-            result.If(() => Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected || (Gas() >= 200 && Minerals() >= 250));
+            result.If(() => Lifting.Get().Detected || (Gas() >= 200 && Minerals() >= 250));
             result.Building(UnitTypes.FACTORY, () => Completed(UnitTypes.FACTORY_FLYING) == 0);
             result.Building(UnitTypes.STARPORT);
 
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             TimingAttackTask.Task.RequiredSize = 1;
             TimingAttackTask.Task.RetreatSize = 0;
@@ -107,12 +108,12 @@ namespace Tyr.Builds.Terran
             tyr.Surrendered = true;
             tyr.SurrenderedFrame = tyr.Frame + 1000000;
 
-            foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
                 if (agent.Unit.UnitType == UnitTypes.FACTORY)
                     agent.Order(485);
 
 
-            foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
                 if (agent.Unit.UnitType == UnitTypes.FACTORY_FLYING && tyr.Frame % 22 == 0)
                 {
                     Point2D a = SC2Util.Point(10, 10);

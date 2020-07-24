@@ -41,7 +41,7 @@ namespace Tyr.Micro
             Unit closeCannon = null;
             float dist = 9 * 9;
 
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (unit.UnitType != UnitTypes.PHOTON_CANNON)
                     continue;
@@ -56,7 +56,7 @@ namespace Tyr.Micro
             if (closeCannon == null)
                 return false;
 
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (unit.UnitType == UnitTypes.PHOTON_CANNON)
                     continue;

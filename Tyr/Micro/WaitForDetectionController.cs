@@ -14,7 +14,7 @@ namespace Tyr.Micro
                 return false;
             Agent closest = null;
             float dist = 1000000;
-            foreach (Agent ally in Tyr.Bot.UnitManager.Agents.Values)
+            foreach (Agent ally in Bot.Bot.UnitManager.Agents.Values)
             {
                 if (ally.Unit.UnitType != UnitTypes.OBSERVER)
                     continue;
@@ -34,7 +34,7 @@ namespace Tyr.Micro
                 return true;
             }
 
-            agent.Order(Abilities.MOVE, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation));
+            agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
             return true;
         }
     }

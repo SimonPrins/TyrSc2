@@ -2,6 +2,6 @@
 {
     public interface Manager
     {
-        void OnFrame(Tyr tyr);
+        void OnFrame(Bot tyr);
     }
 }

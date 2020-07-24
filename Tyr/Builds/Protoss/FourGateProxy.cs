@@ -27,17 +27,17 @@ namespace Tyr.Builds.Protoss
             ArmyObserverTask.Enable();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
-            if (Tyr.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Tyr.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Bot.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
             ProxyFourGateTask.Enable();
             ReaperDefenseTask = new DefenseSquadTask(Main, UnitTypes.STALKER);
             ReaperDefenseTask.MaxDefenders = 0;
             DefenseSquadTask.Enable(ReaperDefenseTask);
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(StalkerAttackNaturalController);
@@ -67,7 +67,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             tyr.NexusAbilityManager.PriotitizedAbilities.Add(1568);
             if (Completed(UnitTypes.OBSERVER) > 0
@@ -125,7 +125,7 @@ namespace Tyr.Builds.Protoss
             return total - alreadyBuilt >= robos;
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50
@@ -162,7 +162,7 @@ namespace Tyr.Builds.Protoss
                 }
                 else if (Completed(UnitTypes.STALKER) >= 4
                     && Minerals() >= 100
-                    && Tyr.Bot.EnemyRace == Race.Zerg
+                    && Bot.Bot.EnemyRace == Race.Zerg
                     && !Roach.Get().DetectedPreviously
                     && Count(UnitTypes.ZEALOT) < Count(UnitTypes.STALKER))
                 {

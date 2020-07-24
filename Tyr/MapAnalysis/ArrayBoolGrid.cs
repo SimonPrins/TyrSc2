@@ -10,6 +10,13 @@ namespace Tyr.MapAnalysis
         {
             data = new bool[width, height];
         }
+        public ArrayBoolGrid(BoolGrid other)
+        {
+            data = new bool[other.Width(), other.Height()];
+            for (int x = 0; x < Width(); x++)
+                for (int y = 0; y < Height(); y++)
+                    this[x, y] = other[x, y];
+        }
 
         public override BoolGrid Clone()
         {
@@ -27,19 +34,19 @@ namespace Tyr.MapAnalysis
 
         internal void Set(Point2D pos, bool val)
         {
-            data[(int)pos.X, (int)pos.Y] = val;
+            data[(int)pos.X, (int)pos.Y] =  Inverted ? !val : val;
         }
 
         public new bool this[Point2D pos]
         {
             get { return Get(pos); }
-            set { data[(int)pos.X, (int)pos.Y] = value; }
+            set { data[(int)pos.X, (int)pos.Y] = Inverted ? !value : value; }
         }
 
         public new bool this[int x, int y]
         {
             get { return Get(SC2Util.Point(x, y)); }
-            set { data[x, y] = value; }
+            set { data[x, y] = Inverted ? !value : value; }
         }
 
         public override int Width()

@@ -13,6 +13,7 @@ namespace Tyr.Micro
         public int CourageCount = 30;
         public float EnemyBaseRange = 0;
         public bool DefendHome = true;
+        public bool MoveToMain = false;
 
         public FearEnemyController(uint from, uint to, float range)
         {
@@ -47,22 +48,22 @@ namespace Tyr.Micro
             if (!Scared.Contains(agent.Unit.UnitType))
                 return false;
 
-            if (EnemyBaseRange > 0 && agent.DistanceSq(Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]) <= EnemyBaseRange * EnemyBaseRange)
+            if (EnemyBaseRange > 0 && agent.DistanceSq(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) <= EnemyBaseRange * EnemyBaseRange)
                 return false;
 
             int totalUnits = 0;
             foreach (uint type in Scared)
-                totalUnits += Tyr.Bot.UnitManager.Completed(type);
+                totalUnits += Bot.Bot.UnitManager.Completed(type);
             if (totalUnits >= CourageCount)
                 return false;
 
-            if (agent.DistanceSq(Tyr.Bot.MapAnalyzer.StartLocation) < 40 * 40 && DefendHome)
+            if (agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) < 40 * 40 && DefendHome)
                 return false;
             float dist;
 
             Point2D retreatFrom = null;
-            dist = 15 * 15;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            dist = Range * Range;
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (!Terror.Contains(enemy.UnitType))
                     continue;
@@ -76,7 +77,10 @@ namespace Tyr.Micro
             }
             if (retreatFrom != null && dist < Range * Range)
             {
-                agent.Order(Abilities.MOVE, agent.From(retreatFrom, 4));
+                if (MoveToMain)
+                    agent.Order(Abilities.MOVE, Bot.Bot.MapAnalyzer.StartLocation);
+                else
+                    agent.Order(Abilities.MOVE, agent.From(retreatFrom, 4));
                 return true;
             }
 

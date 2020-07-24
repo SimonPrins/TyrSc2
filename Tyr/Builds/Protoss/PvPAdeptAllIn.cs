@@ -22,12 +22,12 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
             ForwardProbeTask.Enable();
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(AdeptPhaseEnemyMainController);
             MicroControllers.Add(new AdeptKillWorkersController());
@@ -60,7 +60,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (!ChatMessageSent)
             {

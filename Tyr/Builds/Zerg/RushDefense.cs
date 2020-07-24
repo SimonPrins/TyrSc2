@@ -2,6 +2,7 @@
 using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Micro;
+using Tyr.StrategyAnalysis;
 using Tyr.Tasks;
 using Tyr.Util;
 
@@ -30,7 +31,7 @@ namespace Tyr.Builds.Zerg
             //WorkerRushDefenseTask.Enable();
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new RavagerController());
             MicroControllers.Add(new DodgeBallController());
@@ -59,7 +60,7 @@ namespace Tyr.Builds.Zerg
         private BuildList Overlords()
         {
             BuildList result = new BuildList();
-            result.If(() => { return !Tyr.Bot.EnemyStrategyAnalyzer.WorkerRushDetected || (FoodUsed() == ExpectedAvailableFood() && Count(UnitTypes.ZERGLING) >= 4) || Count(UnitTypes.ZERGLING) >= 6; });
+            result.If(() => { return !StrategyAnalysis.WorkerRush.Get().Detected || (FoodUsed() == ExpectedAvailableFood() && Count(UnitTypes.ZERGLING) >= 4) || Count(UnitTypes.ZERGLING) >= 6; });
             result.If(() => { return Count(UnitTypes.SPAWNING_POOL) > 0 && FoodUsed() >= ExpectedAvailableFood() - 2; });
             result.Morph(UnitTypes.OVERLORD, 25);
             return result;
@@ -70,7 +71,7 @@ namespace Tyr.Builds.Zerg
             BuildList result = new BuildList();
             result.If(() =>
             {
-                return Tyr.Bot.EnemyStrategyAnalyzer.WorkerRushDetected;
+                return StrategyAnalysis.WorkerRush.Get().Detected;
             });
             result.Morph(UnitTypes.DRONE, 2);
             result.Building(UnitTypes.SPAWNING_POOL);
@@ -83,10 +84,10 @@ namespace Tyr.Builds.Zerg
             BuildList result = new BuildList();
             result.If(() => {
 
-                if (!Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected)
+                if (!Lifting.Get().Detected)
                     return false;
                 // First destroy non-lifted buildings.
-                foreach (Unit enemy in Tyr.Bot.Enemies())
+                foreach (Unit enemy in Bot.Bot.Enemies())
                     if (UnitTypes.BuildingTypes.Contains(enemy.UnitType) && !enemy.IsFlying)
                         return false;
                 return true;
@@ -111,7 +112,7 @@ namespace Tyr.Builds.Zerg
             BuildList result = new BuildList();
             result.If(() =>
             {
-                return !Tyr.Bot.EnemyStrategyAnalyzer.WorkerRushDetected || Count(UnitTypes.ZERGLING) >= 10;
+                return !StrategyAnalysis.WorkerRush.Get().Detected || Count(UnitTypes.ZERGLING) >= 10;
             });
             result.Morph(UnitTypes.DRONE, 14);
             result.Building(UnitTypes.SPAWNING_POOL);
@@ -123,35 +124,35 @@ namespace Tyr.Builds.Zerg
             result.Morph(UnitTypes.ROACH, 6);
             result.If(() => { return Count(UnitTypes.LAIR) > 0; });
             result.Building(UnitTypes.EXTRACTOR);
-            result.Morph(UnitTypes.ROACH, 5, () => { return !Tyr.Bot.EnemyStrategyAnalyzer.ReaperRushDetected; });
+            result.Morph(UnitTypes.ROACH, 5, () => { return !ReaperRush.Get().Detected; });
             result.Morph(UnitTypes.OVERSEER);
             result.Building(UnitTypes.HYDRALISK_DEN);
-            result.Morph(UnitTypes.ROACH, 4, () => { return !Tyr.Bot.EnemyStrategyAnalyzer.ReaperRushDetected; } );
+            result.Morph(UnitTypes.ROACH, 4, () => { return !ReaperRush.Get().Detected; } );
             result.Morph(UnitTypes.HYDRALISK, 5);
             result.Morph(UnitTypes.OVERSEER);
             result.Morph(UnitTypes.HYDRALISK, 80);
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
-            WorkerScoutTask.Task.Stopped = tyr.Frame >= 40 * 22.4 || tyr.EnemyStrategyAnalyzer.WorkerRushDetected;
+            WorkerScoutTask.Task.Stopped = tyr.Frame >= 40 * 22.4 || StrategyAnalysis.WorkerRush.Get().Detected;
             if (WorkerScoutTask.Task.Stopped)
                 WorkerScoutTask.Task.Clear();
 
-            if (tyr.EnemyStrategyAnalyzer.WorkerRushDetected)
+            if (StrategyAnalysis.WorkerRush.Get().Detected)
                 foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                     task.DefenseRadius = 6;
 
-            DefenseTask.GroundDefenseTask.Stopped = tyr.EnemyStrategyAnalyzer.ReaperRushDetected && Completed(UnitTypes.HYDRALISK) + Completed(UnitTypes.ROACH) >= 25;
+            DefenseTask.GroundDefenseTask.Stopped = ReaperRush.Get().Detected && Completed(UnitTypes.HYDRALISK) + Completed(UnitTypes.ROACH) >= 25;
             if (DefenseTask.GroundDefenseTask.Stopped)
                 DefenseTask.GroundDefenseTask.Clear();
-            DefenseTask.AirDefenseTask.Stopped = tyr.EnemyStrategyAnalyzer.ReaperRushDetected && Completed(UnitTypes.HYDRALISK) + Completed(UnitTypes.ROACH) >= 25;
+            DefenseTask.AirDefenseTask.Stopped = ReaperRush.Get().Detected && Completed(UnitTypes.HYDRALISK) + Completed(UnitTypes.ROACH) >= 25;
             if (DefenseTask.AirDefenseTask.Stopped)
                 DefenseTask.AirDefenseTask.Clear();
 
             TimingAttackTask.Task.RetreatSize = 5;
-            TimingAttackTask.Task.RequiredSize = tyr.EnemyStrategyAnalyzer.ReaperRushDetected && !TimingAttackTask.Task.AttackSent ? 15 : 25;
+            TimingAttackTask.Task.RequiredSize = ReaperRush.Get().Detected && !TimingAttackTask.Task.AttackSent ? 15 : 25;
             TimingAttackTask.Task.DefendOtherAgents = false;
 
             DefenseTask.GroundDefenseTask.MainDefenseRadius = 20;
@@ -175,7 +176,7 @@ namespace Tyr.Builds.Zerg
             }
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))
             {
@@ -202,30 +203,30 @@ namespace Tyr.Builds.Zerg
             }
             else if (agent.Unit.UnitType == UnitTypes.HYDRALISK_DEN)
             {
-                if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(134)
+                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(134)
                     && Gas() >= 100
                     && Minerals() >= 100)
                     agent.Order(1282);
             }
             else if (agent.Unit.UnitType == UnitTypes.EVOLUTION_CHAMBER)
             {
-                if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(59)
-                    && !Tyr.Bot.UnitManager.ActiveOrders.Contains(1192))
+                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(59)
+                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1192))
                     agent.Order(1192);
-                else if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(56)
-                    && !Tyr.Bot.UnitManager.ActiveOrders.Contains(1189))
+                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(56)
+                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1189))
                     agent.Order(1189);
-                else if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(60)
-                    && !Tyr.Bot.UnitManager.ActiveOrders.Contains(1193))
+                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(60)
+                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1193))
                     agent.Order(1193);
-                else if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(57)
-                    && !Tyr.Bot.UnitManager.ActiveOrders.Contains(1190))
+                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(57)
+                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1190))
                     agent.Order(1190);
-                else if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(61)
-                    && !Tyr.Bot.UnitManager.ActiveOrders.Contains(1194))
+                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(61)
+                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1194))
                     agent.Order(1194);
-                else if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(58)
-                    && !Tyr.Bot.UnitManager.ActiveOrders.Contains(1191))
+                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(58)
+                    && !Bot.Bot.UnitManager.ActiveOrders.Contains(1191))
                     agent.Order(1191);
             }
         }

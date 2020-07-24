@@ -2,6 +2,7 @@
 using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Micro;
+using Tyr.StrategyAnalysis;
 using Tyr.Tasks;
 using Tyr.Util;
 
@@ -36,7 +37,7 @@ namespace Tyr.Builds.Zerg
             return ZergBuildUtil.GetDefenseBuild();
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new CorruptorController());
             MicroControllers.Add(new QueenTransfuseController());
@@ -76,14 +77,14 @@ namespace Tyr.Builds.Zerg
 
         private BuildList MainBuild()
         {
-            Point2D spinePos = Tyr.Bot.MapAnalyzer.Walk(NaturalDefensePos, Tyr.Bot.MapAnalyzer.EnemyDistances, 5);
+            Point2D spinePos = Bot.Bot.MapAnalyzer.Walk(NaturalDefensePos, Bot.Bot.MapAnalyzer.EnemyDistances, 5);
 
             BuildList result = new BuildList();
             //result.If(() => { return !SmellCheese; });
             result.Building(UnitTypes.HATCHERY, 2, () => { return Count(UnitTypes.HATCHERY) + Count(UnitTypes.LAIR) + Count(UnitTypes.HIVE) < 2; });
             result.Building(UnitTypes.SPAWNING_POOL);
             result.If(() => { return Count(UnitTypes.QUEEN) > 0; });
-            result.If(() => { return Completed(UnitTypes.HATCHERY) + Completed(UnitTypes.LAIR) >= 2 && Tyr.Bot.Frame >= 22.4 * 60 * 2; });
+            result.If(() => { return Completed(UnitTypes.HATCHERY) + Completed(UnitTypes.LAIR) >= 2 && Bot.Bot.Frame >= 22.4 * 60 * 2; });
             result.Building(UnitTypes.SPINE_CRAWLER, Natural, spinePos, 2);
             result.Building(UnitTypes.SPINE_CRAWLER, Natural, spinePos, 2, () => { return StalkerDefense; });
             result.Building(UnitTypes.ROACH_WARREN);
@@ -96,7 +97,7 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             TimingAttackTask.Task.RequiredSize = 32;
             TimingAttackTask.Task.RetreatSize = 10;
@@ -110,7 +111,7 @@ namespace Tyr.Builds.Zerg
             /*
             if ((!SmellCheese && tyr.Frame >= 22.4 * 60 * 1.5
                 && !tyr.EnemyStrategyAnalyzer.NoProxyGatewayConfirmed)
-                || (!SmellCheese && tyr.Frame < 22.4 * 60 * 1.5 && tyr.EnemyStrategyAnalyzer.ThreeGateDetected))
+                || (!SmellCheese && tyr.Frame < 22.4 * 60 * 1.5 && ThreeGate.Get().Detected))
             {
                 SmellCheese = true;
                 TimingAttackTask.RequiredSize = 18;
@@ -123,7 +124,7 @@ namespace Tyr.Builds.Zerg
                 CannonRush = true;
 
             if (tyr.Frame < 22.4 * 60 * 2 && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.CYBERNETICS_CORE) > 0
-                && tyr.EnemyStrategyAnalyzer.ThreeGateDetected)
+                && ThreeGate.Get().Detected)
             {
                 StalkerDefense = true;
                 DefenseTask.GroundDefenseTask.ExpandDefenseRadius = 13;
@@ -235,9 +236,9 @@ namespace Tyr.Builds.Zerg
                         CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.CORRUPTOR);
                     }
                     else if (Minerals() >= 100 && FoodUsed()
-                        + Tyr.Bot.UnitManager.Count(UnitTypes.HATCHERY) * 2
-                        + Tyr.Bot.UnitManager.Count(UnitTypes.LAIR) * 2
-                        + Tyr.Bot.UnitManager.Count(UnitTypes.HIVE) * 2
+                        + Bot.Bot.UnitManager.Count(UnitTypes.HATCHERY) * 2
+                        + Bot.Bot.UnitManager.Count(UnitTypes.LAIR) * 2
+                        + Bot.Bot.UnitManager.Count(UnitTypes.HIVE) * 2
                         >= ExpectedAvailableFood() - 2)
                     {
                         agent.Order(1344);
@@ -248,7 +249,7 @@ namespace Tyr.Builds.Zerg
             }
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))
             {

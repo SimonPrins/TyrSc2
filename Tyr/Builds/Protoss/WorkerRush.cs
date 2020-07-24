@@ -1,27 +1,42 @@
 ﻿using SC2APIProtocol;
+using System;
 using Tyr.Agents;
 using Tyr.Builds.BuildLists;
+using Tyr.StrategyAnalysis;
 using Tyr.Tasks;
+using Tyr.Util;
 
 namespace Tyr.Builds.Protoss
 {
     public class WorkerRush : Build
     {
-        private WorkerRushTask WorkerRushTask = new WorkerRushTask();
+        private WorkerRushTask WorkerRushTask;
         private int LastReinforcementsFrame = 0;
         private bool MessageSent = false;
+        public bool CounterJensiii = false;
+        public bool Recalled = false;
+        public bool BuildStalkers = false;
+
 
         public override string Name()
         {
             return "WorkerRush";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void InitializeTasks()
         {
-            tyr.TaskManager.Add(WorkerRushTask);
-            tyr.TaskManager.Add(new FlyerAttackTask() { RequiredSize = 3 });
-            tyr.TaskManager.Add(new ElevatorChaserTask());
+            base.InitializeTasks();
+            WorkerRushTask = CounterJensiii ? new WorkerRushJensiiTask() : new WorkerRushTask();
+            Bot.Bot.TaskManager.Add(WorkerRushTask);
+            Bot.Bot.TaskManager.Add(new FlyerAttackTask() { RequiredSize = 3 });
+            Bot.Bot.TaskManager.Add(new ElevatorChaserTask());
+            TimingAttackTask.Enable();
+            RecallTask.Enable();
+            DefenseTask.Enable();
+        }
 
+        public override void OnStart(Bot tyr)
+        {
             Set += ProtossBuildUtil.Pylons();
             Set += BuildPylonForPower();
             Set += BuildStargatesAgainstLifters();
@@ -31,7 +46,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => { return Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected; });
+            result.If(() => { return Lifting.Get().Detected; });
             result.If(() => { return Minerals() >= 300
                     && Count(UnitTypes.STARGATE) < 2
                     && Completed(UnitTypes.CYBERNETICS_CORE) > 0
@@ -45,19 +60,31 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.If(() => { return Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected; });
-            result += new BuildingStep(UnitTypes.GATEWAY);
-            result += new BuildingStep(UnitTypes.ASSIMILATOR);
-            result += new BuildingStep(UnitTypes.CYBERNETICS_CORE);
-            result += new BuildingStep(UnitTypes.ASSIMILATOR);
-            result += new BuildingStep(UnitTypes.STARGATE, 2);
+            result.If(() => Lifting.Get().Detected || Bot.Bot.Frame >= 22.4 * 60 * 10 || CounterWorkerRush.Get().Detected);
+            result.Building(UnitTypes.GATEWAY);
+            result.Building(UnitTypes.ASSIMILATOR);
+            result.Building(UnitTypes.CYBERNETICS_CORE);
+            result.Train(UnitTypes.STALKER, 10, () => BuildStalkers);
+            result.Building(UnitTypes.ASSIMILATOR, () => Count(UnitTypes.STALKER) > 0 || !BuildStalkers);
+            result.Building(UnitTypes.STARGATE, 2, () => Count(UnitTypes.STALKER) > 0 || !BuildStalkers);
 
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
-            if (tyr.EnemyStrategyAnalyzer.LiftingDetected)
+            if (Count(UnitTypes.STALKER) > 0)
+                BalanceGas();
+            else if (Gas() < 50)
+                GasWorkerTask.WorkersPerGas = 3;
+            else
+                GasWorkerTask.WorkersPerGas = 1;
+
+            TimingAttackTask.Task.RequiredSize = 1;
+            TimingAttackTask.Task.RetreatSize = 0;
+            TimingAttackTask.Task.ExcludeUnitTypes.Add(UnitTypes.VOID_RAY);
+
+            if (Lifting.Get().Detected)
             {
                 int surfaceEnemies = 0;
                 foreach (Unit unit in tyr.Enemies())
@@ -79,15 +106,50 @@ namespace Tyr.Builds.Protoss
                     }
 
             if (tyr.Frame - LastReinforcementsFrame >= 100
-                && WorkerTask.Task.Units.Count >= (tyr.EnemyStrategyAnalyzer.LiftingDetected ? 22 : 12)
-                && !tyr.EnemyStrategyAnalyzer.LiftingDetected)
+                && WorkerTask.Task.Units.Count >= (Lifting.Get().Detected ? 22 : 12)
+                && !Lifting.Get().Detected
+                && (!CounterWorkerRush.Get().Detected || tyr.Frame >= 22.4 * 120)
+                && (!CounterWorkerRush.Get().Detected || !BuildStalkers))
             {
                 LastReinforcementsFrame = tyr.Frame;
                 WorkerRushTask.TakeWorkers += 6;
             }
+            if (UseRecall())
+            {
+                RecallTask.Task.Location = new PotentialHelper(tyr.TargetManager.PotentialEnemyStartLocations[0], 8).To(Main.BaseLocation.Pos).Get();
+                Recalled = true;
+            }
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        private bool UseRecall()
+        {
+            if (Recalled)
+                return false;
+            int enemyDefendingWorkers = 0;
+            int enemyAttackingWorkers = 0;
+            foreach (Unit enemy in Bot.Bot.Enemies())
+            {
+                if (!UnitTypes.WorkerTypes.Contains(enemy.UnitType))
+                    continue;
+                if (SC2Util.DistanceSq(enemy.Pos, Bot.Bot.MapAnalyzer.StartLocation) <= 30 * 30)
+                    enemyAttackingWorkers++;
+                if (SC2Util.DistanceSq(enemy.Pos, Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) <= 30 * 30)
+                    enemyDefendingWorkers++;
+            }
+            if (Lifting.Get().Detected && enemyDefendingWorkers == 0)
+                return true;
+            if (CounterWorkerRush.Get().Detected 
+                && enemyDefendingWorkers == 0
+                && Bot.Bot.Frame >= 22.4 * 60)
+                return true;
+
+            if (enemyAttackingWorkers >= 5)
+                return true;
+            return false;
+
+        }
+
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

@@ -7,6 +7,7 @@ namespace Tyr.Micro
     public class StutterController : CustomController
     {
         public Point2D Toward;
+        public float Range = -1;
         public override bool DetermineAction(Agent agent, Point2D target)
         {
             if (agent.Unit.UnitType == UnitTypes.THOR && agent.Unit.WeaponCooldown >= 5)
@@ -38,7 +39,7 @@ namespace Tyr.Micro
             if (agent.Unit.WeaponCooldown == 0 && agent.Unit.UnitType != UnitTypes.CYCLONE)
                 return false;
 
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (agent.Unit.UnitType == UnitTypes.HELLBAT
                     && (UnitTypes.RangedTypes.Contains(unit.UnitType)
@@ -64,13 +65,17 @@ namespace Tyr.Micro
                     continue;
 
                 float maxDist;
-                if (agent.Unit.UnitType == UnitTypes.BROOD_LORD)
-                    maxDist = 8 * 8;
-                else if (agent.Unit.UnitType == UnitTypes.RAVAGER) maxDist = 6 * 6;
-                else maxDist = 4 * 4;
+                if (Range < 0)
+                {
+                    if (agent.Unit.UnitType == UnitTypes.BROOD_LORD)
+                        maxDist = 8 * 8;
+                    else if (agent.Unit.UnitType == UnitTypes.RAVAGER) maxDist = 6 * 6;
+                    else maxDist = 4 * 4;
+                }
+                else maxDist = Range * Range;
                 if (SC2Util.DistanceSq(unit.Pos, agent.Unit.Pos) <= maxDist)
                 {
-                    Point2D stutterTarget = Toward == null ? SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation) : Toward;
+                    Point2D stutterTarget = Toward == null ? SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation) : Toward;
                     if (agent.DistanceSq(stutterTarget) > 10 * 10)
                         agent.Order(Abilities.MOVE, stutterTarget);
                     else

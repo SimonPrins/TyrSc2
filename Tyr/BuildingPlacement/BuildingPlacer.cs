@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using SC2APIProtocol;
 using Tyr.Agents;
 using Tyr.Managers;
@@ -14,36 +15,41 @@ namespace Tyr.BuildingPlacement
      */
     public class BuildingPlacer
     {
-        private Tyr bot;
+        private Bot bot;
         private bool PylonsFilled = false;
         public bool BuildInsideMainOnly = false;
         public bool SpreadCannons;
         public bool BuildCompact = false;
 
         public List<ReservedBuilding> ReservedLocation = new List<ReservedBuilding>();
+        public BoolGrid LimitBuildArea = null;
 
-        public BuildingPlacer(Tyr bot)
+        private bool DetailedLogs = false;
+        public bool CannonPlacementFailed = false;
+
+        public BuildingPlacer(Bot bot)
         {
             this.bot = bot;
         }
 
         public Point2D FindPlacement(Point2D target, Point2D size, uint type)
         {
-            if (Tyr.Bot.MyRace == Race.Terran)
+            if (Bot.Bot.MyRace == Race.Terran)
             {
                 if (type != UnitTypes.REFINERY
                     && type != UnitTypes.COMMAND_CENTER
                     && type != UnitTypes.MISSILE_TURRET)
                     return TerranBuildingPlacement.FindPlacement(target, size, type);
             }
-            else if (Tyr.Bot.MyRace == Race.Protoss)
+            else if (Bot.Bot.MyRace == Race.Protoss)
             {
                 if (type != UnitTypes.ASSIMILATOR
                     && type != UnitTypes.NEXUS
                     && type != UnitTypes.PHOTON_CANNON
                     && type != UnitTypes.SHIELD_BATTERY
-                    && Tyr.Bot.MapAnalyzer.StartArea[target]
-                    && !BuildCompact)
+                    && Bot.Bot.MapAnalyzer.StartArea[target]
+                    && !BuildCompact
+                    && SC2Util.DistanceSq(target, Bot.Bot.MapAnalyzer.StartLocation) <= 25 * 25)
                     return ProtossBuildingPlacement.FindPlacement(target, size, type);
             }
             Point2D result = findPlacementLocal(target, size, type, 20);
@@ -54,16 +60,23 @@ namespace Tyr.BuildingPlacement
 
         public Point2D FindPlacement(Point2D target, Point2D size, uint type, int maxDist)
         {
+            DetailedLogs = false;
             Point2D result = findPlacementLocal(target, size, type, maxDist);
             if (type == UnitTypes.PYLON)
                 PylonsFilled = result == null;
+            if (result == null && type == 66)
+            {
+                DebugUtil.WriteLine("No placement found for " + type + " around " + target);
+                if (type == 66)
+                    CannonPlacementFailed = true;
+
+            }
             return result;
         }
 
         private Point2D findPlacementLocal(Point2D target, Point2D size, uint type, int maxDist)
         {
             target = SC2Util.Point((int)target.X + 0.5f * (size.X % 2f), (int)target.Y + 0.5f * (size.Y % 2f));
-
             for (int range = 0; range < maxDist; range++)
             {
                 for (int x = -range; x <= range; x++)
@@ -122,8 +135,22 @@ namespace Tyr.BuildingPlacement
             // Check if the building can be placed on this position of the map.
             for (float x = -size.X / 2f; x < size.X / 2f + 0.1f; x++)
                 for (float y = -size.Y / 2f; y < size.Y / 2f + 0.1f; y++)
+                {
                     if (!SC2Util.GetTilePlacable((int)Math.Round(location.X + x), (int)Math.Round(location.Y + y)))
+                    {
+                        if (DetailedLogs)
+                            FileUtil.Debug("Tile not placable " + (location.X + x) + ", " + (location.Y + y) + " for " + location);
                         return false;
+                    }
+
+                    if (LimitBuildArea != null
+                        && !LimitBuildArea[(int)Math.Round(location.X + x), (int)Math.Round(location.Y + y)])
+                    {
+                        if (DetailedLogs)
+                            FileUtil.Debug("Not in build area " + (location.X + x) + ", " + (location.Y + y) + " for " + location);
+                        return false;
+                    }
+                }
 
             if (CanHaveAddOn(type))
             {
@@ -140,13 +167,13 @@ namespace Tyr.BuildingPlacement
             if (BuildInsideMainOnly)
                 for (float x = -size.X / 2f; x < size.X / 2f + 0.1f; x++)
                     for (float y = -size.Y / 2f; y < size.Y / 2f + 0.1f; y++)
-                        if (!Tyr.Bot.MapAnalyzer.StartArea[(int)Math.Round(location.X + x), (int)Math.Round(location.Y + y)])
+                        if (!Bot.Bot.MapAnalyzer.StartArea[(int)Math.Round(location.X + x), (int)Math.Round(location.Y + y)])
                             return false;
 
             if (!UnitTypes.ResourceCenters.Contains(type))
             {
                 float baseDistance = (type == UnitTypes.MISSILE_TURRET || type == UnitTypes.SPORE_CRAWLER || type == UnitTypes.PYLON) ? 3f : 5f;
-                foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Bot.BaseManager.Bases)
                 {
                     if (Math.Abs(b.BaseLocation.Pos.X - location.X) < baseDistance
                         && Math.Abs(b.BaseLocation.Pos.Y - location.Y) < baseDistance)
@@ -168,8 +195,14 @@ namespace Tyr.BuildingPlacement
             }
 
             foreach (Unit unit in bot.Observation.Observation.RawData.Units)
-                if (!unit.IsFlying && !CheckDistance(location, type, SC2Util.To2D(unit.Pos), unit.UnitType, buildingsOnly))
+                if (!unit.IsFlying
+                    && (UnitTypes.BuildingTypes.Contains(unit.UnitType) || unit.Alliance != Alliance.Self)
+                    && !CheckDistance(location, type, SC2Util.To2D(unit.Pos), unit.UnitType, buildingsOnly))
+                {
+                    if (DetailedLogs)
+                        FileUtil.Debug("Unit close for " + location);
                     return false;
+                }
 
             foreach (BuildRequest request in ConstructionTask.Task.UnassignedRequests)
                 if (request != skipRequest && !CheckDistance(location, type, request.Pos, request.Type, buildingsOnly))
@@ -179,11 +212,11 @@ namespace Tyr.BuildingPlacement
                 if (request != skipRequest && !CheckDistance(location, type, request.Pos, request.Type, buildingsOnly))
                     return false;
 
-            foreach (ReservedBuilding building in Tyr.Bot.buildingPlacer.ReservedLocation)
+            foreach (ReservedBuilding building in Bot.Bot.buildingPlacer.ReservedLocation)
                 if (!CheckDistClose(location.X - 1.5f, location.Y - 1.5f, location.X + 1.5f, location.Y + 1.5f, building.Pos, building.Type))
                     return false;
 
-            if (Tyr.Bot.MyRace == Race.Zerg && type != UnitTypes.HATCHERY && type != UnitTypes.EXTRACTOR)
+            if (Bot.Bot.MyRace == Race.Zerg && type != UnitTypes.HATCHERY && type != UnitTypes.EXTRACTOR)
             {
                 BoolGrid creep = new ImageBoolGrid(bot.Observation.Observation.RawData.MapState.Creep, 1);
                 for (float dx = -size.X / 2f; dx <= size.X / 2f + 0.01f; dx++)
@@ -191,13 +224,27 @@ namespace Tyr.BuildingPlacement
                         if (!creep[(int)(location.X + dx), (int)(location.Y + dy)])
                             return false;
             }
-            if (Tyr.Bot.MyRace != Race.Zerg)
+            if (Bot.Bot.MyRace != Race.Zerg)
             {
                 BoolGrid creep = new ImageBoolGrid(bot.Observation.Observation.RawData.MapState.Creep, 1);
                 for (float dx = -size.X / 2f; dx <= size.X / 2f + 0.01f; dx++)
                     for (float dy = -size.Y / 2f; dy <= size.Y / 2f + 0.01f; dy++)
                         if (creep[(int)(location.X + dx), (int)(location.Y + dy)])
                             return false;
+            }
+
+            if (type == UnitTypes.PYLON)
+            {
+                foreach (Agent agent in Bot.Bot.Units())
+                {
+                    if (agent.Unit.UnitType != UnitTypes.PYLON)
+                        continue;
+
+                    // Pylons should not be placed corner to corner as this prevents units from walking between them.
+                    if (Math.Abs(agent.Unit.Pos.X - location.X) == 2
+                        && Math.Abs(agent.Unit.Pos.Y - location.Y) == 2)
+                        return false;
+                }
             }
 
             if (type != UnitTypes.PYLON && bot.MyRace == Race.Protoss)
@@ -207,7 +254,7 @@ namespace Tyr.BuildingPlacement
                     if (unit.UnitType != UnitTypes.PYLON || unit.BuildProgress < 1)
                         continue;
 
-                    if (Tyr.Bot.MapAnalyzer.MapHeight((int)unit.Pos.X, (int)unit.Pos.Y) < Tyr.Bot.MapAnalyzer.MapHeight((int)location.X, (int)location.Y))
+                    if (Bot.Bot.MapAnalyzer.MapHeight((int)unit.Pos.X, (int)unit.Pos.Y) < Bot.Bot.MapAnalyzer.MapHeight((int)location.X, (int)location.Y))
                         continue;
 
                     if (location.X - size.X / 2f >= unit.Pos.X - 6 && location.X + size.X / 2f <= unit.Pos.X + 6
@@ -217,6 +264,8 @@ namespace Tyr.BuildingPlacement
                             return true;
                     }
                 }
+                if (DetailedLogs)
+                    FileUtil.Debug("No Pylon power " + location);
                 return false;
             }
 
@@ -248,7 +297,8 @@ namespace Tyr.BuildingPlacement
             if (UnitTypes.WorkerTypes.Contains(unitType))
                 return SC2Util.DistanceGrid(unitPos, location) > 3;
 
-            if (BuildCompact)
+            if (BuildCompact
+                    || SC2Util.DistanceSq(location, Bot.Bot.MapAnalyzer.StartLocation) > 25 * 25)
                 return CheckDistanceClose(location, buildingType, unitPos, unitType);
             if ((buildingType == UnitTypes.PHOTON_CANNON && !SpreadCannons)
                 || buildingType == UnitTypes.SHIELD_BATTERY
@@ -325,5 +375,61 @@ namespace Tyr.BuildingPlacement
         {
             return type == UnitTypes.BARRACKS || type == UnitTypes.FACTORY || type == UnitTypes.STARPORT;
         }
+
+        public void BuildInsideWall(WallInCreator wallIn)
+        {
+            BoolGrid pathable = Bot.Bot.MapAnalyzer.Pathable;
+            ArrayBoolGrid walledPathable = new ArrayBoolGrid(pathable.Width(), pathable.Height());
+            for (int x = 0; x < pathable.Width(); x++)
+                for (int y = 0; y < pathable.Height(); y++)
+                {
+                    if (!pathable[x, y])
+                    {
+                        walledPathable[x, y] = false;
+                        continue;
+                    }
+                    bool blocked = false;
+                    foreach (WallBuilding building in wallIn.Wall)
+                    {
+                        if (Math.Abs(building.Pos.X - x) <= building.Size.X / 2f
+                            && Math.Abs(building.Pos.Y - y) <= building.Size.Y / 2f)
+                        {
+                            blocked = true;
+                            break;
+                        }
+                    }
+                    walledPathable[x, y] = !blocked;
+                }
+            LimitBuildArea = walledPathable.GetConnected(SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
+
+            /*
+            DrawGrid(pathable, "Pathable");
+            DrawGrid(walledPathable, "WalledPathable");
+            DrawGrid(LimitBuildArea, "BuildArea");
+            */
+        }
+
+        /*
+        private void DrawGrid(BoolGrid grid, string name)
+        {
+            if (!Tyr.Debug)
+                return;
+
+            int width = Tyr.Bot.GameInfo.StartRaw.PathingGrid.Size.X;
+            int height = Tyr.Bot.GameInfo.StartRaw.PathingGrid.Size.Y;
+
+            System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height);
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                {
+                    if (grid[x, y])
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.White);
+                    else
+                        bmp.SetPixel(x, height - 1 - y, System.Drawing.Color.Black);
+                }
+
+            bmp.Save(Directory.GetCurrentDirectory() + "/data/" + name + ".png");
+        }
+        */
     }
 }

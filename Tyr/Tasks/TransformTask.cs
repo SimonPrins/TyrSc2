@@ -14,12 +14,12 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public void HellionsToHellbats()
         {
-            if (Tyr.Bot.Build.Completed(UnitTypes.ARMORY) == 0)
+            if (Bot.Bot.Build.Completed(UnitTypes.ARMORY) == 0)
                 TransformationMap.Remove(UnitTypes.HELLION);
             else if (!TransformationMap.ContainsKey(UnitTypes.HELLION))
                 TransformationMap.Add(UnitTypes.HELLION, 1998);
@@ -49,7 +49,7 @@ namespace Tyr.Tasks
         public override bool DoWant(Agent agent)
         {
             return TransformationMap.ContainsKey(agent.Unit.UnitType) 
-                && (agent.DistanceSq(Tyr.Bot.MapAnalyzer.StartLocation) <= 20 * 20 || agent.DistanceSq(Tyr.Bot.BaseManager.NaturalDefensePos) <= 15 * 15);
+                && (agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) <= 20 * 20 || agent.DistanceSq(Bot.Bot.BaseManager.NaturalDefensePos) <= 15 * 15);
         }
 
         public override bool IsNeeded()
@@ -57,7 +57,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             List<Agent> done = new List<Agent>();
             foreach (Agent agent in units)

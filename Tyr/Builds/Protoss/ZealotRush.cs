@@ -1,6 +1,7 @@
 ﻿using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Micro;
+using Tyr.StrategyAnalysis;
 using Tyr.Tasks;
 using Tyr.Util;
 
@@ -10,10 +11,12 @@ namespace Tyr.Builds.Protoss
     {
         public bool ProxyPylon = false;
         private bool PylonPlaced = false;
-        public int RequiredSize = 8;
+        public int RequiredSize = 6;
         public bool CancelWorkerRush = false;
+        public bool MovePastSpineCrawlers = false;
 
         public int RushWorkers = 0;
+        private FearCannonsController FearCannonsController = new FearCannonsController();
 
 
         public override string Name()
@@ -26,17 +29,22 @@ namespace Tyr.Builds.Protoss
             base.InitializeTasks();
             DefenseTask.Enable();
             TimingAttackTask.Enable();
-            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
             if (ProxyPylon)
                 PlacePylonTask.Enable();
             WorkerRushTask.Enable();
             WorkerRushTask.Task.TakeWorkers = RushWorkers;
+            WorkerRushDefenseTask.Enable();
+            if (MovePastSpineCrawlers)
+                RunbyTask.Enable();
+            MineGoldenWallMineralsTask.Enable();
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new FleeCyclonesController());
+            MicroControllers.Add(FearCannonsController);
 
             Set += ProtossBuildUtil.Pylons();
             Set += Units();
@@ -59,18 +67,29 @@ namespace Tyr.Builds.Protoss
                 result.Building(UnitTypes.GATEWAY, 2, () => Count(UnitTypes.ZEALOT) >= 2);
             }
             else
-                result.Building(UnitTypes.GATEWAY, 4);
-            result.Building(UnitTypes.ASSIMILATOR, () => Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected);
-            result.Building(UnitTypes.CYBERNETICS_CORE, () => Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected);
-            result.Train(UnitTypes.STALKER, 5, () => Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected);
-            result.If(() => { return Count(UnitTypes.ZEALOT) >= 8; });
-            result.Building(UnitTypes.GATEWAY, 2);
+            {
+                result.Building(UnitTypes.GATEWAY, 3);
+                result.Building(UnitTypes.GATEWAY, 1, () => Count(UnitTypes.ZEALOT) >= 4);
+            }
+            result.Building(UnitTypes.ASSIMILATOR, () => Lifting.Get().Detected);
+            result.Building(UnitTypes.CYBERNETICS_CORE, () => Lifting.Get().Detected);
+            result.Train(UnitTypes.STALKER, 5, () => Lifting.Get().Detected);
+            //result.If(() => { return Count(UnitTypes.ZEALOT) >= 8; });
+            //result.Building(UnitTypes.GATEWAY, 2);
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             TimingAttackTask.Task.RequiredSize = RequiredSize;
+
+            if (Completed(UnitTypes.ZEALOT) >= 25)
+            {
+                FearCannonsController.Stopped = true;
+                RunbyTask.Task.StopAndClear(true);
+            }
+            if (Completed(UnitTypes.ZEALOT) < 15)
+                FearCannonsController.Stopped = false;
 
             tyr.buildingPlacer.BuildCompact = true;
 
@@ -91,7 +110,7 @@ namespace Tyr.Builds.Protoss
                     }
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             /*
             if (agent.Unit.UnitType == UnitTypes.NEXUS
@@ -101,7 +120,7 @@ namespace Tyr.Builds.Protoss
                 */
             if (agent.Unit.UnitType == UnitTypes.GATEWAY && Minerals() >= 100
                 && (Minerals() >= 150 || PylonPlaced || !ProxyPylon)
-                && Count(UnitTypes.STALKER) >= 5 || !tyr.EnemyStrategyAnalyzer.LiftingDetected)
+                && Count(UnitTypes.STALKER) >= 5 || !Lifting.Get().Detected)
                 agent.Order(916);
         }
     }

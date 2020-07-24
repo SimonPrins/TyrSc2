@@ -14,7 +14,7 @@ namespace Tyr.Tasks
 
         public override bool DoWant(Agent agent)
         {
-            return Units.Count == 0 && Condition() && agent.Unit.UnitType == UnitTypes.HYDRALISK && SC2Util.DistanceGrid(agent.Unit.Pos, Tyr.Bot.MapAnalyzer.StartLocation) <= 30;
+            return Units.Count == 0 && Condition() && agent.Unit.UnitType == UnitTypes.HYDRALISK && SC2Util.DistanceGrid(agent.Unit.Pos, Bot.Bot.MapAnalyzer.StartLocation) <= 30;
         }
 
         public override bool IsNeeded()
@@ -22,7 +22,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             foreach (Agent agent in units)
                 agent.Order(Abilities.MORPH_LURKER);

@@ -7,6 +7,7 @@ namespace Tyr.Micro
 {
     public class AdeptKillWorkersController : CustomController
     {
+        public HashSet<uint> TargetTypes = UnitTypes.WorkerTypes;
         private Dictionary<ulong, int> TargetCount = new Dictionary<ulong, int>();
         private Dictionary<ulong, ulong> Targets = new Dictionary<ulong, ulong>();
         public override bool DetermineAction(Agent agent, Point2D target)
@@ -20,9 +21,9 @@ namespace Tyr.Micro
             float dist = 10 * 10;
             bool alreadyTargeted = false;
             Unit killTarget = null;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
-                if (!UnitTypes.WorkerTypes.Contains(enemy.UnitType))
+                if (!TargetTypes.Contains(enemy.UnitType))
                     continue;
 
                 int newTargetted = CollectionUtil.Get(TargetCount, enemy.Tag);
@@ -59,15 +60,15 @@ namespace Tyr.Micro
             if (Targets.ContainsKey(agent.Unit.Tag))
             {
                 ulong target = Targets[agent.Unit.Tag];
-                if (!Tyr.Bot.EnemyManager.LastSeenFrame.ContainsKey(target)
-                    || Tyr.Bot.EnemyManager.LastSeenFrame[target] <= Tyr.Bot.Frame - 1)
+                if (!Bot.Bot.EnemyManager.LastSeenFrame.ContainsKey(target)
+                    || Bot.Bot.EnemyManager.LastSeenFrame[target] <= Bot.Bot.Frame - 1)
                 {
                     Targets.Remove(agent.Unit.Tag);
                     TargetCount[target]--;
                     return false;
                 }
-                if (Tyr.Bot.EnemyManager.LastSeen[target] != null
-                    && agent.DistanceSq(Tyr.Bot.EnemyManager.LastSeen[target]) >= 12 * 12)
+                if (Bot.Bot.EnemyManager.LastSeen[target] != null
+                    && agent.DistanceSq(Bot.Bot.EnemyManager.LastSeen[target]) >= 12 * 12)
                 {
                     Targets.Remove(agent.Unit.Tag);
                     TargetCount[target]--;

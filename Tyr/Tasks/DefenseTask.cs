@@ -10,13 +10,14 @@ namespace Tyr.Tasks
     {
         public static DefenseTask GroundDefenseTask = new DefenseTask();
         public static DefenseTask AirDefenseTask = new DefenseTask() { Air = true };
-        public int MaxDefenseRadius = 40;
-        public int DrawDefenderRadius = 40;
+        public int MaxDefenseRadius = 120;
+        public int DrawDefenderRadius = 80;
         public int MainDefenseRadius = 30;
         public int ExpandDefenseRadius = 20;
         public int BufferZone = 5;
         public bool IncludePhoenixes;
         public bool Air = false;
+        public bool UseForceFields = false;
 
         private bool Defending = false;
 
@@ -26,6 +27,9 @@ namespace Tyr.Tasks
         private Unit Target = null;
         private int TargetCalculatedFrame = 0;
 
+
+        private ForceFieldUtil ForceFieldUtil = new ForceFieldUtil();
+
         public DefenseTask() : base(7)
         {
             JoinCombatSimulation = true;
@@ -34,9 +38,9 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             GroundDefenseTask.Stopped = false;
-            Tyr.Bot.TaskManager.Add(GroundDefenseTask);
+            Bot.Bot.TaskManager.Add(GroundDefenseTask);
             AirDefenseTask.Stopped = false;
-            Tyr.Bot.TaskManager.Add(AirDefenseTask);
+            Bot.Bot.TaskManager.Add(AirDefenseTask);
         }
 
         public bool IsDefending()
@@ -52,10 +56,10 @@ namespace Tyr.Tasks
                 return false;
             if (!agent.CanAttackGround() && !Air && (agent.Unit.UnitType != UnitTypes.PHOENIX || !IncludePhoenixes))
                 return false;
-            if (SC2Util.DistanceSq(agent.Unit.Pos, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation)) <= DrawDefenderRadius * DrawDefenderRadius)
+            if (SC2Util.DistanceSq(agent.Unit.Pos, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation)) <= DrawDefenderRadius * DrawDefenderRadius)
                 return true;
-            foreach (Base b in Tyr.Bot.BaseManager.Bases)
-                if (b.Owner == Tyr.Bot.PlayerId && agent.DistanceSq(b.BaseLocation.Pos) <= 15 * 15)
+            foreach (Base b in Bot.Bot.BaseManager.Bases)
+                if (b.Owner == Bot.Bot.PlayerId && agent.DistanceSq(b.BaseLocation.Pos) <= 15 * 15)
                     return true;
             return false;
         }
@@ -69,14 +73,14 @@ namespace Tyr.Tasks
 
         public Unit GetTarget()
         {
-            if (TargetCalculatedFrame == Tyr.Bot.Frame)
+            if (TargetCalculatedFrame == Bot.Bot.Frame)
                 return Target;
-            TargetCalculatedFrame = Tyr.Bot.Frame;
+            TargetCalculatedFrame = Bot.Bot.Frame;
 
             Target = null;
             float dist = GetMaxDefenseRadiusSq();
 
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
                 if (!IgnoreEnemyTypes.Contains(unit.UnitType)
                     && unit.UnitType != UnitTypes.ADEPT_PHASE_SHIFT
                     && unit.UnitType != UnitTypes.KD8_CHARGE
@@ -93,16 +97,16 @@ namespace Tyr.Tasks
                         continue;
                     if (!unit.IsFlying && Air && unit.UnitType != UnitTypes.COLOSUS)
                         continue;
-                    float newDist = SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation));
+                    float newDist = SC2Util.DistanceSq(unit.Pos, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation));
                     if (newDist >= GetMaxDefenseRadiusSq())
                         continue;
 
                     bool nearBase = newDist <= GetMainDefenseRadiusSq();
                     if (!nearBase)
                     {
-                        foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                        foreach (Base b in Bot.Bot.BaseManager.Bases)
                         {
-                            if (b.Owner != Tyr.Bot.PlayerId)
+                            if (b.Owner != Bot.Bot.PlayerId)
                                 continue;
                             float expandDist = SC2Util.DistanceSq(unit.Pos, b.BaseLocation.Pos);
                             if (expandDist >= 18 * 18
@@ -138,16 +142,24 @@ namespace Tyr.Tasks
             return Target;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             Unit target = GetTarget();
+
+            if (UseForceFields)
+                ForceFieldUtil.DetermineForceFieldPlacement(Units);
             if (target == null)
             {
                 Clear();
                 return;
             }
+
             foreach (Agent agent in units)
+            {
+                if (UseForceFields && ForceFieldUtil.Place(agent))
+                    continue;
                 tyr.MicroController.Attack(agent, SC2Util.To2D(target.Pos));
+            }
         }
 
         float GetMainDefenseRadiusSq()

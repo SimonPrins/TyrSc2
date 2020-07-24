@@ -19,7 +19,7 @@ namespace Tyr.Micro
 
             float distance = 12 * 12;
             Unit killTarget = null;
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (!UnitTypes.WorkerTypes.Contains(unit.UnitType))
                     continue;

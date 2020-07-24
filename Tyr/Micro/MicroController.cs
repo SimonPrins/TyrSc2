@@ -14,7 +14,7 @@ namespace Tyr.Micro
 
         public bool TryAttack(Agent agent, Point2D target)
         {
-            foreach (CustomController customController in Tyr.Bot.Build.GetMicroControllers())
+            foreach (CustomController customController in Bot.Bot.Build.GetMicroControllers())
                 if (!customController.Stopped && customController.DetermineAction(agent, target))
                     return true;
             return false;

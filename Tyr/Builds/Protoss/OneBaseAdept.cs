@@ -8,20 +8,26 @@ namespace Tyr.Builds.Protoss
     public class OneBaseAdept : Build
     {
         private TimingAttackTask attackTask = new TimingAttackTask() { RequiredSize = 8 };
+        private AdeptPhaseEnemyMainController AdeptPhaseEnemyMainController = new AdeptPhaseEnemyMainController();
+        private FearEnemyController FearSpinesController = new FearEnemyController(UnitTypes.ADEPT, UnitTypes.SPINE_CRAWLER, 12) { CourageCount = 30 };
 
         public override string Name()
         {
             return "OneBaseAdept";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             tyr.TaskManager.Add(new DefenseTask());
             tyr.TaskManager.Add(attackTask);
             tyr.TaskManager.Add(new WorkerScoutTask());
             if (tyr.BaseManager.Pocket != null)
                 tyr.TaskManager.Add(new ScoutProxyTask(tyr.BaseManager.Pocket.BaseLocation.Pos));
+
+            MicroControllers.Add(AdeptPhaseEnemyMainController);
+            MicroControllers.Add(FearSpinesController);
             MicroControllers.Add(new StutterController());
+
             
             Set += ProtossBuildUtil.Pylons();
             Set += MainBuildList();
@@ -40,10 +46,10 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         { }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

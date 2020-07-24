@@ -31,7 +31,7 @@ namespace Tyr.Builds.Terran
             return "HellbatRush";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new DodgeBallController());
@@ -56,10 +56,10 @@ namespace Tyr.Builds.Terran
             result.If(() =>
             {
                 return Build.FoodUsed()
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.COMMAND_CENTER)
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.BARRACKS) * 2
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.FACTORY) * 2
-                    + Tyr.Bot.UnitManager.Count(UnitTypes.STARPORT) * 2
+                    + Bot.Bot.UnitManager.Count(UnitTypes.COMMAND_CENTER)
+                    + Bot.Bot.UnitManager.Count(UnitTypes.BARRACKS) * 2
+                    + Bot.Bot.UnitManager.Count(UnitTypes.FACTORY) * 2
+                    + Bot.Bot.UnitManager.Count(UnitTypes.STARPORT) * 2
                     >= Build.ExpectedAvailableFood() - 2
                     && Build.ExpectedAvailableFood() < 200;
             });
@@ -102,7 +102,7 @@ namespace Tyr.Builds.Terran
             result.Building(UnitTypes.SUPPLY_DEPOT, Main, WallIn.Wall[2].Pos, true);
             result.Building(UnitTypes.FACTORY, () => !LingRush || Count(UnitTypes.MARINE) > 0);
             result.Building(UnitTypes.REFINERY);
-            result.If(() => Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(19) || Tyr.Bot.UnitManager.ActiveOrders.Contains(761));
+            result.If(() => Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(19) || Bot.Bot.UnitManager.ActiveOrders.Contains(761));
             result.Building(UnitTypes.ARMORY);
             result.If(() => Count(UnitTypes.HELLBAT) >= 16 || Minerals() >= 500 || RoachDefense);
             result.Building(UnitTypes.COMMAND_CENTER);
@@ -114,7 +114,7 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             TransformTask.Task.HellionsToHellbats();
             if (RoachDefense)

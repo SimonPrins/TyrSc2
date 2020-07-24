@@ -19,7 +19,7 @@ namespace Tyr.CombatSim
                 Player1Units.Add(unit);
             else if (unit.Owner == 2)
                 Player2Units.Add(unit);
-            else if (Tyr.Debug)
+            else if (Bot.Debug)
                 throw new System.ArgumentException("Can't add unit. Owner " + unit.Owner + "unknown.");
         }
 

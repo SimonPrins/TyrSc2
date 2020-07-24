@@ -13,7 +13,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public WorkerSafetyTask() : base(10)
@@ -35,7 +35,7 @@ namespace Tyr.Tasks
             if (cannon == null)
                 return false;
 
-            if (agent.DistanceSq(Tyr.Bot.BaseManager.Main.BaseLocation.Pos) >= 40 * 40)
+            if (agent.DistanceSq(Bot.Bot.BaseManager.Main.BaseLocation.Pos) >= 40 * 40)
                 return false;
 
             Safe(agent, cannon);
@@ -55,7 +55,7 @@ namespace Tyr.Tasks
             float distance = 1000 * 1000;
             Agent cannon = null;
 
-            foreach (Agent possibleCannon in Tyr.Bot.UnitManager.Agents.Values)
+            foreach (Agent possibleCannon in Bot.Bot.UnitManager.Agents.Values)
             {
                 if (possibleCannon.Unit.UnitType != UnitTypes.PHOTON_CANNON
                     || possibleCannon.Unit.BuildProgress < 0.95)
@@ -74,7 +74,7 @@ namespace Tyr.Tasks
 
         private bool UnderThreat(Agent agent, float radius)
         {
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.REAPER
                     && enemy.UnitType != UnitTypes.BANSHEE)
@@ -87,10 +87,10 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.Build.Completed(UnitTypes.PHOTON_CANNON) > 0;
+            return Bot.Bot.Build.Completed(UnitTypes.PHOTON_CANNON) > 0;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             for (int i = units.Count - 1; i >= 0; i--)
             {

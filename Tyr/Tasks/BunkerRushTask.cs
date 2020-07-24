@@ -24,7 +24,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -49,15 +49,15 @@ namespace Tyr.Tasks
         {
             if (HideLocation == null)
             {
-                if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+                if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
                     return null;
 
-                Point2D enemyMain = Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0];
-                Point2D enemyNatural = Tyr.Bot.MapAnalyzer.GetEnemyNatural().Pos;
+                Point2D enemyMain = Bot.Bot.TargetManager.PotentialEnemyStartLocations[0];
+                Point2D enemyNatural = Bot.Bot.MapAnalyzer.GetEnemyNatural().Pos;
 
                 Point2D enemyThird = null;
                 float dist = 10000;
-                foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Bot.BaseManager.Bases)
                 {
                     float newDist = SC2Util.DistanceSq(enemyMain, b.BaseLocation.Pos);
 
@@ -76,15 +76,15 @@ namespace Tyr.Tasks
             return HideLocation;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             BuildingType barracksType = BuildingType.LookUp[UnitTypes.BARRACKS];
-            if (Tyr.Bot.UnitManager.Count(UnitTypes.BARRACKS) < 2 && tyr.Minerals() >= 150 && BuildRequests.Count == 0)
+            if (Bot.Bot.UnitManager.Count(UnitTypes.BARRACKS) < 2 && tyr.Minerals() >= 150 && BuildRequests.Count == 0)
             {
                 Point2D placement = ProxyBuildingPlacer.FindPlacement(GetHideLocation(), barracksType.Size, UnitTypes.BARRACKS);
                 BuildRequests.Add(new BuildRequest() { Type = UnitTypes.BARRACKS, Pos = placement });
             }
-            else if (Tyr.Bot.UnitManager.Count(UnitTypes.BUNKER) < 2 && tyr.Minerals() >= 100 && BuildRequests.Count == 0 && tyr.UnitManager.Completed(UnitTypes.BARRACKS) > 0 && tyr.UnitManager.Count(UnitTypes.BARRACKS) >= 2)
+            else if (Bot.Bot.UnitManager.Count(UnitTypes.BUNKER) < 2 && tyr.Minerals() >= 100 && BuildRequests.Count == 0 && tyr.UnitManager.Completed(UnitTypes.BARRACKS) > 0 && tyr.UnitManager.Count(UnitTypes.BARRACKS) >= 2)
             {
                 PotentialHelper helper = new PotentialHelper(tyr.MapAnalyzer.GetEnemyNatural().Pos);
                 helper.Magnitude = 4;
@@ -92,7 +92,7 @@ namespace Tyr.Tasks
                 Point2D placement = ProxyBuildingPlacer.FindPlacement(helper.Get(), barracksType.Size, UnitTypes.BUNKER);
                 BuildRequests.Add(new BuildRequest() { Type = UnitTypes.BUNKER, Pos = placement });
             }
-            else if (Tyr.Bot.UnitManager.Count(UnitTypes.BUNKER) >= 2 && tyr.Minerals() >= 100 && BuildRequests.Count == 0 && tyr.UnitManager.Count(UnitTypes.SIEGE_TANK) >= 2 && tyr.UnitManager.Count(UnitTypes.BARRACKS) >= 2 && tyr.UnitManager.Completed(UnitTypes.ENGINEERING_BAY) >= 1 && tyr.UnitManager.Count(UnitTypes.MISSILE_TURRET) < 2)
+            else if (Bot.Bot.UnitManager.Count(UnitTypes.BUNKER) >= 2 && tyr.Minerals() >= 100 && BuildRequests.Count == 0 && tyr.UnitManager.Count(UnitTypes.SIEGE_TANK) >= 2 && tyr.UnitManager.Count(UnitTypes.BARRACKS) >= 2 && tyr.UnitManager.Completed(UnitTypes.ENGINEERING_BAY) >= 1 && tyr.UnitManager.Count(UnitTypes.MISSILE_TURRET) < 2)
             {
                 PotentialHelper helper = new PotentialHelper(tyr.MapAnalyzer.GetEnemyNatural().Pos);
                 helper.Magnitude = 4;
@@ -104,7 +104,7 @@ namespace Tyr.Tasks
             List<BuildRequest> doneRequests = new List<BuildRequest>();
             foreach (BuildRequest request in BuildRequests)
             {
-                if (request.worker != null && !Tyr.Bot.UnitManager.Agents.ContainsKey(request.worker.Unit.Tag))
+                if (request.worker != null && !Bot.Bot.UnitManager.Agents.ContainsKey(request.worker.Unit.Tag))
                     request.worker = null;
                 if (request.worker == null)
                 {

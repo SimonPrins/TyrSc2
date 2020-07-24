@@ -13,7 +13,7 @@ namespace Tyr.Micro
             PotentialHelper potential = new PotentialHelper(agent.Unit.Pos);
             potential.Magnitude = 4;
             bool flee = false;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (UnitTypes.AirAttackTypes.Contains(enemy.UnitType)
                     && agent.DistanceSq(enemy) <= 8 * 8)

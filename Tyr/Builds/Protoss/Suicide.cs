@@ -10,12 +10,12 @@ namespace Tyr.Builds.Protoss
             return "Suicide";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             tyr.TaskManager = new TaskManager();
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             Agent main = null;
             foreach (Agent agent in tyr.UnitManager.Agents.Values)
@@ -29,7 +29,7 @@ namespace Tyr.Builds.Protoss
                     agent.Order(Abilities.ATTACK, main.Unit.Tag);
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
         }
     }

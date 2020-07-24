@@ -13,19 +13,19 @@ namespace Tyr.Micro
             if (agent.Unit.UnitType != UnitTypes.ADEPT)
                 return false;
             
-            if (Tyr.Bot.Frame % 44 >= 2)
+            if (Bot.Bot.Frame % 44 >= 2)
                 return false;
 
-            bool secondChance = Tyr.Bot.Frame % 44 == 1;
-            if (secondChance && Tyr.Bot.UnitManager.Count(UnitTypes.ADEPT_PHASE_SHIFT) == 0)
+            bool secondChance = Bot.Bot.Frame % 44 == 1;
+            if (secondChance && Bot.Bot.UnitManager.Count(UnitTypes.ADEPT_PHASE_SHIFT) == 0)
                 return false;
 
             if (PhaseTarget == null)
             {
-                if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+                if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
                     return false;
-                foreach (Base b in Tyr.Bot.BaseManager.Bases)
-                    if (SC2Util.DistanceSq(b.BaseLocation.Pos, Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]) <= 2 * 2)
+                foreach (Base b in Bot.Bot.BaseManager.Bases)
+                    if (SC2Util.DistanceSq(b.BaseLocation.Pos, Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) <= 2 * 2)
                     {
                         PhaseTarget = b.MineralLinePos;
                         break;
@@ -35,7 +35,7 @@ namespace Tyr.Micro
                 return false;
 
             bool closeEnemies = false;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
                 if ((enemy.UnitType == UnitTypes.IMMORTAL || enemy.UnitType == UnitTypes.STALKER)
                     && agent.DistanceSq(enemy) <= 15 * 15)
                 {

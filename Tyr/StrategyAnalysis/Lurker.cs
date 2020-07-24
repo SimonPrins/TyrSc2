@@ -13,7 +13,7 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            return Tyr.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.LURKER) + Tyr.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.LURKER_BURROWED) > 0;
+            return Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.LURKER) + Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.LURKER_BURROWED) > 0;
         }
 
         public override string Name()

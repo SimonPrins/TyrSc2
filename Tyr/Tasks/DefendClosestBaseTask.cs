@@ -27,10 +27,10 @@ namespace Tyr.Tasks
         {
             if (!agent.IsCombatUnit)
                 return false;
-            if (SC2Util.DistanceSq(agent.Unit.Pos, SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation)) <= DrawDefenderRadius * DrawDefenderRadius)
+            if (SC2Util.DistanceSq(agent.Unit.Pos, SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation)) <= DrawDefenderRadius * DrawDefenderRadius)
                 return true;
-            foreach (Base b in Tyr.Bot.BaseManager.Bases)
-                if (b.Owner == Tyr.Bot.PlayerId && agent.DistanceSq(b.BaseLocation.Pos) <= 15 * 15)
+            foreach (Base b in Bot.Bot.BaseManager.Bases)
+                if (b.Owner == Bot.Bot.PlayerId && agent.DistanceSq(b.BaseLocation.Pos) <= 15 * 15)
                     return true;
             return false;
         }
@@ -39,7 +39,7 @@ namespace Tyr.Tasks
         {
             Dictionary<Base, int> attackerCount = new Dictionary<Base, int>();
 
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
                 if (unit.UnitType != UnitTypes.ADEPT_PHASE_SHIFT
                     && unit.UnitType != UnitTypes.KD8_CHARGE
                     && unit.UnitType != UnitTypes.OVERLORD
@@ -53,9 +53,9 @@ namespace Tyr.Tasks
                 {
                     float dist = GetExpandDefenseRadiusSq();
                     Base closest = null;
-                    foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                    foreach (Base b in Bot.Bot.BaseManager.Bases)
                     {
-                        if (b.Owner != Tyr.Bot.PlayerId)
+                        if (b.Owner != Bot.Bot.PlayerId)
                             continue;
 
                         float newDist = SC2Util.DistanceSq(unit.Pos, b.BaseLocation.Pos);
@@ -75,7 +75,7 @@ namespace Tyr.Tasks
 
             Base defendedBase = null;
             int attackers = MinimumAttackers - 1;
-            foreach (Base b in Tyr.Bot.BaseManager.Bases)
+            foreach (Base b in Bot.Bot.BaseManager.Bases)
             {
                 if (!attackerCount.ContainsKey(b))
                     continue;
@@ -93,7 +93,7 @@ namespace Tyr.Tasks
             return GetDefendedBase() != null;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             Base defendedBase = GetDefendedBase();
             if (defendedBase == null)

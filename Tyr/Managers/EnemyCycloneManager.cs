@@ -9,7 +9,7 @@ namespace Tyr.Managers
     public class EnemyCycloneManager : Manager
     {
         private Dictionary<ulong, int> LastHitFrame = new Dictionary<ulong, int>();
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
             foreach (Agent agent in tyr.Units())
             {
@@ -20,7 +20,7 @@ namespace Tyr.Managers
                     continue;
                 bool cycloneClose = false;
                 int enemiesClose = 0;
-                foreach (Unit enemy in Tyr.Bot.Enemies())
+                foreach (Unit enemy in Bot.Bot.Enemies())
                 {
                     if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                         continue;

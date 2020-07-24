@@ -8,5 +8,6 @@ namespace Tyr.Managers
         public Point Pos;
         public uint Type;
         public int LastSeen;
+        public bool Flying;
     }
 }

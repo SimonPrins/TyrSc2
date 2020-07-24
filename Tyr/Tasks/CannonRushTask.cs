@@ -36,11 +36,11 @@ namespace Tyr.Tasks
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
             if (Units.Count == 0)
-                result.Add(new UnitDescriptor() { Pos = Tyr.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.PROBE } });
+                result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.PROBE } });
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             DetermineCannonLocation();
             if (CannonLocation == null)
@@ -144,10 +144,10 @@ namespace Tyr.Tasks
             if (CannonLocation != null)
                 return;
             
-            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
                 return;
-            Point2D enemyMain = Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0];
-            Point2D enemyRamp = Tyr.Bot.MapAnalyzer.GetEnemyRamp();
+            Point2D enemyMain = Bot.Bot.TargetManager.PotentialEnemyStartLocations[0];
+            Point2D enemyRamp = Bot.Bot.MapAnalyzer.GetEnemyRamp();
 
             for (float x = -20; x <= 20; x++)
                 for (float y = -20; y <= 20; y++)

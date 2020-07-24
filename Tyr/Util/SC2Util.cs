@@ -10,7 +10,7 @@ namespace Tyr.Util
     {
         public static int GetDataValue(ImageData data, int x, int y)
         {
-            if (Tyr.Bot.OldMapData)
+            if (Bot.Bot.OldMapData)
                 return GetDataValueOld(data, x, y);
 
             if (data.BitsPerPixel == 1)
@@ -38,9 +38,16 @@ namespace Tyr.Util
 
         public static bool GetTilePlacable(int x, int y)
         {
-            if (x < 0 || y < 0 || x >= Tyr.Bot.GameInfo.StartRaw.PlacementGrid.Size.X || y >= Tyr.Bot.GameInfo.StartRaw.PlacementGrid.Size.Y)
+            if (x < 0 || y < 0 || x >= Bot.Bot.GameInfo.StartRaw.PlacementGrid.Size.X || y >= Bot.Bot.GameInfo.StartRaw.PlacementGrid.Size.Y)
                 return false;
-            return SC2Util.GetDataValue(Tyr.Bot.GameInfo.StartRaw.PlacementGrid, x, y) != 0;
+            return SC2Util.GetDataValue(Bot.Bot.GameInfo.StartRaw.PlacementGrid, x, y) != 0;
+        }
+
+        public static bool GetTileVisible(int x, int y)
+        {
+            if (x < 0 || y < 0 || x >= Bot.Bot.Observation.Observation.FeatureLayerData.Renders.VisibilityMap.Size.X || y >= Bot.Bot.Observation.Observation.FeatureLayerData.Renders.VisibilityMap.Size.Y)
+                return false;
+            return GetDataValue(Bot.Bot.Observation.Observation.FeatureLayerData.Renders.VisibilityMap, x, y) != 0;
         }
 
         public static Point2D Point(float x, float y)
@@ -111,7 +118,7 @@ namespace Tyr.Util
 
         public static Point To3D(Point2D pos)
         {
-            return Point(pos.X, pos.Y, Tyr.Bot.MapAnalyzer.MapHeight((int)pos.X, (int)pos.Y));
+            return Point(pos.X, pos.Y, Bot.Bot.MapAnalyzer.MapHeight((int)pos.X, (int)pos.Y));
         }
 
         public static Point2D Normalize(Point2D point)
@@ -125,7 +132,7 @@ namespace Tyr.Util
             if (Math.Abs(pos2.X - pos1.X) >= Math.Abs(pos2.Y - pos1.Y))
             {
                 if (pos2.X > pos1.X)
-                     return Point(pos1.X + distance, pos1.Y);
+                    return Point(pos1.X + distance, pos1.Y);
                 else
                     return Point(pos1.X - distance, pos1.Y);
             }
@@ -137,10 +144,27 @@ namespace Tyr.Util
                     return Point(pos1.X, pos1.Y - distance);
             }
         }
-        
+        public static Point2D FromCardinal(Point2D pos1, Point2D pos2, float distance)
+        {
+            if (Math.Abs(pos2.X - pos1.X) >= Math.Abs(pos2.Y - pos1.Y))
+            {
+                if (pos2.X > pos1.X)
+                    return Point(pos1.X - distance, pos1.Y);
+                else
+                    return Point(pos1.X + distance, pos1.Y);
+            }
+            else
+            {
+                if (pos2.Y > pos1.Y)
+                    return Point(pos1.X, pos1.Y - distance);
+                else
+                    return Point(pos1.X, pos1.Y + distance);
+            }
+        }
+
         public static bool IsVersionBefore(string version)
         {
-            string[] currentVersionParts = Tyr.Bot.GameVersion.Split('.');
+            string[] currentVersionParts = Bot.Bot.GameVersion.Split('.');
             string[] compareVersionParts = version.Split('.');
 
             for (int i = 0; i < compareVersionParts.Length; i++)

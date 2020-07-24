@@ -31,14 +31,14 @@ namespace Tyr.Tasks
         public override List<UnitDescriptor> GetDescriptors()
         {
             if (IdleLocation == null)
-                IdleLocation = Tyr.Bot.MapAnalyzer.GetMainRamp();
+                IdleLocation = Bot.Bot.MapAnalyzer.GetMainRamp();
             List<UnitDescriptor> result = new List<UnitDescriptor>();
             if (units.Count == 0)
                 result.Add(new UnitDescriptor() { Pos = IdleLocation, Count = 1, UnitTypes = new HashSet<uint>() { UnitTypes.SIEGE_TANK, UnitTypes.SIEGE_TANK_SIEGED } });
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (Stopped)
             {

@@ -20,7 +20,7 @@ namespace Tyr.Tasks
             }
         }
 
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
             // Remove dead workers.
             for (int i = Count - 1; i >= 0; i--)

@@ -14,7 +14,7 @@ namespace Tyr.Micro
             if (agent.Unit.UnitType != UnitTypes.DISRUPTOR)
                 return false;
 
-            if (PhaseFrame.ContainsKey(agent.Unit.Tag) && Tyr.Bot.Frame - PhaseFrame[agent.Unit.Tag] <= 22)
+            if (PhaseFrame.ContainsKey(agent.Unit.Tag) && Bot.Bot.Frame - PhaseFrame[agent.Unit.Tag] <= 22)
                 return true;
 
             if (Phase(agent))
@@ -22,7 +22,7 @@ namespace Tyr.Micro
 
             Unit closestEnemy = null;
             float distance = 9 * 9;
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (!UnitTypes.CanAttackGround(unit.UnitType))
                     continue;
@@ -46,10 +46,10 @@ namespace Tyr.Micro
 
         private bool Phase(Agent agent)
         {
-            if (PhaseFrame.ContainsKey(agent.Unit.Tag) && Tyr.Bot.Frame - PhaseFrame[agent.Unit.Tag] <= 224)
+            if (PhaseFrame.ContainsKey(agent.Unit.Tag) && Bot.Bot.Frame - PhaseFrame[agent.Unit.Tag] <= 224)
                 return false;
 
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (UnitTypes.BuildingTypes.Contains(unit.UnitType))
                     continue;
@@ -68,7 +68,7 @@ namespace Tyr.Micro
 
                 int count = 0;
                 bool closeAlly = false;
-                foreach (Agent ally in Tyr.Bot.UnitManager.Agents.Values)
+                foreach (Agent ally in Bot.Bot.UnitManager.Agents.Values)
                 {
                     if (ally.Unit.IsFlying)
                         continue;
@@ -80,7 +80,7 @@ namespace Tyr.Micro
                 }
                 if (closeAlly)
                     break; 
-                foreach (Unit unit2 in Tyr.Bot.Enemies())
+                foreach (Unit unit2 in Bot.Bot.Enemies())
                 {
                     if (UnitTypes.BuildingTypes.Contains(unit.UnitType))
                         continue;
@@ -100,7 +100,7 @@ namespace Tyr.Micro
                 if (count >= 6)
                 {
                     agent.Order(2346, SC2Util.To2D(unit.Pos));
-                    CollectionUtil.Add(PhaseFrame, agent.Unit.Tag, Tyr.Bot.Frame);
+                    CollectionUtil.Add(PhaseFrame, agent.Unit.Tag, Bot.Bot.Frame);
                     return true;
                 }
 

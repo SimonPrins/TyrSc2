@@ -13,7 +13,7 @@ namespace Tyr.Micro
 
             float dist = 12 * 12;
             Unit fleeTarget = null;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.VIKING_FIGHTER)
                     continue;

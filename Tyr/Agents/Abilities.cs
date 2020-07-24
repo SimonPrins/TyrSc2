@@ -71,6 +71,8 @@ namespace Tyr.Agents
         public static int MORPH_BROODLORD = 1372;
         public static int BLINK = 1442;
         public static int MORPH_OVERSEER = 1448;
+        public static int WarpPrismPhasingMode = 1528;
+        public static int WarpPrismTransportMode = 1530;
         public static int TRANSFUSE = 1664;
         public static int MORPH_RAVAGER = 2330;
         public static int MORPH_LURKER = 2332;
@@ -79,5 +81,6 @@ namespace Tyr.Agents
         public static int CORROSIVE_BILE = 2338;
         public static int WIDOW_MINE_BURROW = 2095;
         public static int WIDOW_MINE_UNBURROW = 2097;
+
     }
 }

@@ -19,6 +19,13 @@ namespace Tyr.Micro
             Range = range;
             MoveCommand = moveCommand;
         }
+        public AttackEnemyController(uint from, HashSet<uint> to, float range, bool moveCommand)
+        {
+            Attacker.Add(from);
+            Targets = to;
+            Range = range;
+            MoveCommand = moveCommand;
+        }
 
         public AttackEnemyController(uint from, HashSet<uint> to, float range)
         {
@@ -50,7 +57,7 @@ namespace Tyr.Micro
 
             Unit attack = null;
             dist = Range * Range;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (!Targets.Contains(enemy.UnitType))
                     continue;

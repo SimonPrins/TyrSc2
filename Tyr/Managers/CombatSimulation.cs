@@ -15,8 +15,14 @@ namespace Tyr.Managers
         public float AllyDistance = 3;
         public int SimulationLength = 300;
         public bool Debug = false;
+        public bool ShowStats = false;
 
-        public void OnFrame(Tyr tyr)
+        public float MyStartResources;
+        public float MyFinalResources;
+        public float EnemyStartResources;
+        public float EnemyFinalResources;
+
+        public void OnFrame(Bot tyr)
         {
             List<Unit> simulatedUnits = new List<Unit>();
             foreach (Task task in tyr.TaskManager.Tasks)
@@ -48,13 +54,14 @@ namespace Tyr.Managers
 
             bool logSimulation = tyr.Frame % 22 == 0 && simulationGroups.Count > 0 && Debug;
 
-            tyr.DrawText("Simulations: " + simulationGroups.Count);
+            if (ShowStats)
+                tyr.DrawText("Simulations: " + simulationGroups.Count);
             if (logSimulation)
                 FileUtil.Debug("Simulations: " + simulationGroups.Count);
 
 
             bool printState = false;
-            if (Tyr.Debug && tyr.Observation.Chat != null && tyr.Observation.Chat.Count > 0)
+            if (Bot.Debug && tyr.Observation.Chat != null && tyr.Observation.Chat.Count > 0)
             {
                 foreach (ChatReceived message in tyr.Observation.Chat)
                 {
@@ -66,6 +73,10 @@ namespace Tyr.Managers
                 }
             }
 
+            MyStartResources = 0;
+            MyFinalResources = 0;
+            EnemyStartResources = 0;
+            EnemyFinalResources = 0;
             int i = 0;
             foreach (List<Unit> simulationGroup in simulationGroups)
             {
@@ -81,9 +92,19 @@ namespace Tyr.Managers
 
                 float myNewResources = GetResources(state, true);
                 float enemyNewResources = GetResources(state, false);
-                tyr.DrawText("SimulationResult me: " + myResources + " -> " + myNewResources + " his: " + enemyResources + " -> " + enemyNewResources);
+                if (ShowStats)
+                    tyr.DrawText("SimulationResult me: " + myResources + " -> " + myNewResources + " his: " + enemyResources + " -> " + enemyNewResources);
                 if (logSimulation)
                     FileUtil.Debug("SimulationResult me: " + myResources + " -> " + myNewResources + " his: " + enemyResources + " -> " + enemyNewResources);
+
+                if (myResources > 0
+                    && enemyResources > 0)
+                {
+                    MyStartResources += myResources;
+                    MyFinalResources += myNewResources;
+                    EnemyStartResources += enemyResources;
+                    EnemyFinalResources += enemyNewResources;
+                }
 
                 MakeDecision(simulationGroup, state, myResources, myNewResources, enemyResources, enemyNewResources, myUpgrades, enemyUpgrades);
                 i++;
@@ -110,7 +131,7 @@ namespace Tyr.Managers
                     for (int i = simulatedUnits.Count - 1; i >= 0; i--)
                     {
                         Unit compare = simulatedUnits[i];
-                        if (SC2Util.DistanceSq(current.Pos, compare.Pos) > (current.Owner != Tyr.Bot.PlayerId || compare.Owner != Tyr.Bot.PlayerId ? EnemyDistance * EnemyDistance : AllyDistance * AllyDistance))
+                        if (SC2Util.DistanceSq(current.Pos, compare.Pos) > (current.Owner != Bot.Bot.PlayerId || compare.Owner != Bot.Bot.PlayerId ? EnemyDistance * EnemyDistance : AllyDistance * AllyDistance))
                             continue;
                         simulationGroup.Add(compare);
                         CollectionUtil.RemoveAt(simulatedUnits, i);
@@ -121,7 +142,7 @@ namespace Tyr.Managers
             return simulationGroups;
         }
 
-        private SimulationState GetState(Tyr tyr, List<Unit> simulationGroup, HashSet<uint> myUpgrades, HashSet<uint> enemyUpgrades, bool flee)
+        private SimulationState GetState(Bot tyr, List<Unit> simulationGroup, HashSet<uint> myUpgrades, HashSet<uint> enemyUpgrades, bool flee)
         {
             SimulationState state = new SimulationState();
             foreach (Unit unit in simulationGroup)
@@ -173,11 +194,11 @@ namespace Tyr.Managers
             int prevProceed = 0;
             int prevFallBack = 0;
             foreach (Unit unit in simulationGroup)
-                if (Tyr.Bot.UnitManager.Agents.ContainsKey(unit.Tag) && Tyr.Bot.Frame - Tyr.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecisionFrame < 10)
+                if (Bot.Bot.UnitManager.Agents.ContainsKey(unit.Tag) && Bot.Bot.Frame - Bot.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecisionFrame < 10)
                 {
-                    if (Tyr.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecision == CombatSimulationDecision.Proceed)
+                    if (Bot.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecision == CombatSimulationDecision.Proceed)
                         prevProceed++;
-                    else if (Tyr.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecision == CombatSimulationDecision.FallBack)
+                    else if (Bot.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecision == CombatSimulationDecision.FallBack)
                         prevFallBack++;
                 }
 
@@ -186,12 +207,13 @@ namespace Tyr.Managers
                 partProceed = 0;
             else
                 partProceed = (float)prevProceed / (prevProceed + prevFallBack);
-            Tyr.Bot.DrawText("Proceed: " + partProceed);
+            if (ShowStats)
+                Bot.Bot.DrawText("Proceed: " + partProceed);
             if (enemyResources - enemyNewResources >= (myResources - myNewResources) * (1.1 - 0.3 * partProceed))
                 ApplyDecision(simulationGroup, CombatSimulationDecision.Proceed);
             else
             {
-                SimulationState fleeState = GetState(Tyr.Bot, simulationGroup, myUpgrades, enemyUpgrades, true);
+                SimulationState fleeState = GetState(Bot.Bot, simulationGroup, myUpgrades, enemyUpgrades, true);
                 state.Simulate(100);
                 float myFleeResources = GetResources(fleeState, true);
                 if (enemyResources - enemyNewResources >= (myFleeResources - myNewResources) * (1.1 - 0.3 * partProceed))
@@ -204,10 +226,10 @@ namespace Tyr.Managers
         private void ApplyDecision(List<Unit> simulationGroup, CombatSimulationDecision decision)
         {
             foreach (Unit unit in simulationGroup)
-                if (Tyr.Bot.UnitManager.Agents.ContainsKey(unit.Tag))
+                if (Bot.Bot.UnitManager.Agents.ContainsKey(unit.Tag))
                 {
-                    Tyr.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecision = decision;
-                    Tyr.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecisionFrame = Tyr.Bot.Frame;
+                    Bot.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecision = decision;
+                    Bot.Bot.UnitManager.Agents[unit.Tag].CombatSimulationDecisionFrame = Bot.Bot.Frame;
                 }
         }
     }

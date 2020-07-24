@@ -7,19 +7,19 @@ namespace Tyr.MapAnalysis
 {
     public abstract class BoolGrid
     {
-        private bool inverted = false;
+        protected bool Inverted = false;
         internal abstract bool GetInternal(Point2D pos);
         public bool Get(Point2D pos)
         {
             if (pos.X < 0 || pos.Y < 0 || pos.X >= Width() || pos.Y >= Height())
                 return false;
-            return GetInternal(pos) == (!inverted);
+            return GetInternal(pos) == (!Inverted);
         }
 
         public BoolGrid Invert()
         {
             BoolGrid result = Clone();
-            result.inverted = true;
+            result.Inverted = true;
             return result;
         }
 
@@ -168,6 +168,23 @@ namespace Tyr.MapAnalysis
                             success = this[x + dx, y + dy];
                     if (success)
                         result[x, y] = true;
+                }
+
+            return result;
+        }
+
+        public BoolGrid Grow()
+        {
+            ArrayBoolGrid result = new ArrayBoolGrid(Width(), Height());
+
+            for (int x = 1; x < Width() - 1; x++)
+                for (int y = 1; y < Height() - 1; y++)
+                {
+                    bool success = false;
+                    for (int dx = -1; dx <= 1 && !success; dx++)
+                        for (int dy = -1; dy <= 1 && !success; dy++)
+                            success = this[x + dx, y + dy];
+                    result[x, y] = success;
                 }
 
             return result;

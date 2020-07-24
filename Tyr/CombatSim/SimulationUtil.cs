@@ -30,7 +30,7 @@ namespace Tyr.CombatSim
             result.IsAir = unit.IsFlying || unit.UnitType == UnitTypes.COLOSUS;
             result.IsGround = !unit.IsFlying || unit.UnitType == UnitTypes.COLOSUS;
             result.Armor = (int)unitType.Armor;
-            result.Owner = unit.Owner == Tyr.Bot.PlayerId ? 1 : 2;
+            result.Owner = unit.Owner == Bot.Bot.PlayerId ? 1 : 2;
             result.Pos = new Point(unit.Pos.X, unit.Pos.Y);
             result.Tag = (long)unit.Tag;
             result.UnitType = unit.UnitType;
@@ -61,7 +61,7 @@ namespace Tyr.CombatSim
             result.Damage = (int)weapon.Damage;
             if (weapon.DamageBonus != null && weapon.DamageBonus.Count > 0)
             {
-                if (weapon.DamageBonus.Count >= 2 && Tyr.Debug)
+                if (weapon.DamageBonus.Count >= 2 && Bot.Debug)
                     throw new ArgumentException("Only one bonus damage supported.");
                 result.BonusDamage = (int)weapon.DamageBonus[0].Bonus;
                 result.BonusDamageAttribute = FromAttribute(weapon.DamageBonus[0].Attribute);
@@ -106,7 +106,7 @@ namespace Tyr.CombatSim
                 return UnitAttribute.Heroic;
             else if (attribute == SC2APIProtocol.Attribute.Summoned)
                 return UnitAttribute.Summoned;
-            else if (Tyr.Debug)
+            else if (Bot.Debug)
                 throw new ArgumentException("Attribute " + attribute + " not supported.");
             else
                 return UnitAttribute.None;

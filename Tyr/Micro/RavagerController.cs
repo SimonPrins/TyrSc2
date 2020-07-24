@@ -12,7 +12,7 @@ namespace Tyr.Micro
             if (agent.Unit.UnitType != UnitTypes.RAVAGER)
                 return false;
 
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (UnitTypes.BuildingTypes.Contains(unit.UnitType) && unit.UnitType != UnitTypes.SPINE_CRAWLER && unit.UnitType != UnitTypes.SPINE_CRAWLER_UPROOTED)
                     continue;
@@ -31,7 +31,7 @@ namespace Tyr.Micro
                     count = 6;
                 else
                     count = 1;
-                foreach (Unit unit2 in Tyr.Bot.Enemies())
+                foreach (Unit unit2 in Bot.Bot.Enemies())
                 {
                     if (UnitTypes.BuildingTypes.Contains(unit.UnitType))
                         continue;
@@ -56,7 +56,7 @@ namespace Tyr.Micro
                     continue;
 
                 bool friendlyFire = false;
-                foreach (Agent ally in Tyr.Bot.UnitManager.Agents.Values)
+                foreach (Agent ally in Bot.Bot.UnitManager.Agents.Values)
                 {
                     if (ally.DistanceSq(unit) <= 2 * 2)
                     {

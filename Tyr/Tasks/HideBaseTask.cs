@@ -22,16 +22,16 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
         {
-            if (ClaimWorkersOutsideMain && !Tyr.Bot.MapAnalyzer.MainAndPocketArea[SC2Util.To2D(agent.Unit.Pos)] && Tyr.Bot.MapAnalyzer.Placement[SC2Util.To2D(agent.Unit.Pos)]
+            if (ClaimWorkersOutsideMain && !Bot.Bot.MapAnalyzer.MainAndPocketArea[SC2Util.To2D(agent.Unit.Pos)] && Bot.Bot.MapAnalyzer.Placement[SC2Util.To2D(agent.Unit.Pos)]
                 && agent.DistanceSq(HideLocation.BaseLocation.Pos) >= 20 * 20)
                 return true;
 
-            return !ProbeSent && agent.IsWorker && units.Count == 0 && Tyr.Bot.Frame >= MoveOutFrame;
+            return !ProbeSent && agent.IsWorker && units.Count == 0 && Bot.Bot.Frame >= MoveOutFrame;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -46,7 +46,7 @@ namespace Tyr.Tasks
             return HideLocation != null && !NexusComplete;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (units.Count > 0)
                 ProbeSent = true;

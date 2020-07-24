@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using SC2API_CSharp;
 using SC2APIProtocol;
 using Tyr.Builds;
-using Tyr.CombatSim;
+using Tyr.buildSelection;
+using Tyr.BuildSelection;
 using Tyr.Util;
 
 namespace Tyr
 {
     public class Program
     {
-        public static Race MyRace = Race.Random;
+        public static Race MyRace = Race.Protoss;
+        private static DateTime ValidUntil = DateTime.Parse("07/24/2020", CultureInfo.InvariantCulture);
         public static void Run(string[] args)
         {/*
             if (args.Length == 0)
@@ -22,7 +25,59 @@ namespace Tyr
             */
 
             Tyr tyr = new Tyr();
+            string[] settings = FileUtil.ReadSettingsFile();
+            foreach (string line in settings)
+            {
+                string[] setting = line.Split('=');
+                if (setting.Length != 2)
+                    continue;
+                if (setting[0].Trim() != "debug")
+                    continue;
+                if (setting[1].Trim() == "true")
+                    Tyr.Debug = true;
+                else if (setting[1].Trim() == "false")
+                    Tyr.Debug = false;
+            }
+
+            string now = DateTime.Now.ToShortDateString();
+            if (ValidUntil != null && ValidUntil.Ticks < DateTime.Now.Ticks)
+            {
+                bool extension = false;
+                foreach (string line in settings)
+                {
+                    string[] setting = line.Split('=');
+                    if (setting.Length != 2)
+                        continue;
+                    if (setting[0].Trim() != "extendTime")
+                        continue;
+                    if (setting[1].Trim() == now)
+                        extension = true;
+                }
+                foreach (string line in settings)
+                {
+                    string[] setting = line.Split('=');
+                    if (setting.Length != 2)
+                        continue;
+                    if (setting[0].Trim() != "noTimeLimit")
+                        continue;
+                    if (setting[1].Trim() == "true")
+                        extension = true;
+                }
+                if (!extension)
+                {
+                    DebugUtil.WriteLine("This version of Tyr is only valid until " + ValidUntil.ToShortDateString() + ". It is only intended for week " + tyr.VersionNumber + " of Probots. Are you sure you have the latest version? If you want to ignore this error for today you should set extendTime to " + now + " in the settings.txt file.");
+                    FileUtil.Log("This version of Tyr is only valid until " + ValidUntil.ToShortDateString() + ". It is only intended for week " + tyr.VersionNumber + " of Probots. Are you sure you have the latest version? If you want to ignore this error for today you should set extendTime to " + now + " in the settings.txt file.");
+                    System.Console.ReadLine();
+                    throw new Exception("This version of Tyr is only valid until " + ValidUntil.ToShortDateString() + ". It is only intended for week " + tyr.VersionNumber + " of Probots. Are you sure you have the latest version? If you want to ignore this error for today you should set extendTime to " + now + " in the settings.txt file.");
+                }
+            }
+
+            tyr.OnInitialize();
+
             ReadBuildFile(tyr);
+            DetermineBuildsProvider(tyr);
+            DetermineBuildSelector(tyr);
+            DetermineProbotsChat(tyr);
 
 
             string arguments = "Commandline args: ";
@@ -85,11 +140,78 @@ namespace Tyr
                     Build build = (Build)Activator.CreateInstance(buildType);
                     if (build.Name() == words[1])
                     {
-                        FileUtil.AllowWritingFiles = false;
                         tyr.FixedBuild = build;
                         break;
                     }
                 }
+            }
+        }
+
+        private static void DetermineBuildsProvider(Tyr tyr)
+        {
+            string[] settings = FileUtil.ReadSettingsFile();
+            foreach (string line in settings)
+            {
+                string[] setting = line.Split('=');
+                if (setting.Length != 2)
+                    continue;
+                if (setting[0].Trim() != "BuildsProvider")
+                    continue;
+                string buildsProviderName = setting[1].Trim();
+
+
+                foreach (Type buildsProviderType in typeof(BuildsProvider).Assembly.GetTypes().Where(type => (typeof(BuildsProvider)).IsAssignableFrom(type)))
+                {
+                    if (buildsProviderType.FullName.Substring(buildsProviderType.FullName.LastIndexOf('.') + 1) == buildsProviderName)
+                    {
+                        BuildsProvider buildsProvider = (BuildsProvider)Activator.CreateInstance(buildsProviderType);
+                        tyr.BuildsProvider = buildsProvider;
+                        DebugUtil.WriteLine("Found buildsProvider: " + buildsProviderName);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private static void DetermineBuildSelector(Tyr tyr)
+        {
+            string[] settings = FileUtil.ReadSettingsFile();
+            foreach (string line in settings)
+            {
+                string[] setting = line.Split('=');
+                if (setting.Length != 2)
+                    continue;
+                if (setting[0].Trim() != "BuildSelector")
+                    continue;
+                string buildSelectorName = setting[1].Trim();
+
+
+                foreach (Type buildSelectorType in typeof(BuildSelector).Assembly.GetTypes().Where(type => (typeof(BuildSelector)).IsAssignableFrom(type)))
+                {
+                    if (buildSelectorType.FullName.Substring(buildSelectorType.FullName.LastIndexOf('.') + 1) == buildSelectorName)
+                    {
+                        BuildSelector buildSelector = (BuildSelector)Activator.CreateInstance(buildSelectorType);
+                        tyr.BuildSelector = buildSelector;
+                        break;
+                    }
+                }
+            }
+        }
+
+        private static void DetermineProbotsChat(Tyr tyr)
+        {
+            string[] settings = FileUtil.ReadSettingsFile();
+            foreach (string line in settings)
+            {
+                string[] setting = line.Split('=');
+                if (setting.Length != 2)
+                    continue;
+                if (setting[0].Trim() != "ProbotsChat")
+                    continue;
+                if (setting[1].Trim() == "true")
+                    tyr.ProbotsChatMessages = true;
+                else if (setting[1].Trim() == "false")
+                    tyr.ProbotsChatMessages = false;
             }
         }
     }

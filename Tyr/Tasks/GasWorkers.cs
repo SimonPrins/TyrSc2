@@ -20,7 +20,7 @@ namespace Tyr.Tasks
             }
         }
 
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
             // Remove dead workers.
             for (int i = Workers.Count - 1; i >= 0; i--)
@@ -55,8 +55,8 @@ namespace Tyr.Tasks
         {
             Workers.Add(agent);
             agent.Order(Abilities.MOVE, Gas.Tag);
-            if (!Tyr.Bot.UnitManager.DisappearedUnits.ContainsKey(agent.Unit.Tag))
-                Tyr.Bot.UnitManager.DisappearedUnits.Add(agent.Unit.Tag, agent);
+            if (!Bot.Bot.UnitManager.DisappearedUnits.ContainsKey(agent.Unit.Tag))
+                Bot.Bot.UnitManager.DisappearedUnits.Add(agent.Unit.Tag, agent);
         }
     }
 }

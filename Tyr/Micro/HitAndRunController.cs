@@ -9,7 +9,7 @@ namespace Tyr.Micro
         public override bool DetermineAction(Agent agent, Point2D target)
         {
             bool nearbyDead = false;
-            foreach (RecentlyDeceased deceased in Tyr.Bot.EnemyManager.GetRecentlyDeceased())
+            foreach (RecentlyDeceased deceased in Bot.Bot.EnemyManager.GetRecentlyDeceased())
             {
                 if (UnitTypes.AirAttackTypes.Contains(deceased.UnitType) && agent.DistanceSq(deceased.Pos) <= 15 * 15)
                 {
@@ -24,7 +24,7 @@ namespace Tyr.Micro
             potential.Magnitude = 4;
 
             int count = 0;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (!UnitTypes.AirAttackTypes.Contains(enemy.UnitType))
                     continue;

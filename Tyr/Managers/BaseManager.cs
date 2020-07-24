@@ -17,7 +17,7 @@ namespace Tyr.Managers
         public Base Natural { get; private set; }
         public Base Pocket { get; private set; }
 
-        public void OnStart(Tyr tyr)
+        public void OnStart(Bot tyr)
         {
             int[,] distances = tyr.MapAnalyzer.Distances(SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
             BaseLocation natural = null;
@@ -126,7 +126,7 @@ namespace Tyr.Managers
 
         }
 
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
             tyr.DrawSphere(SC2Util.Point(NaturalDefensePos.X, NaturalDefensePos.Y, 10));
             AvailableGasses = 0;
@@ -222,10 +222,14 @@ namespace Tyr.Managers
                 {
                     if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                         continue;
-                    if (SC2Util.DistanceSq(enemy.Pos, b.BaseLocation.Pos) >= 15 * 15)
+                    if (SC2Util.DistanceSq(enemy.Pos, b.BaseLocation.Pos) >= 20 * 20)
+                        continue;
+                    if (enemy.UnitType != UnitTypes.ORACLE
+                        && SC2Util.DistanceSq(enemy.Pos, b.BaseLocation.Pos) >= 15 * 15)
                         continue;
 
-                    if (enemy.UnitType == UnitTypes.ORACLE)
+                    if (enemy.UnitType == UnitTypes.ORACLE
+                        || enemy.UnitType == UnitTypes.LIBERATOR_AG)
                         attackerCount += 8;
 
                     b.UnderAttack = true;
@@ -245,7 +249,7 @@ namespace Tyr.Managers
 
             foreach (Base b in Bases)
                 if (b.Owner == -1)
-                    Tyr.Bot.DrawSphere(b.BaseLocation.Pos);
+                    Bot.Bot.DrawSphere(b.BaseLocation.Pos);
 
             CheckBlockedBases();
         }
@@ -254,7 +258,7 @@ namespace Tyr.Managers
         {
             foreach (Base b in Bases)
             {
-                if (b.Owner == Tyr.Bot.PlayerId
+                if (b.Owner == Bot.Bot.PlayerId
                     && b.ResourceCenter != null)
                 {
                     b.Blocked = false;
@@ -263,7 +267,7 @@ namespace Tyr.Managers
 
                 if (b.Blocked)
                 {
-                    foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+                    foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
                         if (agent.DistanceSq(b.BaseLocation.Pos) <= 2 * 2)
                         {
                             b.Blocked = false;
@@ -274,7 +278,7 @@ namespace Tyr.Managers
                         continue;
                 }
 
-                foreach (Unit enemy in Tyr.Bot.Enemies())
+                foreach (Unit enemy in Bot.Bot.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.WIDOW_MINE_BURROWED
                         && enemy.UnitType != UnitTypes.ZERGLING_BURROWED)
@@ -289,7 +293,7 @@ namespace Tyr.Managers
             }
             foreach (Base b in Bases)
                 if (b.Blocked)
-                    Tyr.Bot.DrawSphere(b.BaseLocation.Pos);
+                    Bot.Bot.DrawSphere(b.BaseLocation.Pos);
 
         }
     }

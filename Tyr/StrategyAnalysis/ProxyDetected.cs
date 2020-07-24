@@ -15,18 +15,18 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
                 return false;
-            if (Tyr.Bot.Frame >= 22.4 * 60 * 3)
+            if (Bot.Bot.Frame >= 22.4 * 60 * 3)
                 return false;
-            if (Tyr.Bot.EnemyStrategyAnalyzer.Expanded)
+            if (Expanded.Get().Detected)
                 return false;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (!UnitTypes.BuildingTypes.Contains(enemy.UnitType))
                     continue;
 
-                if (SC2Util.DistanceSq(enemy.Pos, Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]) >= 40 * 40)
+                if (SC2Util.DistanceSq(enemy.Pos, Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) >= 40 * 40)
                     return true;
             }
             return false;

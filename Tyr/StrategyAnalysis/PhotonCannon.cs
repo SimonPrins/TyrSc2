@@ -13,7 +13,7 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            return Tyr.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) > 0;
+            return Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) > 0;
         }
 
         public override string Name()

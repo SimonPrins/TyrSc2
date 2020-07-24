@@ -11,14 +11,14 @@ namespace Tyr.Managers
         public Dictionary<ulong, Agent> Agents = new Dictionary<ulong, Agent>();
 
         // Counts the number of units of each type we own.
-        public Dictionary<uint, int> Counts { get; internal set; }
-        public Dictionary<uint, int> CompletedCounts { get; internal set; }
+        public Dictionary<uint, int> Counts = new Dictionary<uint, int>();
+        public Dictionary<uint, int> CompletedCounts = new Dictionary<uint, int>();
         public uint FoodExpected { get; internal set; }
 
         public Dictionary<ulong, Agent> DisappearedUnits = new Dictionary<ulong, Agent>();
         public HashSet<uint> ActiveOrders = new HashSet<uint>();
 
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
             Counts = new Dictionary<uint, int>();
             CompletedCounts = new Dictionary<uint, int>();
@@ -30,6 +30,8 @@ namespace Tyr.Managers
             }
             ActiveOrders = new HashSet<uint>();
 
+            int directCountNexus = 0;
+            int abilityCountNexus = 0;
             FoodExpected = 0;
             // Update our unit set.
             foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
@@ -41,6 +43,8 @@ namespace Tyr.Managers
                 }
                 // Count how many of each unitType we have.
                 CollectionUtil.Increment(Counts, unit.UnitType);
+                if (unit.UnitType == UnitTypes.NEXUS)
+                    directCountNexus++;
                 if (UnitTypes.EquivalentTypes.ContainsKey(unit.UnitType))
                     foreach (uint t in UnitTypes.EquivalentTypes[unit.UnitType])
                         CollectionUtil.Increment(Counts, t);
@@ -53,9 +57,11 @@ namespace Tyr.Managers
                 }
 
                 if (unit.Orders != null && unit.Orders.Count > 0 && Abilities.Creates.ContainsKey(unit.Orders[0].AbilityId)
-                    && unit.UnitType != UnitTypes.SCV)
+                    && unit.UnitType != UnitTypes.SCV && unit.UnitType != UnitTypes.PROBE)
                 {
                     CollectionUtil.Increment(Counts, Abilities.Creates[unit.Orders[0].AbilityId]);
+                    if (Abilities.Creates[unit.Orders[0].AbilityId] == UnitTypes.NEXUS)
+                        abilityCountNexus++;
                     if (unit.Orders.Count >= 2 && unit.Orders[1].Progress > 0 && Abilities.Creates.ContainsKey(unit.Orders[1].AbilityId))
                         CollectionUtil.Increment(Counts, Abilities.Creates[unit.Orders[1].AbilityId]);
                 }
@@ -120,10 +126,13 @@ namespace Tyr.Managers
                     ActiveOrders.Add(unit.Orders[0].AbilityId);
             }
 
+            int buildRequestNexusCounts = 0;
             foreach (BuildRequest request in ConstructionTask.Task.BuildRequests)
             {
                 // Count how many of each unitType we intend to build.
                 CollectionUtil.Increment(Counts, request.Type);
+                if (request.Type == UnitTypes.NEXUS)
+                    buildRequestNexusCounts++;
                 if (request.Type == UnitTypes.PYLON)
                     FoodExpected += 8;
                 if (request.Type == UnitTypes.SUPPLY_DEPOT)
@@ -149,6 +158,8 @@ namespace Tyr.Managers
             {
                 // Count how many of each unitType we intend to build.
                 CollectionUtil.Increment(Counts, request.Type);
+                if (request.Type == UnitTypes.NEXUS)
+                    buildRequestNexusCounts++;
                 FoodExpected += 8;
                 if (request.Base != null)
                     CollectionUtil.Increment(request.Base.BuildingCounts, request.Type);
@@ -166,6 +177,10 @@ namespace Tyr.Managers
                 && tyr.Observation.Observation.RawData.Event.DeadUnits != null)
                 foreach (ulong deadUnit in tyr.Observation.Observation.RawData.Event.DeadUnits)
                     Agents.Remove(deadUnit);
+
+            Bot.Bot.DrawText("Direct nexus count: " + directCountNexus);
+            Bot.Bot.DrawText("Ability nexus count: " + abilityCountNexus);
+            Bot.Bot.DrawText("Build request nexus count: " + buildRequestNexusCounts);
         }
 
         public int Count(uint type)
@@ -184,10 +199,28 @@ namespace Tyr.Managers
                 return 0;
         }
 
+        public int Count(HashSet<uint> types)
+        {
+            int total = 0;
+            foreach (uint type in types)
+                total += Count(type);
+            return total;
+        }
+
+        public int Completed(HashSet<uint> types)
+        {
+            int total = 0;
+            foreach (uint type in types)
+                total += Completed(type);
+            return total;
+        }
+
         public void AddActions(List<Action> actions)
         {
             foreach (KeyValuePair<ulong, Agent> pair in Agents)
             {
+                if (Bot.Bot.ArchonMode && pair.Value.Unit.IsSelected)
+                    continue;
                 if (pair.Value.Command != null)
                 {
                     Action action = new Action();

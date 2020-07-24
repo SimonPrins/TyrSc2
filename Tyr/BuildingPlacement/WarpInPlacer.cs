@@ -19,7 +19,6 @@ namespace Tyr.BuildingPlacement
 
         private static Point2D findPlacementLocal(Point2D target, uint type, int maxDist)
         {
-            FileUtil.Debug("Frame: " + Tyr.Bot.Frame + " finding location around: " + target);
             target = SC2Util.Point((int)target.X + 0.5f, (int)target.Y + 0.5f);
 
             for (int range = 0; range < maxDist; range++)
@@ -46,7 +45,7 @@ namespace Tyr.BuildingPlacement
 
         public static bool CheckPlacement(Point2D location, uint type, BuildRequest skipRequest, bool buildingsOnly)
         {
-            int timeSinceLastWarpIn = Tyr.Bot.Frame - TrainStep.LastWarpInFrame;
+            int timeSinceLastWarpIn = Bot.Bot.Frame - TrainStep.LastWarpInFrame;
             if (timeSinceLastWarpIn >= 4
                 && timeSinceLastWarpIn <= 10
                 && SC2Util.DistanceSq(location, TrainStep.LastWarpInLocation) <= 0.25f)
@@ -56,7 +55,7 @@ namespace Tyr.BuildingPlacement
             if (!SC2Util.GetTilePlacable((int)Math.Round(location.X), (int)Math.Round(location.Y)))
                 return false;
 
-            foreach (Unit unit in Tyr.Bot.Observation.Observation.RawData.Units)
+            foreach (Unit unit in Bot.Bot.Observation.Observation.RawData.Units)
                 if (!unit.IsFlying && !CheckDistance(location, type, SC2Util.To2D(unit.Pos), unit.UnitType, buildingsOnly))
                     return false;
 
@@ -68,12 +67,12 @@ namespace Tyr.BuildingPlacement
                 if (request != skipRequest && !CheckDistance(location, type, request.Pos, request.Type, buildingsOnly))
                     return false;
 
-            foreach (Unit unit in Tyr.Bot.Observation.Observation.RawData.Units)
+            foreach (Unit unit in Bot.Bot.Observation.Observation.RawData.Units)
             {
-                if (unit.UnitType != UnitTypes.PYLON || unit.BuildProgress < 1)
+                if ((unit.UnitType != UnitTypes.PYLON && unit.UnitType != UnitTypes.WARP_PRISM_PHASING) || unit.BuildProgress < 1)
                     continue;
                 
-                if (Tyr.Bot.MapAnalyzer.MapHeight((int)unit.Pos.X, (int)unit.Pos.Y) < Tyr.Bot.MapAnalyzer.MapHeight((int)location.X, (int)location.Y))
+                if (Bot.Bot.MapAnalyzer.MapHeight((int)unit.Pos.X, (int)unit.Pos.Y) < Bot.Bot.MapAnalyzer.MapHeight((int)location.X, (int)location.Y))
                     continue;
 
                 if (location.X - 1 >= unit.Pos.X - 6 && location.X + 1 <= unit.Pos.X + 6

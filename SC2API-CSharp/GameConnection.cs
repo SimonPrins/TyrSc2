@@ -122,6 +122,7 @@ namespace SC2API_CSharp
 
             joinGame.Options = new InterfaceOptions();
             joinGame.Options.Raw = true;
+            joinGame.Options.ShowCloaked = true;
             joinGame.Options.Score = true;
 
             Request request = new Request();

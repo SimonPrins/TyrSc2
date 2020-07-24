@@ -19,7 +19,7 @@ namespace Tyr.Tasks
 
         public override bool DoWant(Agent agent)
         {
-            return (agent.Unit.UnitType == UnitTypes.DARK_TEMPLAR || agent.Unit.UnitType == UnitTypes.HIGH_TEMPLAR) && SC2Util.DistanceGrid(agent.Unit.Pos, Tyr.Bot.MapAnalyzer.StartLocation) <= 80;
+            return (agent.Unit.UnitType == UnitTypes.DARK_TEMPLAR || agent.Unit.UnitType == UnitTypes.HIGH_TEMPLAR) && SC2Util.DistanceGrid(agent.Unit.Pos, Bot.Bot.MapAnalyzer.StartLocation) <= 80;
         }
 
         public override bool IsNeeded()
@@ -27,7 +27,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             for (int i = 0; i < units.Count - 1; i++)
             {

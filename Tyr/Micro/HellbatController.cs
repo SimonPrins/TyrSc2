@@ -12,12 +12,12 @@ namespace Tyr.Micro
                 return false;
 
             float dist;
-            if (agent.DistanceSq(Tyr.Bot.MapAnalyzer.StartLocation) >= 40 * 40)
+            if (agent.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation) >= 40 * 40)
             {
                 Point2D retreatTo = null;
                 dist = 15 * 15;
                 bool sieged = false;
-                foreach (Agent ally in Tyr.Bot.UnitManager.Agents.Values)
+                foreach (Agent ally in Bot.Bot.UnitManager.Agents.Values)
                 {
                     if (ally.Unit.UnitType != UnitTypes.SIEGE_TANK
                         && ally.Unit.UnitType != UnitTypes.SIEGE_TANK_SIEGED)

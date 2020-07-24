@@ -12,12 +12,12 @@ namespace Tyr.Micro
             Point2D retreatFrom = null;
             float dist = 10 * 10;
 
-            foreach (UnitLocation enemy in Tyr.Bot.EnemyMineManager.Mines)
+            foreach (UnitLocation enemy in Bot.Bot.EnemyMineManager.Mines)
             {
-                if (!Tyr.Bot.EnemyManager.LastSeenFrame.ContainsKey(enemy.Tag))
+                if (!Bot.Bot.EnemyManager.LastSeenFrame.ContainsKey(enemy.Tag))
                     continue;
                 float newDist = agent.DistanceSq(enemy.Pos);
-                if (Tyr.Bot.Frame - Tyr.Bot.EnemyManager.LastSeenFrame[enemy.Tag] < 2)
+                if (Bot.Bot.Frame - Bot.Bot.EnemyManager.LastSeenFrame[enemy.Tag] < 2)
                     continue;
 
                 if (newDist < dist)

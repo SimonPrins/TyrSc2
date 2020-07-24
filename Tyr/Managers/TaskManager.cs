@@ -10,7 +10,7 @@ namespace Tyr.Managers
 
         public CombatSimulation CombatSimulation = new CombatSimulation();
 
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
             foreach (Task task in Tasks)
                 task.Cleanup(tyr);

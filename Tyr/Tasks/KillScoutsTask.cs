@@ -49,7 +49,7 @@ namespace Tyr.Tasks
             if (Target != null)
             {
                 bool stillThere = false;
-                foreach (Unit enemy in Tyr.Bot.Enemies())
+                foreach (Unit enemy in Bot.Bot.Enemies())
                 {
                     if (enemy.Tag == Target.Tag)
                     {
@@ -62,9 +62,9 @@ namespace Tyr.Tasks
                 else
                 {
                     bool close = false;
-                    foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                    foreach (Base b in Bot.Bot.BaseManager.Bases)
                     {
-                        if (b.Owner != Tyr.Bot.PlayerId)
+                        if (b.Owner != Bot.Bot.PlayerId)
                             continue;
                         if (SC2Util.DistanceSq(b.BaseLocation.Pos, Target.Pos) <= 20 * 20)
                         {
@@ -77,16 +77,16 @@ namespace Tyr.Tasks
                     else return;
                 }
             }
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.OVERLORD
                     && enemy.UnitType != UnitTypes.OVERSEER
                     && !UnitTypes.ChangelingTypes.Contains(enemy.UnitType)
                     && !UnitTypes.WorkerTypes.Contains(enemy.UnitType))
                     continue;
-                foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Bot.BaseManager.Bases)
                 {
-                    if (b.Owner != Tyr.Bot.PlayerId)
+                    if (b.Owner != Bot.Bot.PlayerId)
                         continue;
                     if (SC2Util.DistanceSq(b.BaseLocation.Pos, enemy.Pos) <= 15 * 15)
                     {
@@ -99,7 +99,7 @@ namespace Tyr.Tasks
 
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (units.Count == 0)
                 return;

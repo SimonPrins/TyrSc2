@@ -22,9 +22,9 @@ namespace Tyr.Micro
             PotentialHelper potential = new PotentialHelper(agent.Unit.Pos);
             potential.Magnitude = 4;
             bool flee = false;
-            foreach (Managers.Effect effect in Tyr.Bot.EffectManager.Effects)
+            foreach (Managers.Effect effect in Bot.Bot.EffectManager.Effects)
                 if (effect.EffectId == 11 && agent.DistanceSq(effect.Pos) <= 3 * 3
-                    && (Tyr.Bot.Frame - effect.FirstSeenFrame >= 34 || agent.Unit.UnitType != UnitTypes.ZERGLING))
+                    && (Bot.Bot.Frame - effect.FirstSeenFrame >= 34 || agent.Unit.UnitType != UnitTypes.ZERGLING))
                 {
                     potential.From(effect.Pos);
                     flee = true;
@@ -46,7 +46,7 @@ namespace Tyr.Micro
             foreach (Agent disruptor in PhasedDisruptorTask.Task.Units)
             {
                 if (!PhasedDisruptorTask.Task.PhasedFrame.ContainsKey(disruptor.Unit.Tag)
-                    || Tyr.Bot.Frame - PhasedDisruptorTask.Task.PhasedFrame[disruptor.Unit.Tag] < 23)
+                    || Bot.Bot.Frame - PhasedDisruptorTask.Task.PhasedFrame[disruptor.Unit.Tag] < 23)
                     continue;
 
                 if (agent.DistanceSq(disruptor) <= 3 * 3)

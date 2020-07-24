@@ -10,7 +10,7 @@ namespace Tyr.Tasks
     {
         public static PhoenixHarassTask Task = new PhoenixHarassTask();
 
-        public int RequiredSize { get; set; } = 5;
+        public int RequiredSize { get; set; } = 7;
 
         Point2D Target = null;
 
@@ -36,10 +36,10 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.UnitManager.Completed(UnitTypes.PHOENIX) >= RequiredSize;
+            return Bot.Bot.UnitManager.Completed(UnitTypes.PHOENIX) >= RequiredSize;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
 
             Center = new Point2D();
@@ -118,7 +118,7 @@ namespace Tyr.Tasks
         public void DetermineTarget()
         {
             if (Target == null)
-                Target = Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0];
+                Target = Bot.Bot.TargetManager.PotentialEnemyStartLocations[0];
 
             bool phoenixClose = false;
             foreach (Agent agent in Units)
@@ -133,9 +133,9 @@ namespace Tyr.Tasks
                 return;
             if (TargetLocations.Count == 0)
             {
-                foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Bot.BaseManager.Bases)
                 {
-                    if (SC2Util.DistanceSq(b.BaseLocation.Pos, Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]) >= 50 * 50)
+                    if (SC2Util.DistanceSq(b.BaseLocation.Pos, Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) >= 50 * 50)
                         continue;
 
                     TargetLocations.Add(b.BaseLocation.Pos);
@@ -192,7 +192,7 @@ namespace Tyr.Tasks
                     continue;
 
                 Unit liftTarget = null;
-                foreach (Unit enemy in Tyr.Bot.Enemies())
+                foreach (Unit enemy in Bot.Bot.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.QUEEN
                         && enemy.UnitType != UnitTypes.HYDRALISK)
@@ -214,7 +214,7 @@ namespace Tyr.Tasks
                 }
                 if (liftTarget != null)
                 {
-                    GravitonTargets.Add(new GravitonTarget() { PhoenixTag = agent.Unit.Tag, TargetTag = liftTarget.Tag, StartFrame = Tyr.Bot.Frame });
+                    GravitonTargets.Add(new GravitonTarget() { PhoenixTag = agent.Unit.Tag, TargetTag = liftTarget.Tag, StartFrame = Bot.Bot.Frame });
                     allowedLifts--;
                     lifts--;
                     if (allowedLifts == 0)
@@ -223,37 +223,7 @@ namespace Tyr.Tasks
                 }
                 if (lifts < 5)
                     return;
-                foreach (Unit enemy in Tyr.Bot.Enemies())
-                {
-                    if (!UnitTypes.WorkerTypes.Contains(enemy.UnitType))
-                        continue;
-                    if (agent.DistanceSq(enemy) >= 12 * 12)
-                        continue;
-                    if (SC2Util.DistanceSq(enemy.Pos, Center) >= 20 * 20)
-                        continue;
-                    bool alreadyLifted = false;
-                    foreach (GravitonTarget target in GravitonTargets)
-                        if (target.TargetTag == enemy.Tag)
-                        {
-                            alreadyLifted = true;
-                            break;
-                        }
-                    if (alreadyLifted)
-                        continue;
-                    liftTarget = enemy;
-                }
-                if (liftTarget != null)
-                {
-                    GravitonTargets.Add(new GravitonTarget() { PhoenixTag = agent.Unit.Tag, TargetTag = liftTarget.Tag, StartFrame = Tyr.Bot.Frame });
-                    allowedLifts--;
-                    lifts--;
-                    if (allowedLifts == 0)
-                        return;
-                    continue;
-                }
-                if (lifts < 10)
-                    return;
-                foreach (Unit enemy in Tyr.Bot.Enemies())
+                foreach (Unit enemy in Bot.Bot.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.ROACH
                         && enemy.UnitType != UnitTypes.RAVAGER)
@@ -275,7 +245,35 @@ namespace Tyr.Tasks
                 }
                 if (liftTarget != null)
                 {
-                    GravitonTargets.Add(new GravitonTarget() { PhoenixTag = agent.Unit.Tag, TargetTag = liftTarget.Tag, StartFrame = Tyr.Bot.Frame });
+                    GravitonTargets.Add(new GravitonTarget() { PhoenixTag = agent.Unit.Tag, TargetTag = liftTarget.Tag, StartFrame = Bot.Bot.Frame });
+                    allowedLifts--;
+                    lifts--;
+                    if (allowedLifts == 0)
+                        return;
+                    continue;
+                }
+                foreach (Unit enemy in Bot.Bot.Enemies())
+                {
+                    if (!UnitTypes.WorkerTypes.Contains(enemy.UnitType))
+                        continue;
+                    if (agent.DistanceSq(enemy) >= 12 * 12)
+                        continue;
+                    if (SC2Util.DistanceSq(enemy.Pos, Center) >= 20 * 20)
+                        continue;
+                    bool alreadyLifted = false;
+                    foreach (GravitonTarget target in GravitonTargets)
+                        if (target.TargetTag == enemy.Tag)
+                        {
+                            alreadyLifted = true;
+                            break;
+                        }
+                    if (alreadyLifted)
+                        continue;
+                    liftTarget = enemy;
+                }
+                if (liftTarget != null)
+                {
+                    GravitonTargets.Add(new GravitonTarget() { PhoenixTag = agent.Unit.Tag, TargetTag = liftTarget.Tag, StartFrame = Bot.Bot.Frame });
                     allowedLifts--;
                     lifts--;
                     if (allowedLifts == 0)
@@ -294,15 +292,15 @@ namespace Tyr.Tasks
 
         public bool Done()
         {
-            if (Tyr.Bot.Frame - StartFrame >= 22.4 * 7)
+            if (Bot.Bot.Frame - StartFrame >= 22.4 * 7)
                 return true;
-            if (!Tyr.Bot.UnitManager.Agents.ContainsKey(PhoenixTag))
+            if (!Bot.Bot.UnitManager.Agents.ContainsKey(PhoenixTag))
                 return true;
-            if (Tyr.Bot.EnemyManager.LastSeenFrame.ContainsKey(TargetTag)
-                && Tyr.Bot.Frame - Tyr.Bot.EnemyManager.LastSeenFrame[TargetTag] >= 1)
+            if (Bot.Bot.EnemyManager.LastSeenFrame.ContainsKey(TargetTag)
+                && Bot.Bot.Frame - Bot.Bot.EnemyManager.LastSeenFrame[TargetTag] >= 1)
                 return true;
 
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
                 if (enemy.Tag == TargetTag)
                     return false;
             return true;
@@ -310,9 +308,9 @@ namespace Tyr.Tasks
 
         public Point2D GetTargetLocation()
         {
-            if (Tyr.Bot.EnemyManager.LastSeen.ContainsKey(TargetTag))
-                return SC2Util.To2D(Tyr.Bot.EnemyManager.LastSeen[TargetTag].Pos);
-            return SC2Util.To2D(Tyr.Bot.UnitManager.Agents[PhoenixTag].Unit.Pos);
+            if (Bot.Bot.EnemyManager.LastSeen.ContainsKey(TargetTag))
+                return SC2Util.To2D(Bot.Bot.EnemyManager.LastSeen[TargetTag].Pos);
+            return SC2Util.To2D(Bot.Bot.UnitManager.Agents[PhoenixTag].Unit.Pos);
         }
     }
 

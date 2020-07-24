@@ -30,7 +30,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -40,33 +40,33 @@ namespace Tyr.Tasks
 
         private bool GetWorkerRushHappening()
         {
-            if (Tyr.Bot.Frame == WorkerRushHappeningFrame)
+            if (Bot.Bot.Frame == WorkerRushHappeningFrame)
                 return WorkerRushHappening;
 
-            WorkerRushHappeningFrame = Tyr.Bot.Frame;
+            WorkerRushHappeningFrame = Bot.Bot.Frame;
 
             int invadingWorkers = 0;
             int dist = WorkerRushHappening ? 80 * 80 : 30 * 30;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (!UnitTypes.WorkerTypes.Contains(enemy.UnitType))
                     continue;
 
-                if (SC2Util.DistanceSq(enemy.Pos, Tyr.Bot.MapAnalyzer.StartLocation) <= dist)
+                if (SC2Util.DistanceSq(enemy.Pos, Bot.Bot.MapAnalyzer.StartLocation) <= dist)
                     invadingWorkers++;
             }
             if (!WorkerRushHappening && invadingWorkers >= 8)
             {
                 WorkerRushHappening = true;
                 State = GatherDefenders;
-                GatherDefendersStartFrame = Tyr.Bot.Frame;
+                GatherDefendersStartFrame = Bot.Bot.Frame;
             }
 
             if (WorkerRushHappening && invadingWorkers == 0)
                 WorkerRushHappening = false;
 
-            Tyr.Bot.DrawText("Invading workers: " + invadingWorkers);
-            Tyr.Bot.DrawText("Workerrush happening: " + WorkerRushHappening);
+            Bot.Bot.DrawText("Invading workers: " + invadingWorkers);
+            Bot.Bot.DrawText("Workerrush happening: " + WorkerRushHappening);
 
             return WorkerRushHappening;
         }
@@ -83,7 +83,7 @@ namespace Tyr.Tasks
             return GetWorkerRushHappening();
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (!GetWorkerRushHappening())
             {
@@ -97,10 +97,16 @@ namespace Tyr.Tasks
                 ExecuteDefend(tyr);
         }
 
-        public void ExecuteGatherDefenders(Tyr tyr)
+        public void ExecuteGatherDefenders(Bot tyr)
         {
             if (mineral == null && tyr.BaseManager.Main.BaseLocation.MineralFields.Count > 0)
                 mineral = tyr.BaseManager.Main.BaseLocation.MineralFields[0];
+
+            if (mineral == null)
+            {
+                State = Defend;
+                return;
+            }
 
             foreach (Agent agent in Units)
                 agent.Order(Abilities.MOVE, mineral.Tag);
@@ -109,7 +115,7 @@ namespace Tyr.Tasks
                 State = Defend;
         }
 
-        public void ExecuteDefend(Tyr tyr)
+        public void ExecuteDefend(Bot tyr)
         {
             bool surround = (tyr.Frame - GatherDefendersStartFrame - 110) % 23 < 8;
 
@@ -153,8 +159,9 @@ namespace Tyr.Tasks
                     agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
                 if (closestEnemy != null && agent.Unit.WeaponCooldown <= 6)
                     agent.Order(Abilities.ATTACK, SC2Util.To2D(closestEnemy.Pos));
-                else
+                else if (mineral != null)
                     agent.Order(Abilities.MOVE, mineral.Tag);
+                else agent.FleeEnemies(false);
             }
         }
     }

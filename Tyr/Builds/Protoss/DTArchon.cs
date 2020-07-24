@@ -18,7 +18,7 @@ namespace Tyr.Builds.Protoss
             return "DTArchon";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             tyr.TaskManager.Add(new DefenseTask());
             tyr.TaskManager.Add(attackTask);
@@ -30,7 +30,7 @@ namespace Tyr.Builds.Protoss
             tyr.TaskManager.Add(new ArchonMergeTask());
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             Point2D main = SC2Util.To2D(tyr.MapAnalyzer.StartLocation);
             Base mainBase = null;
@@ -114,7 +114,7 @@ namespace Tyr.Builds.Protoss
             }
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50
@@ -126,7 +126,7 @@ namespace Tyr.Builds.Protoss
             }
             else if (agent.Unit.UnitType == UnitTypes.GATEWAY)
             {
-                if (Tyr.Bot.EnemyRace == Race.Zerg)
+                if (Bot.Bot.EnemyRace == Race.Zerg)
                 {
                     if (!stopRush && Completed(UnitTypes.DARK_SHRINE) > 0 && Count(UnitTypes.DARK_TEMPLAR) < 2)
                     {

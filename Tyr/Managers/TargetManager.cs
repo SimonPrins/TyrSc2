@@ -11,13 +11,16 @@ namespace Tyr.Managers
         private ulong targetUnitTag = 0;
         bool enemyMainFound = false;
         public bool PrefferDistant { get; set; } = true;
+        public bool IncludeAllEnemies = true;
 
         public bool TargetAllBuildings = false;
         public bool TargetCannons = false;
         public bool TargetGateways = false;
         public bool SkipPlanetaries = false;
+        public bool IgnoreFlyingBuildings = false;
+        public Point2D CloseTo;
 
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
             if (PotentialEnemyStartLocations.Count > 1 && !enemyMainFound)
             {
@@ -59,7 +62,7 @@ namespace Tyr.Managers
                         || (TargetGateways && building.Type == UnitTypes.WARP_GATE)
                         || TargetAllBuildings)
                     {
-                        float newDist = SC2Util.DistanceSq(building.Pos, PotentialEnemyStartLocations[0]);
+                        float newDist = SC2Util.DistanceSq(building.Pos, CloseTo == null ? PotentialEnemyStartLocations[0] : CloseTo);
                         if ((PrefferDistant && newDist > dist)
                             || (!PrefferDistant && newDist < dist))
                         {
@@ -78,12 +81,14 @@ namespace Tyr.Managers
 
             Point2D lastTarget = AttackTarget;
 
-            if (!tyr.EnemyManager.EnemyBuildings.ContainsKey(targetUnitTag))
+            if (!tyr.EnemyManager.EnemyBuildings.ContainsKey(targetUnitTag) || tyr.EnemyManager.EnemyBuildings[targetUnitTag].Flying)
             {
                 AttackTarget = null;
                 targetUnitTag = 0;
                 foreach (BuildingLocation enemyBuilding in tyr.EnemyManager.EnemyBuildings.Values)
                 {
+                    if (enemyBuilding.Flying && IgnoreFlyingBuildings)
+                        continue;
                     AttackTarget = SC2Util.To2D(enemyBuilding.Pos);
                     targetUnitTag = enemyBuilding.Tag;
                     break;
@@ -111,6 +116,19 @@ namespace Tyr.Managers
             }
             else AttackTarget = SC2Util.To2D(tyr.EnemyManager.EnemyBuildings[targetUnitTag].Pos);
 
+            if (IncludeAllEnemies && CloseTo != null)
+            {
+                float dist = 15 * 15;
+                foreach (Unit enemy in tyr.Enemies())
+                {
+                    float newDist = SC2Util.DistanceSq(enemy.Pos, CloseTo);
+                    if (newDist >= dist)
+                        continue;
+                    dist = newDist;
+                    AttackTarget = SC2Util.To2D(enemy.Pos);
+                }
+            }
+
             if (tyr.EnemyManager.EnemyBuildings.Count == 0 && PotentialEnemyStartLocations.Count == 1)
             {
                 bool cleared = false;
@@ -131,7 +149,7 @@ namespace Tyr.Managers
             }
         }
 
-        public void OnStart(Tyr tyr)
+        public void OnStart(Bot tyr)
         {
             foreach (Point2D location in tyr.GameInfo.StartRaw.StartLocations)
                 if (SC2Util.DistanceGrid(tyr. MapAnalyzer.StartLocation, location) > 20)

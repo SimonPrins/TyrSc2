@@ -12,6 +12,7 @@ namespace Tyr.Tasks
     {
         public static ProxyTask Task = new ProxyTask();
         public bool UseCloseHideLocation = true;
+        public bool UseEnemyNatural = false;
         public Point2D HideLocation;
 
         public List<BuildRequest> BuildRequests = new List<BuildRequest>();
@@ -31,7 +32,7 @@ namespace Tyr.Tasks
         {
             Task.Buildings = buildings;
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public static void Enable(List<ProxyBuilding> buildings, bool useCloseHideLocation)
@@ -39,7 +40,7 @@ namespace Tyr.Tasks
             Task.Buildings = buildings;
             Task.Stopped = false;
             Task.UseCloseHideLocation = useCloseHideLocation;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -57,23 +58,29 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.Frame > 100;
+            return Bot.Bot.Frame > 100;
         }
 
         public Point2D GetHideLocation()
         {
             if (HideLocation == null)
             {
-                if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
+                if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count != 1)
                     return null;
 
-                Point2D enemyMain = Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0];
-                Point2D enemyNatural = Tyr.Bot.MapAnalyzer.GetEnemyNatural().Pos;
+                if (UseEnemyNatural)
+                {
+                    HideLocation = Bot.Bot.MapAnalyzer.GetEnemyNatural().Pos;
+                    return HideLocation;
+                }
+
+                Point2D enemyMain = Bot.Bot.TargetManager.PotentialEnemyStartLocations[0];
+                Point2D enemyNatural = Bot.Bot.MapAnalyzer.GetEnemyNatural().Pos;
                 Point2D closeTo = UseCloseHideLocation ? enemyMain : 
                         new PotentialHelper(enemyNatural, 30).From(enemyMain).Get();
                 
                 float dist = 10000;
-                foreach (Base b in Tyr.Bot.BaseManager.Bases)
+                foreach (Base b in Bot.Bot.BaseManager.Bases)
                 {
                     float newDist = SC2Util.DistanceSq(closeTo, b.BaseLocation.Pos);
                     
@@ -89,13 +96,13 @@ namespace Tyr.Tasks
                 }
                 
                 HideLocation = new PotentialHelper(HideLocation, 6)
-                    .To(Tyr.Bot.MapAnalyzer.StartLocation)
+                    .To(Bot.Bot.MapAnalyzer.StartLocation)
                     .Get();
             }
             return HideLocation;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             Point2D hideLocation = GetHideLocation();
             if (hideLocation == null)
@@ -112,7 +119,7 @@ namespace Tyr.Tasks
             List<BuildRequest> doneRequests = new List<BuildRequest>();
             foreach (BuildRequest request in BuildRequests)
             {
-                if (request.worker != null && !Tyr.Bot.UnitManager.Agents.ContainsKey(request.worker.Unit.Tag))
+                if (request.worker != null && !Bot.Bot.UnitManager.Agents.ContainsKey(request.worker.Unit.Tag))
                     request.worker = null;
                 if (request.worker == null)
                 {
@@ -150,7 +157,7 @@ namespace Tyr.Tasks
                 {
                     float dist = 20 * 20;
                     Unit target = null;
-                    foreach (Unit enemy in Tyr.Bot.Enemies())
+                    foreach (Unit enemy in Bot.Bot.Enemies())
                     {
                         if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                             continue;
@@ -164,7 +171,7 @@ namespace Tyr.Tasks
                     }
                     if (target != null)
                     {
-                        Tyr.Bot.DrawLine(agent.Unit.Pos, target.Pos);
+                        Bot.Bot.DrawLine(agent.Unit.Pos, target.Pos);
                         agent.Order(Abilities.MOVE, agent.From(target, 4));
                         continue;
                     }
@@ -175,6 +182,15 @@ namespace Tyr.Tasks
                 {
                     if (request.worker == null || request.worker.Unit.Tag != agent.Unit.Tag)
                         continue;
+                    
+                    foreach (Unit enemy in tyr.Enemies())
+                    {
+                        if (!enemy.IsFlying && SC2Util.DistanceGrid(request.Pos, enemy.Pos) <= (UnitTypes.WorkerTypes.Contains(enemy.UnitType) ? 3 : 1))
+                        {
+                            Point2D placement = ProxyBuildingPlacer.FindPlacement(GetHideLocation(), BuildingType.LookUp[request.Type].Size, request.Type);
+                            request.Pos = placement;
+                        }
+                    }
 
                     building = true;
                     if (agent.DistanceSq(request.Pos) <= 10 * 10)

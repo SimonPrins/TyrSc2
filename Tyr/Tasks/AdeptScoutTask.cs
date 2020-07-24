@@ -23,7 +23,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (tyr.Frame % (22) == 0)
                 foreach(Agent agent in tyr.UnitManager.Agents.Values)

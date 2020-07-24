@@ -1,5 +1,5 @@
-﻿using System;
-using SC2APIProtocol;
+﻿using SC2APIProtocol;
+using System;
 using Tyr.Managers;
 using Tyr.Util;
 
@@ -29,16 +29,34 @@ namespace Tyr.Agents
 
         public void Order(int ability)
         {
-            Order(ability, null);
+            Order(ability, (Point2D)null);
+        }
+
+        internal bool IsCarryingResources()
+        {
+            foreach (int buff in Unit.BuffIds)
+                if (buff >= 271 && buff <= 275)
+                    return true;
+            return false;
+        }
+
+        public void Order(int ability, Point target)
+        {
+            Order(ability, SC2Util.To2D(target));
         }
 
         public void Order(int ability, Point2D target)
         {
+            Order(ability, target, false);
+        }
+
+        public void Order(int ability, Point2D target, bool queue)
+        {
             // Make sure blink doesn't get cancelled.
-            if (LastAbility == Abilities.BLINK && Tyr.Bot.Frame - LastOrderFrame <= 20)
+            if (LastAbility == Abilities.BLINK && Bot.Bot.Frame - LastOrderFrame <= 20)
                 return;
             // Short delay between orders to prevent order spam.
-            if (LastAbility == ability && Tyr.Bot.Frame - LastOrderFrame <= 5)
+            if (!queue && LastAbility == ability && Bot.Bot.Frame - LastOrderFrame <= 5)
                 return;
 
             LastAbility = ability;
@@ -51,11 +69,13 @@ namespace Tyr.Agents
                 && Unit.Orders[0].AbilityId == ability)
                 return;
 
-            LastOrderFrame = Tyr.Bot.Frame;
+            LastOrderFrame = Bot.Bot.Frame;
             Command = new ActionRawUnitCommand();
             Command.AbilityId = ability;
             Command.TargetWorldSpacePos = target;
             Command.UnitTags.Add(Unit.Tag);
+            if (queue)
+                Command.QueueCommand = true;
         }
 
         public bool FleeEnemies(bool returnFire)
@@ -68,8 +88,18 @@ namespace Tyr.Agents
             Point2D retreatFrom = null;
             Unit retreatUnit = null;
             float dist = fleeDistance * fleeDistance;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
+                if (enemy.UnitType == UnitTypes.CREEP_TUMOR
+                    || enemy.UnitType == UnitTypes.CREEP_TUMOR_BURROWED
+                    || enemy.UnitType == UnitTypes.CREEP_TUMOR_QUEEN
+                    || enemy.UnitType == UnitTypes.EGG
+                    || enemy.UnitType == UnitTypes.OVERLORD
+                    || enemy.UnitType == UnitTypes.OVERLORD_COCOON
+                    || enemy.UnitType == UnitTypes.OVERSEER
+                    || enemy.UnitType == UnitTypes.LARVA
+                    || UnitTypes.ChangelingTypes.Contains(enemy.UnitType))
+                    continue;
                 float newDist = DistanceSq(enemy);
                 if (newDist < dist)
                 {
@@ -78,7 +108,7 @@ namespace Tyr.Agents
                     dist = newDist;
                 }
             }
-            foreach (UnitLocation enemy in Tyr.Bot.EnemyMineManager.Mines)
+            foreach (UnitLocation enemy in Bot.Bot.EnemyMineManager.Mines)
             {
                 float newDist = DistanceSq(enemy.Pos);
                 if (newDist < dist)
@@ -87,7 +117,7 @@ namespace Tyr.Agents
                     dist = newDist;
                 }
             }
-            foreach (UnitLocation enemy in Tyr.Bot.EnemyTankManager.Tanks)
+            foreach (UnitLocation enemy in Bot.Bot.EnemyTankManager.Tanks)
             {
                 float newDist = DistanceSq(enemy.Pos);
                 if (newDist < dist)
@@ -124,9 +154,9 @@ namespace Tyr.Agents
             potential.From(retreatFrom);
             Point2D fleeTo;
             if (Unit.IsFlying)
-                fleeTo = SC2Util.To2D(Tyr.Bot.MapAnalyzer.StartLocation);
+                fleeTo = SC2Util.To2D(Bot.Bot.MapAnalyzer.StartLocation);
             else
-                fleeTo = Tyr.Bot.MapAnalyzer.Walk(SC2Util.To2D(Unit.Pos), Tyr.Bot.MapAnalyzer.MainDistances, 6);
+                fleeTo = Bot.Bot.MapAnalyzer.Walk(SC2Util.To2D(Unit.Pos), Bot.Bot.MapAnalyzer.MainDistances, 6);
             potential.To(fleeTo);
             Order(Abilities.MOVE, potential.Get());
         }
@@ -157,12 +187,12 @@ namespace Tyr.Agents
         internal void ArchonMerge(Agent agent)
         {
             // Short delay between orders to prevent order spam.
-            if (Tyr.Bot.Frame - LastOrderFrame <= 5)
+            if (Bot.Bot.Frame - LastOrderFrame <= 5)
                 return;
 
             agent.Command = null;
 
-            LastOrderFrame = Tyr.Bot.Frame;
+            LastOrderFrame = Bot.Bot.Frame;
             Command = new ActionRawUnitCommand();
             Command.AbilityId = 1766;
             Command.UnitTags.Add(Unit.Tag);
@@ -171,9 +201,9 @@ namespace Tyr.Agents
 
         public Agent GetAddOn()
         {
-            if (!Tyr.Bot.UnitManager.Agents.ContainsKey(Unit.AddOnTag))
+            if (!Bot.Bot.UnitManager.Agents.ContainsKey(Unit.AddOnTag))
                 return null;
-            return Tyr.Bot.UnitManager.Agents[Unit.AddOnTag];
+            return Bot.Bot.UnitManager.Agents[Unit.AddOnTag];
         }
 
         public uint CurrentAbility()
@@ -215,7 +245,7 @@ namespace Tyr.Agents
         public void Order(int ability, ulong targetTag)
         {
             // Make sure blink doesn't get cancelled.
-            if (LastAbility == Abilities.BLINK && Tyr.Bot.Frame - LastOrderFrame <= 20)
+            if (LastAbility == Abilities.BLINK && Bot.Bot.Frame - LastOrderFrame <= 20)
                 return;
             // Ignore orders that are the same or similar to existing orders.
             if (Unit.Orders.Count != 0 && Unit.Orders[0].TargetUnitTag == targetTag && Unit.Orders[0].AbilityId == ability)

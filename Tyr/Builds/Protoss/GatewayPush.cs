@@ -14,7 +14,7 @@ namespace Tyr.Builds.Protoss
             return "GatewayPush";
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             tyr.TaskManager.Add(new DefenseTask());
             tyr.TaskManager.Add(attackTask);
@@ -50,13 +50,13 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
-            if (tyr.EnemyStrategyAnalyzer.CannonRushDetected)
+            if (StrategyAnalysis.CannonRush.Get().Detected)
                 attackTask.RequiredSize = 5;
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50
@@ -67,7 +67,7 @@ namespace Tyr.Builds.Protoss
             }
             else if (agent.Unit.UnitType == UnitTypes.GATEWAY)
             {
-                if (Tyr.Bot.EnemyRace == Race.Zerg)
+                if (Bot.Bot.EnemyRace == Race.Zerg)
                 {
                     if (Minerals() >= 50
                         && Gas() >= 150
@@ -100,18 +100,18 @@ namespace Tyr.Builds.Protoss
             }
             else if (agent.Unit.UnitType == UnitTypes.TEMPLAR_ARCHIVE)
             {
-                if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(52)
+                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(52)
                     && Minerals() >= 200
                     && Gas() >= 200)
                     agent.Order(1126);
             }
             else if (agent.Unit.UnitType == UnitTypes.TWILIGHT_COUNSEL)
             {
-                if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
+                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(130)
                     && Minerals() >= 100
                     && Gas() >= 100)
                     agent.Order(1594);
-                else if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
+                else if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(86)
                      && Minerals() >= 100
                      && Gas() >= 100)
                     agent.Order(1592);

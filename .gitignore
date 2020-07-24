@@ -10,3 +10,7 @@ TyrDotnetCore/obj/
 TyrExecutable/bin/
 TyrExecutable/obj/
 .vs/
+Tyr/Secret
+build-tyckles.cmd
+build-tyr-probots.cmd
+build-tyr.cmd

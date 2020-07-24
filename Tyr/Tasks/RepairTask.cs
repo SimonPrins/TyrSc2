@@ -50,7 +50,7 @@ namespace Tyr.Tasks
             {
                 int needed = NeedsExtraRepairing.Contains(building) ? 5 : 3;
                 result.Add(new UnitDescriptor() {
-                    Pos = SC2Util.To2D(Tyr.Bot.UnitManager.Agents[building].Unit.Pos),
+                    Pos = SC2Util.To2D(Bot.Bot.UnitManager.Agents[building].Unit.Pos),
                     Count = AlreadyRepairing.ContainsKey(building) ? (needed - AlreadyRepairing[building]) : needed,
                     UnitTypes = new HashSet<uint>() { UnitTypes.SCV },
                     Marker = building,
@@ -68,23 +68,23 @@ namespace Tyr.Tasks
 
         private void UpdateNeedsRepairing()
         {
-            if (NeedsRepairingUpdateFrame >= Tyr.Bot.Frame)
+            if (NeedsRepairingUpdateFrame >= Bot.Bot.Frame)
                 return;
-            NeedsRepairingUpdateFrame = Tyr.Bot.Frame;
+            NeedsRepairingUpdateFrame = Bot.Bot.Frame;
 
             AlreadyRepairing = new Dictionary<ulong, int>();
             NeedsRepairing = new List<ulong>();
 
             List<ulong> noLongerRepairing = new List<ulong>();
             foreach (ulong tag in NeedsExtraRepairing)
-                if (!Tyr.Bot.UnitManager.Agents.ContainsKey(tag) || Tyr.Bot.UnitManager.Agents[tag].Unit.Health == Tyr.Bot.UnitManager.Agents[tag].Unit.HealthMax)
+                if (!Bot.Bot.UnitManager.Agents.ContainsKey(tag) || Bot.Bot.UnitManager.Agents[tag].Unit.Health == Bot.Bot.UnitManager.Agents[tag].Unit.HealthMax)
                     noLongerRepairing.Add(tag);
             foreach (ulong tag in noLongerRepairing)
                 NeedsExtraRepairing.Remove(tag);
 
             bool wallCompleted = WallCompleted();
 
-            foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType != UnitTypes.BUNKER
                     && agent.Unit.UnitType != UnitTypes.PLANETARY_FORTRESS
@@ -117,7 +117,7 @@ namespace Tyr.Tasks
             if (WallIn == null)
                 return false;
             int count = 0;
-            foreach (Agent agent in Tyr.Bot.UnitManager.Agents.Values)
+            foreach (Agent agent in Bot.Bot.UnitManager.Agents.Values)
             {
                 if (PartOfWall(agent))
                     count++;
@@ -138,7 +138,7 @@ namespace Tyr.Tasks
         }
 
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             List<Agent> unassignedSCVs = new List<Agent>();
             Dictionary<ulong, int> alreadyRepairing = new Dictionary<ulong, int>();

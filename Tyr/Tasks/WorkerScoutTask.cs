@@ -30,7 +30,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -43,13 +43,13 @@ namespace Tyr.Tasks
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
-            result.Add(new UnitDescriptor() { Pos = Tyr.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = UnitTypes.WorkerTypes });
+            result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = UnitTypes.WorkerTypes });
             return result;
         }
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.Frame >= StartFrame && !ScoutSent;
+            return Bot.Bot.Frame >= StartFrame && !ScoutSent;
         }
 
         public bool BaseCircled()
@@ -57,7 +57,7 @@ namespace Tyr.Tasks
             return ScoutPoints != null && ScoutPoints.Count == 0;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 1 && ScoutPoints == null)
             {
@@ -130,10 +130,8 @@ namespace Tyr.Tasks
                     }
                     
                     float distance = 6 * 6;
-                    foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
+                    foreach (Unit unit in tyr.Enemies())
                     {
-                        if (unit.Alliance != Alliance.Enemy)
-                            continue;
                         if (!UnitTypes.CombatUnitTypes.Contains(unit.UnitType) && !UnitTypes.WorkerTypes.Contains(unit.UnitType))
                             continue;
                         float newDist = SC2Util.DistanceSq(unit.Pos, agent.Unit.Pos);
@@ -166,7 +164,7 @@ namespace Tyr.Tasks
 
         private void GetEnemyNatural()
         {
-            EnemyNatural = Tyr.Bot.MapAnalyzer.GetEnemyNatural();
+            EnemyNatural = Bot.Bot.MapAnalyzer.GetEnemyNatural();
         }
     }
 }

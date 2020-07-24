@@ -28,7 +28,7 @@ namespace Tyr.Micro
             Point2D attackTarget = potential.Get();
             Point2D minePos = null;
             float dist = 10 * 10;
-            foreach (UnitLocation mine in Tyr.Bot.EnemyMineManager.Mines)
+            foreach (UnitLocation mine in Bot.Bot.EnemyMineManager.Mines)
             {
                 float newDist = agent.DistanceSq(mine.Pos);
                 if (newDist < dist)
@@ -49,19 +49,19 @@ namespace Tyr.Micro
 
         private Unit GetNaturalBunker()
         {
-            if (UpdateFrame == Tyr.Bot.Frame)
+            if (UpdateFrame == Bot.Bot.Frame)
                 return Bunker;
-            UpdateFrame = Tyr.Bot.Frame;
+            UpdateFrame = Bot.Bot.Frame;
             Bunker = null;
 
             if (EnemyNatural == null)
-                EnemyNatural = Tyr.Bot.MapAnalyzer.GetEnemyNatural().Pos;
+                EnemyNatural = Bot.Bot.MapAnalyzer.GetEnemyNatural().Pos;
 
             if (EnemyNatural == null)
                 return null;
             Unit bunker = null;
             Unit cc = null;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (enemy.UnitType == UnitTypes.BUNKER && enemy.BuildProgress >= 0.99)
                 {

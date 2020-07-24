@@ -20,17 +20,17 @@ namespace Tyr.Micro
 
             bool closeEnemy = false;
             if (agent.Unit.UnitType == UnitTypes.SIEGE_TANK_SIEGED
-                && (!LastCheckFrame.ContainsKey(agent.Unit.Tag) || Tyr.Bot.Frame - LastCheckFrame[agent.Unit.Tag] > 22.4 * KeepTankSiegedTime))
-                LastEnemyFrame[agent.Unit.Tag] = Tyr.Bot.Frame;
-            LastCheckFrame[agent.Unit.Tag] = Tyr.Bot.Frame;
+                && (!LastCheckFrame.ContainsKey(agent.Unit.Tag) || Bot.Bot.Frame - LastCheckFrame[agent.Unit.Tag] > 22.4 * KeepTankSiegedTime))
+                LastEnemyFrame[agent.Unit.Tag] = Bot.Bot.Frame;
+            LastCheckFrame[agent.Unit.Tag] = Bot.Bot.Frame;
 
             if (!LastEnemyFrame.ContainsKey(agent.Unit.Tag))
                 LastEnemyFrame.Add(agent.Unit.Tag, 0);
-            else if (Tyr.Bot.Frame - LastEnemyFrame[agent.Unit.Tag] <= 22.4 * KeepTankSiegedTime)
+            else if (Bot.Bot.Frame - LastEnemyFrame[agent.Unit.Tag] <= 22.4 * KeepTankSiegedTime)
                 closeEnemy = true;
 
 
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (enemy.IsFlying)
                     continue;
@@ -55,7 +55,7 @@ namespace Tyr.Micro
                 if (agent.DistanceSq(enemy) <= dist * dist)
                 {
                     closeEnemy = true;
-                    LastEnemyFrame[agent.Unit.Tag] = Tyr.Bot.Frame;
+                    LastEnemyFrame[agent.Unit.Tag] = Bot.Bot.Frame;
                     break;
                 }
             }

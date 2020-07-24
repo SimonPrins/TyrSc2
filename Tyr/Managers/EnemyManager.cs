@@ -9,6 +9,7 @@ namespace Tyr.Managers
     {
         public Dictionary<ulong, BuildingLocation> EnemyBuildings = new Dictionary<ulong, BuildingLocation>();
         private List<Unit> Enemies;
+        private List<Unit> CloakedEnemies;
         private int EnemiesFrame = -1;
         public Queue<RecentlyDeceased> RecentlyDeceased = new Queue<RecentlyDeceased>();
         public Dictionary<ulong, Unit> LastSeen = new Dictionary<ulong, Unit>();
@@ -19,6 +20,11 @@ namespace Tyr.Managers
             Update();
             return Enemies;
         }
+        public List<Unit> GetCloakedEnemies()
+        {
+            Update();
+            return CloakedEnemies;
+        }
 
         public Queue<RecentlyDeceased> GetRecentlyDeceased()
         {
@@ -28,43 +34,53 @@ namespace Tyr.Managers
 
         private void Update()
         {
-            if (Tyr.Bot.Frame > EnemiesFrame)
+            if (Bot.Bot.Frame > EnemiesFrame)
             {
-                if (Tyr.Bot.Observation.Observation.RawData.Event != null
-                    && Tyr.Bot.Observation.Observation.RawData.Event.DeadUnits != null)
-                    foreach (ulong tag in Tyr.Bot.Observation.Observation.RawData.Event.DeadUnits)
+                if (Bot.Bot.Observation.Observation.RawData.Event != null
+                    && Bot.Bot.Observation.Observation.RawData.Event.DeadUnits != null)
+                    foreach (ulong tag in Bot.Bot.Observation.Observation.RawData.Event.DeadUnits)
                     {
                         foreach (Unit unit in Enemies)
                             if (unit.Tag == tag)
                             {
-                                RecentlyDeceased.Enqueue(new RecentlyDeceased() { UnitType = unit.UnitType, Pos = unit.Pos, Frame = Tyr.Bot.Frame });
+                                RecentlyDeceased.Enqueue(new RecentlyDeceased() { UnitType = unit.UnitType, Pos = unit.Pos, Frame = Bot.Bot.Frame });
                                 break;
                             }
                     }
 
-                while (RecentlyDeceased.Count > 0 && RecentlyDeceased.Peek().Frame < Tyr.Bot.Frame - 66)
+                while (RecentlyDeceased.Count > 0 && RecentlyDeceased.Peek().Frame < Bot.Bot.Frame - 66)
                     RecentlyDeceased.Dequeue();
 
-                EnemiesFrame = Tyr.Bot.Frame;
+                EnemiesFrame = Bot.Bot.Frame;
 
                 Enemies = new List<Unit>();
+                CloakedEnemies = new List<Unit>();
 
-                foreach (Unit unit in Tyr.Bot.Observation.Observation.RawData.Units)
+                foreach (Unit unit in Bot.Bot.Observation.Observation.RawData.Units)
+                {
                     if (unit.Alliance == Alliance.Enemy)
-                        Enemies.Add(unit);
+                    {
+                        if (unit.Cloak == CloakState.Cloaked || unit.Cloak == CloakState.CloakedDetected)
+                            CloakedEnemies.Add(unit);
+                        if (unit.Cloak != CloakState.Cloaked)
+                            Enemies.Add(unit);
+                    }
+                }
             }
         }
 
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
-            if (Tyr.Bot.Observation.Observation.RawData.Event != null
-                && Tyr.Bot.Observation.Observation.RawData.Event.DeadUnits != null)
-                foreach (ulong tag in Tyr.Bot.Observation.Observation.RawData.Event.DeadUnits)
+            if (Bot.Bot.Observation.Observation.RawData.Event != null
+                && Bot.Bot.Observation.Observation.RawData.Event.DeadUnits != null)
+                foreach (ulong tag in Bot.Bot.Observation.Observation.RawData.Event.DeadUnits)
                 {
                     if (LastSeen.ContainsKey(tag))
                         LastSeen.Remove(tag);
                     if (LastSeenFrame.ContainsKey(tag))
                         LastSeenFrame.Remove(tag);
+                    if (EnemyBuildings.ContainsKey(tag))
+                        EnemyBuildings.Remove(tag);
                 }
             List<ulong> destroyedBuildings = new List<ulong>();
             foreach (BuildingLocation location in EnemyBuildings.Values)
@@ -74,7 +90,7 @@ namespace Tyr.Managers
             foreach (ulong tag in destroyedBuildings)
                 EnemyBuildings.Remove(tag);
 
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 CollectionUtil.Add(LastSeen, unit.Tag, unit);
                 CollectionUtil.Add(LastSeenFrame, unit.Tag, tyr.Frame);
@@ -83,9 +99,9 @@ namespace Tyr.Managers
                     continue;
 
                 if (EnemyBuildings.ContainsKey(unit.Tag))
-                    EnemyBuildings[unit.Tag] = new BuildingLocation() { Tag = unit.Tag, Pos = unit.Pos, Type = unit.UnitType, LastSeen = Tyr.Bot.Frame };
+                    EnemyBuildings[unit.Tag] = new BuildingLocation() { Tag = unit.Tag, Pos = unit.Pos, Type = unit.UnitType, LastSeen = Bot.Bot.Frame, Flying = unit.IsFlying };
                 else
-                    EnemyBuildings.Add(unit.Tag, new BuildingLocation() { Tag = unit.Tag, Pos = unit.Pos, Type = unit.UnitType, LastSeen = Tyr.Bot.Frame });
+                    EnemyBuildings.Add(unit.Tag, new BuildingLocation() { Tag = unit.Tag, Pos = unit.Pos, Type = unit.UnitType, LastSeen = Bot.Bot.Frame, Flying = unit.IsFlying });
             }
         }
     }

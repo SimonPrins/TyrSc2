@@ -16,7 +16,7 @@ namespace Tyr.Micro
 
             float dist = 10 * 10;
             Unit fleeTarget = null;
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (!UnitTypes.CanAttackAir(enemy.UnitType))
                     continue;
@@ -37,8 +37,8 @@ namespace Tyr.Micro
             if (HealTargets.ContainsKey(agent.Unit.Tag))
             {
                 ulong targetTag = HealTargets[agent.Unit.Tag];
-                if (Tyr.Bot.UnitManager.Agents.ContainsKey(targetTag)
-                    && Tyr.Bot.UnitManager.Agents[targetTag].DistanceSq(agent) <= 7 * 7)
+                if (Bot.Bot.UnitManager.Agents.ContainsKey(targetTag)
+                    && Bot.Bot.UnitManager.Agents[targetTag].DistanceSq(agent) <= 7 * 7)
                 {
                     agent.Order(386, targetTag);
                     return true;
@@ -47,7 +47,7 @@ namespace Tyr.Micro
                     HealTargets.Remove(agent.Unit.Tag);
             }
 
-            foreach (Agent ally in Tyr.Bot.UnitManager.Agents.Values)
+            foreach (Agent ally in Bot.Bot.UnitManager.Agents.Values)
             {
                 if (!UnitTypes.LookUp[ally.Unit.UnitType].Attributes.Contains(Attribute.Biological))
                     continue;

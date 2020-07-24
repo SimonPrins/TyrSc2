@@ -10,13 +10,13 @@ namespace Tyr.Managers
         public List<UnitLocation> Tanks = new List<UnitLocation>();
         public Dictionary<ulong, int> SiegeFrame = new Dictionary<ulong, int>();
         
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
             Cleanup(tyr);
             Update(tyr);
         }
 
-        private void Cleanup(Tyr tyr)
+        private void Cleanup(Bot tyr)
         {
             HashSet<ulong> unsiegedTanks = new HashSet<ulong>();
             foreach (Unit enemy in tyr.Enemies())
@@ -53,7 +53,7 @@ namespace Tyr.Managers
             Tanks.RemoveAt(Tanks.Count - 1);
         }
 
-        public void Update(Tyr tyr)
+        public void Update(Bot tyr)
         {
             Dictionary<ulong, UnitLocation> existingTanks = new Dictionary<ulong, UnitLocation>();
             foreach (UnitLocation tank in Tanks)

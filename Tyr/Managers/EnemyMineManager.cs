@@ -10,13 +10,13 @@ namespace Tyr.Managers
         public List<UnitLocation> Mines = new List<UnitLocation>();
         public Dictionary<ulong, int> BurrowFrame = new Dictionary<ulong, int>();
         
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
             Cleanup(tyr);
             Update(tyr);
         }
 
-        private void Cleanup(Tyr tyr)
+        private void Cleanup(Bot tyr)
         {
             HashSet<ulong> unburrowedMines = new HashSet<ulong>();
             foreach (Unit enemy in tyr.Enemies())
@@ -68,7 +68,7 @@ namespace Tyr.Managers
             Mines.RemoveAt(Mines.Count - 1);
         }
 
-        public void Update(Tyr tyr)
+        public void Update(Bot tyr)
         {
             Dictionary<ulong, UnitLocation> existingMines = new Dictionary<ulong, UnitLocation>();
             foreach (UnitLocation mine in Mines)

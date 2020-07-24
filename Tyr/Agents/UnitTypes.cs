@@ -154,6 +154,8 @@ namespace Tyr.Agents
         public static uint VESPENE_GEYSER = 342;
         public static uint SPACE_PLATFORM_GEYSER = 343;
         public static uint RICH_VESPENE_GEYSER = 344;
+        public static uint DESTRUCTIBLE_DEBRIS_ULBR = 376;
+        public static uint DESTRUCTIBLE_DEBRIS_BLUR = 377;
         public static uint MINERAL_FIELD_750 = 483;
         public static uint HELLBAT = 484;
         public static uint SWARM_HOST = 494;
@@ -189,9 +191,20 @@ namespace Tyr.Agents
         public static uint BATTLE_STATION_MINERAL_FIELD_750 = 887;
         public static uint LURKER_DEN = 504;
         public static uint SHIELD_BATTERY = 1910;
+        public static uint REFINERY_RICH = 1943;
+        public static uint ASSIMILATOR_RICH = 1980;
+        public static uint EXTRACTOR_RICH = 1981;
+        public static uint MINERAL_FIELD_450 = 1982;
+        public static uint MINERAL_FIELD_OPAQUE = 1983;
+        public static uint MINERAL_FIELD_OPAQUE_900 = 1984;
 
         public static void LoadData(ResponseData data)
         {
+            if (Bot.Bot.GameVersion.StartsWith("4.10."))
+            {
+                ASSIMILATOR_RICH = 1956;
+                EXTRACTOR_RICH = 1957;
+            }
             foreach (UnitTypeData unitType in data.Units)
             {
                 LookUp.Add(unitType.UnitId, unitType);
@@ -204,6 +217,7 @@ namespace Tyr.Agents
             {
                 ARMORY,
                 ASSIMILATOR,
+                ASSIMILATOR_RICH,
                 BANELING_NEST,
                 BARRACKS,
                 BARRACKS_FLYING,
@@ -217,6 +231,7 @@ namespace Tyr.Agents
                 ENGINEERING_BAY,
                 EVOLUTION_CHAMBER,
                 EXTRACTOR,
+                EXTRACTOR_RICH,
                 FACTORY,
                 FACTORY_FLYING,
                 FACTORY_REACTOR,
@@ -242,6 +257,7 @@ namespace Tyr.Agents
                 PYLON,
                 REACTOR,
                 REFINERY,
+                REFINERY_RICH,
                 ROACH_WARREN,
                 ROBOTICS_BAY,
                 ROBOTICS_FACILITY,
@@ -493,8 +509,11 @@ namespace Tyr.Agents
                 PURIFIER_VESPENE_GEYSER,
                 SHAKURAS_VESPENE_GEYSER,
                 EXTRACTOR,
+                EXTRACTOR_RICH,
                 ASSIMILATOR,
-                REFINERY
+                ASSIMILATOR_RICH,
+                REFINERY,
+                REFINERY_RICH
 
         };
         public static HashSet<uint> WorkerTypes = new HashSet<uint>
@@ -537,7 +556,8 @@ namespace Tyr.Agents
             { SIEGE_TANK_SIEGED, new List<uint>() { SIEGE_TANK }},
             { WIDOW_MINE_BURROWED, new List<uint>() { WIDOW_MINE }},
             { THOR_SINGLE_TARGET, new List<uint>() { THOR }},
-            { WARP_GATE, new List<uint>() { GATEWAY }}
+            { WARP_GATE, new List<uint>() { GATEWAY }},
+            { WARP_PRISM_PHASING, new List<uint>() { WARP_PRISM }}
         };
 
         public static bool CanAttackGround(uint type)
@@ -552,7 +572,9 @@ namespace Tyr.Agents
                 || type == INFESTOR
                 || type == DISRUPTOR
                 || type == ORACLE
-                || type == PHOENIX)
+                || type == PHOENIX
+                || type == SENTRY
+                || type == VOID_RAY)
                 return true;
             foreach (Weapon weapon in LookUp[type].Weapons)
                 if (weapon.Type == Weapon.Types.TargetType.Any
@@ -568,7 +590,8 @@ namespace Tyr.Agents
                 || type == WIDOW_MINE_BURROWED
                 || type == CYCLONE
                 || type == INFESTOR
-                || type == BATTLECRUISER)
+                || type == BATTLECRUISER
+                || type == VOID_RAY)
                 return true;
             foreach (Weapon weapon in LookUp[type].Weapons)
                 if (weapon.Type == Weapon.Types.TargetType.Any

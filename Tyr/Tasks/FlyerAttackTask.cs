@@ -16,20 +16,20 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
         {
-            return agent.Unit.UnitType == UnitTypes.VOID_RAY || agent.Unit.UnitType == UnitTypes.CARRIER;
+            return agent.Unit.UnitType == UnitTypes.VOID_RAY || agent.Unit.UnitType == UnitTypes.CARRIER || agent.Unit.UnitType == UnitTypes.TEMPEST;
         }
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.UnitManager.Completed(UnitTypes.VOID_RAY) + Tyr.Bot.UnitManager.Completed(UnitTypes.CARRIER) >= RequiredSize;
+            return Bot.Bot.UnitManager.Completed(UnitTypes.VOID_RAY) + Bot.Bot.UnitManager.Completed(UnitTypes.CARRIER) + Bot.Bot.UnitManager.Completed(UnitTypes.TEMPEST) >= RequiredSize;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             Dictionary<ulong, Unit> targets = new Dictionary<ulong, Unit>();
             bool attacking = false;

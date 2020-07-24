@@ -37,12 +37,12 @@ namespace Tyr.Builds.Protoss
             HideLostWorkersTask.Enable();
             
             FlyerDestroyTask.Enable();
-            if (Tyr.Bot.EnemyRace == Race.Protoss)
+            if (Bot.Bot.EnemyRace == Race.Protoss)
                 ProxySpotterTask.Enable();
             ShieldBatteryTargetTask.Enable();
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             tyr.Monday = true;
 
@@ -73,7 +73,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.Building(UnitTypes.PYLON, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building3, true);
+            result.Building(UnitTypes.PYLON, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building3, true);
 
             return result;
         }
@@ -82,36 +82,36 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            Point2D cannon1Pos = SC2Util.Point(Tyr.Bot.MapAnalyzer.building1.X + (Tyr.Bot.MapAnalyzer.building1.X - Tyr.Bot.MapAnalyzer.building2.X) / 2, Tyr.Bot.MapAnalyzer.building1.Y + (Tyr.Bot.MapAnalyzer.building1.Y - Tyr.Bot.MapAnalyzer.building2.Y) / 2);
-            Point2D cannon2Pos = SC2Util.Point(Tyr.Bot.MapAnalyzer.building2.X + (Tyr.Bot.MapAnalyzer.building2.X - Tyr.Bot.MapAnalyzer.building1.X) / 2, Tyr.Bot.MapAnalyzer.building2.Y + (Tyr.Bot.MapAnalyzer.building2.Y - Tyr.Bot.MapAnalyzer.building1.Y) / 2);
+            Point2D cannon1Pos = SC2Util.Point(Bot.Bot.MapAnalyzer.building1.X + (Bot.Bot.MapAnalyzer.building1.X - Bot.Bot.MapAnalyzer.building2.X) / 2, Bot.Bot.MapAnalyzer.building1.Y + (Bot.Bot.MapAnalyzer.building1.Y - Bot.Bot.MapAnalyzer.building2.Y) / 2);
+            Point2D cannon2Pos = SC2Util.Point(Bot.Bot.MapAnalyzer.building2.X + (Bot.Bot.MapAnalyzer.building2.X - Bot.Bot.MapAnalyzer.building1.X) / 2, Bot.Bot.MapAnalyzer.building2.Y + (Bot.Bot.MapAnalyzer.building2.Y - Bot.Bot.MapAnalyzer.building1.Y) / 2);
 
             List<Point2D> gasses = new List<Point2D>();
-            foreach (Unit unit in Tyr.Bot.Observation.Observation.RawData.Units)
-                if (UnitTypes.GasGeysers.Contains(unit.UnitType) && SC2Util.DistanceSq(unit.Pos, Tyr.Bot.MapAnalyzer.StartLocation) <= 20 * 20)
+            foreach (Unit unit in Bot.Bot.Observation.Observation.RawData.Units)
+                if (UnitTypes.GasGeysers.Contains(unit.UnitType) && SC2Util.DistanceSq(unit.Pos, Bot.Bot.MapAnalyzer.StartLocation) <= 20 * 20)
                     gasses.Add(SC2Util.To2D(unit.Pos));
 
-            result.Building(UnitTypes.FORGE, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building1, true);
-            result.Building(UnitTypes.GATEWAY, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building2, true);
+            result.Building(UnitTypes.FORGE, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building1, true);
+            result.Building(UnitTypes.GATEWAY, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building2, true);
             result.Building(UnitTypes.PYLON, Main);
             result.Building(UnitTypes.PYLON, Main, gasses[0], () => { return !DefendMarines; });
-            result.Building(UnitTypes.PHOTON_CANNON, Tyr.Bot.BaseManager.Main, cannon1Pos);
+            result.Building(UnitTypes.PHOTON_CANNON, Bot.Bot.BaseManager.Main, cannon1Pos);
             result.Building(UnitTypes.PYLON, Main, gasses[1], () => { return !DefendMarines; });
-            result.Building(UnitTypes.PHOTON_CANNON, Tyr.Bot.BaseManager.Main, cannon2Pos);
-            result.Building(UnitTypes.PHOTON_CANNON, Tyr.Bot.BaseManager.Main, gasses[0], () => { return !DefendMarines; });
-            result.Building(UnitTypes.PHOTON_CANNON, Tyr.Bot.BaseManager.Main, gasses[1], () => { return !DefendMarines; });
+            result.Building(UnitTypes.PHOTON_CANNON, Bot.Bot.BaseManager.Main, cannon2Pos);
+            result.Building(UnitTypes.PHOTON_CANNON, Bot.Bot.BaseManager.Main, gasses[0], () => { return !DefendMarines; });
+            result.Building(UnitTypes.PHOTON_CANNON, Bot.Bot.BaseManager.Main, gasses[1], () => { return !DefendMarines; });
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.CYBERNETICS_CORE);
-            result.Building(UnitTypes.SHIELD_BATTERY, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building1, () => { return DefendReapers || DefendMarines; });
-            result.Building(UnitTypes.PYLON, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building1,
+            result.Building(UnitTypes.SHIELD_BATTERY, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building1, () => { return DefendReapers || DefendMarines; });
+            result.Building(UnitTypes.PYLON, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building1,
                 () => { return DefendMarines; });
-            result.Building(UnitTypes.PYLON, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building2,
+            result.Building(UnitTypes.PYLON, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building2,
                 () => { return DefendMarines; });
-            result.Building(UnitTypes.SHIELD_BATTERY, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building2, () => { return DefendReapers || DefendMarines; });
+            result.Building(UnitTypes.SHIELD_BATTERY, Bot.Bot.BaseManager.Main, Bot.Bot.MapAnalyzer.building2, () => { return DefendReapers || DefendMarines; });
             //result.Building(UnitTypes.PHOTON_CANNON, Tyr.Bot.BaseManager.Main, Tyr.Bot.MapAnalyzer.building3);
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.STARGATE);
-            result.Building(UnitTypes.PHOTON_CANNON, Tyr.Bot.BaseManager.Main, gasses[0], () => { return DefendReapers; });
-            result.Building(UnitTypes.PHOTON_CANNON, Tyr.Bot.BaseManager.Main, gasses[1], () => { return DefendReapers; });
+            result.Building(UnitTypes.PHOTON_CANNON, Bot.Bot.BaseManager.Main, gasses[0], () => { return DefendReapers; });
+            result.Building(UnitTypes.PHOTON_CANNON, Bot.Bot.BaseManager.Main, gasses[1], () => { return DefendReapers; });
             result.Building(UnitTypes.FLEET_BEACON);
             result.Building(UnitTypes.STARGATE, 2);
 
@@ -133,7 +133,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             DefendMarines = tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BARRACKS) >= 3
                 && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REFINERY) == 0
@@ -211,7 +211,7 @@ namespace Tyr.Builds.Protoss
             }
                 
 
-            if (!DefendRush && tyr.Frame <= 4800 && Tyr.Bot.EnemyRace != Race.Zerg)
+            if (!DefendRush && tyr.Frame <= 4800 && Bot.Bot.EnemyRace != Race.Zerg)
             {
                 int enemyCount = 0;
                 foreach (Unit enemy in tyr.Enemies())
@@ -226,7 +226,7 @@ namespace Tyr.Builds.Protoss
                 HideBaseTask.Task.BuildNexus = true;
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

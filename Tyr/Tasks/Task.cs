@@ -10,7 +10,8 @@ namespace Tyr.Tasks
         protected List<Agent> units = new List<Agent>();
 
         private MicroController MicroController = new MicroController();
-        public List<CustomController> CustomControllers = new List<CustomController>();
+        public List<CustomController> BeforeControllers = new List<CustomController>();
+        public List<CustomController> AfterControllers = new List<CustomController>();
 
         public bool AllowClaiming = true;
         public bool JoinCombatSimulation = false;
@@ -20,7 +21,7 @@ namespace Tyr.Tasks
             Priority = priority;
         }
 
-        public void Cleanup(Tyr tyr)
+        public void Cleanup(Bot tyr)
         {
             // Remove units that are already dead.
             for (int i = units.Count - 1; i >= 0 ; i--)
@@ -29,7 +30,7 @@ namespace Tyr.Tasks
         }
 
         public abstract bool IsNeeded();
-        public abstract void OnFrame(Tyr tyr);
+        public abstract void OnFrame(Bot tyr);
         public abstract bool DoWant(Agent agent);
         public int Priority { get; set; }
         public virtual List<UnitDescriptor> GetDescriptors()
@@ -78,6 +79,13 @@ namespace Tyr.Tasks
             Clear(IdleTask.Task);
         }
 
+        public void StopAndClear(bool stopped)
+        {
+            Stopped = stopped;
+            if (Stopped)
+                Clear();
+        }
+
         public void ClearLast()
         {
             ClearAt(units.Count - 1);
@@ -106,13 +114,18 @@ namespace Tyr.Tasks
         public static void Enable(Task task)
         {
             task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(task);
+            Bot.Bot.TaskManager.Add(task);
         }
 
         public void Attack(Agent agent, Point2D point)
         {
-            if (!MicroController.TryAttack(agent, point, CustomControllers))
-                Tyr.Bot.MicroController.Attack(agent, point);
+            if (MicroController.TryAttack(agent, point, BeforeControllers))
+                return;
+            if (Bot.Bot.MicroController.TryAttack(agent, point))
+                return;
+            if (MicroController.TryAttack(agent, point, AfterControllers))
+                return;
+            agent.Order(Abilities.ATTACK, point);
         }
 
         public virtual void AddCombatSimulationUnits(List<Unit> simulationUnits)

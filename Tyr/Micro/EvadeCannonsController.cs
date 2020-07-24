@@ -12,7 +12,7 @@ namespace Tyr.Micro
                 return false;
 
             if (agent.Unit.WeaponCooldown >= 5
-                && (Tyr.Bot.Frame % 100 > 50 || Tyr.Bot.UnitManager.Completed(UnitTypes.STALKER) + Tyr.Bot.UnitManager.Completed(UnitTypes.IMMORTAL) >= 8))
+                && (Bot.Bot.Frame % 100 > 50 || Bot.Bot.UnitManager.Completed(UnitTypes.STALKER) + Bot.Bot.UnitManager.Completed(UnitTypes.IMMORTAL) >= 8))
                 return false;
 
             if (agent.Unit.UnitType != UnitTypes.VOID_RAY
@@ -43,7 +43,7 @@ namespace Tyr.Micro
 
             float dist = 10 * 10;
             Unit fleeTarget = null;
-            foreach (Unit unit in Tyr.Bot.Enemies())
+            foreach (Unit unit in Bot.Bot.Enemies())
             {
                 if (unit.UnitType != UnitTypes.PHOTON_CANNON)
                     continue;

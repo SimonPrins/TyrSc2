@@ -33,10 +33,10 @@ namespace Tyr.Builds.Protoss
             ArmyObserverTask.Enable();
             DefenseTask.Enable();
             //TimingAttackTask.Enable();
-            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
-            if (Tyr.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Tyr.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Bot.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
             ProxyTask.Enable(new List<ProxyBuilding>() {
                 new ProxyBuilding() { UnitType = UnitTypes.PYLON },
                 new ProxyBuilding() { UnitType = UnitTypes.ROBOTICS_FACILITY, Number = 2 }
@@ -56,7 +56,7 @@ namespace Tyr.Builds.Protoss
             WarpPrismElevatorTask.Enable();
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(StutterController);
             MicroControllers.Add(StalkerAttackNaturalController);
@@ -107,19 +107,31 @@ namespace Tyr.Builds.Protoss
         }
 
         bool printed = false;
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(1568);
+            if (Completed(UnitTypes.WARP_PRISM) == 0
+                && (Count(UnitTypes.WARP_PRISM) == 1 || Count(UnitTypes.IMMORTAL) >= 3))
+                tyr.NexusAbilityManager.PriotitizedAbilities.Remove(TrainingType.LookUp[UnitTypes.IMMORTAL].Ability);
+            else
+                tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.IMMORTAL].Ability);
+            tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.WARP_PRISM].Ability);
             ProxyTask.Task.UseCloseHideLocation = true;
 
             tyr.buildingPlacer.BuildCompact = true;
             tyr.TargetManager.PrefferDistant = false;
             tyr.TargetManager.TargetAllBuildings = true;
 
-            TrainStep.WarpInLocation = ProxyTask.Task.GetHideLocation();
+            Agent warpPrismPhasing = null;
+            foreach (Agent agent in tyr.Units())
+                if (agent.Unit.UnitType == UnitTypes.WARP_PRISM_PHASING)
+                    warpPrismPhasing = agent;
+            if (warpPrismPhasing != null)
+                TrainStep.WarpInLocation = SC2Util.To2D(warpPrismPhasing.Unit.Pos);
+            else
+                TrainStep.WarpInLocation = ProxyTask.Task.GetHideLocation();
             
             if (!printed)
-            foreach (Agent agent in Tyr.Bot.Units())
+            foreach (Agent agent in Bot.Bot.Units())
             {
                 if (agent.Unit.UnitType != UnitTypes.PYLON)
                     continue;

@@ -65,8 +65,8 @@ namespace Tyr.BuildingPlacement
                     return false;
             }
             
-            foreach (Unit unit in Tyr.Bot.Observation.Observation.RawData.Units)
-                if (!unit.IsFlying && (unit.Owner != Tyr.Bot.PlayerId || unit.UnitType == UnitTypes.SIEGE_TANK_SIEGED || UnitTypes.BuildingTypes.Contains(unit.UnitType)) && !CheckDistance(location, type, SC2Util.To2D(unit.Pos), unit.UnitType, buildingsOnly))
+            foreach (Unit unit in Bot.Bot.Observation.Observation.RawData.Units)
+                if (!unit.IsFlying && (unit.Owner != Bot.Bot.PlayerId || unit.UnitType == UnitTypes.SIEGE_TANK_SIEGED || UnitTypes.BuildingTypes.Contains(unit.UnitType)) && !CheckDistance(location, type, SC2Util.To2D(unit.Pos), unit.UnitType, buildingsOnly))
                     return false;
 
             foreach (BuildRequest request in ConstructionTask.Task.UnassignedRequests)
@@ -77,31 +77,31 @@ namespace Tyr.BuildingPlacement
                 if (request != skipRequest && !CheckDistance(location, type, request.Pos, request.Type, buildingsOnly))
                     return false;
 
-            if (Tyr.Bot.MyRace == Race.Zerg && type != UnitTypes.HATCHERY && type != UnitTypes.EXTRACTOR)
+            if (Bot.Bot.MyRace == Race.Zerg && type != UnitTypes.HATCHERY && type != UnitTypes.EXTRACTOR)
             {
-                BoolGrid creep = new ImageBoolGrid(Tyr.Bot.Observation.Observation.RawData.MapState.Creep, 1);
+                BoolGrid creep = new ImageBoolGrid(Bot.Bot.Observation.Observation.RawData.MapState.Creep, 1);
                 for (float dx = -size.X / 2f; dx <= size.X / 2f + 0.01f; dx++)
                     for (float dy = -size.Y / 2f; dy <= size.Y / 2f + 0.01f; dy++)
                         if (!creep[(int)(location.X + dx), (int)(location.Y + dy)])
                             return false;
             }
-            if (Tyr.Bot.MyRace != Race.Zerg)
+            if (Bot.Bot.MyRace != Race.Zerg)
             {
-                BoolGrid creep = new ImageBoolGrid(Tyr.Bot.Observation.Observation.RawData.MapState.Creep, 1);
+                BoolGrid creep = new ImageBoolGrid(Bot.Bot.Observation.Observation.RawData.MapState.Creep, 1);
                 for (float dx = -size.X / 2f; dx <= size.X / 2f + 0.01f; dx++)
                     for (float dy = -size.Y / 2f; dy <= size.Y / 2f + 0.01f; dy++)
                         if (creep[(int)(location.X + dx), (int)(location.Y + dy)])
                             return false;
             }
 
-            if (type != UnitTypes.PYLON && Tyr.Bot.MyRace == Race.Protoss)
+            if (type != UnitTypes.PYLON && Bot.Bot.MyRace == Race.Protoss)
             {
-                foreach (Unit unit in Tyr.Bot.Observation.Observation.RawData.Units)
+                foreach (Unit unit in Bot.Bot.Observation.Observation.RawData.Units)
                 {
                     if (unit.UnitType != UnitTypes.PYLON || unit.BuildProgress < 1)
                         continue;
 
-                    if (Tyr.Bot.MapAnalyzer.MapHeight((int)unit.Pos.X, (int)unit.Pos.Y) < Tyr.Bot.MapAnalyzer.MapHeight((int)location.X, (int)location.Y))
+                    if (Bot.Bot.MapAnalyzer.MapHeight((int)unit.Pos.X, (int)unit.Pos.Y) < Bot.Bot.MapAnalyzer.MapHeight((int)location.X, (int)location.Y))
                         continue;
 
                     if (location.X - size.X / 2f >= unit.Pos.X - 6 && location.X + size.X / 2f <= unit.Pos.X + 6

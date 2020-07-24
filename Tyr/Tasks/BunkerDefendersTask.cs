@@ -13,7 +13,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public BunkerDefendersTask() : base(10)
@@ -23,7 +23,7 @@ namespace Tyr.Tasks
         {
             if (GetBunker() == null)
                 return false;
-            return agent.Unit.UnitType == UnitTypes.MARINE && Units.Count < Tyr.Bot.Build.Count(UnitTypes.BUNKER) * 4;
+            return agent.Unit.UnitType == UnitTypes.MARINE && Units.Count < Bot.Bot.Build.Count(UnitTypes.BUNKER) * 4;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -31,7 +31,7 @@ namespace Tyr.Tasks
             List<UnitDescriptor> descriptors = new List<UnitDescriptor>();
 
             descriptors.Add(new UnitDescriptor() {
-                Count = Tyr.Bot.Build.Completed(UnitTypes.BUNKER) * 4 - Units.Count,
+                Count = Bot.Bot.Build.Completed(UnitTypes.BUNKER) * 4 - Units.Count,
                 UnitTypes = new HashSet<uint>() { UnitTypes.MARINE }
             });
 
@@ -40,10 +40,10 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.Build.Completed(UnitTypes.BUNKER) > 0 && !LeaveBunkers;
+            return Bot.Bot.Build.Completed(UnitTypes.BUNKER) > 0 && !LeaveBunkers;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (LeaveBunkers)
             {
@@ -66,12 +66,12 @@ namespace Tyr.Tasks
 
         public Agent GetBunker()
         {
-            if (Tyr.Bot.Frame == BunkerDeterminedFrame)
+            if (Bot.Bot.Frame == BunkerDeterminedFrame)
                 return Bunker;
-            BunkerDeterminedFrame = Tyr.Bot.Frame;
+            BunkerDeterminedFrame = Bot.Bot.Frame;
 
             Bunker = null;
-            foreach (Agent bunker in Tyr.Bot.UnitManager.Agents.Values)
+            foreach (Agent bunker in Bot.Bot.UnitManager.Agents.Values)
             {
                 if (bunker.Unit.UnitType != UnitTypes.BUNKER
                     || bunker.Unit.BuildProgress < 0.90)

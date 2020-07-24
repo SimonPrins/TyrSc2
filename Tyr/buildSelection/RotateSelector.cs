@@ -5,6 +5,7 @@ namespace Tyr.BuildSelection
 {
     public class RotateSelector : BuildSelector
     {
+        public bool CountWins = true;
         public Build Select(List<Build> builds, string[] lines)
         {
             Dictionary<string, int> defeats = new Dictionary<string, int>();
@@ -14,7 +15,7 @@ namespace Tyr.BuildSelection
                 if (line.StartsWith("result "))
                 {
                     string[] words = line.Split(' ');
-                    if (words[1] != Tyr.Bot.EnemyRace.ToString())
+                    if (words[1] != Bot.Bot.EnemyRace.ToString())
                         continue;
                     if (words[3] == "Defeat")
                     {
@@ -31,7 +32,7 @@ namespace Tyr.BuildSelection
                 else if (line.StartsWith("started"))
                 {
                     string[] words = line.Split(' ');
-                    if (words[1] != Tyr.Bot.EnemyRace.ToString())
+                    if (words[1] != Bot.Bot.EnemyRace.ToString())
                         continue;
 
                     if (!games.ContainsKey(words[2]))
@@ -49,7 +50,11 @@ namespace Tyr.BuildSelection
                 if (!games.ContainsKey(option.Name()))
                     games.Add(option.Name(), 0);
                 
-                int newLosses = defeats[option.Name()] - (games[option.Name()] - defeats[option.Name()]) / 4;
+                int newLosses;
+                if (CountWins)
+                    newLosses = defeats[option.Name()] - (games[option.Name()] - defeats[option.Name()]) / 4;
+                else
+                    newLosses = defeats[option.Name()];
 
                 if (newLosses < losses)
                 {

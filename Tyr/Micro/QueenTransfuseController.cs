@@ -15,7 +15,7 @@ namespace Tyr.Micro
             
             Agent transfuseTarget = null;
             float health = 10000;
-            foreach (Agent ally in Tyr.Bot.UnitManager.Agents.Values)
+            foreach (Agent ally in Bot.Bot.UnitManager.Agents.Values)
             {
                 if (!UnitTypes.CombatUnitTypes.Contains(ally.Unit.UnitType))
                     continue;

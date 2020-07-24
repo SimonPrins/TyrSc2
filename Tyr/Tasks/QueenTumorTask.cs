@@ -19,17 +19,17 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
         {
-            return Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR) + Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR_QUEEN) < 3 && agent.Unit.UnitType == UnitTypes.QUEEN && agent.Unit.Energy >= 75 && Units.Count == 0;
+            return Bot.Bot.Build.Count(UnitTypes.CREEP_TUMOR) + Bot.Bot.Build.Count(UnitTypes.CREEP_TUMOR_QUEEN) < 3 && agent.Unit.UnitType == UnitTypes.QUEEN && agent.Unit.Energy >= 75 && Units.Count == 0;
         }
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR) + Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR_QUEEN) + Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR_BURROWED) < 6;
+            return Bot.Bot.Build.Count(UnitTypes.CREEP_TUMOR) + Bot.Bot.Build.Count(UnitTypes.CREEP_TUMOR_QUEEN) + Bot.Bot.Build.Count(UnitTypes.CREEP_TUMOR_BURROWED) < 6;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -40,7 +40,7 @@ namespace Tyr.Tasks
             return descriptors;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             foreach (Agent agent in tyr.UnitManager.Agents.Values)
             {
@@ -59,7 +59,7 @@ namespace Tyr.Tasks
                 }
             }
 
-            if (Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR) + Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR_QUEEN) + Tyr.Bot.Build.Count(UnitTypes.CREEP_TUMOR_BURROWED) >= 6)
+            if (Bot.Bot.Build.Count(UnitTypes.CREEP_TUMOR) + Bot.Bot.Build.Count(UnitTypes.CREEP_TUMOR_QUEEN) + Bot.Bot.Build.Count(UnitTypes.CREEP_TUMOR_BURROWED) >= 6)
                 Clear();
 
             if (units.Count == 0)

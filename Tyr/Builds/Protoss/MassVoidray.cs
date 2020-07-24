@@ -1,8 +1,10 @@
 ﻿using SC2APIProtocol;
 using System;
+using System.Collections.Generic;
 using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Managers;
+using Tyr.MapAnalysis;
 using Tyr.Micro;
 using Tyr.Tasks;
 using Tyr.Util;
@@ -23,47 +25,61 @@ namespace Tyr.Builds.Protoss
         private FearVikingsController FearVikingsController = new FearVikingsController() { Stopped = true };
         public bool BuildCarriers = false;
         private bool Beyond2Cannons = true;
+        public bool NaturalWall = false;
+        public bool CloseWall = false;
+        public Test BuildDefenses;
+        private WallInCreator WallIn;
+        public bool Recalled = false;
+        public bool DelayNatural = false;
 
         public override string Name()
         {
             return "MassVoidray";
         }
+        public delegate bool Test();
 
         public override void InitializeTasks()
         {
             base.InitializeTasks();
             DefenseTask.Enable();
             FlyerAttackTask.Enable();
-            if (Tyr.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Tyr.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Bot.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
             WorkerSafetyTask.Enable();
             WorkerScoutTask.Enable();
+            RecallTask.Enable();
 
             FlyerDestroyTask.Enable();
-            if (Tyr.Bot.EnemyRace == Race.Protoss)
+            if (Bot.Bot.EnemyRace == Race.Protoss)
                 ProxySpotterTask.Enable();
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
+            if (BuildDefenses == null)
+                BuildDefenses = () => !SkipDefenses;
             tyr.Monday = true;
 
             MicroControllers.Add(FearVikingsController);
             MicroControllers.Add(new VoidrayController());
             MicroControllers.Add(new CarrierController());
             MicroControllers.Add(new StutterController());
-            
-            if (SkipDefenses)
-                Set += ProtossBuildUtil.Pylons();
-            else
+
+            if (WallIn == null)
             {
-                Set += NaturalDefenses();
-                Set += RushDefenses();
-                Set += ProtossBuildUtil.Pylons();
-                Set += BuildReaperDefenseCannon();
-                Set += BuildReaperRushDefense();
-                Set += ProtossBuildUtil.Nexus(2);
+                WallIn = new WallInCreator();
+                WallIn.CreateFullNatural(new List<uint>() { UnitTypes.GATEWAY, UnitTypes.GATEWAY, UnitTypes.PYLON, UnitTypes.GATEWAY });
+                WallIn.ReserveSpace();
+                if (NaturalWall)
+                    tyr.buildingPlacer.BuildInsideWall(WallIn);
             }
+
+            Set += NaturalDefenses();
+            Set += RushDefenses();
+            Set += ProtossBuildUtil.Pylons();
+            Set += BuildReaperDefenseCannon();
+            Set += BuildReaperRushDefense();
+            Set += ProtossBuildUtil.Nexus(2, () => Count(UnitTypes.GATEWAY) > 0 && (!DelayNatural || Count(UnitTypes.STARGATE) > 0));
             Set += PowerPylons();
             Set += MainBuild();
         }
@@ -71,17 +87,25 @@ namespace Tyr.Builds.Protoss
         private BuildList NaturalDefenses()
         {
             BuildList result = new BuildList();
-            
-            result.Building(UnitTypes.PYLON, Natural, NaturalDefensePos);
-            result.Building(UnitTypes.FORGE, Natural, NaturalDefensePos);
+
+            result.If(() => BuildDefenses());
+            if (NaturalWall)
+                result.If(() => Completed(UnitTypes.FORGE) > 0);
+            if (!NaturalWall)
+            {
+                result.Building(UnitTypes.PYLON, Natural, NaturalDefensePos);
+                result.Building(UnitTypes.FORGE, Natural, NaturalDefensePos);
+            }
             result.Building(UnitTypes.PHOTON_CANNON, Natural, NaturalDefensePos, 2);
+            if (NaturalWall)
+                result.Building(UnitTypes.PYLON, Natural, NaturalDefensePos);
             result.If(() => { return Count(UnitTypes.NEXUS) >= 2 && Beyond2Cannons; });
             result.Building(UnitTypes.PHOTON_CANNON, Natural, NaturalDefensePos, () => { return !DefendReapers; });
             result.Building(UnitTypes.PHOTON_CANNON, Natural, NaturalDefensePos, () => { return !DefendReapers; });
             result.Building(UnitTypes.PYLON, Natural);
             result.Building(UnitTypes.SHIELD_BATTERY, Natural, NaturalDefensePos);
             result.If(() => { return !DefendReapers; });
-            result.If(() => { return Minerals() >= 650 && Tyr.Bot.Frame % 9 == 0; });
+            result.If(() => { return Minerals() >= 650 && Bot.Bot.Frame % 9 == 0; });
             result.Building(UnitTypes.PHOTON_CANNON, Natural, NaturalDefensePos, 2);
             result.If(() => { return Minerals() >= 650; });
             result.Building(UnitTypes.PHOTON_CANNON, Natural, NaturalDefensePos, 2);
@@ -95,6 +119,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
+            result.If(() => BuildDefenses());
             result.If(() => { return Count(UnitTypes.FORGE) > 0 && DefendRush; });
             result.Building(UnitTypes.PHOTON_CANNON, Natural, NaturalDefensePos, 4);
             result.If(() => { return !DefendReapers; });
@@ -107,14 +132,15 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
+            result.If(() => BuildDefenses());
             Base reaperBase = null;
-            foreach (Base b in Tyr.Bot.BaseManager.Bases)
-                if (b != Tyr.Bot.BaseManager.Main && b != Tyr.Bot.BaseManager.Natural)
+            foreach (Base b in Bot.Bot.BaseManager.Bases)
+                if (b != Bot.Bot.BaseManager.Main && b != Bot.Bot.BaseManager.Natural)
                     reaperBase = b;
 
             Base naturalMirrorBase = null;
-            foreach (Base b in Tyr.Bot.BaseManager.Bases)
-                if (b != Tyr.Bot.BaseManager.Main && b != Tyr.Bot.BaseManager.Natural
+            foreach (Base b in Bot.Bot.BaseManager.Bases)
+                if (b != Bot.Bot.BaseManager.Main && b != Bot.Bot.BaseManager.Natural
                     && b != reaperBase)
                     naturalMirrorBase = b;
 
@@ -135,6 +161,7 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
+            result.If(() => BuildDefenses());
             result.If(() => { return DefendReapers; });
             result.Building(UnitTypes.PYLON, Main);
             result.Building(UnitTypes.PYLON, Natural, 3);
@@ -170,13 +197,28 @@ namespace Tyr.Builds.Protoss
         {
             BuildList result = new BuildList();
 
-            result.Building(UnitTypes.PYLON, Main);
-            result.Building(UnitTypes.GATEWAY);
-            if (SkipDefenses)
-                result.Building(UnitTypes.NEXUS, 2);
-            result.Building(UnitTypes.ASSIMILATOR);
-            result.Building(UnitTypes.CYBERNETICS_CORE);
-            result.Building(UnitTypes.ASSIMILATOR);
+            if (NaturalWall)
+            {
+                result.Building(UnitTypes.PYLON, Natural, WallIn.Wall[2].Pos, true);
+                result.Building(UnitTypes.GATEWAY, Natural, WallIn.Wall[0].Pos, true);
+                if (!BuildDefenses())
+                    result.Building(UnitTypes.NEXUS, 2, () => !DelayNatural || Count(UnitTypes.STARGATE) > 0);
+
+                result.Building(UnitTypes.ASSIMILATOR);
+                result.Building(UnitTypes.CYBERNETICS_CORE, Natural, WallIn.Wall[1].Pos, true);
+                result.Building(UnitTypes.ASSIMILATOR);
+                result.Building(UnitTypes.FORGE, Natural, WallIn.Wall[3].Pos, true);
+            }
+            else
+            {
+                result.Building(UnitTypes.PYLON, Main);
+                result.Building(UnitTypes.GATEWAY);
+                if (!BuildDefenses())
+                    result.Building(UnitTypes.NEXUS, 2, () => !DelayNatural || Count(UnitTypes.STARGATE) > 0);
+                result.Building(UnitTypes.ASSIMILATOR);
+                result.Building(UnitTypes.CYBERNETICS_CORE);
+                result.Building(UnitTypes.ASSIMILATOR);
+            }
             result.Building(UnitTypes.STARGATE);
             result.Building(UnitTypes.ASSIMILATOR, 2);
             result.Building(UnitTypes.FLEET_BEACON, () => { return BuildCarriers; });
@@ -186,17 +228,28 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             tyr.NexusAbilityManager.PriotitizedAbilities.Add(948);
             tyr.NexusAbilityManager.PriotitizedAbilities.Add(950);
             tyr.buildingPlacer.BuildCompact = true;
 
+            if (WorkerScoutTask.Task.BaseCircled())
+            {
+                WorkerScoutTask.Task.Stopped = true;
+                WorkerScoutTask.Task.Clear();
+            }
+
             FlyerAttackTask.Task.RequiredSize = RequiredSize;
             IdleTask.Task.FearEnemies = true;
 
             DefenseTask.AirDefenseTask.IgnoreEnemyTypes.Add(UnitTypes.VIKING_FIGHTER);
-
+            if (TotalEnemyCount(UnitTypes.TEMPEST) > 0)
+            {
+                DefenseTask.AirDefenseTask.MainDefenseRadius = 50;
+                DefenseTask.AirDefenseTask.ExpandDefenseRadius = 50;
+                DefenseTask.AirDefenseTask.BufferZone = 20;
+            }
             FlyerDestroyTask.Task.Stopped = !DefendReapers;
             FlyerAttackTask.Task.Stopped = DefendReapers;
 
@@ -230,7 +283,7 @@ namespace Tyr.Builds.Protoss
             }
                 
 
-            if (!DefendRush && tyr.Frame <= 4800 && Tyr.Bot.EnemyRace != Race.Zerg)
+            if (!DefendRush && tyr.Frame <= 4800 && Bot.Bot.EnemyRace != Race.Zerg)
             {
                 int enemyCount = 0;
                 foreach (Unit enemy in tyr.Enemies())
@@ -241,14 +294,15 @@ namespace Tyr.Builds.Protoss
                     DefendRush = true;
             }
             
-            if ((tyr.EnemyRace == Race.Terran || tyr.EnemyRace == Race.Random)
+            if ((tyr.EnemyRace == Race.Terran)
+                && ReaperDefenseCannonStep != null
                 && ReaperDefenseCannonStep.DesiredPos == null
-                && !SkipDefenses)
+                && BuildDefenses())
             {
                 foreach (Unit unit in tyr.Enemies())
                 {
                     if (unit.UnitType == UnitTypes.REAPER
-                        && Tyr.Bot.MapAnalyzer.StartArea[(int)System.Math.Round(unit.Pos.X), (int)System.Math.Round(unit.Pos.Y)])
+                        && Bot.Bot.MapAnalyzer.StartArea[(int)System.Math.Round(unit.Pos.X), (int)System.Math.Round(unit.Pos.Y)])
                     {
                         Point2D dir = SC2Util.Point(unit.Pos.X - tyr.MapAnalyzer.StartLocation.X, unit.Pos.Y - tyr.MapAnalyzer.StartLocation.Y);
                         float length = (float)System.Math.Sqrt(dir.X * dir.X + dir.Y * dir.Y);
@@ -259,13 +313,54 @@ namespace Tyr.Builds.Protoss
                     }
                 }
             }
+
+            if (!Recalled
+                && Completed(UnitTypes.PHOTON_CANNON) <= 2
+                && DefenseTask.AirDefenseTask.Units.Count + DefenseTask.GroundDefenseTask.Units.Count <= 4
+                && TimingAttackTask.Task.Units.Count >= 6)
+            {
+                int enemyAttackingUnits = 0;
+                foreach (Unit enemy in tyr.Enemies())
+                {
+                    if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
+                        continue;
+                    if (SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation) >= 60 * 60)
+                        continue;
+                    enemyAttackingUnits++;
+                }
+
+                if (enemyAttackingUnits >= 5)
+                {
+                    Point2D averagePos = new Point2D();
+                    foreach (Agent agent in TimingAttackTask.Task.Units)
+                    {
+                        averagePos.X += agent.Unit.Pos.X;
+                        averagePos.Y += agent.Unit.Pos.Y;
+                    }
+                    averagePos.X /= TimingAttackTask.Task.Units.Count;
+                    averagePos.Y /= TimingAttackTask.Task.Units.Count;
+                    Point2D recallPos = null;
+                    float dist = 1000000;
+                    foreach (Agent agent in TimingAttackTask.Task.Units)
+                    {
+                        float newDist = agent.DistanceSq(averagePos);
+                        if (newDist >= dist)
+                            continue;
+                        dist = newDist;
+                        recallPos = SC2Util.To2D(agent.Unit.Pos);
+                    }
+                    RecallTask.Task.Location = recallPos;
+                    Recalled = true;
+                    System.Console.WriteLine("Recalling.");
+                }
+            }
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50
-                && Count(UnitTypes.PROBE) < (SkipDefenses ? 31 : 39)
+                && Count(UnitTypes.PROBE) < (BuildDefenses() ? 39 : 31)
                 && (Count(UnitTypes.PROBE) < 32 || Count(UnitTypes.CARRIER) + Count(UnitTypes.VOID_RAY) > 0)
                 && (Count(UnitTypes.PROBE) < 20 || Count(UnitTypes.CYBERNETICS_CORE) > 0)
                 && (Count(UnitTypes.PROBE) < 16 || Count(UnitTypes.NEXUS) >= 2)

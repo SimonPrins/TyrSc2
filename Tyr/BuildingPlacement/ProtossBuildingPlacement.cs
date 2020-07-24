@@ -37,6 +37,21 @@ namespace Tyr.BuildingPlacement
                 {
                     if (!RectBuildable(x - 1f, y - 1f, x + 1f, y + 1f))
                         continue;
+
+                    bool adjacentPylon = false;
+                    foreach (Agent pylon in Pylons)
+                    {
+                        // Pylons should not be placed corner to corner as this prevents units from walking between them.
+                        if (Math.Abs(pylon.Unit.Pos.X - x) == 2
+                            && Math.Abs(pylon.Unit.Pos.Y - y) == 2)
+                        {
+                            adjacentPylon = true;
+                            break;
+                        }
+                    }
+                    if (adjacentPylon)
+                        continue;
+
                     float newScore = 0;
                     if (Pylons.Count == 0)
                     {
@@ -49,12 +64,24 @@ namespace Tyr.BuildingPlacement
                         if (newScore > score)
                             continue;
                     }
+                    if (Tyr.Bot.MapAnalyzer.StartArea[(int)x, (int)y]
+                        && Tyr.Bot.MapAnalyzer.WallDistances[(int)x, (int)y] < 4)
+                        newScore += 1000;
 
                     float closestPylonDist = 8 * 8;
                     foreach (Agent pylon in Pylons)
                         closestPylonDist = Math.Min(closestPylonDist, SC2Util.DistanceSq(pylon.Unit.Pos, SC2Util.Point(x, y)));
 
                     newScore += SC2Util.DistanceSq(target, SC2Util.Point(x, y)) - closestPylonDist * 4;
+
+                    foreach (Unit gas in Tyr.Bot.Observation.Observation.RawData.Units)
+                    {
+                        if (!UnitTypes.GasGeysers.Contains(gas.UnitType))
+                            continue;
+
+                        if (SC2Util.DistanceSq(gas.Pos, SC2Util.Point(x, y)) <= 5 * 5)
+                            newScore += 10000;
+                    }
                     
                     if (newScore > score)
                         continue;
@@ -147,7 +174,7 @@ namespace Tyr.BuildingPlacement
                     bool hasPower = false;
                     foreach (Agent pylon in Pylons)
                     {
-                        if (pylon.Unit.BuildProgress < 1)
+                        if (pylon.Unit.BuildProgress < (Tyr.Bot.Build.Completed(UnitTypes.GATEWAY) == 0 ? 0.3 : 0.70))
                             continue;
 
                         if (Tyr.Bot.MapAnalyzer.MapHeight((int)pylon.Unit.Pos.X, (int)pylon.Unit.Pos.Y) < Tyr.Bot.MapAnalyzer.MapHeight((int)x, (int)y))
@@ -185,7 +212,7 @@ namespace Tyr.BuildingPlacement
 
         public static bool IsBuildingInPowerField(Point2D pos, Point2D size, Point2D pylonPos)
         {
-            return pos.X - size.X / 2f >= pylonPos.X - 6 && pos.X + size.X / 2f <= pylonPos.X + 6
+            return pos.X - size.X / 2f >= pylonPos.X - 7 && pos.X + size.X / 2f <= pylonPos.X + 7
                 && pos.Y - size.Y / 2f >= pylonPos.Y - 7 && pos.Y + size.Y / 2f <= pylonPos.Y + 7
                 && SC2Util.DistanceGrid(pylonPos, pos) <= 10 - size.X / 2f - size.Y / 2f;
         }
@@ -195,10 +222,15 @@ namespace Tyr.BuildingPlacement
             BoolGrid creep = new ImageBoolGrid(Tyr.Bot.Observation.Observation.RawData.MapState.Creep, 1);
             for (float x = x1; x <= x2; x++)
                 for (float y = y1; y <= y2; y++)
+                {
                     if (!SC2Util.GetTilePlacable((int)x, (int)y) || creep[(int)(x), (int)(y)])
                     {
                         return false;
                     }
+                    if (Tyr.Bot.buildingPlacer.LimitBuildArea != null
+                        && !Tyr.Bot.buildingPlacer.LimitBuildArea[(int)x, (int)y])
+                        return false;
+                }
             return true;
         }
     }

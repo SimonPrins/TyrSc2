@@ -33,10 +33,10 @@ namespace Tyr.Builds.Protoss
             DefenseTask.Enable();
             TimingAttackTask.Enable();
             DefendRegionTask.Enable();
-            if (Tyr.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
+            if (Bot.Bot.TargetManager.PotentialEnemyStartLocations.Count > 1)
                 WorkerScoutTask.Enable();
-            if (Tyr.Bot.BaseManager.Pocket != null)
-                ScoutProxyTask.Enable(Tyr.Bot.BaseManager.Pocket.BaseLocation.Pos);
+            if (Bot.Bot.BaseManager.Pocket != null)
+                ScoutProxyTask.Enable(Bot.Bot.BaseManager.Pocket.BaseLocation.Pos);
             ProxyTask.Enable(new List<ProxyBuilding>() {
                 new ProxyBuilding() { UnitType = UnitTypes.PYLON },
                 new ProxyBuilding() { UnitType = UnitTypes.STARGATE, Number = 1 , Test = () => Count(UnitTypes.CYBERNETICS_CORE) > 0},
@@ -49,7 +49,7 @@ namespace Tyr.Builds.Protoss
             }, true);
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             ProxyTask.Task.UseCloseHideLocation = UseCloseHideLocation;
 
@@ -65,7 +65,7 @@ namespace Tyr.Builds.Protoss
                 WallIn.Create(new List<uint>() { UnitTypes.GATEWAY, UnitTypes.PYLON, UnitTypes.GATEWAY });
                 WallIn.ReserveSpace();
                 ShieldBatteryPos = SC2Util.TowardCardinal(WallIn.Wall[1].Pos, Main.BaseLocation.Pos, 2);
-                Tyr.Bot.buildingPlacer.ReservedLocation.Add(new ReservedBuilding() { Type = UnitTypes.SHIELD_BATTERY, Pos = ShieldBatteryPos });
+                Bot.Bot.buildingPlacer.ReservedLocation.Add(new ReservedBuilding() { Type = UnitTypes.SHIELD_BATTERY, Pos = ShieldBatteryPos });
             }
             
             Set += ProtossBuildUtil.Pylons(() => Completed(UnitTypes.PYLON) >= 2);
@@ -97,23 +97,25 @@ namespace Tyr.Builds.Protoss
             result.Building(UnitTypes.ASSIMILATOR);
             result.Building(UnitTypes.FORGE);
             result.Building(UnitTypes.PHOTON_CANNON, Main, MainDefensePos, () => !DefendingStalker || Count(UnitTypes.FLEET_BEACON) > 0);
-            result.Building(UnitTypes.STARGATE, 2, () => Tyr.Bot.Frame >= 22.4 * 60 * 4);
+            result.Building(UnitTypes.STARGATE, 2, () => Bot.Bot.Frame >= 22.4 * 60 * 4);
             result.Building(UnitTypes.STARGATE, 1, () => ProxyTask.Task.Units.Count == 0 && DepoweredStargates >= 1);
             result.Building(UnitTypes.STARGATE, 1, () => ProxyTask.Task.Units.Count == 0 && DepoweredStargates >= 2);
             //result.Building(UnitTypes.SHIELD_BATTERY, Main, ShieldBatteryPos, true, () => Minerals() >= 400);
             result.Building(UnitTypes.FLEET_BEACON);
-            result.Building(UnitTypes.PYLON, Main, ShieldBatteryPos, true, () => Minerals() >= 400 && Tyr.Bot.Frame >= 22.4 * 60 * 5);
-            result.Building(UnitTypes.PHOTON_CANNON, Main, MainDefensePos, 2, () => Minerals() >= 400 && Tyr.Bot.Frame >= 22.4 * 60 * 5);
-            result.Building(UnitTypes.SHIELD_BATTERY, Main, MainDefensePos, 2, () => Minerals() >= 400 && Tyr.Bot.Frame >= 22.4 * 60 * 5);
+            result.Building(UnitTypes.PYLON, Main, ShieldBatteryPos, true, () => Minerals() >= 400 && Bot.Bot.Frame >= 22.4 * 60 * 5);
+            result.Building(UnitTypes.PHOTON_CANNON, Main, MainDefensePos, 2, () => Minerals() >= 400 && Bot.Bot.Frame >= 22.4 * 60 * 5);
+            result.Building(UnitTypes.SHIELD_BATTERY, Main, MainDefensePos, 2, () => Minerals() >= 400 && Bot.Bot.Frame >= 22.4 * 60 * 5);
 
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
+            if (tyr.Frame == (int)(22.4 * 60) && LogLabel.FoundMM)
+                tyr.Chat("These Tempests are perfectly balanced. As all things should be.");
             if (!ChatMessageSent)
             {
-                if (Completed(UnitTypes.TEMPEST) > 0)
+                if (Completed(UnitTypes.TEMPEST) > 0 && !LogLabel.FoundMM)
                 {
                     tyr.Chat("This build is dedicated to Andyman!");
                     ChatMessageSent = true;

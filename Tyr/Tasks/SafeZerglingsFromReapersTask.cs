@@ -8,6 +8,7 @@ namespace Tyr.Tasks
     class SafeZerglingsFromReapersTask : Task
     {
         public static SafeZerglingsFromReapersTask Task = new SafeZerglingsFromReapersTask();
+        public bool Cautious = false;
 
         public SafeZerglingsFromReapersTask() : base(10)
         { }
@@ -15,23 +16,23 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
         {
             bool speedDone = UpgradeType.LookUp[UpgradeType.MetabolicBoost].Done();
-            bool multipleReapers = Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2;
+            bool multipleReapers = Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2;
             
             if (!CloseReaper(agent))
                 return false;
 
-            if (multipleReapers && agent.Unit.Health < agent.Unit.HealthMax)
+            if (multipleReapers && agent.Unit.Health < agent.Unit.HealthMax && Cautious)
                 return true;
             if (agent.Unit.Health < agent.Unit.HealthMax - 12)
                 return true;
 
-            return multipleReapers && !speedDone;
+            return multipleReapers && !speedDone && Cautious;
         }
 
         public override List<UnitDescriptor> GetDescriptors()
@@ -43,10 +44,10 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) > 0;
+            return Bot.Bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) > 0;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             Point2D target = tyr.BaseManager.Main.MineralLinePos;
             foreach (Agent agent in units)
@@ -66,7 +67,7 @@ namespace Tyr.Tasks
 
         public bool CloseReaper(Agent agent)
         {
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            foreach (Unit enemy in Bot.Bot.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.REAPER)
                     continue;

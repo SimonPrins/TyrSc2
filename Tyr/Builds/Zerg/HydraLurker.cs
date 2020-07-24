@@ -2,6 +2,7 @@
 using Tyr.Agents;
 using Tyr.Builds.BuildLists;
 using Tyr.Micro;
+using Tyr.StrategyAnalysis;
 using Tyr.Tasks;
 using Tyr.Util;
 
@@ -35,7 +36,7 @@ namespace Tyr.Builds.Zerg
             return ZergBuildUtil.GetDefenseBuild();
         }
 
-        public override void OnStart(Tyr tyr)
+        public override void OnStart(Bot tyr)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new LurkerController());
@@ -90,7 +91,7 @@ namespace Tyr.Builds.Zerg
         private BuildList AntiLifting()
         {
             BuildList result = new BuildList();
-            result.If(() => { return Tyr.Bot.EnemyStrategyAnalyzer.LiftingDetected; });
+            result.If(() => { return Lifting.Get().Detected; });
             result.Building(UnitTypes.EXTRACTOR, 2);
             result.Building(UnitTypes.SPIRE);
             return result;
@@ -99,23 +100,23 @@ namespace Tyr.Builds.Zerg
         private BuildList MainBuild()
         {
             BuildList result = new BuildList();
-            result.Building(UnitTypes.HATCHERY, 2, () => { return Tyr.Bot.EnemyRace != Race.Protoss || (Count(UnitTypes.HATCHERY) + Count(UnitTypes.LAIR) + Count(UnitTypes.HIVE) < 2); });
+            result.Building(UnitTypes.HATCHERY, 2, () => { return Bot.Bot.EnemyRace != Race.Protoss || (Count(UnitTypes.HATCHERY) + Count(UnitTypes.LAIR) + Count(UnitTypes.HIVE) < 2); });
             result.Building(UnitTypes.SPAWNING_POOL);
             result.If(() => { return Count(UnitTypes.QUEEN) > 0; });
-            result.If(() => { return Completed(UnitTypes.HATCHERY) >= 2 && Tyr.Bot.Frame >= 22.4 * 60 * 2; });
+            result.If(() => { return Completed(UnitTypes.HATCHERY) >= 2 && Bot.Bot.Frame >= 22.4 * 60 * 2; });
             result.Building(UnitTypes.EXTRACTOR);
-            result.Building(UnitTypes.SPINE_CRAWLER, Natural, Tyr.Bot.MapAnalyzer.Walk(NaturalDefensePos, Tyr.Bot.MapAnalyzer.EnemyDistances, 5), 2);
+            result.Building(UnitTypes.SPINE_CRAWLER, Natural, Bot.Bot.MapAnalyzer.Walk(NaturalDefensePos, Bot.Bot.MapAnalyzer.EnemyDistances, 5), 2);
             result.If(() => { return Count(UnitTypes.ZERGLING) >= RequiredZerglings && Count(UnitTypes.DRONE) >= 20; });
             result.Building(UnitTypes.EXTRACTOR);
             result.Building(UnitTypes.HYDRALISK_DEN);
             result.Building(UnitTypes.EXTRACTOR, 2);
-            result.Building(UnitTypes.EXTRACTOR, 2, () => { return Tyr.Bot.EnemyRace != Race.Protoss; });
+            result.Building(UnitTypes.EXTRACTOR, 2, () => { return Bot.Bot.EnemyRace != Race.Protoss; });
             result.If(() => { return Count(UnitTypes.HYDRALISK) >= 5; });
             result.Building(UnitTypes.LURKER_DEN);
             return result;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (tyr.EnemyRace == Race.Protoss)
             {
@@ -164,9 +165,9 @@ namespace Tyr.Builds.Zerg
                 MorphingTask.Task.Morph(UnitTypes.OVERSEER);
 
             if (FoodUsed()
-                        + Tyr.Bot.UnitManager.Count(UnitTypes.HATCHERY) * 2
-                        + Tyr.Bot.UnitManager.Count(UnitTypes.LAIR) * 2
-                        + Tyr.Bot.UnitManager.Count(UnitTypes.HIVE) * 2
+                        + Bot.Bot.UnitManager.Count(UnitTypes.HATCHERY) * 2
+                        + Bot.Bot.UnitManager.Count(UnitTypes.LAIR) * 2
+                        + Bot.Bot.UnitManager.Count(UnitTypes.HIVE) * 2
                         >= ExpectedAvailableFood() - 2)
                 MorphingTask.Task.Morph(UnitTypes.OVERLORD);
             else if (Count(UnitTypes.DRONE) >= 14 && Count(UnitTypes.SPAWNING_POOL) == 0) { }
@@ -190,7 +191,7 @@ namespace Tyr.Builds.Zerg
             
         }
 
-        public override void Produce(Tyr tyr, Agent agent)
+        public override void Produce(Bot tyr, Agent agent)
         {
             if (UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))
             {
@@ -217,12 +218,12 @@ namespace Tyr.Builds.Zerg
                     && Completed(UnitTypes.INFESTATION_PIT) > 0
                     && Minerals() >= 200 && Gas() >= 150
                     && Count(UnitTypes.LURKER) >= 4
-                    && Tyr.Bot.EnemyRace == Race.Protoss)
+                    && Bot.Bot.EnemyRace == Race.Protoss)
                     agent.Order(1218);
             }
             else if (agent.Unit.UnitType == UnitTypes.HYDRALISK_DEN)
             {
-                if (!Tyr.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(134)
+                if (!Bot.Bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(134)
                     && Gas() >= 100
                     && Minerals() >= 100)
                     agent.Order(1282);

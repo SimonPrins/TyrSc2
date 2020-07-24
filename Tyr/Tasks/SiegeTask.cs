@@ -44,13 +44,13 @@ namespace Tyr.Tasks
             int combatUnits = 0;
             foreach (uint combatType in UnitTypes.CombatUnitTypes)
                 if (!UnitTypes.EquivalentTypes.ContainsKey(combatType))
-                    combatUnits += Tyr.Bot.UnitManager.Completed(combatType);
+                    combatUnits += Bot.Bot.UnitManager.Completed(combatType);
             if (combatUnits >= RequiredSize)
                 return true;
             return false;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (units.Count <= RetreatSize)
             {
@@ -83,7 +83,7 @@ namespace Tyr.Tasks
                 Kill(tyr);
         }
 
-        public void Advance(Tyr tyr)
+        public void Advance(Bot tyr)
         {
             bool enemyClose = false;
 
@@ -113,7 +113,7 @@ namespace Tyr.Tasks
                 CurrentState = State.SiegeUp;
         }
 
-        public void SiegeUp(Tyr tyr)
+        public void SiegeUp(Bot tyr)
         {
             bool tanksAreSieged = true;
             List<Agent> tanks = GetTanks();
@@ -126,7 +126,7 @@ namespace Tyr.Tasks
                     && agent.DistanceSq(tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 50 * 50)
                 {
                     bool closeEnemy = false;
-                    foreach (Unit enemy in Tyr.Bot.Enemies())
+                    foreach (Unit enemy in Bot.Bot.Enemies())
                         if (agent.DistanceSq(enemy) <= 14 * 14)
                         {
                             closeEnemy = true;
@@ -167,7 +167,7 @@ namespace Tyr.Tasks
                 CurrentState = State.LeapFrog;
         }
 
-        public void LeapFrog(Tyr tyr)
+        public void LeapFrog(Bot tyr)
         {
             List<Agent> tanks = GetTanks();
 
@@ -322,7 +322,7 @@ namespace Tyr.Tasks
                     if (UnsiegingTanks.Contains(agent.Unit.Tag))
                     {
                         bool closeEnemy = false;
-                        foreach (Unit enemy in Tyr.Bot.Enemies())
+                        foreach (Unit enemy in Bot.Bot.Enemies())
                         {
                             if (!UnitTypes.CanAttackGround(enemy.UnitType) && !UnitTypes.BuildingTypes.Contains(enemy.UnitType))
                                 continue;
@@ -389,7 +389,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public void Kill(Tyr tyr)
+        public void Kill(Bot tyr)
         {
             foreach (Agent agent in Units)
                 Attack(agent, tyr.TargetManager.AttackTarget);
@@ -417,7 +417,7 @@ namespace Tyr.Tasks
                     result.Add(agent);
 
             result.Sort((agent1, agent2) => {
-                return Math.Sign(agent2.DistanceSq(Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]) - agent1.DistanceSq(Tyr.Bot.TargetManager.PotentialEnemyStartLocations[0]));
+                return Math.Sign(agent2.DistanceSq(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]) - agent1.DistanceSq(Bot.Bot.TargetManager.PotentialEnemyStartLocations[0]));
             });
 
             return result;

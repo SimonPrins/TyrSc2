@@ -7,13 +7,21 @@ namespace Tyr.Tasks
 {
     class OracleHarassTask : Task
     {
+        public static OracleHarassTask Task = new OracleHarassTask();
         public int RequiredSize { get; set; } = 2;
         public int PulsarFrame;
+
+        public bool IdleAboveEnemyMinerals = false;
 
         HashSet<uint> buffs = new HashSet<uint>();
 
         public OracleHarassTask() : base(5)
         { }
+
+        public static void Enable()
+        {
+            Enable(Task);
+        }
 
         public override bool DoWant(Agent agent)
         {
@@ -22,10 +30,10 @@ namespace Tyr.Tasks
 
         public override bool IsNeeded()
         {
-            return Tyr.Bot.UnitManager.Completed(UnitTypes.ORACLE)  >= RequiredSize;
+            return Bot.Bot.UnitManager.Completed(UnitTypes.ORACLE)  >= RequiredSize;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             Dictionary<ulong, Unit> targets = new Dictionary<ulong, Unit>();
             bool attacking = false;
@@ -94,6 +102,8 @@ namespace Tyr.Tasks
                     agent.Order(Abilities.MOVE, defendTarget);
                 else if (enemyWorker != null)
                     agent.Order(Abilities.ATTACK, enemyWorker.Tag);
+                else if (IdleAboveEnemyMinerals && tyr.TargetManager.PotentialEnemyStartLocations.Count >= 0)
+                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
                 else
                     agent.Order(Abilities.MOVE, tyr.TargetManager.AttackTarget);
             }

@@ -13,7 +13,7 @@ namespace Tyr.StrategyAnalysis
 
         public override bool Detect()
         {
-            return Tyr.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.NYDUS_CANAL) + Tyr.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.NYDUS_NETWORK) > 0;
+            return Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.NYDUS_CANAL) + Bot.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.NYDUS_NETWORK) > 0;
         }
 
         public override string Name()

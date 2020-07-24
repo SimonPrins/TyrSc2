@@ -16,7 +16,7 @@ namespace Tyr.Tasks
         public static void Enable()
         {
             Task.Stopped = false;
-            Tyr.Bot.TaskManager.Add(Task);
+            Bot.Bot.TaskManager.Add(Task);
         }
 
         public override bool DoWant(Agent agent)
@@ -27,17 +27,17 @@ namespace Tyr.Tasks
         public override List<UnitDescriptor> GetDescriptors()
         {
             List<UnitDescriptor> result = new List<UnitDescriptor>();
-            result.Add(new UnitDescriptor() { Pos = Tyr.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = UnitTypes.WorkerTypes });
+            result.Add(new UnitDescriptor() { Pos = Bot.Bot.TargetManager.AttackTarget, Count = 1, UnitTypes = UnitTypes.WorkerTypes });
             return result;
         }
 
         public override bool IsNeeded()
         {
-            float distance = LastPos == null ? 40 * 40 : SC2Util.DistanceSq(Tyr.Bot.MapAnalyzer.StartLocation, LastPos);
-            foreach (Unit enemy in Tyr.Bot.Enemies())
+            float distance = LastPos == null ? 40 * 40 : SC2Util.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation, LastPos);
+            foreach (Unit enemy in Bot.Bot.Enemies())
                 if (enemy.UnitType == UnitTypes.PROBE)
                 {
-                    float newDist = SC2Util.DistanceSq(Tyr.Bot.MapAnalyzer.StartLocation, enemy.Pos);
+                    float newDist = SC2Util.DistanceSq(Bot.Bot.MapAnalyzer.StartLocation, enemy.Pos);
                     if (newDist < distance)
                     {
                         distance = newDist;
@@ -47,7 +47,7 @@ namespace Tyr.Tasks
             return LastPos != null;
         }
 
-        public override void OnFrame(Tyr tyr)
+        public override void OnFrame(Bot tyr)
         {
             if (LastPos == null)
             {

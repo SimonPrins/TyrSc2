@@ -10,7 +10,7 @@ namespace Tyr.Managers
         public int AvailableGasses { get; internal set; }
         public Point2D NaturalDefensePos { get; private set; }
 
-        public void OnStart(Tyr tyr)
+        public void OnStart(Bot tyr)
         {
             float dist = 0;
             Point2D crossSpawn = null;
@@ -28,7 +28,7 @@ namespace Tyr.Managers
             
         }
 
-        public void OnFrame(Tyr tyr)
+        public void OnFrame(Bot tyr)
         {
         }
     }
