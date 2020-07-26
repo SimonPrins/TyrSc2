@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class WorkerDefenseTask : Task
     {
@@ -232,10 +232,10 @@ namespace Tyr.Tasks
             return enemyCounts[unitType];
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Units.Count > 0)
-                tyr.DrawText("Defending workers: " + Units.Count);
+                bot.DrawText("Defending workers: " + Units.Count);
             if (target == null)
             {
                 Clear();
@@ -246,7 +246,7 @@ namespace Tyr.Tasks
                 IdleTask.Task.Add(PopAt(Units.Count - 1));
 
             // Remove probes whose shields have depleted.
-            if (tyr.MyRace == Race.Protoss)
+            if (bot.MyRace == Race.Protoss)
                 for (int i = units.Count - 1; i >= 0; i--)
                     if (units[i].Unit.Shield <= 1)
                     {

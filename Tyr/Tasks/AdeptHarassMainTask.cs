@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class AdeptHarassMainTask : Task
     {
@@ -47,9 +47,9 @@ namespace Tyr.Tasks
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            tyr.DrawText("Adept harass count: " + units.Count);
+            bot.DrawText("Adept harass count: " + units.Count);
             if (Units.Count >= RequiredSize)
                 Sent = true;
 
@@ -66,9 +66,9 @@ namespace Tyr.Tasks
             }
 
             Base enemyMain = null;
-            foreach (Base b in tyr.BaseManager.Bases)
+            foreach (Base b in bot.BaseManager.Bases)
             {
-                if (SC2Util.DistanceSq(b.BaseLocation.Pos, tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 2 * 2)
+                if (SC2Util.DistanceSq(b.BaseLocation.Pos, bot.TargetManager.PotentialEnemyStartLocations[0]) <= 2 * 2)
                 {
                     enemyMain = b;
                     break;
@@ -84,7 +84,7 @@ namespace Tyr.Tasks
                 {
                     if (Bot.Main.Frame % 48 == 0)
                         agent.Order(2544, targetLocation);
-                    tyr.MicroController.Attack(agent, targetLocation);
+                    bot.MicroController.Attack(agent, targetLocation);
                 }
             } else if (CurrentState == State.GroupUp)
             {
@@ -95,7 +95,7 @@ namespace Tyr.Tasks
                     center.Y += agent.Unit.Pos.Y / Units.Count;
                 }
                 foreach (Agent agent in units)
-                    tyr.MicroController.Attack(agent, center);
+                    bot.MicroController.Attack(agent, center);
             }
 
         }

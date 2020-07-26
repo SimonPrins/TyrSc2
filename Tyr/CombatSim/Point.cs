@@ -1,4 +1,4 @@
-﻿namespace Tyr.CombatSim
+﻿namespace SC2Sharp.CombatSim
 {
     public class Point
     {

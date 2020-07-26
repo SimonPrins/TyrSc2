@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class HideBuildingTask : Task
     {
@@ -41,11 +41,11 @@ namespace Tyr.Tasks
             return HideLocation != null;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (CurrentOrder < RequiredBuildings.Count)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == RequiredBuildings[CurrentOrder]
                         && agent.Unit.BuildProgress >= 0.99
                         && agent.DistanceSq(HideLocation.BaseLocation.Pos) <= 15 * 15)
@@ -62,7 +62,7 @@ namespace Tyr.Tasks
                     int order = BuildingType.LookUp[RequiredBuildings[CurrentOrder]].Ability;
                     if (agent.Unit.Orders != null && agent.Unit.Orders.Count > 0 && agent.Unit.Orders[0].AbilityId == order)
                         continue;
-                    if (tyr.Frame % 4 == 0)
+                    if (bot.Frame % 4 == 0)
                     {
                         Point2D target = SC2Util.Point(HideLocation.BaseLocation.Pos.X, HideLocation.BaseLocation.Pos.Y - 1 + 3 * CurrentOrder);
                         agent.Order(order, target);

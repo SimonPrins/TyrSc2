@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class CombatGroup
     {
@@ -118,11 +118,11 @@ namespace Tyr.Tasks
             }
         }
 
-        private void UpdateMedivacRetreatTarget(Bot tyr)
+        private void UpdateMedivacRetreatTarget(Bot bot)
         {
-            if (MedivacRetreatTargetUpdateFrame == tyr.Frame)
+            if (MedivacRetreatTargetUpdateFrame == bot.Frame)
                 return;
-            MedivacRetreatTargetUpdateFrame = tyr.Frame;
+            MedivacRetreatTargetUpdateFrame = bot.Frame;
 
             float distance = 1000 * 1000;
             foreach (Agent agent in Units)
@@ -130,7 +130,7 @@ namespace Tyr.Tasks
                 if (agent.Unit.IsFlying)
                     continue;
 
-                float newDist = agent.DistanceSq(tyr.TargetManager.AttackTarget);
+                float newDist = agent.DistanceSq(bot.TargetManager.AttackTarget);
                 if (newDist < distance)
                 {
                     distance = newDist;

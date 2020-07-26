@@ -1,11 +1,11 @@
-﻿using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class ZealotRush : Build
     {
@@ -41,7 +41,7 @@ namespace Tyr.Builds.Protoss
             MineGoldenWallMineralsTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new FleeCyclonesController());
             MicroControllers.Add(FearCannonsController);
@@ -79,7 +79,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.RequiredSize = RequiredSize;
 
@@ -91,7 +91,7 @@ namespace Tyr.Builds.Protoss
             if (Completed(UnitTypes.ZEALOT) < 15)
                 FearCannonsController.Stopped = false;
 
-            tyr.buildingPlacer.BuildCompact = true;
+            bot.buildingPlacer.BuildCompact = true;
 
             if (TotalEnemyCount(UnitTypes.PROBE) + TotalEnemyCount(UnitTypes.SCV) + TotalEnemyCount(UnitTypes.DRONE) >= 4
                 && CancelWorkerRush)
@@ -101,8 +101,8 @@ namespace Tyr.Builds.Protoss
             }
 
             if (!PylonPlaced)
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
-                    if (agent.Unit.UnitType == UnitTypes.PYLON && SC2Util.DistanceSq(agent.Unit.Pos, tyr.MapAnalyzer.StartLocation) >= 40 * 40)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
+                    if (agent.Unit.UnitType == UnitTypes.PYLON && SC2Util.DistanceSq(agent.Unit.Pos, bot.MapAnalyzer.StartLocation) >= 40 * 40)
                     {
                         PylonPlaced = true;
                         PlacePylonTask.Task.Clear();
@@ -110,7 +110,7 @@ namespace Tyr.Builds.Protoss
                     }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             /*
             if (agent.Unit.UnitType == UnitTypes.NEXUS

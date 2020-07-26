@@ -1,14 +1,14 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.BuildingPlacement;
-using Tyr.Builds.BuildLists;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.BuildingPlacement;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvTStalkerTempest : Build
     {
@@ -31,7 +31,7 @@ namespace Tyr.Builds.Protoss
                 ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new FleeCyclonesController());
             MicroControllers.Add(TempestController);
@@ -80,16 +80,16 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(1568);
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(1568);
 
-            if (tyr.Frame == (int)(22.4 * (LogLabel.FoundStrelok ? 60 : 30)))
-                tyr.Chat(LogLabel.FoundMechSweep ? "Fun isn't something one considers when balancing the universe" : "I am inevitable.");
+            if (bot.Frame == (int)(22.4 * (LogLabel.FoundStrelok ? 60 : 30)))
+                bot.Chat(LogLabel.FoundMechSweep ? "Fun isn't something one considers when balancing the universe" : "I am inevitable.");
 
-            tyr.buildingPlacer.BuildCompact = true;
-            tyr.TargetManager.PrefferDistant = false;
-            tyr.TargetManager.TargetAllBuildings = true;
+            bot.buildingPlacer.BuildCompact = true;
+            bot.TargetManager.PrefferDistant = false;
+            bot.TargetManager.TargetAllBuildings = true;
 
             if (Completed(UnitTypes.TEMPEST) >= 4)
             {

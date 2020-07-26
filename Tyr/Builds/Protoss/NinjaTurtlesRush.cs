@@ -1,13 +1,13 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class NinjaTurtlesRush : Build
     {
@@ -35,7 +35,7 @@ namespace Tyr.Builds.Protoss
                 ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new VoidrayController());
             MicroControllers.Add(new StutterController());
@@ -111,16 +111,16 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             FlyerAttackTask.Task.RequiredSize = 4;
             ConstructionTask.Task.OnlyWorkersFromMain = true;
             
-            tyr.buildingPlacer.BuildInsideMainOnly = true;
+            bot.buildingPlacer.BuildInsideMainOnly = true;
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.OnlyDefendInsideMain = true;
 
-            tyr.buildingPlacer.BuildCompact = true;
+            bot.buildingPlacer.BuildCompact = true;
 
             if (StrategyAnalysis.CannonRush.Get().Detected)
                 VoidrayOnly = true;
@@ -128,45 +128,45 @@ namespace Tyr.Builds.Protoss
             if (VoidrayOnly)
                 DefenseTask.Stopped = true;
             
-            if ((tyr.EnemyRace == Race.Terran || tyr.EnemyRace == Race.Random)
+            if ((bot.EnemyRace == Race.Terran || bot.EnemyRace == Race.Random)
                 && ReaperDefenseCannonStep.DesiredPos == null)
             {
-                foreach (Unit unit in tyr.Enemies())
+                foreach (Unit unit in bot.Enemies())
                 {
                     if (unit.UnitType == UnitTypes.REAPER
                         && Bot.Main.MapAnalyzer.StartArea[(int)System.Math.Round(unit.Pos.X), (int)System.Math.Round(unit.Pos.Y)])
                     {
-                        Point2D dir = SC2Util.Point(unit.Pos.X - tyr.MapAnalyzer.StartLocation.X, unit.Pos.Y - tyr.MapAnalyzer.StartLocation.Y);
+                        Point2D dir = SC2Util.Point(unit.Pos.X - bot.MapAnalyzer.StartLocation.X, unit.Pos.Y - bot.MapAnalyzer.StartLocation.Y);
                         float length = (float)System.Math.Sqrt(dir.X * dir.X + dir.Y * dir.Y);
                         dir = SC2Util.Point(dir.X / length, dir.Y / length);
 
-                        ReaperDefenseCannonStep.DesiredPos = SC2Util.Point(tyr.MapAnalyzer.StartLocation.X + dir.X * 4f, tyr.MapAnalyzer.StartLocation.Y + dir.Y * 4f);
+                        ReaperDefenseCannonStep.DesiredPos = SC2Util.Point(bot.MapAnalyzer.StartLocation.X + dir.X * 4f, bot.MapAnalyzer.StartLocation.Y + dir.Y * 4f);
                         break;
                     }
                 }
             }
             
-            if (Lifting.Get().Detected && tyr.EnemyManager.EnemyBuildings.Count == 0 && !ChasingLiftedBuildings)
+            if (Lifting.Get().Detected && bot.EnemyManager.EnemyBuildings.Count == 0 && !ChasingLiftedBuildings)
             {
                 ChasingLiftedBuildings = true;
-                tyr.TaskManager.Add(new ElevatorChaserTask());
+                bot.TaskManager.Add(new ElevatorChaserTask());
             }
 
             if (gatewayBuilt && Count(UnitTypes.GATEWAY) == 0)
                 gatewayBuilt = false;
             else if (!gatewayBuilt)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.GATEWAY)
                     {
                         gatewayBuilt = true;
-                        agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                        agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
                         break;
                     }
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

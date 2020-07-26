@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ObserverHunterTask : Task
     {
@@ -72,7 +72,7 @@ namespace Tyr.Tasks
             }
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             UpdateTarget();
             if (Target == null)

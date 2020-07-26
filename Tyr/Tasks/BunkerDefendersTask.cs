@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class BunkerDefendersTask : Task
     {
@@ -43,11 +43,11 @@ namespace Tyr.Tasks
             return Bot.Main.Build.Completed(UnitTypes.BUNKER) > 0 && !LeaveBunkers;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (LeaveBunkers)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.BUNKER)
                         agent.Order(408);
                 Clear();

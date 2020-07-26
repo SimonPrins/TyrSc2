@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Micro;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Micro;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class IdleTask : Task
     {
@@ -37,13 +37,13 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (OverrideTarget != null)
                 Target = OverrideTarget;
-            else if (tyr.BaseManager.Natural.Owner == tyr.PlayerId)
-                Target = tyr.BaseManager.NaturalDefensePos;
-            else Target = tyr.BaseManager.MainDefensePos;
+            else if (bot.BaseManager.Natural.Owner == bot.PlayerId)
+                Target = bot.BaseManager.NaturalDefensePos;
+            else Target = bot.BaseManager.MainDefensePos;
 
             foreach (Agent agent in units)
             {
@@ -75,17 +75,17 @@ namespace Tyr.Tasks
                     continue;
                 }
                 if (agent.Unit.UnitType == UnitTypes.OVERLORD 
-                    && agent.DistanceSq(tyr.MapAnalyzer.StartLocation) >= 80 * 80
+                    && agent.DistanceSq(bot.MapAnalyzer.StartLocation) >= 80 * 80
                     && RetreatFarOverlords)
                 {
-                    agent.Order(Abilities.MOVE, SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
+                    agent.Order(Abilities.MOVE, SC2Util.To2D(bot.MapAnalyzer.StartLocation));
                     continue;
                 }
                 if (FearEnemies && (agent.IsCombatUnit || agent.Unit.UnitType == UnitTypes.OVERSEER || agent.Unit.UnitType == UnitTypes.RAVEN))
                 {
                     Unit fleeEnemy = null;
                     float distance = 10 * 10;
-                    foreach (Unit enemy in tyr.Enemies())
+                    foreach (Unit enemy in bot.Enemies())
                     {
                         if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                             continue;
@@ -112,7 +112,7 @@ namespace Tyr.Tasks
                         agent.Order(Abilities.MOVE, Target);
                     continue;
                 }
-                if (AttackMove && agent.Unit.UnitType == UnitTypes.SIEGE_TANK && SC2Util.DistanceSq(agent.Unit.Pos, Target) < IdleRange * IdleRange && tyr.Frame % 67 == 0)
+                if (AttackMove && agent.Unit.UnitType == UnitTypes.SIEGE_TANK && SC2Util.DistanceSq(agent.Unit.Pos, Target) < IdleRange * IdleRange && bot.Frame % 67 == 0)
                 {
                     agent.Order(Abilities.SIEGE);
                     continue;

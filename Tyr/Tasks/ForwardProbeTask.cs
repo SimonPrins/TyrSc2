@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ForwardProbeTask : Task
     {
@@ -44,7 +44,7 @@ namespace Tyr.Tasks
             return Bot.Main.Frame > 1;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             UpdateEnemyBases();
             if (units.Count == 0)
@@ -66,7 +66,7 @@ namespace Tyr.Tasks
             {
                 Unit fleeEnemy = null;
                 float enemyDist = 13 * 13;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (!UnitTypes.CanAttackGround(enemy.UnitType))
                         continue;

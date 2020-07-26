@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.BuildingPlacement
+namespace SC2Sharp.BuildingPlacement
 {
     /*
      * This class is responsible for managing the placement of buildings.

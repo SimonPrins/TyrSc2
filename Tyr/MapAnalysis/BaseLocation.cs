@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
 
-namespace Tyr.MapAnalysis
+namespace SC2Sharp.MapAnalysis
 {
     public class BaseLocation
     {

@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Micro
+namespace SC2Sharp.Micro
 {
     public class LiberatorController : CustomController
     {

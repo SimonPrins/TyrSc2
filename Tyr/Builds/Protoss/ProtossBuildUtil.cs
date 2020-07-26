@@ -1,7 +1,7 @@
-﻿using Tyr.Agents;
-using static Tyr.Builds.BuildLists.ConditionalStep;
+﻿using SC2Sharp.Agents;
+using static SC2Sharp.Builds.BuildLists.ConditionalStep;
 
-namespace Tyr.Builds.BuildLists
+namespace SC2Sharp.Builds.BuildLists
 {
     public class ProtossBuildUtil
     {

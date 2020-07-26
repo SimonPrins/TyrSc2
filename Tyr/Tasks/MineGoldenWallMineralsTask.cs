@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class MineGoldenWallMineralsTask : Task
     {
@@ -41,22 +41,22 @@ namespace Tyr.Tasks
             return Bot.Main.Map == MapAnalysis.MapEnum.GoldenWall && !Done;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Bot.Main.Map != MapAnalysis.MapEnum.GoldenWall)
                 return;
-            Agent resourceCenter = tyr.Build.Main.ResourceCenter;
+            Agent resourceCenter = bot.Build.Main.ResourceCenter;
             if (FirstMineralPos == null)
             {
                 List<Point2D> minerals = new List<Point2D>();
                 float avgX = 0;
                 float avgY = 0;
 
-                foreach (Unit mineral in tyr.Observation.Observation.RawData.Units)
+                foreach (Unit mineral in bot.Observation.Observation.RawData.Units)
                 {
                     if (mineral.Alliance != Alliance.Neutral)
                         continue;
-                    float mainDist = SC2Util.DistanceSq(tyr.MapAnalyzer.StartLocation, mineral.Pos);
+                    float mainDist = SC2Util.DistanceSq(bot.MapAnalyzer.StartLocation, mineral.Pos);
                     if (mainDist < 15 * 15)
                         continue;
                     if (mainDist > 19 * 19)
@@ -96,22 +96,22 @@ namespace Tyr.Tasks
 
             foreach (Agent agent in units)
             {
-                foreach (Unit mineral in tyr.Observation.Observation.RawData.Units)
+                foreach (Unit mineral in bot.Observation.Observation.RawData.Units)
                 {
                     if (mineral.Alliance != Alliance.Neutral)
                         continue;
                     if (SC2Util.DistanceSq(mineral.Pos, FirstMineralPos) > 0.25)
                         continue;
-                    tyr.DrawLine(agent, mineral.Pos);
+                    bot.DrawLine(agent, mineral.Pos);
                 }
-                foreach (Unit mineral in tyr.Observation.Observation.RawData.Units)
+                foreach (Unit mineral in bot.Observation.Observation.RawData.Units)
                 {
                     if (mineral.Alliance != Alliance.Neutral)
                         continue;
                     if (SC2Util.DistanceSq(mineral.Pos, SecondMineralPos) > 0.25)
                         continue;
 
-                    tyr.DrawLine(agent, mineral.Pos);
+                    bot.DrawLine(agent, mineral.Pos);
                 }
                 if (agent.IsCarryingResources())
                 {
@@ -121,14 +121,14 @@ namespace Tyr.Tasks
                 }
                 Unit targetMineral = null;
                 float dist = 20 * 20;
-                foreach (Unit mineral in tyr.Observation.Observation.RawData.Units)
+                foreach (Unit mineral in bot.Observation.Observation.RawData.Units)
                 {
                     if (mineral.Alliance != Alliance.Neutral)
                         continue;
                     if (SC2Util.DistanceSq(mineral.Pos, FirstMineralPos) > 0.25
                         && SC2Util.DistanceSq(mineral.Pos, SecondMineralPos) > 0.25)
                         continue;
-                    float newDist = SC2Util.DistanceSq(mineral.Pos, tyr.MapAnalyzer.StartLocation);
+                    float newDist = SC2Util.DistanceSq(mineral.Pos, bot.MapAnalyzer.StartLocation);
                     if (newDist > dist)
                         continue;
                     dist = newDist;

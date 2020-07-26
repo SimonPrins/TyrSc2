@@ -1,6 +1,6 @@
 ﻿using SC2APIProtocol;
 
-namespace Tyr.MapAnalysis
+namespace SC2Sharp.MapAnalysis
 {
     public class Gas
     {

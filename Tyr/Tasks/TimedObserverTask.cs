@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class TimedObserverTask : Task
     {
@@ -35,7 +35,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Target != null)
                 foreach (Agent agent in units)

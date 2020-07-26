@@ -1,7 +1,7 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.Micro
+namespace SC2Sharp.Micro
 {
     public class EvadeCannonsController : CustomController
     {

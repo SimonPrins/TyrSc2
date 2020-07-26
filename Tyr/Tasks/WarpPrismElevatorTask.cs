@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class WarpPrismElevatorTask : Task
     {
@@ -51,7 +51,7 @@ namespace Tyr.Tasks
             return EnemyThird != null;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (WarpPrism != null)
             {
@@ -76,13 +76,13 @@ namespace Tyr.Tasks
                         ClearAt(i);
                 }
 
-            if (EnemyThird == null && tyr.TargetManager.PotentialEnemyStartLocations.Count == 1)
+            if (EnemyThird == null && bot.TargetManager.PotentialEnemyStartLocations.Count == 1)
             {
-                Point2D enemyNatural = tyr.MapAnalyzer.GetEnemyNatural().Pos;
-                Point2D enemyMain = tyr.TargetManager.PotentialEnemyStartLocations[0];
-                Point2D enemyRamp = tyr.MapAnalyzer.GetEnemyRamp();
+                Point2D enemyNatural = bot.MapAnalyzer.GetEnemyNatural().Pos;
+                Point2D enemyMain = bot.TargetManager.PotentialEnemyStartLocations[0];
+                Point2D enemyRamp = bot.MapAnalyzer.GetEnemyRamp();
                 float dist = 1000000;
-                foreach (BaseLocation loc in tyr.MapAnalyzer.BaseLocations)
+                foreach (BaseLocation loc in bot.MapAnalyzer.BaseLocations)
                 {
                     if (SC2Util.DistanceSq(loc.Pos, enemyNatural) <= 2 * 2)
                         continue;
@@ -99,10 +99,10 @@ namespace Tyr.Tasks
                 }
                 PotentialHelper potential;
                 dist = 25 * 25;
-                for (int x = 0; x < tyr.MapAnalyzer.EnemyDistances.GetLength(0); x++)
-                    for (int y = 0; y < tyr.MapAnalyzer.EnemyDistances.GetLength(1); y++)
+                for (int x = 0; x < bot.MapAnalyzer.EnemyDistances.GetLength(0); x++)
+                    for (int y = 0; y < bot.MapAnalyzer.EnemyDistances.GetLength(1); y++)
                     {
-                        if (tyr.MapAnalyzer.EnemyDistances[x, y] > 30)
+                        if (bot.MapAnalyzer.EnemyDistances[x, y] > 30)
                             continue;
 
                         Point2D point = new Point2D() { X = x, Y = y };
@@ -112,17 +112,17 @@ namespace Tyr.Tasks
                         dist = newDist;
                         
                         StagingArea = new PotentialHelper(point, 0.5f)
-                            .To(tyr.TargetManager.PotentialEnemyStartLocations[0])
+                            .To(bot.TargetManager.PotentialEnemyStartLocations[0])
                             .Get();
                     }
                 
                 potential = new PotentialHelper(StagingArea, 6.5f);
-                potential.From(tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                potential.From(bot.TargetManager.PotentialEnemyStartLocations[0]);
                 LoadArea = potential.Get();
 
-                if (tyr.Map == MapEnum.Simulacrum)
+                if (bot.Map == MapEnum.Simulacrum)
                 {
-                    if (tyr.MapAnalyzer.StartLocation.X < 100)
+                    if (bot.MapAnalyzer.StartLocation.X < 100)
                     {
                         StagingArea = new Point2D() { X = 136.5f, Y = 51.2f};
                         LoadArea = new Point2D() { X = 134.5f, Y = 55.2f };
@@ -135,7 +135,7 @@ namespace Tyr.Tasks
             }
 
             if (StagingArea != null)
-                tyr.DrawSphere(new Point() { X = StagingArea.X, Y = StagingArea.Y, Z = tyr.MapAnalyzer.StartLocation.Z });
+                bot.DrawSphere(new Point() { X = StagingArea.X, Y = StagingArea.Y, Z = bot.MapAnalyzer.StartLocation.Z });
 
             if (units.Count == 0)
                 return;
@@ -150,7 +150,7 @@ namespace Tyr.Tasks
                     }
             }
             PickupUnitTag = 0;
-            tyr.DrawText("Pickup unit: " + PickupUnitTag);
+            bot.DrawText("Pickup unit: " + PickupUnitTag);
             OrderWarpPrism();
             
             foreach (Agent agent in units)
@@ -160,11 +160,11 @@ namespace Tyr.Tasks
                 if (agent.Unit.IsFlying)
                     DroppedUnits.Add(agent.Unit.Tag);
                 if (DroppedUnits.Contains(agent.Unit.Tag))
-                    Attack(agent, tyr.TargetManager.AttackTarget);
+                    Attack(agent, bot.TargetManager.AttackTarget);
                 else if (PickupUnitTag == agent.Unit.Tag)
                 {
                     if (PickupUnitTag != 0)
-                        tyr.DrawLine(agent.Unit.Pos, WarpPrism.Unit.Pos);
+                        bot.DrawLine(agent.Unit.Pos, WarpPrism.Unit.Pos);
                     agent.Order(Abilities.MOVE, WarpPrism.Unit.Tag);
                 }
                 else if (WarpPrismInPlace)

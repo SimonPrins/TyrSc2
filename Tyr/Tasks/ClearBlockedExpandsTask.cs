@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ClearBlockedExpandsTask : Task
     {
@@ -39,7 +39,7 @@ namespace Tyr.Tasks
             return false;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             CheckBaseCleared();
             if (ClearBase == null)
@@ -59,7 +59,7 @@ namespace Tyr.Tasks
             Bot.Main.DrawText("Clearing base.");
 
             foreach (Agent agent in units)
-                tyr.MicroController.Attack(agent, ClearBase.BaseLocation.Pos);
+                bot.MicroController.Attack(agent, ClearBase.BaseLocation.Pos);
         }
 
         private void CheckBaseCleared()

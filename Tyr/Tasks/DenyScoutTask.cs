@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class DenyScoutTask : Task
     {
@@ -44,10 +44,10 @@ namespace Tyr.Tasks
             return Bot.Main.Frame >= StartFrame && !Done;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Enemy == null)
-                Enemy = tyr.TargetManager.AttackTarget;
+                Enemy = bot.TargetManager.AttackTarget;
 
 
             if (Done)
@@ -60,9 +60,9 @@ namespace Tyr.Tasks
             float pylonDist = 100 * 100;
             Unit probe = null;
             float dist = 1000000;
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
-                float newDist = SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation);
+                float newDist = SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation);
                 if (enemy.UnitType == UnitTypes.PYLON && newDist < pylonDist)
                 {
                     proxyPylon = enemy;
@@ -78,7 +78,7 @@ namespace Tyr.Tasks
             }
 
 
-            foreach (RecentlyDeceased deceased in tyr.EnemyManager.RecentlyDeceased)
+            foreach (RecentlyDeceased deceased in bot.EnemyManager.RecentlyDeceased)
             {
                 if (deceased.UnitType == UnitTypes.PYLON)
                     Done = true;
@@ -90,8 +90,8 @@ namespace Tyr.Tasks
                 }
             }
 
-            Point2D Ramp = tyr.MapAnalyzer.GetMainRamp();
-            Point2D natural = tyr.BaseManager.Natural.BaseLocation.Pos;
+            Point2D Ramp = bot.MapAnalyzer.GetMainRamp();
+            Point2D natural = bot.BaseManager.Natural.BaseLocation.Pos;
             float dx = natural.X - Ramp.X;
             float dy = natural.Y - Ramp.Y;
             float size = (float)Math.Sqrt(dx * dx + dy * dy);

@@ -1,7 +1,7 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.MapAnalysis
+namespace SC2Sharp.MapAnalysis
 {
     public class WallBuilding
     {

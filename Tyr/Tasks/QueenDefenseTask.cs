@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class QueenDefenseTask : Task
     {
@@ -27,10 +27,10 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             int bases = 0;
-            foreach (Base b in tyr.BaseManager.Bases)
+            foreach (Base b in bot.BaseManager.Bases)
                 if (b.ResourceCenter != null)
                     bases++;
 
@@ -38,13 +38,13 @@ namespace Tyr.Tasks
             Base defendBase = null;
             if (bases >= 2)
             {
-                target = tyr.BaseManager.NaturalDefensePos;
-                defendBase = tyr.BaseManager.Natural;
+                target = bot.BaseManager.NaturalDefensePos;
+                defendBase = bot.BaseManager.Natural;
             }
             else
             {
-                target = tyr.BaseManager.MainDefensePos;
-                defendBase = tyr.BaseManager.Main;
+                target = bot.BaseManager.MainDefensePos;
+                defendBase = bot.BaseManager.Main;
             }
             
             PotentialHelper potential = new PotentialHelper(target);
@@ -57,7 +57,7 @@ namespace Tyr.Tasks
                 if (queen.Unit.Energy >= 50)
                 {
                     Agent transfuseTarget = null;
-                    foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                    foreach (Agent agent in bot.UnitManager.Agents.Values)
                     {
                         if (agent.Unit.HealthMax - agent.Unit.Health >= 125
                             && agent.Unit.Tag != queen.Unit.Tag

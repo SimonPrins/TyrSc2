@@ -1,14 +1,14 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Zerg
+namespace SC2Sharp.Builds.Zerg
 {
     public class MassHydra : Build
     {
@@ -24,23 +24,23 @@ namespace Tyr.Builds.Zerg
             return "MassHydra";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new TargetFireController(GetPriorities()));
-            tyr.TaskManager.Add(TimingAttackTask);
-            tyr.TaskManager.Add(new WorkerScoutTask());
+            bot.TaskManager.Add(TimingAttackTask);
+            bot.TaskManager.Add(new WorkerScoutTask());
 
             foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 QueenInjectTask queenInjectTask = new QueenInjectTask(b);
-                tyr.TaskManager.Add(queenInjectTask);
+                bot.TaskManager.Add(queenInjectTask);
                 QueenInjectTasks.Add(queenInjectTask);
-                if (b != tyr.BaseManager.Main && b != tyr.BaseManager.Natural)
-                    tyr.TaskManager.Add(new DefenseSquadTask(b, UnitTypes.HYDRALISK));
+                if (b != bot.BaseManager.Main && b != bot.BaseManager.Natural)
+                    bot.TaskManager.Add(new DefenseSquadTask(b, UnitTypes.HYDRALISK));
             }
-            tyr.TaskManager.Add(new QueenDefenseTask());
-            tyr.TaskManager.Add(DefenseTask);
+            bot.TaskManager.Add(new QueenDefenseTask());
+            bot.TaskManager.Add(DefenseTask);
             Set += RushDefense();
             Set += AntiLifting();
             Set += MainBuild();
@@ -100,10 +100,10 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (FourRax.Get().Detected
-                || (tyr.EnemyRace == Race.Terran && tyr.Frame >= 22.4 * 85 && !tyr.EnemyStrategyAnalyzer.NoProxyTerranConfirmed && tyr.TargetManager.PotentialEnemyStartLocations.Count == 1)
+                || (bot.EnemyRace == Race.Terran && bot.Frame >= 22.4 * 85 && !bot.EnemyStrategyAnalyzer.NoProxyTerranConfirmed && bot.TargetManager.PotentialEnemyStartLocations.Count == 1)
                 || ReaperRush.Get().Detected)
             {
                 SmellCheese = true;
@@ -117,7 +117,7 @@ namespace Tyr.Builds.Zerg
             if (SmellCheese)
             {
 
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                 {
                     if (Count(UnitTypes.HATCHERY) >= 2 && agent.Unit.UnitType == UnitTypes.HATCHERY
                         && agent.Unit.BuildProgress < 0.99)
@@ -131,7 +131,7 @@ namespace Tyr.Builds.Zerg
                             && Count(UnitTypes.DRONE) < 17 - Completed(UnitTypes.EXTRACTOR))
                         {
                             agent.Order(1342);
-                            CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.DRONE);
+                            CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.DRONE);
                         }
                         else if (Completed(UnitTypes.SPIRE) + Completed(UnitTypes.GREATER_SPIRE) > 0
                             && Minerals() >= 100
@@ -139,19 +139,19 @@ namespace Tyr.Builds.Zerg
                             && ExpectedAvailableFood() > FoodUsed() + 4)
                         {
                             agent.Order(1346);
-                            CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.MUTALISK);
+                            CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.MUTALISK);
                         }
                         else if (Minerals() >= 75 && Gas() >= 25 && ExpectedAvailableFood() > FoodUsed() + 6
                             && (!Lifting.Get().Detected || Count(UnitTypes.ROACH) < 25))
                         {
                             agent.Order(1351);
-                            CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.ROACH);
+                            CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.ROACH);
                         }
                         else if (Minerals() >= 100 && FoodUsed() > ExpectedAvailableFood() - 16)
                         {
                             agent.Order(1344);
-                            CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.OVERLORD);
-                            tyr.UnitManager.FoodExpected += 8;
+                            CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.OVERLORD);
+                            bot.UnitManager.FoodExpected += 8;
                         }
                     }
                 }
@@ -162,7 +162,7 @@ namespace Tyr.Builds.Zerg
                 && Count (UnitTypes.OVERSEER) == 0)
                 MorphingTask.Task.Morph(UnitTypes.OVERSEER);
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType == UnitTypes.LARVA)
                 {
@@ -175,7 +175,7 @@ namespace Tyr.Builds.Zerg
                         && (Count(UnitTypes.ZERGLING) >= RequiredZerglings || Count(UnitTypes.DRONE) <= 18))
                     {
                         agent.Order(1342);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.DRONE);
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.DRONE);
                     }
                     else if (Completed(UnitTypes.SPAWNING_POOL) > 0
                         && Count(UnitTypes.ZERGLING) < RequiredZerglings
@@ -184,8 +184,8 @@ namespace Tyr.Builds.Zerg
                         && (Count(UnitTypes.SPINE_CRAWLER) >= 2 || Minerals() >= 200))
                     {
                         agent.Order(1343);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.ZERGLING);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.ZERGLING);
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.ZERGLING);
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.ZERGLING);
                     }
                     else if (Completed(UnitTypes.HYDRALISK_DEN) > 0
                         && Minerals() >= 100
@@ -193,7 +193,7 @@ namespace Tyr.Builds.Zerg
                         && ExpectedAvailableFood() > FoodUsed() + 4)
                     {
                         agent.Order(1345);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.HYDRALISK);
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.HYDRALISK);
                     }
                     else if (Minerals() >= 100 && FoodUsed()
                         + Bot.Main.UnitManager.Count(UnitTypes.HATCHERY) * 2
@@ -202,14 +202,14 @@ namespace Tyr.Builds.Zerg
                         >= ExpectedAvailableFood() - 2)
                     {
                         agent.Order(1344);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.OVERLORD);
-                        tyr.UnitManager.FoodExpected += 8;
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.OVERLORD);
+                        bot.UnitManager.FoodExpected += 8;
                     }
                 }
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (SmellCheese)
             {
@@ -230,13 +230,13 @@ namespace Tyr.Builds.Zerg
                     && Completed(UnitTypes.SPAWNING_POOL) > 0)
                 {
                     agent.Order(1632);
-                    CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.QUEEN);
+                    CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.QUEEN);
                 }
                 else if (Minerals() >= 100 && Completed(UnitTypes.QUEEN) < 5
                     && Count(UnitTypes.LAIR) > 0)
                 {
                     agent.Order(1632);
-                    CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.QUEEN);
+                    CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.QUEEN);
                 }
                 else if (Count(UnitTypes.SPINE_CRAWLER) > 0
                     && Minerals() >= 150 && Gas() >= 100

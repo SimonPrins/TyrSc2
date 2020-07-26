@@ -1,15 +1,15 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Threading.Tasks;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class TwoBaseZealotImmortal : Build
     {
@@ -81,10 +81,10 @@ namespace Tyr.Builds.Protoss
             ArmyObserverTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             DefenseTask.Enable();
-            OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
+            OverrideDefenseTarget = bot.MapAnalyzer.Walk(NaturalDefensePos, bot.MapAnalyzer.EnemyDistances, 15);
 
             MicroControllers.Add(new SoftLeashController(UnitTypes.ZEALOT, UnitTypes.IMMORTAL, 6));
             MicroControllers.Add(new StalkerController());
@@ -162,15 +162,15 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             WorkerScoutTask.Task.StartFrame = (int)(22.4 * 80);
 
-            tyr.TargetManager.TargetAllBuildings = true;
+            bot.TargetManager.TargetAllBuildings = true;
 
-            tyr.NexusAbilityManager.OnlyChronoPrioritizedUnits = Count(UnitTypes.ROBOTICS_FACILITY) > 0;
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.IMMORTAL].Ability);
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.WARP_PRISM].Ability);
+            bot.NexusAbilityManager.OnlyChronoPrioritizedUnits = Count(UnitTypes.ROBOTICS_FACILITY) > 0;
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.IMMORTAL].Ability);
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.WARP_PRISM].Ability);
 
             if (TimingAttackTask.Task.AttackSent)
                 GasWorkerTask.WorkersPerGas = 3;
@@ -190,10 +190,10 @@ namespace Tyr.Builds.Protoss
 
                 int warpInsReady = 0;
                 RequestQuery query = new RequestQuery();
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                     if (agent.Unit.UnitType == UnitTypes.WARP_GATE)
                         query.Abilities.Add(new RequestQueryAvailableAbilities() { UnitTag = agent.Unit.Tag });
-                Task<ResponseQuery> task = tyr.GameConnection.SendQuery(query);
+                Task<ResponseQuery> task = bot.GameConnection.SendQuery(query);
                 task.Wait();
                 ResponseQuery response = task.Result;
                 foreach (ResponseQueryAvailableAbilities availableAbilities in response.Abilities)

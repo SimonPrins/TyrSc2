@@ -1,6 +1,6 @@
-﻿using Tyr.MapAnalysis;
+﻿using SC2Sharp.MapAnalysis;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class BuildRequestGas : BuildRequest
     {

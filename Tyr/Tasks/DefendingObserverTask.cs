@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class DefendingObserverTask : Task
     {
@@ -36,14 +36,14 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (units.Count == 0)
                 return;
 
             Unit fleeEnemy = null;
             float dist = 8 * 8;
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
                 if (!UnitTypes.AirAttackTypes.Contains(enemy.UnitType))
                     continue;
@@ -66,15 +66,15 @@ namespace Tyr.Tasks
 
             dist = 50 * 50;
             Unit scoutEnemy = null;
-            foreach (Unit enemy in tyr.CloakedEnemies())
+            foreach (Unit enemy in bot.CloakedEnemies())
             {
                 float newDist = Units[0].DistanceSq(enemy);
                 if (newDist >= dist)
                     continue;
                 bool close = false;
-                foreach (Base b in tyr.BaseManager.Bases)
+                foreach (Base b in bot.BaseManager.Bases)
                 {
-                    if (b.Owner != tyr.PlayerId)
+                    if (b.Owner != bot.PlayerId)
                         continue;
                     if (SC2Util.DistanceSq(enemy.Pos, b.BaseLocation.Pos) <= 30 * 30)
                     {
@@ -89,14 +89,14 @@ namespace Tyr.Tasks
             }
 
             int bases = 0;
-            foreach (Base b in tyr.BaseManager.Bases)
+            foreach (Base b in bot.BaseManager.Bases)
                 if (b.ResourceCenter != null)
                     bases++;
 
             Point2D defenseLocation;
             if (bases >= 2)
-                defenseLocation = tyr.BaseManager.NaturalDefensePos;
-            else defenseLocation = tyr.BaseManager.MainDefensePos;
+                defenseLocation = bot.BaseManager.NaturalDefensePos;
+            else defenseLocation = bot.BaseManager.MainDefensePos;
 
             foreach (Agent agent in units)
             {

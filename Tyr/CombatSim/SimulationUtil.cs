@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.CombatSim.ActionProcessors;
-using Tyr.CombatSim.DamageProcessors;
+using SC2Sharp.Agents;
+using SC2Sharp.CombatSim.ActionProcessors;
+using SC2Sharp.CombatSim.DamageProcessors;
 
-namespace Tyr.CombatSim
+namespace SC2Sharp.CombatSim
 {
     public class SimulationUtil
     {

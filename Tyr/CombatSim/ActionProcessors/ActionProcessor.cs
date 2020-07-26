@@ -1,6 +1,6 @@
-﻿using Tyr.CombatSim.Actions;
+﻿using SC2Sharp.CombatSim.Actions;
 
-namespace Tyr.CombatSim.ActionProcessors
+namespace SC2Sharp.CombatSim.ActionProcessors
 {
     public interface ActionProcessor
     {

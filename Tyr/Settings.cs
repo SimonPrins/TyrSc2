@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Tyr.Util;
+using SC2Sharp.Util;
 
-namespace Tyr
+namespace SC2Sharp
 {
     public class Settings
     {

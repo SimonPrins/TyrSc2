@@ -1,4 +1,4 @@
-﻿namespace Tyr.CombatSim.Actions
+﻿namespace SC2Sharp.CombatSim.Actions
 {
     public class Move : Action
     {

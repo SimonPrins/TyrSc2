@@ -1,10 +1,10 @@
 ﻿using System;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class OracleHarassBasesTask : Task
     {
@@ -37,10 +37,10 @@ namespace Tyr.Tasks
             return Bot.Main.UnitManager.Completed(UnitTypes.ORACLE) >= RequiredSize;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Target == null)
-                Target = tyr.TargetManager.PotentialEnemyStartLocations[0];
+                Target = bot.TargetManager.PotentialEnemyStartLocations[0];
 
             if (MoveToSide)
             {
@@ -69,7 +69,7 @@ namespace Tyr.Tasks
             }
 
             int enemyCount = 0;
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
                 if (!UnitTypes.AirAttackTypes.Contains(enemy.UnitType))
                     continue;
@@ -77,19 +77,19 @@ namespace Tyr.Tasks
                 if (SC2Util.DistanceSq(enemy.Pos, Target) <= 12 * 12)
                     enemyCount++;
             }
-            foreach (UnitLocation mine in tyr.EnemyMineManager.Mines)
+            foreach (UnitLocation mine in bot.EnemyMineManager.Mines)
                 if (SC2Util.DistanceSq(mine.Pos, Target) <= 12 * 12)
                     enemyCount++;
 
             if (enemyCount >= 6)
             {
                 DebugUtil.WriteLine("Switching targets.");
-                foreach (Base b in tyr.BaseManager.Bases)
+                foreach (Base b in bot.BaseManager.Bases)
                 {
                     if (SC2Util.DistanceSq(b.BaseLocation.Pos, Target) <= 4)
                         continue;
 
-                    if (b.Owner == tyr.PlayerId || b.Owner == -1)
+                    if (b.Owner == bot.PlayerId || b.Owner == -1)
                         continue;
 
                     Target = b.BaseLocation.Pos;
@@ -99,7 +99,7 @@ namespace Tyr.Tasks
             }
 
             foreach (Agent agent in units)
-                Attack(agent, tyr.TargetManager.AttackTarget);
+                Attack(agent, bot.TargetManager.AttackTarget);
         }
 
         private void GetSideTarget()

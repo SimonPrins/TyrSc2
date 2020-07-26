@@ -1,25 +1,25 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class EnemyMineManager : Manager
     {
         public List<UnitLocation> Mines = new List<UnitLocation>();
         public Dictionary<ulong, int> BurrowFrame = new Dictionary<ulong, int>();
         
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
-            Cleanup(tyr);
-            Update(tyr);
+            Cleanup(bot);
+            Update(bot);
         }
 
-        private void Cleanup(Bot tyr)
+        private void Cleanup(Bot bot)
         {
             HashSet<ulong> unburrowedMines = new HashSet<ulong>();
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
                 if (enemy.UnitType == UnitTypes.WIDOW_MINE)
                     unburrowedMines.Add(enemy.Tag);
 
@@ -32,7 +32,7 @@ namespace Tyr.Managers
                     continue;
                 }
                 bool removed = false;
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                 {
                     if (agent.Unit.DetectRange <= 1)
                         continue;
@@ -46,7 +46,7 @@ namespace Tyr.Managers
                 }
                 if (removed)
                     continue;
-                foreach (SC2APIProtocol.Effect effect in tyr.Observation.Observation.RawData.Effects)
+                foreach (SC2APIProtocol.Effect effect in bot.Observation.Observation.RawData.Effects)
                 {
                     if (effect.EffectId != 6)
                         continue;
@@ -68,7 +68,7 @@ namespace Tyr.Managers
             Mines.RemoveAt(Mines.Count - 1);
         }
 
-        public void Update(Bot tyr)
+        public void Update(Bot bot)
         {
             Dictionary<ulong, UnitLocation> existingMines = new Dictionary<ulong, UnitLocation>();
             foreach (UnitLocation mine in Mines)
@@ -76,21 +76,21 @@ namespace Tyr.Managers
 
             HashSet<ulong> removeMines = new HashSet<ulong>();
 
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
                 if (enemy.UnitType == UnitTypes.WIDOW_MINE)
                 {
                     if (BurrowFrame.ContainsKey(enemy.Tag))
-                        BurrowFrame[enemy.Tag] = tyr.Frame;
+                        BurrowFrame[enemy.Tag] = bot.Frame;
                     else
-                        BurrowFrame.Add(enemy.Tag, tyr.Frame);
+                        BurrowFrame.Add(enemy.Tag, bot.Frame);
                 }
                 if (existingMines.ContainsKey(enemy.Tag))
                 {
                     if (enemy.UnitType == UnitTypes.WIDOW_MINE_BURROWED)
                     {
                         existingMines[enemy.Tag].Pos = enemy.Pos;
-                        existingMines[enemy.Tag].LastSeenFrame = tyr.Frame;
+                        existingMines[enemy.Tag].LastSeenFrame = bot.Frame;
                     }
                     else
                         removeMines.Add(enemy.Tag);
@@ -100,7 +100,7 @@ namespace Tyr.Managers
                 if (enemy.UnitType != UnitTypes.WIDOW_MINE_BURROWED)
                     continue;
 
-                Mines.Add(new UnitLocation() { Tag = enemy.Tag, UnitType = enemy.UnitType, LastSeenFrame = tyr.Frame, Pos = enemy.Pos });
+                Mines.Add(new UnitLocation() { Tag = enemy.Tag, UnitType = enemy.UnitType, LastSeenFrame = bot.Frame, Pos = enemy.Pos });
             }
 
             for (int i = Mines.Count - 1; i >= 0; i--)

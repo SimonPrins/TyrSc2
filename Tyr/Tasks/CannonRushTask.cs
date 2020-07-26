@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.BuildingPlacement;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.BuildingPlacement;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class CannonRushTask : Task
     {
@@ -40,7 +40,7 @@ namespace Tyr.Tasks
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             DetermineCannonLocation();
             if (CannonLocation == null)
@@ -57,7 +57,7 @@ namespace Tyr.Tasks
             bool powerAvailable = false;
             bool cannonCover = false;
             int totalCannonCount = 0;
-            foreach (Agent agent in tyr.Units())
+            foreach (Agent agent in bot.Units())
             {
                 if (agent.Unit.UnitType == UnitTypes.PYLON)
                 {
@@ -99,7 +99,7 @@ namespace Tyr.Tasks
 
             if (firstCannonDone && secondCannonDone && cannonCover && totalCannonCount < 4 && NextCannonLocation == null)
             {
-                NextCannonLocation = tyr.buildingPlacer.FindPlacement(new PotentialHelper(CannonLocation, 5).To(tyr.TargetManager.PotentialEnemyStartLocations[0]).Get(), new Point2D() { X = 2, Y = 2 }, UnitTypes.PHOTON_CANNON);
+                NextCannonLocation = bot.buildingPlacer.FindPlacement(new PotentialHelper(CannonLocation, 5).To(bot.TargetManager.PotentialEnemyStartLocations[0]).Get(), new Point2D() { X = 2, Y = 2 }, UnitTypes.PHOTON_CANNON);
             }
 
             foreach (Agent agent in Units)

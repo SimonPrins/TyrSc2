@@ -1,9 +1,9 @@
-﻿using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.Tasks;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Zerg
+namespace SC2Sharp.Builds.Zerg
 {
     public class OneBaseZergling : Build
     {
@@ -28,7 +28,7 @@ namespace Tyr.Builds.Zerg
             SafeZerglingsFromReapersTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new ZerglingController());
             MicroControllers.Add(new StutterController());
@@ -76,9 +76,9 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            if (tyr.TargetManager.PotentialEnemyStartLocations.Count <= 1)
+            if (bot.TargetManager.PotentialEnemyStartLocations.Count <= 1)
             {
                 WorkerScoutTask.Task.Stopped = true;
                 WorkerScoutTask.Task.Clear();
@@ -116,7 +116,7 @@ namespace Tyr.Builds.Zerg
             DefenseTask.AirDefenseTask.MaxDefenseRadius = 55;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.SPAWNING_POOL)
             {

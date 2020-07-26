@@ -1,14 +1,14 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.BuildingPlacement;
-using Tyr.Builds.BuildLists;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.BuildingPlacement;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class OneBaseTempest : Build
     {
@@ -35,7 +35,7 @@ namespace Tyr.Builds.Protoss
                 ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(TempestController);
             MicroControllers.Add(new StutterController());
@@ -93,18 +93,18 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
 
             if (!UnitTypes.CanAttackAir(UnitTypes.QUEEN)
-                && tyr.Frame == 10)
-                tyr.Chat("Omg Queens can't shoot!");
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(1568);
+                && bot.Frame == 10)
+                bot.Chat("Omg Queens can't shoot!");
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(1568);
             ProxyTask.Task.EvadeEnemies = true;
             
-            tyr.buildingPlacer.BuildCompact = true;
-            tyr.TargetManager.PrefferDistant = false;
-            tyr.TargetManager.TargetAllBuildings = true;
+            bot.buildingPlacer.BuildCompact = true;
+            bot.TargetManager.PrefferDistant = false;
+            bot.TargetManager.TargetAllBuildings = true;
 
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.Stopped = true;
@@ -113,14 +113,14 @@ namespace Tyr.Builds.Protoss
             TimingAttackTask.Task.RetreatSize = 0;
             TimingAttackTask.Task.UnitType = UnitTypes.TEMPEST;
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
                 
-                agent.Order(Abilities.MOVE, agent.From(tyr.MapAnalyzer.GetMainRamp(), 4));
+                agent.Order(Abilities.MOVE, agent.From(bot.MapAnalyzer.GetMainRamp(), 4));
             }
         }
     }

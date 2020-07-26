@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.MapAnalysis
+namespace SC2Sharp.MapAnalysis
 {
     public class MapAnalyzer
     {
@@ -30,16 +30,16 @@ namespace Tyr.MapAnalysis
 
         private Point2D EnemyRamp = null;
         
-        public void Analyze(Bot tyr)
+        public void Analyze(Bot bot)
         {
             // Determine the start location.
-            foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
-                if (unit.Owner == tyr.PlayerId && UnitTypes.ResourceCenters.Contains(unit.UnitType))
+            foreach (Unit unit in bot.Observation.Observation.RawData.Units)
+                if (unit.Owner == bot.PlayerId && UnitTypes.ResourceCenters.Contains(unit.UnitType))
                     StartLocation = unit.Pos;
 
             List<MineralField> mineralFields = new List<MineralField>();
 
-            foreach (Unit mineralField in tyr.Observation.Observation.RawData.Units)
+            foreach (Unit mineralField in bot.Observation.Observation.RawData.Units)
                 if (UnitTypes.MineralFields.Contains(mineralField.UnitType))
                     mineralFields.Add(new MineralField() { Pos = mineralField.Pos, Tag = mineralField.Tag });
 
@@ -78,7 +78,7 @@ namespace Tyr.MapAnalysis
             }
 
             List<Gas> gasses = new List<Gas>();
-            foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
+            foreach (Unit unit in bot.Observation.Observation.RawData.Units)
                 if (UnitTypes.GasGeysers.Contains(unit.UnitType))
                     gasses.Add(new Gas() { Pos = unit.Pos, Tag = unit.Tag });
 
@@ -89,7 +89,7 @@ namespace Tyr.MapAnalysis
             foreach (BaseLocation loc in BaseLocations)
                 DetermineFinalLocation(loc, gasses);
             
-            if (tyr.GameInfo.MapName.Contains("Blueshift"))
+            if (bot.GameInfo.MapName.Contains("Blueshift"))
             {
                 foreach (BaseLocation loc in BaseLocations)
                 {
@@ -111,7 +111,7 @@ namespace Tyr.MapAnalysis
             int width = Bot.Main.GameInfo.StartRaw.MapSize.X;
             int height = Bot.Main.GameInfo.StartRaw.MapSize.Y;
 
-            Placement = new ImageBoolGrid(tyr.GameInfo.StartRaw.PlacementGrid);
+            Placement = new ImageBoolGrid(bot.GameInfo.StartRaw.PlacementGrid);
             StartArea = Placement.GetConnected(SC2Util.To2D(StartLocation));
 
             ArrayBoolGrid startLocations = new ArrayBoolGrid(Placement.Width(), Placement.Height());

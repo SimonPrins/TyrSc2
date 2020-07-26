@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
-using static Tyr.Builds.BuildLists.ConditionalStep;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
+using static SC2Sharp.Builds.BuildLists.ConditionalStep;
 
-namespace Tyr.Builds.BuildLists
+namespace SC2Sharp.Builds.BuildLists
 {
     public class BuildingStep : BuildStep
     {

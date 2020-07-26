@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ElevatorChaserTask : Task
     {
@@ -30,15 +30,15 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Targets == null)
             {
                 Targets = new List<Point2D>();
-                Targets.Add(SC2Util.Point(tyr.GameInfo.StartRaw.PlayableArea.P0.X, tyr.GameInfo.StartRaw.PlayableArea.P0.Y));
-                Targets.Add(SC2Util.Point(tyr.GameInfo.StartRaw.PlayableArea.P1.X, tyr.GameInfo.StartRaw.PlayableArea.P0.Y));
-                Targets.Add(SC2Util.Point(tyr.GameInfo.StartRaw.PlayableArea.P1.X, tyr.GameInfo.StartRaw.PlayableArea.P1.Y));
-                Targets.Add(SC2Util.Point(tyr.GameInfo.StartRaw.PlayableArea.P0.X, tyr.GameInfo.StartRaw.PlayableArea.P1.Y));
+                Targets.Add(SC2Util.Point(bot.GameInfo.StartRaw.PlayableArea.P0.X, bot.GameInfo.StartRaw.PlayableArea.P0.Y));
+                Targets.Add(SC2Util.Point(bot.GameInfo.StartRaw.PlayableArea.P1.X, bot.GameInfo.StartRaw.PlayableArea.P0.Y));
+                Targets.Add(SC2Util.Point(bot.GameInfo.StartRaw.PlayableArea.P1.X, bot.GameInfo.StartRaw.PlayableArea.P1.Y));
+                Targets.Add(SC2Util.Point(bot.GameInfo.StartRaw.PlayableArea.P0.X, bot.GameInfo.StartRaw.PlayableArea.P1.Y));
             }
 
             foreach (Agent agent in units)

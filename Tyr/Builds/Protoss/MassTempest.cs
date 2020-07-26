@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class MassTempest : Build
     {
@@ -30,7 +30,7 @@ namespace Tyr.Builds.Protoss
                 ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new FleeCyclonesController());
             MicroControllers.Add(new TempestController());
@@ -112,24 +112,24 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.RequiredSize = RequiredSize;
             TimingAttackTask.Task.UnitType = UnitTypes.TEMPEST;
 
-            tyr.buildingPlacer.BuildCompact = true;
+            bot.buildingPlacer.BuildCompact = true;
             
             float Z = 0;
-            foreach (Agent agent in tyr.Units())
+            foreach (Agent agent in bot.Units())
                 Z = System.Math.Max(Z, agent.Unit.Pos.Z);
-            tyr.DrawSphere(new SC2APIProtocol.Point() { X = WallIn.Wall[3].Pos.X, Y = WallIn.Wall[3].Pos.Y, Z = Z });
+            bot.DrawSphere(new SC2APIProtocol.Point() { X = WallIn.Wall[3].Pos.X, Y = WallIn.Wall[3].Pos.Y, Z = Z });
 
             DefenseTask.GroundDefenseTask.MainDefenseRadius = 40;
             DefenseTask.GroundDefenseTask.DrawDefenderRadius = 100;
 
-            if (tyr.Frame % 224 == 0)
+            if (bot.Frame % 224 == 0)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.GATEWAY)
                     {
                         agent.Order(Abilities.MOVE, Natural.BaseLocation.Pos);

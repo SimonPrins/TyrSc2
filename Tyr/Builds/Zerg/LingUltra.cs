@@ -1,13 +1,13 @@
 ﻿using System;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Zerg
+namespace SC2Sharp.Builds.Zerg
 {
     public class LingUltra : Build
     {
@@ -18,7 +18,7 @@ namespace Tyr.Builds.Zerg
 
         private bool GoingUltras = false;
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new TargetFireController(GetPriorities()));
@@ -157,7 +157,7 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             DefenseTask.AirDefenseTask.MaxDefenseRadius = 100;
             DefenseTask.AirDefenseTask.ExpandDefenseRadius = 25;

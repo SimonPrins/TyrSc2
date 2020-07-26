@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Tyr.StrategyAnalysis
+namespace SC2Sharp.StrategyAnalysis
 {
     public abstract class Strategy
     {

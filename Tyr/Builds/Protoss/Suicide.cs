@@ -1,7 +1,7 @@
-﻿using Tyr.Agents;
-using Tyr.Managers;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Managers;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class Suicide : Build
     {
@@ -10,26 +10,26 @@ namespace Tyr.Builds.Protoss
             return "Suicide";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            tyr.TaskManager = new TaskManager();
+            bot.TaskManager = new TaskManager();
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             Agent main = null;
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
                 if (agent.IsResourceCenter)
                 {
                     main = agent;
                     break;
                 }
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
                 if (agent.IsWorker)
                     agent.Order(Abilities.ATTACK, main.Unit.Tag);
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
         }
     }

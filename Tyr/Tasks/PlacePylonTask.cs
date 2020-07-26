@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class PlacePylonTask : Task
     {
@@ -38,7 +38,7 @@ namespace Tyr.Tasks
             return Bot.Main.Frame >= 400;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (units.Count == 0)
                 return;
@@ -47,40 +47,40 @@ namespace Tyr.Tasks
                     (probe.Unit.Orders[0].AbilityId == BuildingType.LookUp[UnitTypes.PYLON].Ability))
                 return;
 
-            if (tyr.Frame < LastBuiltFrame + 5)
+            if (bot.Frame < LastBuiltFrame + 5)
                 return;
 
-            if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 1 && SC2Util.DistanceSq(probe.Unit.Pos, tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 20 * 20)
+            if (bot.TargetManager.PotentialEnemyStartLocations.Count == 1 && SC2Util.DistanceSq(probe.Unit.Pos, bot.TargetManager.PotentialEnemyStartLocations[0]) <= 20 * 20)
             {
-                probe.Order(Abilities.MOVE, SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
+                probe.Order(Abilities.MOVE, SC2Util.To2D(bot.MapAnalyzer.StartLocation));
                 return;
             }
 
-            foreach (BuildingLocation building in tyr.EnemyManager.EnemyBuildings.Values)
+            foreach (BuildingLocation building in bot.EnemyManager.EnemyBuildings.Values)
             {
                 if (SC2Util.DistanceSq(probe.Unit.Pos, building.Pos) <= 8 * 8)
                 {
-                    probe.Order(Abilities.MOVE, SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
+                    probe.Order(Abilities.MOVE, SC2Util.To2D(bot.MapAnalyzer.StartLocation));
                     
                     return;
                 }
                 if (SC2Util.DistanceSq(probe.Unit.Pos, building.Pos) <= 10 * 10)
                 {
-                    if (tyr.Observation.Observation.PlayerCommon.Minerals < 100)
+                    if (bot.Observation.Observation.PlayerCommon.Minerals < 100)
                     {
-                        probe.Order(Abilities.MOVE, SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
+                        probe.Order(Abilities.MOVE, SC2Util.To2D(bot.MapAnalyzer.StartLocation));
                         return;
                     }
                     else
                     {
-                        Point2D buildLocation = tyr.buildingPlacer.FindPlacement(SC2Util.To2D(probe.Unit.Pos), SC2Util.Point(2, 2), UnitTypes.PYLON);
+                        Point2D buildLocation = bot.buildingPlacer.FindPlacement(SC2Util.To2D(probe.Unit.Pos), SC2Util.Point(2, 2), UnitTypes.PYLON);
                         probe.Order(BuildingType.LookUp[UnitTypes.PYLON].Ability, buildLocation);
-                        LastBuiltFrame = tyr.Frame;
+                        LastBuiltFrame = bot.Frame;
                         return;
                     }
                 }
             }
-            probe.Order(Abilities.MOVE, tyr.TargetManager.AttackTarget);
+            probe.Order(Abilities.MOVE, bot.TargetManager.AttackTarget);
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class CreeperLordTask : Task
     {
@@ -42,7 +42,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             HashSet<Base> alreadyAssigned = new HashSet<Base>();
             foreach (Agent agent in Units)
@@ -57,16 +57,16 @@ namespace Tyr.Tasks
             }
 
             List<Base> bases = new List<Base>();
-            foreach (Base b in tyr.BaseManager.Bases)
+            foreach (Base b in bot.BaseManager.Bases)
             {
-                if (b != tyr.BaseManager.Main
-                    && b != tyr.BaseManager.Natural
-                    && SC2Util.DistanceSq(b.BaseLocation.Pos, tyr.TargetManager.PotentialEnemyStartLocations[0]) >= 2 * 2
+                if (b != bot.BaseManager.Main
+                    && b != bot.BaseManager.Natural
+                    && SC2Util.DistanceSq(b.BaseLocation.Pos, bot.TargetManager.PotentialEnemyStartLocations[0]) >= 2 * 2
                     && b.Owner == -1
                     && !alreadyAssigned.Contains(b))
                     bases.Add(b);
             }
-            bases.Sort((Base a, Base b) => Math.Sign(tyr.MapAnalyzer.EnemyDistances[(int)a.BaseLocation.Pos.X, (int)a.BaseLocation.Pos.Y] - tyr.MapAnalyzer.EnemyDistances[(int)b.BaseLocation.Pos.X, (int)b.BaseLocation.Pos.Y]));
+            bases.Sort((Base a, Base b) => Math.Sign(bot.MapAnalyzer.EnemyDistances[(int)a.BaseLocation.Pos.X, (int)a.BaseLocation.Pos.Y] - bot.MapAnalyzer.EnemyDistances[(int)b.BaseLocation.Pos.X, (int)b.BaseLocation.Pos.Y]));
             
             int assignPos = 0;
             if (bases.Count > 0)

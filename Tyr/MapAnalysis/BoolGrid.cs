@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Util;
+using SC2Sharp.Util;
 
-namespace Tyr.MapAnalysis
+namespace SC2Sharp.MapAnalysis
 {
     public abstract class BoolGrid
     {

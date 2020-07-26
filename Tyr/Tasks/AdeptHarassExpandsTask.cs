@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class AdeptHarassExpandsTask : Task
     {
@@ -40,25 +40,25 @@ namespace Tyr.Tasks
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             for (int i = Bases.Count - 1; i >= 0; i--)
             {
-                if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 1
-                    && SC2Util.DistanceSq(Bases[i], tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 25 * 25)
+                if (bot.TargetManager.PotentialEnemyStartLocations.Count == 1
+                    && SC2Util.DistanceSq(Bases[i], bot.TargetManager.PotentialEnemyStartLocations[0]) <= 25 * 25)
                 {
                     Bases.RemoveAt(i);
                     continue;
                 }
-                if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 1
-                    && SC2Util.DistanceSq(Bases[i], tyr.TargetManager.PotentialEnemyStartLocations[0]) >= 70 * 70)
+                if (bot.TargetManager.PotentialEnemyStartLocations.Count == 1
+                    && SC2Util.DistanceSq(Bases[i], bot.TargetManager.PotentialEnemyStartLocations[0]) >= 70 * 70)
                 {
                     Bases.RemoveAt(i);
                     continue;
                 }
 
                 bool closeEnemy = false;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (!UnitTypes.WorkerTypes.Contains(enemy.UnitType))
                         continue;
@@ -83,7 +83,7 @@ namespace Tyr.Tasks
             }
 
             if (Bases.Count == 0)
-                foreach (BaseLocation b in tyr.MapAnalyzer.BaseLocations)
+                foreach (BaseLocation b in bot.MapAnalyzer.BaseLocations)
                     Bases.Add(b.Pos);
             
 
@@ -118,11 +118,11 @@ namespace Tyr.Tasks
                     }
                     if (closeEnemy)
                     {
-                        agent.Order(2544, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                        agent.Order(2544, bot.TargetManager.PotentialEnemyStartLocations[0]);
                         continue;
                     }
                 }
-                tyr.MicroController.Attack(agent, target);
+                bot.MicroController.Attack(agent, target);
             }
         }
     }

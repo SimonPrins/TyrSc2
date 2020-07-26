@@ -1,6 +1,6 @@
-﻿using Tyr.Agents;
+﻿using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class ProductionTask : Task
     {
@@ -25,19 +25,19 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             foreach (Agent agent in units)
             {
                 if (agent.Unit.Orders.Count == 0)
-                    tyr.Build.ProduceOverride(tyr, agent);
+                    bot.Build.ProduceOverride(bot, agent);
                 else if (agent.Unit.Orders.Count == 1
-                    && tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag)
-                    && (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.REACTOR
-                        || tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.BARRACKS_REACTOR
-                        || tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_REACTOR
-                        || tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_REACTOR))
-                    tyr.Build.ProduceOverride(tyr, agent);
+                    && bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag)
+                    && (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.REACTOR
+                        || bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.BARRACKS_REACTOR
+                        || bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_REACTOR
+                        || bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_REACTOR))
+                    bot.Build.ProduceOverride(bot, agent);
             }
         }
     }

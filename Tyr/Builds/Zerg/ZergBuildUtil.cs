@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.StrategyAnalysis;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.StrategyAnalysis;
 
-namespace Tyr.Builds.Zerg
+namespace SC2Sharp.Builds.Zerg
 {
     public class ZergBuildUtil
     {

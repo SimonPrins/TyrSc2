@@ -1,14 +1,14 @@
 ﻿using SC2APIProtocol;
 using System;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvTDisruptor : Build
     {
@@ -43,11 +43,11 @@ namespace Tyr.Builds.Protoss
             ForceFieldRampTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
-            OverrideMainDefenseTarget = new PotentialHelper(tyr.MapAnalyzer.GetMainRamp(), 6).
-                To(tyr.MapAnalyzer.StartLocation)
+            OverrideDefenseTarget = bot.MapAnalyzer.Walk(NaturalDefensePos, bot.MapAnalyzer.EnemyDistances, 15);
+            OverrideMainDefenseTarget = new PotentialHelper(bot.MapAnalyzer.GetMainRamp(), 6).
+                To(bot.MapAnalyzer.StartLocation)
                 .Get();
             
             MicroControllers.Add(FallBackController);
@@ -212,7 +212,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
         
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (FourRaxSuspected && Gas() >= 200)
                 GasWorkerTask.WorkersPerGas = 1;
@@ -232,7 +232,7 @@ namespace Tyr.Builds.Protoss
 
             WaitForDetectionController.Stopped = !CloakedBanshee;
 
-            tyr.DrawText("CloakedBanshee: " + CloakedBanshee);
+            bot.DrawText("CloakedBanshee: " + CloakedBanshee);
 
             WorkerScoutTask.Task.StartFrame = 600;
             ObserverScoutTask.Task.Priority = 6;
@@ -249,10 +249,10 @@ namespace Tyr.Builds.Protoss
                 ForwardProbeTask.Task.Clear();
                 */
 
-            tyr.NexusAbilityManager.Stopped = Count(UnitTypes.STALKER) == 0 && tyr.Frame >= 120 * 22.4;
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(917);
+            bot.NexusAbilityManager.Stopped = Count(UnitTypes.STALKER) == 0 && bot.Frame >= 120 * 22.4;
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(917);
 
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.BATTLECRUISER) > 0)
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.BATTLECRUISER) > 0)
                 BattlecruisersDetected = true;
 
             if (FourRax.Get().Detected)
@@ -260,14 +260,14 @@ namespace Tyr.Builds.Protoss
             if (ProxyDetected.Get().Detected)
                 FourRaxSuspected = true;
             if (WorkerScoutTask.Task.BaseCircled()
-                && tyr.Frame < 22.4 * 60 * 2
+                && bot.Frame < 22.4 * 60 * 2
                 && TotalEnemyCount(UnitTypes.BARRACKS) == 0)
                 FourRaxSuspected = true;
             if (!FourRaxSuspected)
             {
-                Point2D enemyRamp = tyr.MapAnalyzer.GetEnemyRamp();
+                Point2D enemyRamp = bot.MapAnalyzer.GetEnemyRamp();
                 int enemyBarrackWallCount = 0;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (enemyRamp == null)
                         break;
@@ -284,10 +284,10 @@ namespace Tyr.Builds.Protoss
 
             if (FourRaxSuspected)
             {
-                tyr.TargetManager.TargetAllBuildings = true;
+                bot.TargetManager.TargetAllBuildings = true;
                 FallBackController.Stopped = true;
             }
-            tyr.TargetManager.SkipPlanetaries = true;
+            bot.TargetManager.SkipPlanetaries = true;
 
             ForceFieldRampTask.Task.Stopped = !FourRaxSuspected || Completed(UnitTypes.STALKER) >= 18;
             if (ForceFieldRampTask.Task.Stopped)
@@ -295,7 +295,7 @@ namespace Tyr.Builds.Protoss
 
             if (FourRaxSuspected && Completed(UnitTypes.STALKER) < 10)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.NEXUS)
                         continue;
@@ -306,8 +306,8 @@ namespace Tyr.Builds.Protoss
             }
 
 
-            tyr.DrawText("Defending units: " + DefenseTask.GroundDefenseTask.Units.Count);
-            tyr.DrawText("Is defending: " + DefenseTask.GroundDefenseTask.IsDefending());
+            bot.DrawText("Defending units: " + DefenseTask.GroundDefenseTask.Units.Count);
+            bot.DrawText("Is defending: " + DefenseTask.GroundDefenseTask.IsDefending());
 
             if (FourRaxSuspected)
                 TimingAttackTask.Task.RequiredSize = 18;
@@ -321,7 +321,7 @@ namespace Tyr.Builds.Protoss
                 task.Stopped = Completed(UnitTypes.ZEALOT) >= 5;
 
             
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 3 || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 3 || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0)
                 TimingAttackTask.Task.DefendOtherAgents = false;
 
             if (Count(UnitTypes.NEXUS) <= 1)
@@ -354,14 +354,14 @@ namespace Tyr.Builds.Protoss
 
             if (EarlyPool.Get().Detected && !Expanded.Get().Detected && Completed(UnitTypes.ZEALOT) < 2)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.NEXUS
                         && agent.Unit.BuildProgress < 0.99)
                         agent.Order(Abilities.CANCEL);
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (Count(UnitTypes.PROBE) >= 24
                 && Count(UnitTypes.NEXUS) < 2

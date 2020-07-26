@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Micro;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Micro;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ParasitedBCTask : Task
     {
@@ -37,24 +37,24 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             foreach (Agent agent in Units)
             {
                 if (!ParasitedFrame.ContainsKey(agent.Unit.Tag))
-                    ParasitedFrame.Add(agent.Unit.Tag, tyr.Frame);
+                    ParasitedFrame.Add(agent.Unit.Tag, bot.Frame);
 
-                if (tyr.Frame - ParasitedFrame[agent.Unit.Tag] == 1)
+                if (bot.Frame - ParasitedFrame[agent.Unit.Tag] == 1)
                 {
                     agent.Order(Abilities.CANCEL);
                     continue;
                 }
 
-                if (tyr.Frame - ParasitedFrame[agent.Unit.Tag] == 5)
+                if (bot.Frame - ParasitedFrame[agent.Unit.Tag] == 5)
                 {
                     Unit target = null;
                     int value = 0;
-                    foreach (Unit enemy in tyr.Enemies())
+                    foreach (Unit enemy in bot.Enemies())
                     {
                         if (!UnitTypes.LookUp.ContainsKey(enemy.UnitType))
                             continue;
@@ -72,10 +72,10 @@ namespace Tyr.Tasks
                     continue;
                 }
 
-                if (tyr.Frame - ParasitedFrame[agent.Unit.Tag] == 180)
+                if (bot.Frame - ParasitedFrame[agent.Unit.Tag] == 180)
                 {
                     bool jumped = false;
-                    foreach (Agent airAttacker in tyr.UnitManager.Agents.Values)
+                    foreach (Agent airAttacker in bot.UnitManager.Agents.Values)
                     {
                         if (!airAttacker.CanAttackAir() || airAttacker.Unit.UnitType == UnitTypes.INFESTOR || airAttacker.Unit.UnitType == UnitTypes.INFESTOR_BURROWED)
                             continue;
@@ -83,7 +83,7 @@ namespace Tyr.Tasks
                             continue;
 
                         int count = 0;
-                        foreach (Agent airAttacker2 in tyr.UnitManager.Agents.Values)
+                        foreach (Agent airAttacker2 in bot.UnitManager.Agents.Values)
                         {
                             if (!airAttacker.CanAttackAir() || airAttacker.Unit.UnitType == UnitTypes.INFESTOR || airAttacker.Unit.UnitType == UnitTypes.INFESTOR_BURROWED)
                                 continue;
@@ -104,18 +104,18 @@ namespace Tyr.Tasks
                     }
                     if (!jumped)
                     {
-                        agent.Order(2358, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                        agent.Order(2358, bot.TargetManager.PotentialEnemyStartLocations[0]);
                         DebugUtil.WriteLine("Jumping BC to enemy start location.");
                     }
                     continue;
                 }
-                if (tyr.Frame - ParasitedFrame[agent.Unit.Tag] > 180)
+                if (bot.Frame - ParasitedFrame[agent.Unit.Tag] > 180)
                     continue;
 
-                if (InfestorController.NeuralControllers.ContainsKey(agent.Unit.Tag) && tyr.UnitManager.Agents.ContainsKey(InfestorController.NeuralControllers[agent.Unit.Tag]))
-                    agent.Order(Abilities.MOVE, SC2Util.To2D(tyr.UnitManager.Agents[InfestorController.NeuralControllers[agent.Unit.Tag]].Unit.Pos));
+                if (InfestorController.NeuralControllers.ContainsKey(agent.Unit.Tag) && bot.UnitManager.Agents.ContainsKey(InfestorController.NeuralControllers[agent.Unit.Tag]))
+                    agent.Order(Abilities.MOVE, SC2Util.To2D(bot.UnitManager.Agents[InfestorController.NeuralControllers[agent.Unit.Tag]].Unit.Pos));
                 else
-                    Attack(agent, tyr.TargetManager.AttackTarget);
+                    Attack(agent, bot.TargetManager.AttackTarget);
             }
         }
     }

@@ -1,46 +1,46 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Builds;
-using Tyr.Builds.Protoss;
-using Tyr.Builds.Terran;
-using Tyr.Builds.Zerg;
-using Tyr.StrategyAnalysis;
+using SC2Sharp.Builds;
+using SC2Sharp.Builds.Protoss;
+using SC2Sharp.Builds.Terran;
+using SC2Sharp.Builds.Zerg;
+using SC2Sharp.StrategyAnalysis;
 
-namespace Tyr.buildSelection
+namespace SC2Sharp.buildSelection
 {
     class ArchonBuildsProvider : BuildsProvider
     {
-        public List<Build> GetBuilds(Bot tyr, string[] lines)
+        public List<Build> GetBuilds(Bot bot, string[] lines)
         {
             List<Build> options;
 
-            if (tyr.MyRace == Race.Protoss)
-                options = ProtossBuilds(tyr);
-            else if (tyr.MyRace == Race.Zerg)
-                options = ZergBuilds(tyr);
-            else if (tyr.MyRace == Race.Terran)
-                options = TerranBuilds(tyr);
+            if (bot.MyRace == Race.Protoss)
+                options = ProtossBuilds(bot);
+            else if (bot.MyRace == Race.Zerg)
+                options = ZergBuilds(bot);
+            else if (bot.MyRace == Race.Terran)
+                options = TerranBuilds(bot);
             else
                 options = null;
 
             return options;
         }
 
-        public List<Build> ZergBuilds(Bot tyr)
+        public List<Build> ZergBuilds(Bot bot)
         {
             List<Build> options = new List<Build>();
 
-            if (tyr.EnemyRace == Race.Protoss)
+            if (bot.EnemyRace == Race.Protoss)
             {
                 options.Add(new MassZergling() { AllowHydraTransition = true });
                 options.Add(new MacroHydra());
             }
-            else if (tyr.EnemyRace == Race.Terran)
+            else if (bot.EnemyRace == Race.Terran)
             {
                 options.Add(new MacroHydra());
             }
-            else if (tyr.EnemyRace == Race.Zerg)
+            else if (bot.EnemyRace == Race.Zerg)
             {
                 options.Add(new RoachRavager());
             }
@@ -52,19 +52,19 @@ namespace Tyr.buildSelection
             return options;
         }
 
-        public List<Build> ProtossBuilds(Bot tyr)
+        public List<Build> ProtossBuilds(Bot bot)
         {
             List<Build> options = new List<Build>();
 
-            if (tyr.EnemyRace == Race.Terran)
+            if (bot.EnemyRace == Race.Terran)
             {
                 options.Add(new PvTStalkerImmortal() { BuildReaperWall = true, ProxyPylon = false, DelayObserver = true, UseColosus = true });
             }
-            else if (tyr.EnemyRace == Race.Zerg)
+            else if (bot.EnemyRace == Race.Zerg)
             {
                 options.Add(new PvZHjax());
             }
-            else if (tyr.EnemyRace == Race.Protoss)
+            else if (bot.EnemyRace == Race.Protoss)
             {
                 options.Add(new PvPStalkerImmortal());
             }
@@ -72,19 +72,19 @@ namespace Tyr.buildSelection
             return options;
         }
 
-        public List<Build> TerranBuilds(Bot tyr)
+        public List<Build> TerranBuilds(Bot bot)
         {
             List<Build> options = new List<Build>();
 
-            if (tyr.EnemyRace == Race.Terran)
+            if (bot.EnemyRace == Race.Terran)
             {
                 options.Add(new TankPushProbots());
             }
-            else if (tyr.EnemyRace == Race.Zerg)
+            else if (bot.EnemyRace == Race.Zerg)
             {
                 options.Add(new MechTvZ());
             }
-            else if (tyr.EnemyRace == Race.Protoss)
+            else if (bot.EnemyRace == Race.Protoss)
             {
                 options.Add(new TankPushTvPProbots());
             }

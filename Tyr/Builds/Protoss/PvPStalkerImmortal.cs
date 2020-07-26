@@ -1,15 +1,15 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvPStalkerImmortal : Build
     {
@@ -61,11 +61,11 @@ namespace Tyr.Builds.Protoss
             KillOwnUnitTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
-            OverrideMainDefenseTarget = new PotentialHelper(tyr.MapAnalyzer.GetMainRamp(), 6).
-                To(tyr.MapAnalyzer.StartLocation)
+            OverrideDefenseTarget = bot.MapAnalyzer.Walk(NaturalDefensePos, bot.MapAnalyzer.EnemyDistances, 15);
+            OverrideMainDefenseTarget = new PotentialHelper(bot.MapAnalyzer.GetMainRamp(), 6).
+                To(bot.MapAnalyzer.StartLocation)
                 .Get();
 
             MicroControllers.Add(FallBackController);
@@ -190,13 +190,13 @@ namespace Tyr.Builds.Protoss
 
         private int EnemyArmy = 0;
         
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             WorkerTask.Task.EvacuateThreatenedBases = true;
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
@@ -204,7 +204,7 @@ namespace Tyr.Builds.Protoss
                 if (Count(UnitTypes.NEXUS) < 2 && TimingAttackTask.Task.Units.Count == 0)
                     agent.Order(Abilities.MOVE, Main.BaseLocation.Pos);
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
 
             if (TotalEnemyCount(UnitTypes.ZEALOT) >= 3 || EnemyCount(UnitTypes.PHOTON_CANNON) > 0)
@@ -221,7 +221,7 @@ namespace Tyr.Builds.Protoss
             }
 
             EnemyArmy = System.Math.Max(EnemyArmy, EnemyCount(UnitTypes.ZEALOT) + EnemyCount(UnitTypes.STALKER));
-            tyr.DrawText("Enemy army: " + EnemyArmy);
+            bot.DrawText("Enemy army: " + EnemyArmy);
 
             if (EnemyCount(UnitTypes.PHOENIX) <= 3)
                 DefenseTask.AirDefenseTask.IgnoreEnemyTypes.Add(UnitTypes.PHOENIX);
@@ -234,16 +234,16 @@ namespace Tyr.Builds.Protoss
             else
                 BalanceGas();
 
-            if (TotalEnemyCount(UnitTypes.FORGE) > 0 && tyr.Frame <= 22.4 * 60 * 2)
+            if (TotalEnemyCount(UnitTypes.FORGE) > 0 && bot.Frame <= 22.4 * 60 * 2)
                 EarlyForgeDetected = true;
 
             ScoutTask.Task.ScoutType = UnitTypes.PHOENIX;
-            ScoutTask.Task.Target = tyr.TargetManager.PotentialEnemyStartLocations[0];
+            ScoutTask.Task.Target = bot.TargetManager.PotentialEnemyStartLocations[0];
             
             if (CannonDefenseDetected 
                 && TotalEnemyCount(UnitTypes.STARGATE) + TotalEnemyCount(UnitTypes.DARK_SHRINE) + TotalEnemyCount(UnitTypes.VOID_RAY) == 0)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.SENTRY)
                         continue;
@@ -272,11 +272,11 @@ namespace Tyr.Builds.Protoss
 
             if (!LowGroundCannons)
             {
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.PHOTON_CANNON)
                         continue;
-                    if (tyr.MapAnalyzer.MapHeight((int)enemy.Pos.X, (int)enemy.Pos.Y) < tyr.MapAnalyzer.MapHeight((int)tyr.TargetManager.PotentialEnemyStartLocations[0].X, (int)tyr.TargetManager.PotentialEnemyStartLocations[0].Y))
+                    if (bot.MapAnalyzer.MapHeight((int)enemy.Pos.X, (int)enemy.Pos.Y) < bot.MapAnalyzer.MapHeight((int)bot.TargetManager.PotentialEnemyStartLocations[0].X, (int)bot.TargetManager.PotentialEnemyStartLocations[0].Y))
                     {
                         LowGroundCannons = true;
                         break;
@@ -286,7 +286,7 @@ namespace Tyr.Builds.Protoss
 
             if (!CannonDefenseDetected
                 && TotalEnemyCount(UnitTypes.PHOTON_CANNON) + TotalEnemyCount (UnitTypes.FORGE) > 0
-                && tyr.Frame < 22.4 * 60 * 4
+                && bot.Frame < 22.4 * 60 * 4
                 && (EarlyForgeDetected || Expanded.Get().Detected || LowGroundCannons))
             {
                 CannonDefenseDetected = true;
@@ -297,16 +297,16 @@ namespace Tyr.Builds.Protoss
             if (StrategyAnalysis.WorkerRush.Get().Detected
                 && Count(UnitTypes.ZEALOT) < 2)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.ASSIMILATOR
                         && agent.Unit.BuildProgress < 0.99)
                         agent.Order(Abilities.CANCEL);
             }
 
-            tyr.TargetManager.TargetCannons = true;
+            bot.TargetManager.TargetCannons = true;
             if (ZealotRushSuspected)
             {
-                tyr.TargetManager.TargetGateways = true;
+                bot.TargetManager.TargetGateways = true;
                 WorkerScoutTask.Task.Stopped = true;
                 WorkerScoutTask.Task.Clear();
             }
@@ -329,7 +329,7 @@ namespace Tyr.Builds.Protoss
 
             if (ZealotRushSuspected && Completed(UnitTypes.STALKER) >= 12)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                         continue;
@@ -343,12 +343,12 @@ namespace Tyr.Builds.Protoss
             WorkerScoutTask.Task.StartFrame = 600;
             ObserverScoutTask.Task.Priority = 6;
 
-            tyr.NexusAbilityManager.Stopped = Count(UnitTypes.STALKER) == 0 && tyr.Frame >= 120 * 22.4;
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(917);
+            bot.NexusAbilityManager.Stopped = Count(UnitTypes.STALKER) == 0 && bot.Frame >= 120 * 22.4;
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(917);
 
             if (EnemyExpandFrame >= 1000000
                 && Expanded.Get().Detected)
-                EnemyExpandFrame = tyr.Frame;
+                EnemyExpandFrame = bot.Frame;
 
             if (EnemyExpandFrame < 3 * 60 * 22.4)
                 EarlyExpand = true;
@@ -364,7 +364,7 @@ namespace Tyr.Builds.Protoss
             TimingAttackTask.Task.RetreatSize = 0;
 
             if (EnemyCount(UnitTypes.ZEALOT) + EnemyCount(UnitTypes.STALKER) >= 6
-                && tyr.Frame < 22.4 * 60 * 5)
+                && bot.Frame < 22.4 * 60 * 5)
             {
                 CancelElevator = true;
                 WarpPrismElevatorTask.Task.Cancelled = true;
@@ -390,12 +390,12 @@ namespace Tyr.Builds.Protoss
                 ShieldRegenTask.Task.Stopped = true;
                 ShieldRegenTask.Task.Clear();
                 WarpPrismElevatorTask.Task.Stopped = false;
-                tyr.TargetManager.PrefferDistant = false;
-                tyr.TargetManager.TargetAllBuildings = true;
-                PotentialHelper potential = new PotentialHelper(tyr.TargetManager.PotentialEnemyStartLocations[0], 6);
-                potential.From(tyr.MapAnalyzer.GetEnemyRamp());
+                bot.TargetManager.PrefferDistant = false;
+                bot.TargetManager.TargetAllBuildings = true;
+                PotentialHelper potential = new PotentialHelper(bot.TargetManager.PotentialEnemyStartLocations[0], 6);
+                potential.From(bot.MapAnalyzer.GetEnemyRamp());
                 StutterController.Toward = potential.Get();
-                tyr.DrawSphere(new Point() { X = StutterController.Toward.X, Y = StutterController.Toward.Y, Z = tyr.MapAnalyzer.StartLocation.Z });
+                bot.DrawSphere(new Point() { X = StutterController.Toward.X, Y = StutterController.Toward.Y, Z = bot.MapAnalyzer.StartLocation.Z });
                 EvadeCannonsController.Stopped = Completed(UnitTypes.STALKER) + Completed(UnitTypes.IMMORTAL) >= 12;
                 EvadeCannonsController.FleeToward = StutterController.Toward;
                 FallBackController.Stopped = true;
@@ -404,9 +404,9 @@ namespace Tyr.Builds.Protoss
             {
                 TimingAttackTask.Task.Stopped = false;
                 WarpPrismElevatorTask.Task.Stopped = true;
-                tyr.TargetManager.PrefferDistant = true;
+                bot.TargetManager.PrefferDistant = true;
                 ShieldRegenTask.Task.Stopped = false;
-                tyr.TargetManager.TargetAllBuildings = false;
+                bot.TargetManager.TargetAllBuildings = false;
                 StutterController.Toward = null;
                 EvadeCannonsController.Stopped = true;
                 FallBackController.Stopped = ZealotRushSuspected;
@@ -470,7 +470,7 @@ namespace Tyr.Builds.Protoss
                 + TotalEnemyCount(UnitTypes.FLEET_BEACON) > 0;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (Count(UnitTypes.PROBE) >= 24
                 && Count(UnitTypes.NEXUS) < 2

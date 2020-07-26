@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ReplenishBuildingSCVTask : Task
     {
@@ -103,14 +103,14 @@ namespace Tyr.Tasks
                     AlreadyRepairing.Add(RepairMap[scv.Unit.Tag]);
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            tyr.DrawText("Replenishing scvs: " + Units.Count);
+            bot.DrawText("Replenishing scvs: " + Units.Count);
             List<Agent> unassignedSCVs = new List<Agent>();
             Dictionary<ulong, int> alreadyRepairing = new Dictionary<ulong, int>();
             foreach (Agent agent in Units)
             {
-                tyr.DrawSphere(agent.Unit.Pos);
+                bot.DrawSphere(agent.Unit.Pos);
                 if (RepairMap.ContainsKey(agent.Unit.Tag)
                     && !NeedsRepairing.Contains(RepairMap[agent.Unit.Tag]))
                     RepairMap.Remove(agent.Unit.Tag);
@@ -147,7 +147,7 @@ namespace Tyr.Tasks
 
             foreach (Agent agent in Units)
             {
-                tyr.DrawLine(agent, tyr.UnitManager.Agents[RepairMap[agent.Unit.Tag]].Unit.Pos);
+                bot.DrawLine(agent, bot.UnitManager.Agents[RepairMap[agent.Unit.Tag]].Unit.Pos);
                 agent.Order(Abilities.MOVE, RepairMap[agent.Unit.Tag]);
             }
         }

@@ -1,14 +1,14 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.BuildingPlacement;
-using Tyr.Builds.BuildLists;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.BuildingPlacement;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class TempestProxy : Build
     {
@@ -49,7 +49,7 @@ namespace Tyr.Builds.Protoss
             }, true);
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             ProxyTask.Task.UseCloseHideLocation = UseCloseHideLocation;
 
@@ -109,15 +109,15 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            if (tyr.Frame == (int)(22.4 * 60) && LogLabel.FoundMM)
-                tyr.Chat("These Tempests are perfectly balanced. As all things should be.");
+            if (bot.Frame == (int)(22.4 * 60) && LogLabel.FoundMM)
+                bot.Chat("These Tempests are perfectly balanced. As all things should be.");
             if (!ChatMessageSent)
             {
                 if (Completed(UnitTypes.TEMPEST) > 0 && !LogLabel.FoundMM)
                 {
-                    tyr.Chat("This build is dedicated to Andyman!");
+                    bot.Chat("This build is dedicated to Andyman!");
                     ChatMessageSent = true;
                 }
             }
@@ -133,7 +133,7 @@ namespace Tyr.Builds.Protoss
                 {
                     float dist = 10 * 10;
                     Unit fleeEnemy = null;
-                    foreach (Unit enemy in tyr.Enemies())
+                    foreach (Unit enemy in bot.Enemies())
                     {
                         if (!UnitTypes.CanAttackAir(enemy.UnitType))
                             continue;
@@ -154,19 +154,19 @@ namespace Tyr.Builds.Protoss
                 TempestController.RetreatPos = ProxyTask.Task.GetHideLocation();
 
             DepoweredStargates = 0;
-            foreach (Agent agent in tyr.Units())
+            foreach (Agent agent in bot.Units())
                 if (agent.Unit.UnitType == UnitTypes.STARGATE
                     && !agent.Unit.IsPowered
                     && agent.Unit.BuildProgress >= 0.99)
                     DepoweredStargates++;
-            tyr.DrawText("DepoweredStargates: " + DepoweredStargates);
+            bot.DrawText("DepoweredStargates: " + DepoweredStargates);
 
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(1568);
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(1568);
             ProxyTask.Task.EvadeEnemies = true;
             
-            tyr.buildingPlacer.BuildCompact = true;
-            tyr.TargetManager.PrefferDistant = false;
-            tyr.TargetManager.TargetAllBuildings = true;
+            bot.buildingPlacer.BuildCompact = true;
+            bot.TargetManager.PrefferDistant = false;
+            bot.TargetManager.TargetAllBuildings = true;
 
 
             TrainStep.WarpInLocation = ProxyTask.Task.GetHideLocation();
@@ -178,7 +178,7 @@ namespace Tyr.Builds.Protoss
             TimingAttackTask.Task.UnitType = UnitTypes.TEMPEST;
 
 
-            if (tyr.Frame >= 22.4 * 60 * 4)
+            if (bot.Frame >= 22.4 * 60 * 4)
                 ProxyTask.Task.Stopped = true;
             else
             {
@@ -188,17 +188,17 @@ namespace Tyr.Builds.Protoss
             }
             if (UpgradeType.LookUp[UpgradeType.WarpGate].Progress() >= 0.5 
                 && IdleTask.Task.OverrideTarget == null
-                && (tyr.EnemyRace != Race.Protoss || tyr.Frame >= 22.4 * 4 * 60))
-                IdleTask.Task.OverrideTarget = tyr.MapAnalyzer.Walk(ProxyTask.Task.GetHideLocation(), tyr.MapAnalyzer.EnemyDistances, 10);
+                && (bot.EnemyRace != Race.Protoss || bot.Frame >= 22.4 * 4 * 60))
+                IdleTask.Task.OverrideTarget = bot.MapAnalyzer.Walk(ProxyTask.Task.GetHideLocation(), bot.MapAnalyzer.EnemyDistances, 10);
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
                 
-                agent.Order(Abilities.MOVE, agent.From(tyr.MapAnalyzer.GetMainRamp(), 4));
+                agent.Order(Abilities.MOVE, agent.From(bot.MapAnalyzer.GetMainRamp(), 4));
             }
         }
     }

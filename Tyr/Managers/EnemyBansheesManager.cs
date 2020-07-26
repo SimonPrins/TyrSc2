@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class EnemyBansheesManager : Manager
     {
@@ -12,9 +12,9 @@ namespace Tyr.Managers
         public Point2D BansheeLocation;
         public int BansheeSeenFrame = -1000000;
 
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
-            foreach (Agent observer in tyr.Units())
+            foreach (Agent observer in bot.Units())
             {
                 if (observer.Unit.UnitType != UnitTypes.OBSERVER)
                     continue;
@@ -30,20 +30,20 @@ namespace Tyr.Managers
 
             float dist = 40 * 40;
             if (Bot.Main.Frame - BansheeSeenFrame < 22.4 * 10)
-                dist = SC2Util.DistanceSq(BansheeLocation, tyr.MapAnalyzer.StartLocation);
-            foreach (Unit enemy in tyr.Enemies())
+                dist = SC2Util.DistanceSq(BansheeLocation, bot.MapAnalyzer.StartLocation);
+            foreach (Unit enemy in bot.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.BANSHEE)
                     continue;
-                float newDist = SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation);
+                float newDist = SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation);
                 if (newDist > dist)
                     continue;
                 BansheeLocation = SC2Util.To2D(enemy.Pos);
-                BansheeSeenFrame = tyr.Frame;
+                BansheeSeenFrame = bot.Frame;
                 dist = newDist;
             }
 
-            foreach (Agent agent in tyr.Units())
+            foreach (Agent agent in bot.Units())
             {
                 if (agent.PreviousUnit == null)
                     continue;
@@ -66,7 +66,7 @@ namespace Tyr.Managers
                 if (enemyClose)
                     continue;
                 LastHitLocation = SC2Util.To2D(agent.Unit.Pos);
-                LastHitFrame = tyr.Frame;
+                LastHitFrame = bot.Frame;
             }
         }
     }

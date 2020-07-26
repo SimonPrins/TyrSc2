@@ -1,7 +1,7 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class UnitDescriptor
     {

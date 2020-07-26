@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class EnemyManager : Manager
     {
@@ -69,7 +69,7 @@ namespace Tyr.Managers
             }
         }
 
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
             if (Bot.Main.Observation.Observation.RawData.Event != null
                 && Bot.Main.Observation.Observation.RawData.Event.DeadUnits != null)
@@ -84,7 +84,7 @@ namespace Tyr.Managers
                 }
             List<ulong> destroyedBuildings = new List<ulong>();
             foreach (BuildingLocation location in EnemyBuildings.Values)
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (SC2Util.DistanceSq(agent.Unit.Pos, SC2Util.To2D(location.Pos)) <= 6 * 6)
                         destroyedBuildings.Add(location.Tag);
             foreach (ulong tag in destroyedBuildings)
@@ -93,7 +93,7 @@ namespace Tyr.Managers
             foreach (Unit unit in Bot.Main.Enemies())
             {
                 CollectionUtil.Add(LastSeen, unit.Tag, unit);
-                CollectionUtil.Add(LastSeenFrame, unit.Tag, tyr.Frame);
+                CollectionUtil.Add(LastSeenFrame, unit.Tag, bot.Frame);
 
                 if (!UnitTypes.BuildingTypes.Contains(unit.UnitType))
                     continue;

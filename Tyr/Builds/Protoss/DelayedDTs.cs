@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class DelayedDTs : Build
     {
@@ -30,7 +30,7 @@ namespace Tyr.Builds.Protoss
             DTAttackTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new FleeCyclonesController());
             MicroControllers.Add(new SentryController());
@@ -86,7 +86,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.DefendOtherAgents = false;
             if (Completed(UnitTypes.DARK_TEMPLAR) >= 2)
@@ -94,11 +94,11 @@ namespace Tyr.Builds.Protoss
             else
                 TimingAttackTask.Task.RequiredSize = 20;
 
-            tyr.buildingPlacer.BuildCompact = true;
+            bot.buildingPlacer.BuildCompact = true;
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
@@ -106,7 +106,7 @@ namespace Tyr.Builds.Protoss
                 if (Count(UnitTypes.NEXUS) < 3 && TimingAttackTask.Task.Units.Count == 0)
                     agent.Order(Abilities.MOVE, Main.BaseLocation.Pos);
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
 
             DefenseTask.GroundDefenseTask.IncludePhoenixes = EnemyCount(UnitTypes.CYCLONE) > 0;

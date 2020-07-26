@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class RepairTask : Task
     {
@@ -138,7 +138,7 @@ namespace Tyr.Tasks
         }
 
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             List<Agent> unassignedSCVs = new List<Agent>();
             Dictionary<ulong, int> alreadyRepairing = new Dictionary<ulong, int>();

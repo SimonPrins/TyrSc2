@@ -1,16 +1,16 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Terran
+namespace SC2Sharp.Builds.Terran
 {
     public class MechTvZProbots : Build
     {
@@ -84,7 +84,7 @@ namespace Tyr.Builds.Terran
             return "MechTvZProbots";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             AttackMicroControllers.Add(new SoftLeashController(new HashSet<uint>() { UnitTypes.LIBERATOR, UnitTypes.MEDIVAC, UnitTypes.HELLBAT },
                 new HashSet<uint>() { UnitTypes.SIEGE_TANK, UnitTypes.SIEGE_TANK_SIEGED, UnitTypes.THOR },
@@ -191,16 +191,16 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             WorkerScoutTask.Task.ScoutNatural = true;
             WorkerScoutTask.Task.StartFrame = 224;
 
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK) > 0)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK) > 0)
                 DefendMutas = true;
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ULTRALISK) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ULTRALISK_CAVERN) > 0)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ULTRALISK) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ULTRALISK_CAVERN) > 0)
                 UltralisksDetected = true;
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ROACH) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.HYDRALISK) >= 10)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ROACH) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.HYDRALISK) >= 10)
                 RoachHydra = true;
 
             if (!AttackWithHellbats)
@@ -220,10 +220,10 @@ namespace Tyr.Builds.Terran
                     }
                 }
             }
-            if (!InitialAttackDone && (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ROACH) > 0
-                || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.HYDRALISK) >= 5
-                || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.RAVAGER) > 0
-                //|| tyr.EnemyStrategyAnalyzer.Count(UnitTypes.BANELING) >= 2
+            if (!InitialAttackDone && (bot.EnemyStrategyAnalyzer.Count(UnitTypes.ROACH) > 0
+                || bot.EnemyStrategyAnalyzer.Count(UnitTypes.HYDRALISK) >= 5
+                || bot.EnemyStrategyAnalyzer.Count(UnitTypes.RAVAGER) > 0
+                //|| bot.EnemyStrategyAnalyzer.Count(UnitTypes.BANELING) >= 2
                 || LingRush))
             {
                 InitialAttackDone = true;
@@ -247,22 +247,22 @@ namespace Tyr.Builds.Terran
                 TimingAttackTask.Task.RetreatSize = 6;
             }
 
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK) > 0)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK) > 0)
                 DesiredTanks = 0;
             else if (DesiredTanks == 0)
             {
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                     if (
                         (enemy.UnitType == UnitTypes.QUEEN || enemy.UnitType == UnitTypes.SPINE_CRAWLER || enemy.UnitType == UnitTypes.SPINE_CRAWLER_UPROOTED)
-                        && SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation) <= 40 * 40)
+                        && SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation) <= 40 * 40)
                     {
                         DesiredTanks = 2;
                         break;
                     }
             }
 
-            if (!LingRush && tyr.Frame <= 22.4 * 150
-                && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) >= 5)
+            if (!LingRush && bot.Frame <= 22.4 * 150
+                && bot.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) >= 5)
                 LingRush = true;
 
             TimingAttackTask.Task.BeforeControllers = AttackMicroControllers;
@@ -279,10 +279,10 @@ namespace Tyr.Builds.Terran
 
             TransformTask.Task.HellionsToHellbats();
             
-            if (!UltralisksDetected && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ULTRALISK) + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ULTRALISK_CAVERN) > 0)
+            if (!UltralisksDetected && bot.EnemyStrategyAnalyzer.Count(UnitTypes.ULTRALISK) + bot.EnemyStrategyAnalyzer.Count(UnitTypes.ULTRALISK_CAVERN) > 0)
                 UltralisksDetected = true;
 
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK) > 0)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK) > 0)
             {
                 MinVikings = 6;
                 MaxVikings = 6;
@@ -293,9 +293,9 @@ namespace Tyr.Builds.Terran
                 MinVikings = 0;
                 MaxVikings = 0;
             }
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) >= 15)
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) >= 15)
                 ManyLings = true;
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ROACH) + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.HYDRALISK) >= 10)
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.ROACH) + bot.EnemyStrategyAnalyzer.Count(UnitTypes.HYDRALISK) >= 10)
                 RoachHydra = true;
 
             if (ManyLings
@@ -334,17 +334,17 @@ namespace Tyr.Builds.Terran
             DistributeHellbatsTask.Stopped = Count(UnitTypes.COMMAND_CENTER) < 2
                 || Completed(UnitTypes.HELLBAT) < 2 * (Count(UnitTypes.COMMAND_CENTER) - 1);
 
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANELING) >= 10)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANELING) >= 10)
                 DesiredMines = 12;
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANELING) > 0
-                || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK) > 0)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANELING) > 0
+                || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK) > 0)
                 DesiredMines = 6;
             
-            if (BlueFlameStarted < 0 && tyr.UnitManager.ActiveOrders.Contains(761))
-                BlueFlameStarted = tyr.Frame;
+            if (BlueFlameStarted < 0 && bot.UnitManager.ActiveOrders.Contains(761))
+                BlueFlameStarted = bot.Frame;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.COMMAND_CENTER
                 && Completed(UnitTypes.BARRACKS) > 0
@@ -382,7 +382,7 @@ namespace Tyr.Builds.Terran
             }
             else if (agent.Unit.UnitType == UnitTypes.FACTORY)
             {
-                if (!tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
+                if (!bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
                 {
                     if ((Count(UnitTypes.FACTORY_REACTOR) == 0 || Count(UnitTypes.FACTORY_TECH_LAB) >= 3)
                         && Count(UnitTypes.FACTORY_REACTOR) < 2)
@@ -401,13 +401,13 @@ namespace Tyr.Builds.Terran
                         }
                     }
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB)
                 {
                     if (BlueFlameStarted < 0 
-                        && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.QUEEN) >= 3
+                        && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.QUEEN) >= 3
                         && Count(UnitTypes.HELLBAT) + Count(UnitTypes.HELLION) > 0)
                         return;
-                    if (tyr.Frame <= 22.4 * 5
+                    if (bot.Frame <= 22.4 * 5
                         && !MechDestroyExpandsTask.Task.Stopped
                         && Minerals() >= 100
                         && FoodLeft() >= 2)
@@ -456,7 +456,7 @@ namespace Tyr.Builds.Terran
                             agent.Order(595);
                     }
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_REACTOR)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_REACTOR)
                 {
                     if (Count(UnitTypes.WIDOW_MINE) < DesiredMines
                         && (InitialAttackDone || Count(UnitTypes.WIDOW_MINE) < 2)
@@ -484,7 +484,7 @@ namespace Tyr.Builds.Terran
             }
             else if (agent.Unit.UnitType == UnitTypes.STARPORT)
             {
-                if (!tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
+                if (!bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
                 {
                     if (Count(UnitTypes.VIKING_FIGHTER) > 0)
                     {
@@ -503,7 +503,7 @@ namespace Tyr.Builds.Terran
                         && FoodLeft() >= 2)
                         agent.Order(624);
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_REACTOR)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_REACTOR)
                 {
                     if ((Count(UnitTypes.VIKING_FIGHTER) < MinVikings || Count(UnitTypes.MEDIVAC) >= (DefendMutas ? 2 : 4))
                         && Count(UnitTypes.VIKING_FIGHTER) < MaxVikings)
@@ -530,7 +530,7 @@ namespace Tyr.Builds.Terran
                             agent.Order(626);
                     }
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_TECH_LAB)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_TECH_LAB)
                 {
                     if (Minerals() > 100
                         && Gas() >= 200

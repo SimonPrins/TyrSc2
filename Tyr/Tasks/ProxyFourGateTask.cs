@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.BuildingPlacement;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.BuildingPlacement;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ProxyFourGateTask : Task
     {
@@ -85,7 +85,7 @@ namespace Tyr.Tasks
             return HideLocation;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             BuildingType pylonType = BuildingType.LookUp[UnitTypes.PYLON];
             BuildingType gatewayType = BuildingType.LookUp[UnitTypes.GATEWAY];
@@ -96,7 +96,7 @@ namespace Tyr.Tasks
             Agent pylon = null;
             Agent gateway = null;
             Agent robo = null;
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType != UnitTypes.PYLON
                     && agent.Unit.UnitType != UnitTypes.GATEWAY
@@ -112,19 +112,19 @@ namespace Tyr.Tasks
                 else gateway = agent;
 
             }
-            if (pylon == null && tyr.Minerals() >= 100 && BuildRequests.Count == 0)
+            if (pylon == null && bot.Minerals() >= 100 && BuildRequests.Count == 0)
             {
                 Point2D placement = ProxyBuildingPlacer.FindPlacement(GetHideLocation(), pylonType.Size, UnitTypes.PYLON);
                 if (placement != null)
                     BuildRequests.Add(new BuildRequest() { Type = UnitTypes.PYLON, Pos = placement });
             }
-            else if (gateway == null && pylon != null && pylon.Unit.BuildProgress > 0.99 && tyr.Minerals() >= 150)
+            else if (gateway == null && pylon != null && pylon.Unit.BuildProgress > 0.99 && bot.Minerals() >= 150)
             {
                 Point2D placement = ProxyBuildingPlacer.FindPlacement(GetHideLocation(), gatewayType.Size, UnitTypes.GATEWAY);
                 if (placement != null)
                     BuildRequests.Add(new BuildRequest() { Type = UnitTypes.GATEWAY, Pos = placement });
             }
-            else if (BuildRobo && robo == null && pylon != null && gateway != null && pylon.Unit.BuildProgress > 0.99 && tyr.Minerals() >= 200 && tyr.Gas() >= 100)
+            else if (BuildRobo && robo == null && pylon != null && gateway != null && pylon.Unit.BuildProgress > 0.99 && bot.Minerals() >= 200 && bot.Gas() >= 100)
             {
                 Point2D placement = ProxyBuildingPlacer.FindPlacement(GetHideLocation(), roboType.Size, UnitTypes.ROBOTICS_FACILITY);
                 if (placement != null)
@@ -152,7 +152,7 @@ namespace Tyr.Tasks
                     doneRequests.Add(request);
                     continue;
                 }
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                 {
                     if (agent.Unit.UnitType == request.Type
                         && agent.DistanceSq(request.Pos) < 4)

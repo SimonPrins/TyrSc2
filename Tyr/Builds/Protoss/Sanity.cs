@@ -1,14 +1,14 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.BuildingPlacement;
-using Tyr.Builds.BuildLists;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.BuildingPlacement;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class Sanity : Build
     {
@@ -36,7 +36,7 @@ namespace Tyr.Builds.Protoss
             KillOwnUnitTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new FleeCyclonesController());
             MicroControllers.Add(new SentryController());
@@ -122,10 +122,10 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            tyr.buildingPlacer.BuildInsideMainOnly = true;
-            tyr.buildingPlacer.BuildCompact = true;
+            bot.buildingPlacer.BuildInsideMainOnly = true;
+            bot.buildingPlacer.BuildCompact = true;
             TimingAttackTask.Task.RequiredSize = 30;
 
 
@@ -133,7 +133,7 @@ namespace Tyr.Builds.Protoss
             if (Count(Main, UnitTypes.FORGE) > 0
                 && Completed(UnitTypes.STALKER) >= 28)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.FORGE)
                         continue;
@@ -145,11 +145,11 @@ namespace Tyr.Builds.Protoss
                 }
             }
 
-            if (tyr.Observation.Chat != null)
+            if (bot.Observation.Chat != null)
             {
-                foreach (ChatReceived chat in tyr.Observation.Chat)
+                foreach (ChatReceived chat in bot.Observation.Chat)
                 {
-                    if (chat.PlayerId == tyr.PlayerId)
+                    if (chat.PlayerId == bot.PlayerId)
                         continue;
                     if (!chat.Message.Contains("chosen"))
                         continue;

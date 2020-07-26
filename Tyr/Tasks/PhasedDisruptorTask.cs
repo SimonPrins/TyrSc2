@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class PhasedDisruptorTask : Task
     {
@@ -26,7 +26,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             HashSet<ulong> deadAgents = new HashSet<ulong>();
             foreach (ulong tag in PhasedFrame.Keys)
@@ -35,7 +35,7 @@ namespace Tyr.Tasks
             {
                 deadAgents.Remove(agent.Unit.Tag);
                 if (!PhasedFrame.ContainsKey(agent.Unit.Tag))
-                    PhasedFrame.Add(agent.Unit.Tag, tyr.Frame);
+                    PhasedFrame.Add(agent.Unit.Tag, bot.Frame);
             }
 
             foreach (ulong deadAgentTag in deadAgents)

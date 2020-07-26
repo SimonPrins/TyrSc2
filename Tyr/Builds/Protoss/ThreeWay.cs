@@ -1,15 +1,15 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 using System;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class ThreeWay : Build
     {
@@ -41,12 +41,12 @@ namespace Tyr.Builds.Protoss
             ForceFieldRampTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             BuildingPlacement.ReservedBuilding reservedNatural = new BuildingPlacement.ReservedBuilding();
             reservedNatural.Pos = Natural.BaseLocation.Pos;
             reservedNatural.Type = UnitTypes.NEXUS;
-            tyr.buildingPlacer.ReservedLocation.Add(reservedNatural);
+            bot.buildingPlacer.ReservedLocation.Add(reservedNatural);
             StutterController.Range = 15;
 
             MicroControllers.Add(new SoftLeashController(UnitTypes.COLOSUS, UnitTypes.IMMORTAL, 12));
@@ -65,7 +65,7 @@ namespace Tyr.Builds.Protoss
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.OnlyDefendInsideMain = true;
 
-            Set += ProtossBuildUtil.Pylons(() => (Count(UnitTypes.PYLON) > 0 && Count(UnitTypes.CYBERNETICS_CORE) > 0 && Count(UnitTypes.STALKER) > 0) || tyr.Frame >= 22.4 * 60 * 3.5);
+            Set += ProtossBuildUtil.Pylons(() => (Count(UnitTypes.PYLON) > 0 && Count(UnitTypes.CYBERNETICS_CORE) > 0 && Count(UnitTypes.STALKER) > 0) || bot.Frame >= 22.4 * 60 * 3.5);
             Set += Units();
             Set += ExpandBuildings();
             Set += MainBuildList();
@@ -150,24 +150,24 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            if (tyr.Frame >= 22.4 * (LogLabel.FoundJensii ? 60 : 30) && !IntroductionSent)
+            if (bot.Frame >= 22.4 * (LogLabel.FoundJensii ? 60 : 30) && !IntroductionSent)
             {
                 IntroductionSent = true;
-                tyr.Chat("This is ThreeWayLover. GLHF!");
+                bot.Chat("This is ThreeWayLover. GLHF!");
             }
-            if (tyr.Frame == (int)(22.4 * 60 * 6))
+            if (bot.Frame == (int)(22.4 * 60 * 6))
             {
-                tyr.Chat("You have fallen for my deception!");
+                bot.Chat("You have fallen for my deception!");
             }
-            if (tyr.Frame == (int)(22.4 * (60 * 6 + 5)))
+            if (bot.Frame == (int)(22.4 * (60 * 6 + 5)))
             {
-                tyr.Chat("I'm not ThreeWayLover.");
+                bot.Chat("I'm not ThreeWayLover.");
             }
-            if (tyr.Frame == (int)(22.4 * (60 * 6 + 10)))
+            if (bot.Frame == (int)(22.4 * (60 * 6 + 10)))
             {
-                tyr.Chat("I AM TYR!");
+                bot.Chat("I AM TYR!");
                 RevealSent = true;
             }
 
@@ -177,7 +177,7 @@ namespace Tyr.Builds.Protoss
                 BalanceGas();
 
             if (Count(UnitTypes.NEXUS) >= 2)
-                tyr.buildingPlacer.ReservedLocation.Clear();
+                bot.buildingPlacer.ReservedLocation.Clear();
 
             if (WorkerScoutTask.Task.BaseCircled())
             {
@@ -187,22 +187,22 @@ namespace Tyr.Builds.Protoss
 
             StutterController.Stopped = Completed(UnitTypes.STALKER) < 12;
 
-            foreach (Base b in tyr.BaseManager.Bases)
+            foreach (Base b in bot.BaseManager.Bases)
             {
-                if (tyr.Frame % 2 == 0)
+                if (bot.Frame % 2 == 0)
                     break;
                 if (b.ResourceCenter == null)
                     continue;
-                if (SC2Util.DistanceSq(b.BaseLocation.Pos, tyr.MapAnalyzer.StartLocation) <= 4)
+                if (SC2Util.DistanceSq(b.BaseLocation.Pos, bot.MapAnalyzer.StartLocation) <= 4)
                     continue;
                 int mineral = Random.Next(b.BaseLocation.MineralFields.Count);
                 if (b.BaseLocation.MineralFields[mineral] != null)
                     b.ResourceCenter.Order(Abilities.MOVE, b.BaseLocation.MineralFields[mineral].Tag);
             }
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
@@ -210,13 +210,13 @@ namespace Tyr.Builds.Protoss
                 if (Count(UnitTypes.NEXUS) < 3 && TimingAttackTask.Task.Units.Count == 0)
                     agent.Order(Abilities.MOVE, Main.BaseLocation.Pos);
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
 
-            tyr.NexusAbilityManager.Stopped = Count(UnitTypes.STALKER) == 0;
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(917);
+            bot.NexusAbilityManager.Stopped = Count(UnitTypes.STALKER) == 0;
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(917);
 
-            SaveWorkersTask.Task.Stopped = tyr.Frame >= 22.4 * 60 * 7 || EnemyCount(UnitTypes.CYCLONE) == 0 || !Natural.UnderAttack;
+            SaveWorkersTask.Task.Stopped = bot.Frame >= 22.4 * 60 * 7 || EnemyCount(UnitTypes.CYCLONE) == 0 || !Natural.UnderAttack;
             if (SaveWorkersTask.Task.Stopped)
                 SaveWorkersTask.Task.Clear();
 
@@ -245,7 +245,7 @@ namespace Tyr.Builds.Protoss
             DefenseTask.AirDefenseTask.MaxDefenseRadius = Completed(UnitTypes.STALKER) + Completed(UnitTypes.IMMORTAL) >= 15 ? 120 : 20;
             DefenseTask.AirDefenseTask.DrawDefenderRadius = 80;
 
-            tyr.TargetManager.SkipPlanetaries = true;
+            bot.TargetManager.SkipPlanetaries = true;
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using Tyr.Agents;
-using Tyr.Util;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class StealUnitTask : Task
     {
@@ -25,7 +25,7 @@ namespace Tyr.Tasks
             agent.Order(Abilities.MOVE, SC2Util.Point(Bot.Main.GameInfo.StartRaw.MapSize.X / 2, Bot.Main.GameInfo.StartRaw.MapSize.Y / 2));
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
         }
     }

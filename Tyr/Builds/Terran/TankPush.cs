@@ -1,16 +1,16 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Terran
+namespace SC2Sharp.Builds.Terran
 {
     public class TankPush : Build
     {
@@ -87,7 +87,7 @@ namespace Tyr.Builds.Terran
             return "TankPush";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             AttackMicroControllers.Add(new LeashController(
                 new HashSet<uint>() { UnitTypes.LIBERATOR, UnitTypes.MEDIVAC, UnitTypes.HELLBAT, UnitTypes.WIDOW_MINE, UnitTypes.MARINE },
@@ -115,7 +115,7 @@ namespace Tyr.Builds.Terran
             MicroControllers.Add(new CycloneVsBansheeController());
             MicroControllers.Add(new DodgeBallController());
 
-            OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
+            OverrideDefenseTarget = bot.MapAnalyzer.Walk(NaturalDefensePos, bot.MapAnalyzer.EnemyDistances, 15);
 
             if (WallIn == null)
             {
@@ -206,12 +206,12 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             BalanceGas();
 
-            if (tyr.Observation.ActionErrors != null)
-                foreach (ActionError error in tyr.Observation.ActionErrors)
+            if (bot.Observation.ActionErrors != null)
+                foreach (ActionError error in bot.Observation.ActionErrors)
                     DebugUtil.WriteLine("Error with ability " + error.AbilityId + ": " + error.Result);
 
             TransformTask.Task.Priority = 10;
@@ -222,11 +222,11 @@ namespace Tyr.Builds.Terran
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.CannonDefenseRadius = 20;
             
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) == 1
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) == 1
                 && Completed(UnitTypes.SIEGE_TANK) > 0
-                && tyr.Frame <= 22.4 * 60 * 4
+                && bot.Frame <= 22.4 * 60 * 4
                 && Count(UnitTypes.COMMAND_CENTER) < 3)
-                IdleTask.Task.OverrideTarget = SC2Util.Point((tyr.MapAnalyzer.GetMainRamp().X + Natural.BaseLocation.Pos.X) / 2f, (tyr.MapAnalyzer.GetMainRamp().Y + Natural.BaseLocation.Pos.Y) / 2f);
+                IdleTask.Task.OverrideTarget = SC2Util.Point((bot.MapAnalyzer.GetMainRamp().X + Natural.BaseLocation.Pos.X) / 2f, (bot.MapAnalyzer.GetMainRamp().Y + Natural.BaseLocation.Pos.Y) / 2f);
             else if (Count(UnitTypes.COMMAND_CENTER) >= 3 && !SuspectCloackedBanshees)
                 IdleTask.Task.OverrideTarget = OverrideDefenseTarget;
             else if (Count(UnitTypes.COMMAND_CENTER) >= 2 && SuspectCloackedBanshees)
@@ -321,16 +321,16 @@ namespace Tyr.Builds.Terran
             }
 
             if (StrategyAnalysis.Bio.Get().Detected
-                || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.SIEGE_TANK) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.SIEGE_TANK_SIEGED) > 0
-                || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE_BURROWED) >= 3)
+                || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.SIEGE_TANK) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.SIEGE_TANK_SIEGED) > 0
+                || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE_BURROWED) >= 3)
                 ReapersDetected = false;
-            else if ((tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) > 6
-                || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.BANSHEE) >= 1)
-                && tyr.Frame < 22.4 * 600)
+            else if ((bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) > 6
+                || bot.EnemyStrategyAnalyzer.Count(UnitTypes.BANSHEE) >= 1)
+                && bot.Frame < 22.4 * 600)
                 ReapersDetected = true;
             BunkerDefendersTask.Task.LeaveBunkers = !StrategyAnalysis.Bio.Get().Detected
-                && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 1
-                && (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2 || tyr.Frame <= 22.4 * 60 * 4);
+                && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 1
+                && (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2 || bot.Frame <= 22.4 * 60 * 4);
 
             if (ReapersDetected)
                 DefenseSquadTask.Enable(CycloneDefenseTasks, false, false);
@@ -341,25 +341,25 @@ namespace Tyr.Builds.Terran
                     task.Clear();
                 }
 
-            if ((tyr.EnemyStrategyAnalyzer.Count(UnitTypes.STARPORT_TECH_LAB) > 0 && tyr.Frame <= 4 * 60 * 22.4)
-                || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.BANSHEE) > 0
-                || (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.STARPORT) > 0 && tyr.Frame <= 3 * 60 * 22.4))
+            if ((bot.EnemyStrategyAnalyzer.Count(UnitTypes.STARPORT_TECH_LAB) > 0 && bot.Frame <= 4 * 60 * 22.4)
+                || bot.EnemyStrategyAnalyzer.Count(UnitTypes.BANSHEE) > 0
+                || (bot.EnemyStrategyAnalyzer.Count(UnitTypes.STARPORT) > 0 && bot.Frame <= 3 * 60 * 22.4))
                 SuspectCloackedBanshees = true;
 
-            if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 1
+            if (bot.TargetManager.PotentialEnemyStartLocations.Count == 1
                 && !ScanTimingsSet)
             {
                 ScanTimingsSet = true;
-                tyr.OrbitalAbilityManager.SaveEnergy = 50;
-                tyr.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
+                bot.OrbitalAbilityManager.SaveEnergy = 50;
+                bot.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
                 {
-                    Pos = tyr.TargetManager.PotentialEnemyStartLocations[0],
+                    Pos = bot.TargetManager.PotentialEnemyStartLocations[0],
                     FromFrame = (int)(22.4 * 60 * 2.5)
                 });
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.COMMAND_CENTER
                 && Completed(UnitTypes.BARRACKS) > 0
@@ -404,7 +404,7 @@ namespace Tyr.Builds.Terran
             }
             else if (agent.Unit.UnitType == UnitTypes.FACTORY)
             {
-                if (!tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
+                if (!bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
                 {
                     if (Count(UnitTypes.HELLION) + Count(UnitTypes.CYCLONE) == 0)
                     {
@@ -416,9 +416,9 @@ namespace Tyr.Builds.Terran
                     //else
                     //    agent.Order(455);
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB)
                 {
-                    if ((ReapersDetected || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 1)
+                    if ((ReapersDetected || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 1)
                         && (Count(UnitTypes.CYCLONE) == 0 || ReapersDetected)
                         && Minerals() >= 150
                         && Gas() >= 100
@@ -439,7 +439,7 @@ namespace Tyr.Builds.Terran
                         && FoodLeft() >= 3)
                         agent.Order(591);
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_REACTOR)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_REACTOR)
                 {
                     if (Completed(UnitTypes.ARMORY) > 0
                         && Minerals() >= 75
@@ -462,7 +462,7 @@ namespace Tyr.Builds.Terran
             }
             else if (agent.Unit.UnitType == UnitTypes.STARPORT)
             {
-                if (!tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
+                if (!bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
                 {
                     if (Count(UnitTypes.VIKING_FIGHTER) > 0)
                     {
@@ -481,7 +481,7 @@ namespace Tyr.Builds.Terran
                         && FoodLeft() >= 2)
                         agent.Order(624);
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_REACTOR)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_REACTOR)
                 {
                     if (Count(UnitTypes.VIKING_FIGHTER) < 3 || ReapersDetected)
                     {
@@ -506,7 +506,7 @@ namespace Tyr.Builds.Terran
                             agent.Order(626);
                     }
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_TECH_LAB)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_TECH_LAB)
                 {
                     if (Minerals() > 100
                         && Gas() >= 200

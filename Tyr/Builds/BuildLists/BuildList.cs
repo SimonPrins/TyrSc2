@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Managers;
-using static Tyr.Builds.BuildLists.ConditionalStep;
+using SC2Sharp.Managers;
+using static SC2Sharp.Builds.BuildLists.ConditionalStep;
 
-namespace Tyr.Builds.BuildLists
+namespace SC2Sharp.Builds.BuildLists
 {
     public class BuildList
     {

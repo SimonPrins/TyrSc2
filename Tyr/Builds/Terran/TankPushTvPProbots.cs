@@ -1,16 +1,16 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Terran
+namespace SC2Sharp.Builds.Terran
 {
     public class TankPushTvPProbots : Build
     {
@@ -70,7 +70,7 @@ namespace Tyr.Builds.Terran
             return "TankPushTvP";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             TimingAttackTask.Task.BeforeControllers.Add(new LeashController(new HashSet<uint>() { UnitTypes.LIBERATOR, UnitTypes.MEDIVAC, UnitTypes.CYCLONE, UnitTypes.VIKING_FIGHTER },
                 new HashSet<uint>() { UnitTypes.SIEGE_TANK, UnitTypes.SIEGE_TANK_SIEGED },
@@ -258,40 +258,40 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            if (tyr.Observation.ActionErrors != null)
-                foreach (ActionError error in tyr.Observation.ActionErrors)
+            if (bot.Observation.ActionErrors != null)
+                foreach (ActionError error in bot.Observation.ActionErrors)
                     DebugUtil.WriteLine("Error with ability " + error.AbilityId + ": " + error.Result);
 
-            if (!EcoCheeseSuspected && Expanded.Get().Detected && tyr.Frame <= 22.4 * 60 * 2 && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) == 0)
+            if (!EcoCheeseSuspected && Expanded.Get().Detected && bot.Frame <= 22.4 * 60 * 2 && bot.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) == 0)
                 EcoCheeseSuspected = true;
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.STALKER) + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ADEPT) > 0 
-                || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ZEALOT) >= 3)
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.STALKER) + bot.EnemyStrategyAnalyzer.Count(UnitTypes.ADEPT) > 0 
+                || bot.EnemyStrategyAnalyzer.Count(UnitTypes.ZEALOT) >= 3)
                 EcoCheeseSuspected = false;
 
-            if (!CannonDefenseDetected && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOTON_CANNON) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.FORGE) >= 0 && tyr.Frame < 22.4 * 60 * 4)
+            if (!CannonDefenseDetected && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOTON_CANNON) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.FORGE) >= 0 && bot.Frame < 22.4 * 60 * 4)
                 CannonDefenseDetected = true;
 
-            if (!TempestDetected && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) > 0)
+            if (!TempestDetected && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) > 0)
                 TempestDetected = true;
 
             MechDestroyExpandsTask.Task.RequiredSize = 4;
             MechDestroyExpandsTask.Task.MaxSize = 4;
             MechDestroyExpandsTask.Task.RetreatSize = 0;
             MechDestroyExpandsTask.Task.UnitType = UnitTypes.HELLION;
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER)
-                + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.IMMORTAL)
-                + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.VOID_RAY) > 0
-                && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.NEXUS) >= 2)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER)
+                + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.IMMORTAL)
+                + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.VOID_RAY) > 0
+                && bot.EnemyStrategyAnalyzer.Count(UnitTypes.NEXUS) >= 2)
                 MechDestroyExpandsTask.Task.Stopped = true;
 
             BunkerDefendersTask.Task.LeaveBunkers = EcoCheeseSuspected;
             MarineHarassController.Disabled = !EcoCheeseSuspected;
 
             /*
-            if ((tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER) >= 7 || (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) >= 3 && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.CYBERNETICS_CORE) > 0))
-                && tyr.Frame < 22.4 * 60f * 3.5)
+            if ((bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER) >= 7 || (bot.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) >= 3 && bot.EnemyStrategyAnalyzer.Count(UnitTypes.CYBERNETICS_CORE) > 0))
+                && bot.Frame < 22.4 * 60f * 3.5)
                 FourGateStalkerSuspected = true;
             */
 
@@ -301,7 +301,7 @@ namespace Tyr.Builds.Terran
 
             if (FourGateStalkerSuspected
                 && ((Completed(UnitTypes.SIEGE_TANK) >= 2 && Completed(UnitTypes.MARAUDER) >= 3) || Count(UnitTypes.COMMAND_CENTER) >= 2))
-                IdleTask.Task.OverrideTarget = SC2Util.Point((tyr.MapAnalyzer.GetMainRamp().X + Natural.BaseLocation.Pos.X) / 2f, (tyr.MapAnalyzer.GetMainRamp().Y + Natural.BaseLocation.Pos.Y) / 2f);
+                IdleTask.Task.OverrideTarget = SC2Util.Point((bot.MapAnalyzer.GetMainRamp().X + Natural.BaseLocation.Pos.X) / 2f, (bot.MapAnalyzer.GetMainRamp().Y + Natural.BaseLocation.Pos.Y) / 2f);
             else IdleTask.Task.OverrideTarget = null;
 
             SiegeAtRampTask.Task.Stopped = !FourGateStalkerSuspected || Count(UnitTypes.THOR) > 0;
@@ -312,24 +312,24 @@ namespace Tyr.Builds.Terran
                 && Count(UnitTypes.COMMAND_CENTER) > Completed(UnitTypes.COMMAND_CENTER)
                 && Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STARGATE) == 0)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.COMMAND_CENTER
                         && agent.Unit.BuildProgress < 0.99)
                         agent.Order(Abilities.CANCEL);
             }
 
-            tyr.TargetManager.TargetCannons = true;
+            bot.TargetManager.TargetCannons = true;
             if (!OraclesDetected
-                && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ORACLE) > 0)
-                OraclesDetectedFrame = tyr.Frame;
-            OraclesDetected = tyr.Frame - OraclesDetectedFrame < 30 * 22.4;
+                && bot.EnemyStrategyAnalyzer.Count(UnitTypes.ORACLE) > 0)
+                OraclesDetectedFrame = bot.Frame;
+            OraclesDetected = bot.Frame - OraclesDetectedFrame < 30 * 22.4;
 
             if (Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS)
                 + Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ROBOTICS_BAY)
                 + Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ROBOTICS_FACILITY) > 0)
                 CollosusSuspected = true;
             if (CollosusSuspected
-                || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.TEMPEST) > 0
+                || bot.EnemyStrategyAnalyzer.Count(UnitTypes.TEMPEST) > 0
                 || CannonsDetected)
                 DesiredVikings = 10;
             else if (SkyTossDetected)
@@ -355,7 +355,7 @@ namespace Tyr.Builds.Terran
             }
             else if(Completed(UnitTypes.COMMAND_CENTER) < 2
                 || FourGateStalkerSuspected
-                || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) > 0)
+                || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) > 0)
             {
                 TimingAttackTask.Task.RequiredSize = 40;
                 TimingAttackTask.Task.RetreatSize = 10;
@@ -387,18 +387,18 @@ namespace Tyr.Builds.Terran
                 TimingAttackTask.Task.RetreatSize = 10;
             }
 
-            tyr.DrawText("Attack sent: " + TimingAttackTask.Task.AttackSent);
-            tyr.DrawText("RequiredSize: " + TimingAttackTask.Task.RequiredSize);
+            bot.DrawText("Attack sent: " + TimingAttackTask.Task.AttackSent);
+            bot.DrawText("RequiredSize: " + TimingAttackTask.Task.RequiredSize);
 
             if (!GatewayPushDetected)
             {
-                if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.CYBERNETICS_CORE) > 0
-                    && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) >= 3)
+                if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.CYBERNETICS_CORE) > 0
+                    && bot.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) >= 3)
                     GatewayPushDetected = true;
 
-                if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ADEPT) > 0)
+                if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.ADEPT) > 0)
                     GatewayPushDetected = true;
-                if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.STALKER) >= 3)
+                if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.STALKER) >= 3)
                     GatewayPushDetected = true;
             }
 
@@ -408,26 +408,26 @@ namespace Tyr.Builds.Terran
                 WorkerScoutTask.Task.Clear();
             }
 
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) > 0
-                && tyr.Frame >= 22.4 * 90
-                && tyr.Frame < 22.4 * 110)
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) > 0
+                && bot.Frame >= 22.4 * 90
+                && bot.Frame < 22.4 * 110)
             {
                 WorkerScoutTask.Task.Stopped = true;
                 WorkerScoutTask.Task.Clear();
             }
 
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ASSIMILATOR) + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.CYBERNETICS_CORE) > 0
-                && tyr.Frame >= 22.4 * 75
-                && tyr.Frame < 22.4 * 110)
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.ASSIMILATOR) + bot.EnemyStrategyAnalyzer.Count(UnitTypes.CYBERNETICS_CORE) > 0
+                && bot.Frame >= 22.4 * 75
+                && bot.Frame < 22.4 * 110)
             {
                 WorkerScoutTask.Task.Stopped = true;
                 WorkerScoutTask.Task.Clear();
             }
 
             if ((ZealotRushSuspected
-                || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) > 0
+                || bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) > 0
                 || WorkerRushDetected)
-                && tyr.Frame >= 22.4 * 110)
+                && bot.Frame >= 22.4 * 110)
             {
                 WorkerScoutTask.Task.Stopped = true;
                 WorkerScoutTask.Task.Clear();
@@ -462,11 +462,11 @@ namespace Tyr.Builds.Terran
                 TransformTask.Task.HellionsToHellbats();
             TransformTask.Task.ThorsToSingleTarget();
 
-            if (!ZealotRushConfirmed && Bot.Main.EnemyRace == Race.Protoss && tyr.Frame < 22.4 * 60 * 4 && Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZEALOT) >= 5)
+            if (!ZealotRushConfirmed && Bot.Main.EnemyRace == Race.Protoss && bot.Frame < 22.4 * 60 * 4 && Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZEALOT) >= 5)
                 ZealotRushConfirmed = true;
 
             if (ZealotRushConfirmed && Completed(UnitTypes.HELLION) + Completed(UnitTypes.HELLBAT) + Completed(UnitTypes.MARAUDER) < 6)
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.COMMAND_CENTER && agent.Unit.BuildProgress < 0.99 && agent.DistanceSq(Main.BaseLocation.Pos) >= 4 * 4)
                         agent.Order(Abilities.CANCEL);
 
@@ -480,125 +480,125 @@ namespace Tyr.Builds.Terran
 
             if (!CannonsDetected)
             {
-                if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) > 0
-                    || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.FORGE) > 0)
+                if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) > 0
+                    || bot.EnemyStrategyAnalyzer.Count(UnitTypes.FORGE) > 0)
                     CannonsDetected = true;
             }
 
             if (WorkerRushDefenseTask.Task.WorkerRushHappening)
                 WorkerRushDetected = true;
 
-            if (ScanTimingsSet && tyr.OrbitalAbilityManager.ScanCommands.Count == 0)
-                tyr.OrbitalAbilityManager.SaveEnergy = 0;
+            if (ScanTimingsSet && bot.OrbitalAbilityManager.ScanCommands.Count == 0)
+                bot.OrbitalAbilityManager.SaveEnergy = 0;
             else
-                tyr.OrbitalAbilityManager.SaveEnergy = 50;
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.FORGE) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOTON_CANNON) > 0
-                && tyr.Frame >= 22.4 * 60f * 2.5
+                bot.OrbitalAbilityManager.SaveEnergy = 50;
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.FORGE) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOTON_CANNON) > 0
+                && bot.Frame >= 22.4 * 60f * 2.5
                 && !ScanTimingsSet)
             {
                 ScanTimingsSet = true;
                 if (!EarlyScanSet)
                 {
                     EarlyScanSet = true;
-                    tyr.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
+                    bot.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
                     {
-                        Pos = tyr.TargetManager.PotentialEnemyStartLocations[0],
+                        Pos = bot.TargetManager.PotentialEnemyStartLocations[0],
                         FromFrame = (int)(22.4 * 60 * 3.5)
                     });
                 }
             }
 
-            if (tyr.Frame >= (int)(22.4 * 60f * 2.5)
+            if (bot.Frame >= (int)(22.4 * 60f * 2.5)
                 && !EarlyScanSet
-                && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) == 1
-                && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.FORGE) == 0
-                && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER) == 0
-                && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ADEPT) == 0
-                && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ADEPT_PHASE_SHIFT) == 0)
+                && bot.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) == 1
+                && bot.EnemyStrategyAnalyzer.Count(UnitTypes.FORGE) == 0
+                && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER) == 0
+                && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ADEPT) == 0
+                && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ADEPT_PHASE_SHIFT) == 0)
             {
                 EarlyScanSet = true;
-                tyr.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
+                bot.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
                 {
-                    Pos = tyr.TargetManager.PotentialEnemyStartLocations[0],
+                    Pos = bot.TargetManager.PotentialEnemyStartLocations[0],
                     FromFrame = (int)(22.4 * 60 * 3)
                 });
             }
 
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.GATEWAY) >= 2
-                && (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.CYBERNETICS_CORE) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ASSIMILATOR) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ADEPT) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ADEPT_PHASE_SHIFT) > 0)
-                && tyr.Frame >= 22.4 * 60f * 2.5
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.GATEWAY) >= 2
+                && (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.CYBERNETICS_CORE) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ASSIMILATOR) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ADEPT) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ADEPT_PHASE_SHIFT) > 0)
+                && bot.Frame >= 22.4 * 60f * 2.5
                 && !ScanTimingsSet)
             {
                 ScanTimingsSet = true;
                 if (!EarlyScanSet)
                 {
                     EarlyScanSet = true;
-                    tyr.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
+                    bot.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
                     {
-                        Pos = tyr.TargetManager.PotentialEnemyStartLocations[0],
+                        Pos = bot.TargetManager.PotentialEnemyStartLocations[0],
                         FromFrame = (int)(22.4 * 60 * 3)
                     });
                 }
-                tyr.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
+                bot.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
                 {
-                    Pos = tyr.TargetManager.PotentialEnemyStartLocations[0],
+                    Pos = bot.TargetManager.PotentialEnemyStartLocations[0],
                     FromFrame = (int)(22.4 * 60 * 11.5)
                 });
-                tyr.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
+                bot.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
                 {
-                    Pos = tyr.MapAnalyzer.GetEnemyNatural().Pos,
+                    Pos = bot.MapAnalyzer.GetEnemyNatural().Pos,
                     FromFrame = (int)(22.4 * 60 * 11.5 + 22.4)
                 });
 
             }
 
-            if (!GatewayPushDetected && !ScanTimingsSet && tyr.Frame >= 22.4 * 60f * 2.75)
+            if (!GatewayPushDetected && !ScanTimingsSet && bot.Frame >= 22.4 * 60f * 2.75)
             {
                 ScanTimingsSet = true;
-                tyr.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
+                bot.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
                 {
-                    Pos = tyr.TargetManager.PotentialEnemyStartLocations[0],
+                    Pos = bot.TargetManager.PotentialEnemyStartLocations[0],
                     FromFrame = (int)(22.4 * 60 * 4)
                 });
-                tyr.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
+                bot.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
                 {
-                    Pos = tyr.TargetManager.PotentialEnemyStartLocations[0],
+                    Pos = bot.TargetManager.PotentialEnemyStartLocations[0],
                     FromFrame = (int)(22.4 * 60 * 5.5)
                 });
-                tyr.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
+                bot.OrbitalAbilityManager.ScanCommands.Add(new ScanCommand()
                 {
-                    Pos = tyr.MapAnalyzer.GetEnemyNatural().Pos,
+                    Pos = bot.MapAnalyzer.GetEnemyNatural().Pos,
                     FromFrame = (int)(22.4 * 60 * 5.5 + 22.4)
                 });
             }
 
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.DARK_SHRINE)
-                + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.DARK_TEMPLAR)
-                + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.TWILIGHT_COUNSEL) > 0)
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.DARK_SHRINE)
+                + bot.EnemyStrategyAnalyzer.Count(UnitTypes.DARK_TEMPLAR)
+                + bot.EnemyStrategyAnalyzer.Count(UnitTypes.TWILIGHT_COUNSEL) > 0)
                 DTsSuspected = true;
 
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.STARGATE)
-                + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.VOID_RAY)
-                + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.CARRIER)
-                + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.INTERCEPTOR)
-                + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.TEMPEST)
-                + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.PHOENIX)
-                + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ORACLE) > 0)
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.STARGATE)
+                + bot.EnemyStrategyAnalyzer.Count(UnitTypes.VOID_RAY)
+                + bot.EnemyStrategyAnalyzer.Count(UnitTypes.CARRIER)
+                + bot.EnemyStrategyAnalyzer.Count(UnitTypes.INTERCEPTOR)
+                + bot.EnemyStrategyAnalyzer.Count(UnitTypes.TEMPEST)
+                + bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOENIX)
+                + bot.EnemyStrategyAnalyzer.Count(UnitTypes.ORACLE) > 0)
                 SkyTossDetected = true;
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON)
-                    + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.SHIELD_BATTERY) >= 6
-                    && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ROBOTICS_FACILITY) == 0
-                    && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) < 4)
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON)
+                    + bot.EnemyStrategyAnalyzer.Count(UnitTypes.SHIELD_BATTERY) >= 6
+                    && bot.EnemyStrategyAnalyzer.Count(UnitTypes.ROBOTICS_FACILITY) == 0
+                    && bot.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) < 4)
                 SkyTossDetected = true;
 
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) > 0)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) > 0)
             {
                 TimingAttackTask.Task.BeforeControllers = new List<CustomController>();
                 TransformTask.Task.Priority = 10;
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.COMMAND_CENTER
                 && Completed(UnitTypes.BARRACKS) > 0
@@ -638,7 +638,7 @@ namespace Tyr.Builds.Terran
                     && Count(UnitTypes.VIKING_FIGHTER) + Count(UnitTypes.LIBERATOR) + Count(UnitTypes.MEDIVAC) < Completed(UnitTypes.VIKING_FIGHTER) + Completed(UnitTypes.LIBERATOR) + Completed(UnitTypes.MEDIVAC) + 2
                     && Minerals() <= 200)
                     return;
-                if (!tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
+                if (!bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
                 {
                     if (Count(UnitTypes.MARINE) >= 4 && !WorkerRushDetected)
                     {
@@ -653,7 +653,7 @@ namespace Tyr.Builds.Terran
                         && (!CannonsDetected || Count(UnitTypes.SIEGE_TANK) > 0))
                         agent.Order(560);
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.BARRACKS_TECH_LAB)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.BARRACKS_TECH_LAB)
                 {
                     if (Minerals() >= 100
                         && Gas() >= 25
@@ -669,7 +669,7 @@ namespace Tyr.Builds.Terran
                         && (!OraclesDetected || Count(UnitTypes.VIKING_FIGHTER) > 0 || Count(UnitTypes.MARINE) < 8))
                         agent.Order(560);
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.BARRACKS_REACTOR)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.BARRACKS_REACTOR)
                 {
                     if (StalkerEmergency && Completed(UnitTypes.SIEGE_TANK) >= 2 && Completed(UnitTypes.MARAUDER) >= 4
                         && Count(UnitTypes.COMMAND_CENTER) < 2)
@@ -688,18 +688,18 @@ namespace Tyr.Builds.Terran
                     && FoodLeft() >= 2
                     && Count(UnitTypes.HELLION) < 4
                     && CannonDefenseDetected
-                    && (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER)
-                        + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.IMMORTAL)
-                        + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.VOID_RAY) == 0 || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.NEXUS) < 2)
-                    && tyr.Frame >= 22.4 * 60 * 3
+                    && (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER)
+                        + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.IMMORTAL)
+                        + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.VOID_RAY) == 0 || bot.EnemyStrategyAnalyzer.Count(UnitTypes.NEXUS) < 2)
+                    && bot.Frame >= 22.4 * 60 * 3
                     && Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) < 6)
                 {
                     agent.Order(595);
                     return;
                 }
                 if (SkyTossDetected
-                    && tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag)
-                    && tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB
+                    && bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag)
+                    && bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB
                     && Count(UnitTypes.CYCLONE) < 2)
                 {
                     if (Minerals() >= 150
@@ -713,11 +713,11 @@ namespace Tyr.Builds.Terran
                     && (Completed(UnitTypes.STARPORT_REACTOR) == 0 || Count(UnitTypes.VIKING_FIGHTER) >= Completed(UnitTypes.VIKING_FIGHTER) + 2)
                     && Minerals() <= 300)
                     return;
-                if (!tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
+                if (!bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
                 {
                     if (CannonsDetected)
                         agent.Order(454);
-                    else if (Count(UnitTypes.FACTORY_TECH_LAB) <= Count(UnitTypes.FACTORY_REACTOR) || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) > 0)
+                    else if (Count(UnitTypes.FACTORY_TECH_LAB) <= Count(UnitTypes.FACTORY_REACTOR) || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) > 0)
                     {
                         if (!ZealotRushSuspected || CannonsDetected)
                             agent.Order(454);
@@ -735,12 +735,12 @@ namespace Tyr.Builds.Terran
                     else
                         agent.Order(455);
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB)
                 {
                     if ((!CannonsDetected || Count(UnitTypes.SIEGE_TANK) <= Count(UnitTypes.CYCLONE))
                         && (CannonsDetected || Count(UnitTypes.SIEGE_TANK) < 3 || !SkyTossDetected)
                         && (Count(UnitTypes.SIEGE_TANK) < 2 || !SkyTossDetected || Count(UnitTypes.THOR) >= 2)
-                        && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) == 0
+                        && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) == 0
                         && (!FourGateStalkerSuspected || Count(UnitTypes.SIEGE_TANK) <= Count(UnitTypes.CYCLONE) || Count(UnitTypes.SIEGE_TANK) < 3))
                     {
                         if (Minerals() >= 150
@@ -765,7 +765,7 @@ namespace Tyr.Builds.Terran
                             agent.Order(597);
                     }
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_REACTOR
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_REACTOR
                     && Minerals() >= 100
                     && (!SkyTossDetected || Count(UnitTypes.THOR) >= 2))
                 {
@@ -780,7 +780,7 @@ namespace Tyr.Builds.Terran
             }
             else if (agent.Unit.UnitType == UnitTypes.STARPORT)
             {
-                if (!tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
+                if (!bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
                 {
                     if (DTsSuspected && Count(UnitTypes.STARPORT_TECH_LAB) == 0)
                     {
@@ -805,7 +805,7 @@ namespace Tyr.Builds.Terran
                         && FoodLeft() >= 2)
                         agent.Order(624);
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_REACTOR)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_REACTOR)
                 {
                     if (Count(UnitTypes.VIKING_FIGHTER) < DesiredVikings)
                     {
@@ -830,7 +830,7 @@ namespace Tyr.Builds.Terran
                             agent.Order(626);
                     }
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_TECH_LAB)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_TECH_LAB)
                 {
                     if (Minerals() > 100
                         && Gas() >= 200

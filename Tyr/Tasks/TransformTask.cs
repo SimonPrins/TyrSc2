@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class TransformTask : Task
     {
@@ -57,7 +57,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             List<Agent> done = new List<Agent>();
             foreach (Agent agent in units)

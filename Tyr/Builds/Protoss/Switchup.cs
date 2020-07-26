@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class Switchup : Build
     {
@@ -56,11 +56,11 @@ namespace Tyr.Builds.Protoss
             }
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
         }
     }

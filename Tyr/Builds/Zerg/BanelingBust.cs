@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Zerg
+namespace SC2Sharp.Builds.Zerg
 {
     public class BanelingBust : Build
     {
@@ -24,7 +24,7 @@ namespace Tyr.Builds.Zerg
             SafeZerglingsFromReapersTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new FleeCyclonesController());
             MicroControllers.Add(new HitAndRunController());
@@ -52,7 +52,7 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Gas() >= 100 || UpgradeType.LookUp[UpgradeType.MetabolicBoost].Started())
                 GasWorkerTask.WorkersPerGas = 0;

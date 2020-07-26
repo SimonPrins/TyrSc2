@@ -1,10 +1,10 @@
 ﻿using System;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Terran
+namespace SC2Sharp.Builds.Terran
 {
     public class CycloneRush : Build
     {
@@ -25,7 +25,7 @@ namespace Tyr.Builds.Terran
             return "CycloneRush";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new DodgeBallController());
@@ -73,13 +73,13 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.RequiredSize = 12;
             TimingAttackTask.Task.RetreatSize = 4;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.COMMAND_CENTER
                 && Completed(UnitTypes.BARRACKS) > 0
@@ -115,11 +115,11 @@ namespace Tyr.Builds.Terran
             }
             else if (agent.Unit.UnitType == UnitTypes.FACTORY)
             {
-                if (!tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
+                if (!bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
                 {
                     agent.Order(454);
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB)
                 {
                     if (Minerals() >= 150
                         && Gas() >= 100

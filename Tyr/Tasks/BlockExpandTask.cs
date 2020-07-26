@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class BlockExpandTask : Task
     {
@@ -39,11 +39,11 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Target == null)
-                Target = tyr.MapAnalyzer.GetEnemyNatural().Pos;
-            if (Target != null && tyr.Frame % 5 == 0)
+                Target = bot.MapAnalyzer.GetEnemyNatural().Pos;
+            if (Target != null && bot.Frame % 5 == 0)
                 foreach (Agent agent in Units)
                 {
                     if (agent.Unit.Orders.Count < 7)

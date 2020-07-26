@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class NexusAbilityManager : Manager
     {
@@ -15,24 +15,24 @@ namespace Tyr.Managers
 
         private Dictionary<ulong, int> NotReadyFrame = new Dictionary<ulong, int>();
 
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
-            if (tyr.GameInfo.PlayerInfo[(int)tyr.PlayerId - 1].RaceActual != Race.Protoss
+            if (bot.GameInfo.PlayerInfo[(int)bot.PlayerId - 1].RaceActual != Race.Protoss
                 || Stopped)
                 return;
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
                 if (agent.Unit.UnitType == UnitTypes.NEXUS)
                 {
                     if (agent.Unit.BuildProgress <= 0.999)
                     {
                         if (NotReadyFrame.ContainsKey(agent.Unit.Tag))
-                            NotReadyFrame[agent.Unit.Tag] = tyr.Frame;
+                            NotReadyFrame[agent.Unit.Tag] = bot.Frame;
                         else
-                            NotReadyFrame.Add(agent.Unit.Tag, tyr.Frame);
+                            NotReadyFrame.Add(agent.Unit.Tag, bot.Frame);
                         continue;
                     }
                     if (NotReadyFrame.ContainsKey(agent.Unit.Tag)
-                        && tyr.Frame - NotReadyFrame[agent.Unit.Tag] < 4)
+                        && bot.Frame - NotReadyFrame[agent.Unit.Tag] < 4)
                         continue;
                     findTarget(agent);
                 }

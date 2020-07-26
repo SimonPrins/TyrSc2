@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class DTArchon : Build
     {
@@ -18,23 +18,23 @@ namespace Tyr.Builds.Protoss
             return "DTArchon";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            tyr.TaskManager.Add(new DefenseTask());
-            tyr.TaskManager.Add(attackTask);
-            //tyr.TaskManager.Add(aMoveTask);
-            tyr.TaskManager.Add(new WorkerScoutTask());
+            bot.TaskManager.Add(new DefenseTask());
+            bot.TaskManager.Add(attackTask);
+            //bot.TaskManager.Add(aMoveTask);
+            bot.TaskManager.Add(new WorkerScoutTask());
 
 
 
-            tyr.TaskManager.Add(new ArchonMergeTask());
+            bot.TaskManager.Add(new ArchonMergeTask());
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            Point2D main = SC2Util.To2D(tyr.MapAnalyzer.StartLocation);
+            Point2D main = SC2Util.To2D(bot.MapAnalyzer.StartLocation);
             Base mainBase = null;
-            foreach (Base b in tyr.BaseManager.Bases)
+            foreach (Base b in bot.BaseManager.Bases)
             {
                 if (SC2Util.DistanceSq(b.BaseLocation.Pos, main) <= 6 * 6)
                 {
@@ -45,7 +45,7 @@ namespace Tyr.Builds.Protoss
 
             if (!enemyHasDetection)
             {
-                foreach (Unit unit in tyr.Enemies())
+                foreach (Unit unit in bot.Enemies())
                 {
                     if (unit.UnitType == UnitTypes.OVERSEER
                         || unit.UnitType == UnitTypes.SPORE_CRAWLER
@@ -55,7 +55,7 @@ namespace Tyr.Builds.Protoss
                         || unit.UnitType == UnitTypes.MISSILE_TURRET)
                     {
                         enemyHasDetection = true;
-                        tyr.TaskManager.Add(new ArchonMergeTask());
+                        bot.TaskManager.Add(new ArchonMergeTask());
                         break;
                     }
                 }
@@ -114,7 +114,7 @@ namespace Tyr.Builds.Protoss
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

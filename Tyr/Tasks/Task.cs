@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Micro;
+using SC2Sharp.Agents;
+using SC2Sharp.Micro;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public abstract class Task
     {
@@ -21,16 +21,16 @@ namespace Tyr.Tasks
             Priority = priority;
         }
 
-        public void Cleanup(Bot tyr)
+        public void Cleanup(Bot bot)
         {
             // Remove units that are already dead.
             for (int i = units.Count - 1; i >= 0 ; i--)
-                if (!tyr.UnitManager.Agents.ContainsKey(units[i].Unit.Tag))
+                if (!bot.UnitManager.Agents.ContainsKey(units[i].Unit.Tag))
                     units.RemoveAt(i);
         }
 
         public abstract bool IsNeeded();
-        public abstract void OnFrame(Bot tyr);
+        public abstract void OnFrame(Bot bot);
         public abstract bool DoWant(Agent agent);
         public int Priority { get; set; }
         public virtual List<UnitDescriptor> GetDescriptors()

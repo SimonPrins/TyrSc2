@@ -1,6 +1,6 @@
-﻿using Tyr.Managers;
+﻿using SC2Sharp.Managers;
 
-namespace Tyr.Builds.BuildLists
+namespace SC2Sharp.Builds.BuildLists
 {
     public class BuildingAtBase
     {

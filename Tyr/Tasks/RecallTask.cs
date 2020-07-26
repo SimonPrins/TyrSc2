@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class RecallTask : Task
     {
@@ -36,7 +36,7 @@ namespace Tyr.Tasks
             return Location != null;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Location == null)
             {
@@ -45,7 +45,7 @@ namespace Tyr.Tasks
                 return;
             }
             if (RecallFrame == -1)
-                RecallFrame = tyr.Frame;
+                RecallFrame = bot.Frame;
 
             bool cleared = false;
             for (int i = Units.Count - 1; i >= 0; i--)
@@ -65,9 +65,9 @@ namespace Tyr.Tasks
                 if (agent.DistanceSq(Location) >= 2.5 * 2.5)
                     tooFar = true;
             }
-            if (!tooFar || tyr.Frame - RecallFrame >= 22.4 * 10)
+            if (!tooFar || bot.Frame - RecallFrame >= 22.4 * 10)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.NEXUS)
                         continue;

@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class DefenseTask : Task
     {
@@ -142,7 +142,7 @@ namespace Tyr.Tasks
             return Target;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             Unit target = GetTarget();
 
@@ -158,7 +158,7 @@ namespace Tyr.Tasks
             {
                 if (UseForceFields && ForceFieldUtil.Place(agent))
                     continue;
-                tyr.MicroController.Attack(agent, SC2Util.To2D(target.Pos));
+                bot.MicroController.Attack(agent, SC2Util.To2D(target.Pos));
             }
         }
 

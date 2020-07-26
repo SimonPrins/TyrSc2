@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Micro;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Micro;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class WorkerRushTask : Task
     {
@@ -70,21 +70,21 @@ namespace Tyr.Tasks
             TakeWorkers--;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             ulong mineral = 0;
-            if (tyr.BaseManager.Main.BaseLocation.MineralFields.Count > 0)
-                mineral = tyr.BaseManager.Main.BaseLocation.MineralFields[0].Tag;
+            if (bot.BaseManager.Main.BaseLocation.MineralFields.Count > 0)
+                mineral = bot.BaseManager.Main.BaseLocation.MineralFields[0].Tag;
 
             if (!Close)
             {
                 foreach (Agent agent in units)
                 {
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.AttackTarget);
-                    if (agent.DistanceSq(tyr.TargetManager.AttackTarget) <= 15 * 15)
+                    agent.Order(Abilities.MOVE, bot.TargetManager.AttackTarget);
+                    if (agent.DistanceSq(bot.TargetManager.AttackTarget) <= 15 * 15)
                         Close = true;
                     int closeEnemies = 0;
-                    foreach (Unit enemy in tyr.Enemies())
+                    foreach (Unit enemy in bot.Enemies())
                     {
                         if (agent.DistanceSq(enemy) <= 10 * 10)
                             closeEnemies++;
@@ -105,7 +105,7 @@ namespace Tyr.Tasks
                 if (regenerating.Contains(agent.Unit.Tag))
                 {
                     bool flee = false;
-                    foreach (Unit enemy in tyr.Observation.Observation.RawData.Units)
+                    foreach (Unit enemy in bot.Observation.Observation.RawData.Units)
                     {
                         if (enemy.Alliance != Alliance.Enemy)
                             continue;
@@ -122,12 +122,12 @@ namespace Tyr.Tasks
                     if (flee)
                     {
                         if (mineral == 0)
-                            agent.Order(Abilities.MOVE, SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
+                            agent.Order(Abilities.MOVE, SC2Util.To2D(bot.MapAnalyzer.StartLocation));
                         else
                             agent.Order(Abilities.MOVE, mineral);
                     }
                     else
-                        agent.Order(Abilities.ATTACK, tyr.TargetManager.AttackTarget);
+                        agent.Order(Abilities.ATTACK, bot.TargetManager.AttackTarget);
                 }
                 else
                 {
@@ -135,7 +135,7 @@ namespace Tyr.Tasks
                     if (broodling != null || agent.Unit.WeaponCooldown > 6)
                     {
                         if (mineral == 0)
-                            agent.Order(Abilities.MOVE, SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
+                            agent.Order(Abilities.MOVE, SC2Util.To2D(bot.MapAnalyzer.StartLocation));
                         else
                             agent.Order(Abilities.MOVE, mineral);
                         continue;
@@ -146,7 +146,7 @@ namespace Tyr.Tasks
                         && !UnitTypes.BuildingTypes.Contains(closeTarget.UnitType))
                     {
                         //agent.Order(Abilities.ATTACK, closeTarget.Tag);
-                        agent.Order(Abilities.ATTACK, tyr.TargetManager.AttackTarget);
+                        agent.Order(Abilities.ATTACK, bot.TargetManager.AttackTarget);
                         continue;
                     }
 
@@ -158,10 +158,10 @@ namespace Tyr.Tasks
                         continue;
                     }
                     if (MoveCommandWhenSafe
-                       && MoveWhenSafeController.DetermineAction(agent, tyr.TargetManager.AttackTarget))
+                       && MoveWhenSafeController.DetermineAction(agent, bot.TargetManager.AttackTarget))
                         continue;
 
-                    agent.Order(Abilities.ATTACK, tyr.TargetManager.AttackTarget);
+                    agent.Order(Abilities.ATTACK, bot.TargetManager.AttackTarget);
                 }
             }
         }

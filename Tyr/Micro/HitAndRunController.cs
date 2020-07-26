@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
 
-namespace Tyr.Micro
+namespace SC2Sharp.Micro
 {
     public class HitAndRunController : CustomController
     {

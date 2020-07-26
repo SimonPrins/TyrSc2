@@ -1,9 +1,9 @@
-﻿using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.Tasks;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class OneBaseAdept : Build
     {
@@ -16,13 +16,13 @@ namespace Tyr.Builds.Protoss
             return "OneBaseAdept";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            tyr.TaskManager.Add(new DefenseTask());
-            tyr.TaskManager.Add(attackTask);
-            tyr.TaskManager.Add(new WorkerScoutTask());
-            if (tyr.BaseManager.Pocket != null)
-                tyr.TaskManager.Add(new ScoutProxyTask(tyr.BaseManager.Pocket.BaseLocation.Pos));
+            bot.TaskManager.Add(new DefenseTask());
+            bot.TaskManager.Add(attackTask);
+            bot.TaskManager.Add(new WorkerScoutTask());
+            if (bot.BaseManager.Pocket != null)
+                bot.TaskManager.Add(new ScoutProxyTask(bot.BaseManager.Pocket.BaseLocation.Pos));
 
             MicroControllers.Add(AdeptPhaseEnemyMainController);
             MicroControllers.Add(FearSpinesController);
@@ -46,10 +46,10 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         { }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

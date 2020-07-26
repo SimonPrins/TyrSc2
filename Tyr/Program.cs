@@ -4,12 +4,12 @@ using System.Globalization;
 using System.Linq;
 using SC2API_CSharp;
 using SC2APIProtocol;
-using Tyr.Builds;
-using Tyr.buildSelection;
-using Tyr.BuildSelection;
-using Tyr.Util;
+using SC2Sharp.Builds;
+using SC2Sharp.buildSelection;
+using SC2Sharp.BuildSelection;
+using SC2Sharp.Util;
 
-namespace Tyr
+namespace SC2Sharp
 {
     public class Program
     {
@@ -24,7 +24,7 @@ namespace Tyr
             }
             */
 
-            Bot tyr = new Bot();
+            Bot bot = new Bot();
             string[] settings = FileUtil.ReadSettingsFile();
             foreach (string line in settings)
             {
@@ -65,19 +65,19 @@ namespace Tyr
                 }
                 if (!extension)
                 {
-                    DebugUtil.WriteLine("This version of Tyr is only valid until " + ValidUntil.ToShortDateString() + ". It is only intended for week " + tyr.VersionNumber + " of Probots. Are you sure you have the latest version? If you want to ignore this error for today you should set extendTime to " + now + " in the settings.txt file.");
-                    FileUtil.Log("This version of Tyr is only valid until " + ValidUntil.ToShortDateString() + ". It is only intended for week " + tyr.VersionNumber + " of Probots. Are you sure you have the latest version? If you want to ignore this error for today you should set extendTime to " + now + " in the settings.txt file.");
+                    DebugUtil.WriteLine("This version of Tyr is only valid until " + ValidUntil.ToShortDateString() + ". It is only intended for week " + bot.VersionNumber + " of Probots. Are you sure you have the latest version? If you want to ignore this error for today you should set extendTime to " + now + " in the settings.txt file.");
+                    FileUtil.Log("This version of Tyr is only valid until " + ValidUntil.ToShortDateString() + ". It is only intended for week " + bot.VersionNumber + " of Probots. Are you sure you have the latest version? If you want to ignore this error for today you should set extendTime to " + now + " in the settings.txt file.");
                     System.Console.ReadLine();
-                    throw new Exception("This version of Tyr is only valid until " + ValidUntil.ToShortDateString() + ". It is only intended for week " + tyr.VersionNumber + " of Probots. Are you sure you have the latest version? If you want to ignore this error for today you should set extendTime to " + now + " in the settings.txt file.");
+                    throw new Exception("This version of Tyr is only valid until " + ValidUntil.ToShortDateString() + ". It is only intended for week " + bot.VersionNumber + " of Probots. Are you sure you have the latest version? If you want to ignore this error for today you should set extendTime to " + now + " in the settings.txt file.");
                 }
             }
 
-            tyr.OnInitialize();
+            bot.OnInitialize();
 
-            ReadBuildFile(tyr);
-            DetermineBuildsProvider(tyr);
-            DetermineBuildSelector(tyr);
-            DetermineProbotsChat(tyr);
+            ReadBuildFile(bot);
+            DetermineBuildsProvider(bot);
+            DetermineBuildSelector(bot);
+            DetermineProbotsChat(bot);
 
 
             string arguments = "Commandline args: ";
@@ -87,12 +87,12 @@ namespace Tyr
             FileUtil.Log(arguments);
 
             GameConnection gameConnection = new GameConnection();
-            tyr.GameConnection = gameConnection;
+            bot.GameConnection = gameConnection;
 
             if (args.Length == 0)
-                gameConnection.RunSinglePlayer(tyr, RandomMap(), MyRace, Race.Terran, Difficulty.VeryHard).Wait();
+                gameConnection.RunSinglePlayer(bot, RandomMap(), MyRace, Race.Terran, Difficulty.VeryHard).Wait();
             else
-                gameConnection.RunLadder(tyr, MyRace, args).Wait();
+                gameConnection.RunLadder(bot, MyRace, args).Wait();
         }
 
         private static string RandomMap()
@@ -115,7 +115,7 @@ namespace Tyr
             return maps[rand.Next(maps.Count)];
         }
 
-        private static void ReadBuildFile(Bot tyr)
+        private static void ReadBuildFile(Bot bot)
         {
             foreach (string line in FileUtil.ReadBuildFile())
             {
@@ -140,14 +140,14 @@ namespace Tyr
                     Build build = (Build)Activator.CreateInstance(buildType);
                     if (build.Name() == words[1])
                     {
-                        tyr.FixedBuild = build;
+                        bot.FixedBuild = build;
                         break;
                     }
                 }
             }
         }
 
-        private static void DetermineBuildsProvider(Bot tyr)
+        private static void DetermineBuildsProvider(Bot bot)
         {
             string[] settings = FileUtil.ReadSettingsFile();
             foreach (string line in settings)
@@ -165,7 +165,7 @@ namespace Tyr
                     if (buildsProviderType.FullName.Substring(buildsProviderType.FullName.LastIndexOf('.') + 1) == buildsProviderName)
                     {
                         BuildsProvider buildsProvider = (BuildsProvider)Activator.CreateInstance(buildsProviderType);
-                        tyr.BuildsProvider = buildsProvider;
+                        bot.BuildsProvider = buildsProvider;
                         DebugUtil.WriteLine("Found buildsProvider: " + buildsProviderName);
                         break;
                     }
@@ -173,7 +173,7 @@ namespace Tyr
             }
         }
 
-        private static void DetermineBuildSelector(Bot tyr)
+        private static void DetermineBuildSelector(Bot bot)
         {
             string[] settings = FileUtil.ReadSettingsFile();
             foreach (string line in settings)
@@ -191,14 +191,14 @@ namespace Tyr
                     if (buildSelectorType.FullName.Substring(buildSelectorType.FullName.LastIndexOf('.') + 1) == buildSelectorName)
                     {
                         BuildSelector buildSelector = (BuildSelector)Activator.CreateInstance(buildSelectorType);
-                        tyr.BuildSelector = buildSelector;
+                        bot.BuildSelector = buildSelector;
                         break;
                     }
                 }
             }
         }
 
-        private static void DetermineProbotsChat(Bot tyr)
+        private static void DetermineProbotsChat(Bot bot)
         {
             string[] settings = FileUtil.ReadSettingsFile();
             foreach (string line in settings)
@@ -209,9 +209,9 @@ namespace Tyr
                 if (setting[0].Trim() != "ProbotsChat")
                     continue;
                 if (setting[1].Trim() == "true")
-                    tyr.ProbotsChatMessages = true;
+                    bot.ProbotsChatMessages = true;
                 else if (setting[1].Trim() == "false")
-                    tyr.ProbotsChatMessages = false;
+                    bot.ProbotsChatMessages = false;
             }
         }
     }

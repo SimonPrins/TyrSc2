@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class DistributedDefenseTask : Task
     {
@@ -92,7 +92,7 @@ namespace Tyr.Tasks
             return descriptors;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             Dictionary<ulong, int> assignedDefenders = new Dictionary<ulong, int>();
             Dictionary<ulong, Unit> attackers = GetAttackers();
@@ -166,8 +166,8 @@ namespace Tyr.Tasks
 
             foreach (Agent agent in units)
             {
-                tyr.DrawLine(agent, Targetting[agent.Unit.Tag].Pos);
-                tyr.MicroController.Attack(agent, SC2Util.To2D(Targetting[agent.Unit.Tag].Pos));
+                bot.DrawLine(agent, Targetting[agent.Unit.Tag].Pos);
+                bot.MicroController.Attack(agent, SC2Util.To2D(Targetting[agent.Unit.Tag].Pos));
             }
         }
 

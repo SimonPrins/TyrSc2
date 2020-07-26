@@ -1,7 +1,7 @@
-﻿using Tyr.Agents;
-using Tyr.Util;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ShieldBatteryTargetTask : Task
     {
@@ -25,13 +25,13 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             foreach (Agent battery in units)
             {
                 float dist = 1000000;
                 Agent target = null;
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.Shield < agent.Unit.ShieldMax && (agent.Unit.UnitType == UnitTypes.FORGE || agent.Unit.UnitType == UnitTypes.GATEWAY || agent.Unit.UnitType == UnitTypes.PYLON))
                     {
                         float newDist = SC2Util.DistanceSq(battery.Unit.Pos, agent.Unit.Pos);

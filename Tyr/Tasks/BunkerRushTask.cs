@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.BuildingPlacement;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.BuildingPlacement;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class BunkerRushTask : Task
     {
@@ -76,27 +76,27 @@ namespace Tyr.Tasks
             return HideLocation;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             BuildingType barracksType = BuildingType.LookUp[UnitTypes.BARRACKS];
-            if (Bot.Main.UnitManager.Count(UnitTypes.BARRACKS) < 2 && tyr.Minerals() >= 150 && BuildRequests.Count == 0)
+            if (Bot.Main.UnitManager.Count(UnitTypes.BARRACKS) < 2 && bot.Minerals() >= 150 && BuildRequests.Count == 0)
             {
                 Point2D placement = ProxyBuildingPlacer.FindPlacement(GetHideLocation(), barracksType.Size, UnitTypes.BARRACKS);
                 BuildRequests.Add(new BuildRequest() { Type = UnitTypes.BARRACKS, Pos = placement });
             }
-            else if (Bot.Main.UnitManager.Count(UnitTypes.BUNKER) < 2 && tyr.Minerals() >= 100 && BuildRequests.Count == 0 && tyr.UnitManager.Completed(UnitTypes.BARRACKS) > 0 && tyr.UnitManager.Count(UnitTypes.BARRACKS) >= 2)
+            else if (Bot.Main.UnitManager.Count(UnitTypes.BUNKER) < 2 && bot.Minerals() >= 100 && BuildRequests.Count == 0 && bot.UnitManager.Completed(UnitTypes.BARRACKS) > 0 && bot.UnitManager.Count(UnitTypes.BARRACKS) >= 2)
             {
-                PotentialHelper helper = new PotentialHelper(tyr.MapAnalyzer.GetEnemyNatural().Pos);
+                PotentialHelper helper = new PotentialHelper(bot.MapAnalyzer.GetEnemyNatural().Pos);
                 helper.Magnitude = 4;
-                helper.From(tyr.MapAnalyzer.GetEnemyRamp(), 1);
+                helper.From(bot.MapAnalyzer.GetEnemyRamp(), 1);
                 Point2D placement = ProxyBuildingPlacer.FindPlacement(helper.Get(), barracksType.Size, UnitTypes.BUNKER);
                 BuildRequests.Add(new BuildRequest() { Type = UnitTypes.BUNKER, Pos = placement });
             }
-            else if (Bot.Main.UnitManager.Count(UnitTypes.BUNKER) >= 2 && tyr.Minerals() >= 100 && BuildRequests.Count == 0 && tyr.UnitManager.Count(UnitTypes.SIEGE_TANK) >= 2 && tyr.UnitManager.Count(UnitTypes.BARRACKS) >= 2 && tyr.UnitManager.Completed(UnitTypes.ENGINEERING_BAY) >= 1 && tyr.UnitManager.Count(UnitTypes.MISSILE_TURRET) < 2)
+            else if (Bot.Main.UnitManager.Count(UnitTypes.BUNKER) >= 2 && bot.Minerals() >= 100 && BuildRequests.Count == 0 && bot.UnitManager.Count(UnitTypes.SIEGE_TANK) >= 2 && bot.UnitManager.Count(UnitTypes.BARRACKS) >= 2 && bot.UnitManager.Completed(UnitTypes.ENGINEERING_BAY) >= 1 && bot.UnitManager.Count(UnitTypes.MISSILE_TURRET) < 2)
             {
-                PotentialHelper helper = new PotentialHelper(tyr.MapAnalyzer.GetEnemyNatural().Pos);
+                PotentialHelper helper = new PotentialHelper(bot.MapAnalyzer.GetEnemyNatural().Pos);
                 helper.Magnitude = 4;
-                helper.From(tyr.MapAnalyzer.GetEnemyRamp(), 1);
+                helper.From(bot.MapAnalyzer.GetEnemyRamp(), 1);
                 Point2D placement = ProxyBuildingPlacer.FindPlacement(helper.Get(), new Point2D() { X = 2, Y = 2}, UnitTypes.MISSILE_TURRET);
                 BuildRequests.Add(new BuildRequest() { Type = UnitTypes.MISSILE_TURRET, Pos = placement });
             }
@@ -122,7 +122,7 @@ namespace Tyr.Tasks
                     doneRequests.Add(request);
                     continue;
                 }
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                 {
                     if (agent.Unit.UnitType == request.Type
                         && agent.DistanceSq(request.Pos) < 4)
@@ -137,7 +137,7 @@ namespace Tyr.Tasks
                 BuildRequests.Remove(request);
 
             Agent bunker = null;
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType != UnitTypes.BUNKER)
                     continue;
@@ -147,7 +147,7 @@ namespace Tyr.Tasks
                     bunker = agent;
             }
             Agent bc = null;
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType != UnitTypes.BATTLECRUISER)
                     continue;
@@ -179,7 +179,7 @@ namespace Tyr.Tasks
                     else if (bc != null)
                         agent.Order(Abilities.REPAIR, bc.Unit.Tag);
                     else
-                        agent.Order(Abilities.MOVE, bunker.From(tyr.TargetManager.PotentialEnemyStartLocations[0], 3));
+                        agent.Order(Abilities.MOVE, bunker.From(bot.TargetManager.PotentialEnemyStartLocations[0], 3));
                     continue;
                 }
 

@@ -1,16 +1,16 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class MacroToss : Build
     {
@@ -32,21 +32,21 @@ namespace Tyr.Builds.Protoss
             return "MacroToss";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             DefenseTask.Enable();
-            tyr.TaskManager.Add(attackTask);
-            tyr.TaskManager.Add(WorkerScoutTask);
-            tyr.TaskManager.Add(new ObserverScoutTask());
-            tyr.TaskManager.Add(new ArmyObserverTask());
-            tyr.TaskManager.Add(new AdeptScoutTask());
-            tyr.TaskManager.Add(TimedObserverTask);
+            bot.TaskManager.Add(attackTask);
+            bot.TaskManager.Add(WorkerScoutTask);
+            bot.TaskManager.Add(new ObserverScoutTask());
+            bot.TaskManager.Add(new ArmyObserverTask());
+            bot.TaskManager.Add(new AdeptScoutTask());
+            bot.TaskManager.Add(TimedObserverTask);
             PhasedDisruptorTask.Enable();
-            if (tyr.BaseManager.Pocket != null)
-                tyr.TaskManager.Add(new ScoutProxyTask(tyr.BaseManager.Pocket.BaseLocation.Pos));
+            if (bot.BaseManager.Pocket != null)
+                bot.TaskManager.Add(new ScoutProxyTask(bot.BaseManager.Pocket.BaseLocation.Pos));
             ArchonMergeTask.Enable();
 
-            OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
+            OverrideDefenseTarget = bot.MapAnalyzer.Walk(NaturalDefensePos, bot.MapAnalyzer.EnemyDistances, 15);
 
             MicroControllers.Add(new DodgeBallController());
             MicroControllers.Add(FearSpinesController);
@@ -185,12 +185,12 @@ namespace Tyr.Builds.Protoss
             return total - alreadyBuilt >= robos;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             BalanceGas();
 
-            TimedObserverTask.Target = tyr.TargetManager.PotentialEnemyStartLocations[0];
-            TimedObserverTask.Stopped = tyr.Frame < 22.4 * 60 * 6 || tyr.Frame >= 22.4 * 60 * 7 || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.SPIRE) > 0;
+            TimedObserverTask.Target = bot.TargetManager.PotentialEnemyStartLocations[0];
+            TimedObserverTask.Stopped = bot.Frame < 22.4 * 60 * 6 || bot.Frame >= 22.4 * 60 * 7 || bot.EnemyStrategyAnalyzer.Count(UnitTypes.SPIRE) > 0;
             if (TimedObserverTask.Stopped)
                 TimedObserverTask.Clear();
 
@@ -198,22 +198,22 @@ namespace Tyr.Builds.Protoss
                 Attacking = true;
 
             foreach (WallBuilding building in WallIn.Wall)
-                tyr.DrawSphere(new Point() { X = building.Pos.X, Y = building.Pos.Y, Z = tyr.MapAnalyzer.StartLocation.Z });
+                bot.DrawSphere(new Point() { X = building.Pos.X, Y = building.Pos.Y, Z = bot.MapAnalyzer.StartLocation.Z });
 
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.Stopped = Completed(UnitTypes.ZEALOT) >= 5;
             
-            if (Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 5 && tyr.Frame <= 22.4 * 60 * 2)
+            if (Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 5 && bot.Frame <= 22.4 * 60 * 2)
                 SmellCheese = true;
-            if (Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.SPAWNING_POOL) > 0 && tyr.Frame <= 22.4 * 60 * 1.4 && !Expanded.Get().Detected)
+            if (Bot.Main.EnemyStrategyAnalyzer.Count(UnitTypes.SPAWNING_POOL) > 0 && bot.Frame <= 22.4 * 60 * 1.4 && !Expanded.Get().Detected)
                 SmellCheese = true;
             if (!SpinePushDetected && SmellCheese)
             {
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.QUEEN && enemy.UnitType != UnitTypes.SPINE_CRAWLER && enemy.UnitType != UnitTypes.SPINE_CRAWLER_UPROOTED)
                         continue;
-                    if (SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation) <= 50 * 50)
+                    if (SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation) <= 50 * 50)
                     {
                         SpinePushDetected = true;
                         break;
@@ -223,13 +223,13 @@ namespace Tyr.Builds.Protoss
 
             FearSpinesController.Stopped = !SpinePushDetected;
 
-            if (tyr.EnemyRace == Race.Zerg)
+            if (bot.EnemyRace == Race.Zerg)
             {
-                if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK)
-                    + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BROOD_LORD)
-                    + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.CORRUPTOR)
-                    + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.SPIRE)
-                    + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.GREATER_SPIRE) > 0)
+                if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK)
+                    + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BROOD_LORD)
+                    + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.CORRUPTOR)
+                    + bot.EnemyStrategyAnalyzer.Count(UnitTypes.SPIRE)
+                    + bot.EnemyStrategyAnalyzer.Count(UnitTypes.GREATER_SPIRE) > 0)
                     DesiredStalkers = 15;
                 else
                     DesiredStalkers = 2;
@@ -257,14 +257,14 @@ namespace Tyr.Builds.Protoss
 
             if (EarlyPool.Get().Detected && !Expanded.Get().Detected && Completed(UnitTypes.ZEALOT) < 2)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.NEXUS
                         && agent.Unit.BuildProgress < 0.99)
                         agent.Order(Abilities.CANCEL);
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (Count(UnitTypes.PROBE) >= 24
                 && Count(UnitTypes.NEXUS) < 2

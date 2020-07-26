@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class WorkerScoutTask : Task
     {
@@ -57,9 +57,9 @@ namespace Tyr.Tasks
             return ScoutPoints != null && ScoutPoints.Count == 0;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 1 && ScoutPoints == null)
+            if (bot.TargetManager.PotentialEnemyStartLocations.Count == 1 && ScoutPoints == null)
             {
                 ScoutPoints = new List<Point2D>();
                 for (float dx = -15; dx <= 15; dx++)
@@ -70,25 +70,25 @@ namespace Tyr.Tasks
                         if (dx * dx + dy * dy > 15 * 15)
                             continue;
 
-                        ScoutPoints.Add(new Point2D() { X = tyr.TargetManager.PotentialEnemyStartLocations[0].X + dx, Y = tyr.TargetManager.PotentialEnemyStartLocations[0].Y + dy });
+                        ScoutPoints.Add(new Point2D() { X = bot.TargetManager.PotentialEnemyStartLocations[0].X + dx, Y = bot.TargetManager.PotentialEnemyStartLocations[0].Y + dy });
                     }
             }
 
-            Point2D target = tyr.TargetManager.PotentialEnemyStartLocations[0];
-            if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 1 && units.Count > 0 && SC2Util.DistanceSq(units[0].Unit.Pos, target) <= 6 * 6)
+            Point2D target = bot.TargetManager.PotentialEnemyStartLocations[0];
+            if (bot.TargetManager.PotentialEnemyStartLocations.Count == 1 && units.Count > 0 && SC2Util.DistanceSq(units[0].Unit.Pos, target) <= 6 * 6)
                 Done = true;
             
-            if (!Done && tyr.EnemyManager.EnemyBuildings.Count > 0)
+            if (!Done && bot.EnemyManager.EnemyBuildings.Count > 0)
                 Done = true;
             
-            if (ScoutNatural && tyr.Frame > CheckNaturalTimeEnd)
+            if (ScoutNatural && bot.Frame > CheckNaturalTimeEnd)
             {
                 Done = true;
                 Clear();
                 return;
             }
 
-            bool scoutingNatural = ScoutNatural && tyr.Frame > CheckNaturalTimeStart && tyr.TargetManager.PotentialEnemyStartLocations.Count == 1;
+            bool scoutingNatural = ScoutNatural && bot.Frame > CheckNaturalTimeStart && bot.TargetManager.PotentialEnemyStartLocations.Count == 1;
             if (scoutingNatural)
             {
                 GetEnemyNatural();
@@ -130,7 +130,7 @@ namespace Tyr.Tasks
                     }
                     
                     float distance = 6 * 6;
-                    foreach (Unit unit in tyr.Enemies())
+                    foreach (Unit unit in bot.Enemies())
                     {
                         if (!UnitTypes.CombatUnitTypes.Contains(unit.UnitType) && !UnitTypes.WorkerTypes.Contains(unit.UnitType))
                             continue;

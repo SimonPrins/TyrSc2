@@ -1,11 +1,11 @@
 ﻿using System;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.BuildingPlacement
+namespace SC2Sharp.BuildingPlacement
 {
     /*
      * This class is responsible for managing the placement of buildings.

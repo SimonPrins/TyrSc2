@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class PhoenixHarassTask : Task
     {
@@ -39,7 +39,7 @@ namespace Tyr.Tasks
             return Bot.Main.UnitManager.Completed(UnitTypes.PHOENIX) >= RequiredSize;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
 
             Center = new Point2D();
@@ -92,7 +92,7 @@ namespace Tyr.Tasks
 
                 float dist = 15 * 15;
                 Unit attackTarget = null;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (!enemy.IsFlying)
                         continue;
@@ -110,7 +110,7 @@ namespace Tyr.Tasks
                         agent.Order(Abilities.MOVE, SC2Util.To2D(attackTarget.Pos));
                     continue;
                 }
-                if (tyr.Frame % 5 == 0)
+                if (bot.Frame % 5 == 0)
                     agent.Order(Abilities.MOVE, Target);
             }
         }

@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class DTAttackTask : Task
     {
@@ -27,7 +27,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             foreach (Agent agent in units)
             {
@@ -59,7 +59,7 @@ namespace Tyr.Tasks
                 if (retreat)
                     agent.Order(Abilities.MOVE, SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation));
                 else
-                    agent.Order(Abilities.ATTACK, tyr.TargetManager.AttackTarget);
+                    agent.Order(Abilities.ATTACK, bot.TargetManager.AttackTarget);
             }
         }
     }

@@ -1,14 +1,14 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Builds;
-using Tyr.Builds.Protoss;
-using Tyr.StrategyAnalysis;
+using SC2Sharp.Builds;
+using SC2Sharp.Builds.Protoss;
+using SC2Sharp.StrategyAnalysis;
 
-namespace Tyr.buildSelection
+namespace SC2Sharp.buildSelection
 {
     class TycklesBuildsProvider : BuildsProvider
     {
-        public List<Build> GetBuilds(Bot tyr, string[] lines)
+        public List<Build> GetBuilds(Bot bot, string[] lines)
         {
             List<Build> options = new List<Build>();
 

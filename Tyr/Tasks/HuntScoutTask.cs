@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class HuntScoutTask : Task
     {
@@ -46,9 +46,9 @@ namespace Tyr.Tasks
             return Bot.Main.Frame >= StartFrame && !Done;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            foreach (RecentlyDeceased deceased in tyr.EnemyManager.RecentlyDeceased)
+            foreach (RecentlyDeceased deceased in bot.EnemyManager.RecentlyDeceased)
                 if (deceased.UnitType == UnitTypes.PROBE)
                     Done = true;
 
@@ -60,16 +60,16 @@ namespace Tyr.Tasks
 
             Unit probe = null;
             float dist = 10000;
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
                 if (!UnitTypes.WorkerTypes.Contains(enemy.UnitType))
                     continue;
-                float newDist = SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation);
+                float newDist = SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation);
                 if (newDist > dist)
                     continue;
                 dist = newDist;
                 probe = enemy;
-                EnemyFrame = tyr.Frame;
+                EnemyFrame = bot.Frame;
                 if (Units.Count > 0)
                     Enemy = new PotentialHelper(probe.Pos, 2).From(Units[0].Unit.Pos).Get();
                 else
@@ -78,23 +78,23 @@ namespace Tyr.Tasks
 
             foreach (Agent agent in units)
             {
-                float agentDist = agent.DistanceSq(tyr.MapAnalyzer.StartLocation);
+                float agentDist = agent.DistanceSq(bot.MapAnalyzer.StartLocation);
                 if (agentDist >= 80 * 80 && ScoutBases == null)
                 {
                     ScoutBases = new List<Point2D>();
-                    foreach (Base b in tyr.BaseManager.Bases)
+                    foreach (Base b in bot.BaseManager.Bases)
                     {
-                        float mainDist = SC2Util.DistanceSq(b.BaseLocation.Pos, tyr.MapAnalyzer.StartLocation);
+                        float mainDist = SC2Util.DistanceSq(b.BaseLocation.Pos, bot.MapAnalyzer.StartLocation);
                         if (mainDist >= 60 * 60 || mainDist <= 8 * 8)
                             continue;
                         ScoutBases.Add(b.BaseLocation.Pos);
                     }
-                    ScoutBases.Sort((Point2D a, Point2D b) => tyr.MapAnalyzer.MainDistances[(int)a.X, (int)a.Y] - tyr.MapAnalyzer.MainDistances[(int)b.X, (int)b.Y]);
+                    ScoutBases.Sort((Point2D a, Point2D b) => bot.MapAnalyzer.MainDistances[(int)a.X, (int)a.Y] - bot.MapAnalyzer.MainDistances[(int)b.X, (int)b.Y]);
                 }
 
                 if (probe != null)
                     agent.Order(Abilities.ATTACK, probe.Tag);
-                else if (tyr.Frame - EnemyFrame <= 45 && Enemy != null)
+                else if (bot.Frame - EnemyFrame <= 45 && Enemy != null)
                     agent.Order(Abilities.MOVE, Enemy);
                 else if (ScoutBases != null)
                 {
@@ -111,7 +111,7 @@ namespace Tyr.Tasks
                     agent.Order(Abilities.MOVE, ScoutBases[0]);
                 }
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.AttackTarget);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.AttackTarget);
             }
         }
     }

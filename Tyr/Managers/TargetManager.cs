@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class TargetManager : Manager
     {
@@ -20,12 +20,12 @@ namespace Tyr.Managers
         public bool IgnoreFlyingBuildings = false;
         public Point2D CloseTo;
 
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
             if (PotentialEnemyStartLocations.Count > 1 && !enemyMainFound)
             {
                 for (int i = PotentialEnemyStartLocations.Count - 1; i >= 0; i--)
-                    foreach (Unit unit in tyr.Enemies())
+                    foreach (Unit unit in bot.Enemies())
                         if (SC2Util.DistanceSq(unit.Pos, PotentialEnemyStartLocations[i]) <= 6 * 6)
                         {
                             for (; i > 0; i--)
@@ -37,8 +37,8 @@ namespace Tyr.Managers
             if (PotentialEnemyStartLocations.Count > 1)
             {
                 for (int i = PotentialEnemyStartLocations.Count - 1; i >= 0; i--)
-                    foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
-                        if (unit.Owner == tyr.PlayerId && SC2Util.DistanceGrid(unit.Pos, PotentialEnemyStartLocations[i]) <= 5)
+                    foreach (Unit unit in bot.Observation.Observation.RawData.Units)
+                        if (unit.Owner == bot.PlayerId && SC2Util.DistanceGrid(unit.Pos, PotentialEnemyStartLocations[i]) <= 5)
                         {
                             PotentialEnemyStartLocations.RemoveAt(i);
                             break;
@@ -52,7 +52,7 @@ namespace Tyr.Managers
             {
                 float dist = PrefferDistant ? -1 : 1000000;
                 BuildingLocation target = null;
-                foreach (BuildingLocation building in tyr.EnemyManager.EnemyBuildings.Values)
+                foreach (BuildingLocation building in bot.EnemyManager.EnemyBuildings.Values)
                 {
                     if (SkipPlanetaries && building.Type == UnitTypes.PLANETARY_FORTRESS)
                         continue;
@@ -81,11 +81,11 @@ namespace Tyr.Managers
 
             Point2D lastTarget = AttackTarget;
 
-            if (!tyr.EnemyManager.EnemyBuildings.ContainsKey(targetUnitTag) || tyr.EnemyManager.EnemyBuildings[targetUnitTag].Flying)
+            if (!bot.EnemyManager.EnemyBuildings.ContainsKey(targetUnitTag) || bot.EnemyManager.EnemyBuildings[targetUnitTag].Flying)
             {
                 AttackTarget = null;
                 targetUnitTag = 0;
-                foreach (BuildingLocation enemyBuilding in tyr.EnemyManager.EnemyBuildings.Values)
+                foreach (BuildingLocation enemyBuilding in bot.EnemyManager.EnemyBuildings.Values)
                 {
                     if (enemyBuilding.Flying && IgnoreFlyingBuildings)
                         continue;
@@ -114,12 +114,12 @@ namespace Tyr.Managers
                     }
                 }
             }
-            else AttackTarget = SC2Util.To2D(tyr.EnemyManager.EnemyBuildings[targetUnitTag].Pos);
+            else AttackTarget = SC2Util.To2D(bot.EnemyManager.EnemyBuildings[targetUnitTag].Pos);
 
             if (IncludeAllEnemies && CloseTo != null)
             {
                 float dist = 15 * 15;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     float newDist = SC2Util.DistanceSq(enemy.Pos, CloseTo);
                     if (newDist >= dist)
@@ -129,10 +129,10 @@ namespace Tyr.Managers
                 }
             }
 
-            if (tyr.EnemyManager.EnemyBuildings.Count == 0 && PotentialEnemyStartLocations.Count == 1)
+            if (bot.EnemyManager.EnemyBuildings.Count == 0 && PotentialEnemyStartLocations.Count == 1)
             {
                 bool cleared = false;
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                 {
                     if (SC2Util.DistanceSq(agent.Unit.Pos, PotentialEnemyStartLocations[0]) <= 6 * 6)
                     {
@@ -143,16 +143,16 @@ namespace Tyr.Managers
                 if (cleared)
                 {
                     PotentialEnemyStartLocations.RemoveAt(0);
-                    foreach (Base b in tyr.BaseManager.Bases)
+                    foreach (Base b in bot.BaseManager.Bases)
                         PotentialEnemyStartLocations.Add(b.BaseLocation.Pos);
                 }
             }
         }
 
-        public void OnStart(Bot tyr)
+        public void OnStart(Bot bot)
         {
-            foreach (Point2D location in tyr.GameInfo.StartRaw.StartLocations)
-                if (SC2Util.DistanceGrid(tyr. MapAnalyzer.StartLocation, location) > 20)
+            foreach (Point2D location in bot.GameInfo.StartRaw.StartLocations)
+                if (SC2Util.DistanceGrid(bot. MapAnalyzer.StartLocation, location) > 20)
                     PotentialEnemyStartLocations.Add(location);
             DebugUtil.WriteLine("Enemy locations: " + PotentialEnemyStartLocations.Count);
         }

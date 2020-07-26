@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class OverlordScoutTask : Task
     {
@@ -43,10 +43,10 @@ namespace Tyr.Tasks
             return !ScoutSent;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            Point2D target = tyr.TargetManager.PotentialEnemyStartLocations[0];
-            bool scoutingNatural = tyr.TargetManager.PotentialEnemyStartLocations.Count == 1 && !ScoutMain;
+            Point2D target = bot.TargetManager.PotentialEnemyStartLocations[0];
+            bool scoutingNatural = bot.TargetManager.PotentialEnemyStartLocations.Count == 1 && !ScoutMain;
 
             if (ScoutLocation != null)
                 target = ScoutLocation;

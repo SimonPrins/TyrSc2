@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Micro
+namespace SC2Sharp.Micro
 {
     public class DodgeBallController : CustomController
     {

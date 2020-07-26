@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tyr.Builds;
-using Tyr.Util;
+using SC2Sharp.Builds;
+using SC2Sharp.Util;
 
-namespace Tyr.BuildSelection
+namespace SC2Sharp.BuildSelection
 {
     public class ProbabilitySelector : BuildSelector
     {

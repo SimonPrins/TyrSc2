@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System;
-using Tyr.Agents;
-using Tyr.CombatSim;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.CombatSim;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class TestBuild : Build
     {
@@ -17,7 +17,7 @@ namespace Tyr.Builds.Protoss
         {
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             /*
             FileUtil.Debug("Zealot: \n" + UnitTypes.LookUp[UnitTypes.ZEALOT]);
@@ -37,7 +37,7 @@ namespace Tyr.Builds.Protoss
         float LastEnergy;
         string buffs = "";
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             foreach (SC2APIProtocol.Action action in Bot.Main.Observation.Actions)
             {
@@ -51,7 +51,7 @@ namespace Tyr.Builds.Protoss
                 //DebugUtil.WriteLine("Pos: " + action.ActionRaw.UnitCommand.TargetWorldSpacePos + " ability: " + action.ActionRaw.UnitCommand.AbilityId);
             }
             /*
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType == UnitTypes.IMMORTAL)
                 {
@@ -66,7 +66,7 @@ namespace Tyr.Builds.Protoss
                         || newBuffs != buffs)
                     {
                         buffs = newBuffs;
-                        FileUtil.Debug("Frame: " + tyr.Frame);
+                        FileUtil.Debug("Frame: " + bot.Frame);
                         FileUtil.Debug("Distance travelled: " + Math.Sqrt(SC2Util.DistanceSq(new Point2D() { X = LastX, Y = LastY }, agent.Unit.Pos)));
                         LastX = agent.Unit.Pos.X;
                         LastY = agent.Unit.Pos.Y;

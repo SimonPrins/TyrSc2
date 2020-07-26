@@ -1,4 +1,4 @@
-﻿namespace Tyr.CombatSim.DamageProcessors
+﻿namespace SC2Sharp.CombatSim.DamageProcessors
 {
     public interface DamageProcessor
     {

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Terran
+namespace SC2Sharp.Builds.Terran
 {
     public class MarineRush : Build
     {
@@ -28,7 +28,7 @@ namespace Tyr.Builds.Terran
             return "MarineRush";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new DodgeBallController());
@@ -77,18 +77,18 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             RepairTask.Task.WallIn = WallIn;
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 20)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 20)
                 TimingAttackTask.Task.RequiredSize = 20;
             else
                 TimingAttackTask.Task.RequiredSize = 10;
             foreach (Task task in WorkerDefenseTask.Tasks)
-                task.Stopped = tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 10;
+                task.Stopped = bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 10;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))
             {

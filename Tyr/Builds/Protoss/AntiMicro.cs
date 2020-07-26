@@ -1,14 +1,14 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class AntiMicro : Build
     {
@@ -83,7 +83,7 @@ namespace Tyr.Builds.Protoss
             RampDefensePoint = new PotentialHelper(Bot.Main.MapAnalyzer.GetMainRamp(), 5).To(MainDefensePos).Get();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             DefenseTask.GroundDefenseTask.BeforeControllers.Add(new GravitonBeamController() { LiftReapers = true });
             DefenseTask.GroundDefenseTask.BeforeControllers.Add(KillMarauderController);
@@ -121,7 +121,7 @@ namespace Tyr.Builds.Protoss
             Set += ProtossBuildUtil.Pylons(() => Count(UnitTypes.PYLON) >= 2 
                 && Count(UnitTypes.CYBERNETICS_CORE) > 0
                 && (!ProxyMarauderSuspected || Count(UnitTypes.SHIELD_BATTERY) >= 2)
-                && (!ProxyMarauderSuspected || tyr.Observation.Observation.PlayerCommon.FoodUsed >= 27));
+                && (!ProxyMarauderSuspected || bot.Observation.Observation.PlayerCommon.FoodUsed >= 27));
             Set += Units();
             Set += MainBuildList();
 
@@ -380,7 +380,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (WorkerScoutTask.Task.BaseCircled()
                 && TotalEnemyCount(UnitTypes.BARRACKS) == 0)
@@ -399,25 +399,25 @@ namespace Tyr.Builds.Protoss
                 GasWorkerTask.WorkersPerGas = 3;
 
             if (Main.ResourceCenter != null)
-                tyr.DrawSphere(new Point() { X = RampDefensePoint.X, Y = RampDefensePoint.Y, Z = Main.ResourceCenter.Unit.Pos.Z});
+                bot.DrawSphere(new Point() { X = RampDefensePoint.X, Y = RampDefensePoint.Y, Z = Main.ResourceCenter.Unit.Pos.Z});
 
-            tyr.NexusAbilityManager.Stopped = Completed(UnitTypes.CYBERNETICS_CORE) == 0;
+            bot.NexusAbilityManager.Stopped = Completed(UnitTypes.CYBERNETICS_CORE) == 0;
             if (TotalEnemyCount(UnitTypes.MARAUDER) > 0)
             {
-                tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.IMMORTAL].Ability);
+                bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.IMMORTAL].Ability);
             }
             if (ProxyMarauderSuspected)
             {
-                tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.IMMORTAL].Ability);
-                tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.STALKER].Ability);
-                tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.VOID_RAY].Ability);
-                tyr.NexusAbilityManager.OnlyChronoPrioritizedUnits = Completed(UnitTypes.STALKER) < 4;
+                bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.IMMORTAL].Ability);
+                bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.STALKER].Ability);
+                bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.VOID_RAY].Ability);
+                bot.NexusAbilityManager.OnlyChronoPrioritizedUnits = Completed(UnitTypes.STALKER) < 4;
             }
 
             KillMarauderController.Stopped = !ProxyMarauderSuspected || Completed(UnitTypes.IMMORTAL) >= 2;
 
             DefendingStalkerClose = false;
-            foreach (Agent agent in tyr.Units())
+            foreach (Agent agent in bot.Units())
                 if (agent.Unit.UnitType == UnitTypes.STALKER
                     && agent.DistanceSq(Main.BaseLocation.Pos) <= 50 * 50)
                 {
@@ -425,7 +425,7 @@ namespace Tyr.Builds.Protoss
                     break;
                 }
             EnemyReaperClose = false;
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
                 if (enemy.UnitType == UnitTypes.REAPER
                     && SC2Util.DistanceSq(enemy.Pos, Main.BaseLocation.Pos) <= 50 * 50)
                 {
@@ -449,20 +449,20 @@ namespace Tyr.Builds.Protoss
             PhoenixHuntMarauderController.Stopped = Completed(UnitTypes.PHOENIX) < 4;
 
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY
                     && agent.Unit.UnitType != UnitTypes.ROBOTICS_FACILITY)
                     continue;
 
-                agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
 
             if (EnemyMain == null)
-                EnemyMain = tyr.TargetManager.PotentialEnemyStartLocations[0];
-            foreach (Unit enemy in tyr.Enemies())
+                EnemyMain = bot.TargetManager.PotentialEnemyStartLocations[0];
+            foreach (Unit enemy in bot.Enemies())
             {
                 if (RecordedProxies.Contains(enemy.Tag))
                     continue;
@@ -474,7 +474,7 @@ namespace Tyr.Builds.Protoss
                 if (Util.SC2Util.DistanceSq(enemy.Pos, EnemyMain) <= 40 * 40)
                     continue;
                 RecordedProxies.Add(enemy.Tag);
-                Util.FileUtil.Debug(tyr.GameInfo.MapName + "(" + tyr.MapAnalyzer.StartLocation.X + ", " + tyr.MapAnalyzer.StartLocation.Y + "):(" + enemy.Pos.X + "," + enemy.Pos.Y + ")");
+                Util.FileUtil.Debug(bot.GameInfo.MapName + "(" + bot.MapAnalyzer.StartLocation.X + ", " + bot.MapAnalyzer.StartLocation.Y + "):(" + enemy.Pos.X + "," + enemy.Pos.Y + ")");
             }
 
 
@@ -489,19 +489,19 @@ namespace Tyr.Builds.Protoss
                         probeAttacked = true;
                 if (SCVAttackFrame == 1000000
                     && probeAttacked)
-                    SCVAttackFrame = tyr.Frame;
+                    SCVAttackFrame = bot.Frame;
 
                 if (TotalEnemyCount(UnitTypes.REAPER) + TotalEnemyCount(UnitTypes.MARINE) + TotalEnemyCount(UnitTypes.CYCLONE) + TotalEnemyCount(UnitTypes.BANSHEE) + TotalEnemyCount(UnitTypes.MARAUDER) > 0
-                    || tyr.Frame >= 22.4 * 60 * 2
-                    //|| (tyr.Frame >= 22.4 * 60 * 1.25 && TotalEnemyCount(UnitTypes.SCV) + TotalEnemyCount(UnitTypes.BARRACKS) + TotalEnemyCount(UnitTypes.FACTORY) == 0)
-                    || tyr.Frame - SCVAttackFrame >= 22.4 * 20)
+                    || bot.Frame >= 22.4 * 60 * 2
+                    //|| (bot.Frame >= 22.4 * 60 * 1.25 && TotalEnemyCount(UnitTypes.SCV) + TotalEnemyCount(UnitTypes.BARRACKS) + TotalEnemyCount(UnitTypes.FACTORY) == 0)
+                    || bot.Frame - SCVAttackFrame >= 22.4 * 20)
                 {
                     HuntProxyTask1.StopAndClear(true);
                     HuntProxyTask2.StopAndClear(true);
                 }
                 else
                 {
-                    foreach (Unit enemy in tyr.Enemies())
+                    foreach (Unit enemy in bot.Enemies())
                     {
                         if (enemy.UnitType != UnitTypes.BARRACKS
                             && enemy.UnitType != UnitTypes.FACTORY
@@ -527,7 +527,7 @@ namespace Tyr.Builds.Protoss
             if (TotalEnemyCount(UnitTypes.BATTLECRUISER) > 0)
                 KillVikingController.Stopped = true;
 
-            tyr.TargetManager.TargetAllBuildings = true;
+            bot.TargetManager.TargetAllBuildings = true;
             if (Completed(UnitTypes.IMMORTAL) >= 1)
                 TimingAttackTask.Task.RequiredSize = 6;
             else if (Completed(UnitTypes.PHOENIX) + Completed(UnitTypes.VOID_RAY) + Completed(UnitTypes.IMMORTAL) >= 3)
@@ -537,7 +537,7 @@ namespace Tyr.Builds.Protoss
             else
                 TimingAttackTask.Task.RequiredSize = 20;      
 
-            tyr.buildingPlacer.BuildCompact = true;
+            bot.buildingPlacer.BuildCompact = true;
 
             DefenseTask.GroundDefenseTask.IgnoreEnemyTypes.Add(UnitTypes.REAPER);
             DefenseTask.GroundDefenseTask.IncludePhoenixes = EnemyCount(UnitTypes.CYCLONE) > 0;

@@ -1,11 +1,11 @@
-﻿using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Zerg
+namespace SC2Sharp.Builds.Zerg
 {
     public class ZerglingRush : Build
     {
@@ -17,11 +17,11 @@ namespace Tyr.Builds.Zerg
             return "ZerglingRush";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            tyr.TaskManager.Add(new TimingAttackTask() { RequiredSize = 6 });
-            tyr.TaskManager.Add(WorkerScoutTask);
-            tyr.TaskManager.Add(WorkerRushTask);
+            bot.TaskManager.Add(new TimingAttackTask() { RequiredSize = 6 });
+            bot.TaskManager.Add(WorkerScoutTask);
+            bot.TaskManager.Add(WorkerRushTask);
             WorkerRushDefenseTask.Enable();
             MicroControllers.Add(new FleeBroodlingsController());
             MicroControllers.Add(new TargetFireController(GetPrioritiesCloseRange()) { MoveWhenNoTarget = false });
@@ -29,7 +29,7 @@ namespace Tyr.Builds.Zerg
             foreach (Base b in Bot.Main.BaseManager.Bases)
             {
                 QueenInjectTask queenInjectTask = new QueenInjectTask(b);
-                tyr.TaskManager.Add(queenInjectTask);
+                bot.TaskManager.Add(queenInjectTask);
             }
             Set += MainBuild();
         }
@@ -75,9 +75,9 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            if (tyr.TargetManager.PotentialEnemyStartLocations.Count <= 1)
+            if (bot.TargetManager.PotentialEnemyStartLocations.Count <= 1)
             {
                 WorkerScoutTask.Clear();
                 WorkerScoutTask.Stopped = true;
@@ -89,7 +89,7 @@ namespace Tyr.Builds.Zerg
                 WorkerRushTask.TakeWorkers = 10;
                 WorkersSent = true;
             }
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType == UnitTypes.LARVA)
                 {
@@ -107,7 +107,7 @@ namespace Tyr.Builds.Zerg
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             /*
             if (UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))
@@ -117,7 +117,7 @@ namespace Tyr.Builds.Zerg
                     && Completed(UnitTypes.SPAWNING_POOL) > 0)
                 {
                     agent.Order(1632);
-                    CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.QUEEN);
+                    CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.QUEEN);
                 }
             }
             */

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class AdeptKillSquadTask : Task
     {
@@ -47,7 +47,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             bool workersRemain = false;
             foreach (Unit enemy in Bot.Main.Observation.Observation.RawData.Units)
@@ -94,7 +94,7 @@ namespace Tyr.Tasks
                     target = enemy;
                 }
                 if (underThreat || target == null)
-                    tyr.MicroController.Attack(agent, tyr.TargetManager.AttackTarget);
+                    bot.MicroController.Attack(agent, bot.TargetManager.AttackTarget);
                 else
                     agent.Order(Abilities.ATTACK, target.Tag);
             }

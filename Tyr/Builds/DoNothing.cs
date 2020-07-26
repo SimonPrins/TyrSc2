@@ -1,6 +1,6 @@
-﻿using Tyr.Agents;
+﻿using SC2Sharp.Agents;
 
-namespace Tyr.Builds
+namespace SC2Sharp.Builds
 {
     public class DoNothing : Build
     {
@@ -12,19 +12,19 @@ namespace Tyr.Builds
         public override void InitializeTasks()
         { }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         { }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            tyr.NexusAbilityManager.Stopped = true;
-            tyr.OrbitalAbilityManager.SaveEnergy = 1000;
-            tyr.TaskManager.CombatSimulation.SimulationLength = 0;
-            tyr.AllowGG = false;
-            tyr.AllowChat = false;
+            bot.NexusAbilityManager.Stopped = true;
+            bot.OrbitalAbilityManager.SaveEnergy = 1000;
+            bot.TaskManager.CombatSimulation.SimulationLength = 0;
+            bot.AllowGG = false;
+            bot.AllowChat = false;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         { }
     }
 }

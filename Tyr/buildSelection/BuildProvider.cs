@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Tyr.Builds;
+using SC2Sharp.Builds;
 
-namespace Tyr.buildSelection
+namespace SC2Sharp.buildSelection
 {
     public interface BuildsProvider
     {
-        List<Build> GetBuilds(Bot tyr, string[] lines);
+        List<Build> GetBuilds(Bot bot, string[] lines);
     }
 }

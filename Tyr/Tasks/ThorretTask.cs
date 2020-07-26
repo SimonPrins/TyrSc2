@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class ThorretTask : Task
     {
@@ -59,7 +59,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Stopped)
             {
@@ -97,7 +97,7 @@ namespace Tyr.Tasks
                 foreach (Agent agent in units)
                 {
                     if (agent.DistanceSq(IdleLocation) > 3 * 3)
-                        tyr.MicroController.Attack(agent, IdleLocation);
+                        bot.MicroController.Attack(agent, IdleLocation);
                     else if (agent.Unit.UnitType == UnitTypes.SIEGE_TANK)
                         agent.Order(Abilities.SIEGE);
                 }
@@ -109,7 +109,7 @@ namespace Tyr.Tasks
                     if (agent.Unit.UnitType == UnitTypes.SIEGE_TANK_SIEGED
                         && agent.DistanceSq(IdleLocation) <= 3 * 3)
                         continue;
-                    tyr.MicroController.Attack(agent, SC2Util.To2D(target.Pos));
+                    bot.MicroController.Attack(agent, SC2Util.To2D(target.Pos));
                 }
             }
         }

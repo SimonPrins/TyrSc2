@@ -1,13 +1,13 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.CombatSim;
-using Tyr.CombatSim.CombatMicro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.CombatSim;
+using SC2Sharp.CombatSim.CombatMicro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class CombatSimulation
     {
@@ -22,48 +22,48 @@ namespace Tyr.Managers
         public float EnemyStartResources;
         public float EnemyFinalResources;
 
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
             List<Unit> simulatedUnits = new List<Unit>();
-            foreach (Task task in tyr.TaskManager.Tasks)
+            foreach (Task task in bot.TaskManager.Tasks)
                 task.AddCombatSimulationUnits(simulatedUnits);
 
-            foreach (Unit unit in tyr.EnemyManager.LastSeen.Values)
+            foreach (Unit unit in bot.EnemyManager.LastSeen.Values)
             {
                 if (unit.UnitType == UnitTypes.SIEGE_TANK_SIEGED || unit.UnitType == UnitTypes.WIDOW_MINE_BURROWED)
                     continue;
-                if (tyr.EnemyManager.LastSeen.ContainsKey(unit.Tag) && tyr.Frame - tyr.EnemyManager.LastSeenFrame[unit.Tag] > 112)
+                if (bot.EnemyManager.LastSeen.ContainsKey(unit.Tag) && bot.Frame - bot.EnemyManager.LastSeenFrame[unit.Tag] > 112)
                     continue;
                 if (UnitTypes.CombatUnitTypes.Contains(unit.UnitType))
                     simulatedUnits.Add(unit);
             }
-            foreach (UnitLocation unit in tyr.EnemyMineManager.Mines)
-                if (tyr.EnemyManager.LastSeen.ContainsKey(unit.Tag))
-                    simulatedUnits.Add(tyr.EnemyManager.LastSeen[unit.Tag]);
-            foreach (UnitLocation unit in tyr.EnemyTankManager.Tanks)
-                if (tyr.EnemyManager.LastSeen.ContainsKey(unit.Tag))
-                    simulatedUnits.Add(tyr.EnemyManager.LastSeen[unit.Tag]);
+            foreach (UnitLocation unit in bot.EnemyMineManager.Mines)
+                if (bot.EnemyManager.LastSeen.ContainsKey(unit.Tag))
+                    simulatedUnits.Add(bot.EnemyManager.LastSeen[unit.Tag]);
+            foreach (UnitLocation unit in bot.EnemyTankManager.Tanks)
+                if (bot.EnemyManager.LastSeen.ContainsKey(unit.Tag))
+                    simulatedUnits.Add(bot.EnemyManager.LastSeen[unit.Tag]);
 
             List<List<Unit>> simulationGroups = GroupUnits(simulatedUnits);
 
             HashSet<uint> myUpgrades = new HashSet<uint>();
-            if (tyr.Observation.Observation.RawData.Player.UpgradeIds != null)
-                foreach (uint upgrade in tyr.Observation.Observation.RawData.Player.UpgradeIds)
+            if (bot.Observation.Observation.RawData.Player.UpgradeIds != null)
+                foreach (uint upgrade in bot.Observation.Observation.RawData.Player.UpgradeIds)
                     myUpgrades.Add(upgrade);
             HashSet<uint> enemyUpgrades = new HashSet<uint>();
 
-            bool logSimulation = tyr.Frame % 22 == 0 && simulationGroups.Count > 0 && Debug;
+            bool logSimulation = bot.Frame % 22 == 0 && simulationGroups.Count > 0 && Debug;
 
             if (ShowStats)
-                tyr.DrawText("Simulations: " + simulationGroups.Count);
+                bot.DrawText("Simulations: " + simulationGroups.Count);
             if (logSimulation)
                 FileUtil.Debug("Simulations: " + simulationGroups.Count);
 
 
             bool printState = false;
-            if (Bot.Debug && tyr.Observation.Chat != null && tyr.Observation.Chat.Count > 0)
+            if (Bot.Debug && bot.Observation.Chat != null && bot.Observation.Chat.Count > 0)
             {
-                foreach (ChatReceived message in tyr.Observation.Chat)
+                foreach (ChatReceived message in bot.Observation.Chat)
                 {
                     if (message.Message == "s")
                     {
@@ -80,9 +80,9 @@ namespace Tyr.Managers
             int i = 0;
             foreach (List<Unit> simulationGroup in simulationGroups)
             {
-                SimulationState state = GetState(tyr, simulationGroup, myUpgrades, enemyUpgrades, false);
+                SimulationState state = GetState(bot, simulationGroup, myUpgrades, enemyUpgrades, false);
                 if (printState)
-                    state.SafeToFile("SimulationState-" + tyr.Frame + "-" + i + ".txt");
+                    state.SafeToFile("SimulationState-" + bot.Frame + "-" + i + ".txt");
                 float myResources = GetResources(state, true);
                 float enemyResources = GetResources(state, false);
                 if (printState)
@@ -93,7 +93,7 @@ namespace Tyr.Managers
                 float myNewResources = GetResources(state, true);
                 float enemyNewResources = GetResources(state, false);
                 if (ShowStats)
-                    tyr.DrawText("SimulationResult me: " + myResources + " -> " + myNewResources + " his: " + enemyResources + " -> " + enemyNewResources);
+                    bot.DrawText("SimulationResult me: " + myResources + " -> " + myNewResources + " his: " + enemyResources + " -> " + enemyNewResources);
                 if (logSimulation)
                     FileUtil.Debug("SimulationResult me: " + myResources + " -> " + myNewResources + " his: " + enemyResources + " -> " + enemyNewResources);
 
@@ -142,18 +142,18 @@ namespace Tyr.Managers
             return simulationGroups;
         }
 
-        private SimulationState GetState(Bot tyr, List<Unit> simulationGroup, HashSet<uint> myUpgrades, HashSet<uint> enemyUpgrades, bool flee)
+        private SimulationState GetState(Bot bot, List<Unit> simulationGroup, HashSet<uint> myUpgrades, HashSet<uint> enemyUpgrades, bool flee)
         {
             SimulationState state = new SimulationState();
             foreach (Unit unit in simulationGroup)
             {
 
                 List<CombatMicro> micro;
-                if (flee && unit.Owner == tyr.PlayerId)
+                if (flee && unit.Owner == bot.PlayerId)
                     micro = new List<CombatMicro>() { new Flee() };
                 else
                     micro = GetMicro(unit);
-                state.AddUnit(SimulationUtil.FromUnit(unit, micro, unit.Owner == tyr.PlayerId ? myUpgrades : enemyUpgrades));
+                state.AddUnit(SimulationUtil.FromUnit(unit, micro, unit.Owner == bot.PlayerId ? myUpgrades : enemyUpgrades));
             }
             return state;
         }

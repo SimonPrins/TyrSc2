@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class TimingAttackTask : Task
     {
@@ -86,7 +86,7 @@ namespace Tyr.Tasks
             return false;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (units.Count <= RetreatSize && Units.Count > 0)
             {
@@ -94,7 +94,7 @@ namespace Tyr.Tasks
                 return;
             }
 
-            tyr.DrawText("Army size: " + Units.Count);
+            bot.DrawText("Army size: " + Units.Count);
 
             bool canAttackGround = false;
             foreach (Agent agent in Units)
@@ -113,7 +113,7 @@ namespace Tyr.Tasks
             {
                 foreach (Agent agent in units)
                 {
-                    foreach (Unit enemy in tyr.Enemies())
+                    foreach (Unit enemy in bot.Enemies())
                     {
                         if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                             continue;
@@ -133,7 +133,7 @@ namespace Tyr.Tasks
             {
                 if (agent.Unit.UnitType == UnitTypes.MEDIVAC)
                 {
-                    UpdateMedivacRetreatTarget(tyr);
+                    UpdateMedivacRetreatTarget(bot);
                     if (MedivacRetreatTarget != null)
                     {
                         Attack(agent, SC2Util.To2D(MedivacRetreatTarget.Unit.Pos));
@@ -144,15 +144,15 @@ namespace Tyr.Tasks
                 if (defendAgent != null && agent.DistanceSq(defendAgent) >= 3 * 3 && agent.DistanceSq(defendAgent) <= 40 * 40)
                     Attack(agent, SC2Util.To2D(defendAgent.Unit.Pos));
                 else
-                    Attack(agent, tyr.TargetManager.AttackTarget);
+                    Attack(agent, bot.TargetManager.AttackTarget);
             }
         }
 
-        private void UpdateMedivacRetreatTarget(Bot tyr)
+        private void UpdateMedivacRetreatTarget(Bot bot)
         {
-            if (MedivacRetreatTargetUpdateFrame == tyr.Frame)
+            if (MedivacRetreatTargetUpdateFrame == bot.Frame)
                 return;
-            MedivacRetreatTargetUpdateFrame = tyr.Frame;
+            MedivacRetreatTargetUpdateFrame = bot.Frame;
 
             float distance = 1000 * 1000;
             foreach (Agent agent in Units)
@@ -160,7 +160,7 @@ namespace Tyr.Tasks
                 if (agent.Unit.IsFlying)
                     continue;
 
-                float newDist = agent.DistanceSq(tyr.TargetManager.AttackTarget);
+                float newDist = agent.DistanceSq(bot.TargetManager.AttackTarget);
                 if (newDist < distance)
                 {
                     distance = newDist;

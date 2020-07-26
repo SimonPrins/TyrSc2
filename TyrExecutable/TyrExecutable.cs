@@ -1,4 +1,4 @@
-﻿using Tyr;
+﻿using SC2Sharp;
 
 namespace TyrExecutable
 {

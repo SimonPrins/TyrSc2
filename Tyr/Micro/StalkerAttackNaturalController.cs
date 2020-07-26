@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Micro
+namespace SC2Sharp.Micro
 {
     public class StalkerAttackNaturalController : CustomController
     {

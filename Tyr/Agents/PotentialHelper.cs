@@ -1,7 +1,7 @@
 ﻿using SC2APIProtocol;
-using Tyr.Util;
+using SC2Sharp.Util;
 
-namespace Tyr.Agents
+namespace SC2Sharp.Agents
 {
     public class PotentialHelper
     {

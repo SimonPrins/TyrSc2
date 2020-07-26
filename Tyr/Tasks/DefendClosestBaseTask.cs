@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class DefendClosestBaseTask : Task
     {
@@ -93,7 +93,7 @@ namespace Tyr.Tasks
             return GetDefendedBase() != null;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             Base defendedBase = GetDefendedBase();
             if (defendedBase == null)
@@ -102,7 +102,7 @@ namespace Tyr.Tasks
                 return;
             }
             foreach (Agent agent in units)
-                tyr.MicroController.Attack(agent, defendedBase.BaseLocation.Pos);
+                bot.MicroController.Attack(agent, defendedBase.BaseLocation.Pos);
         }
         
         float GetExpandDefenseRadiusSq()

@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Agents
+namespace SC2Sharp.Agents
 {
     public class Agent
     {

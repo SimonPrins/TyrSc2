@@ -1,7 +1,7 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ShieldRegenTask : Task
     {
@@ -39,13 +39,13 @@ namespace Tyr.Tasks
             return false;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             foreach (Agent agent in units)
             {
                 if (agent.FleeEnemies(false))
                     continue;
-                Attack(agent, tyr.TargetManager.AttackTarget);
+                Attack(agent, bot.TargetManager.AttackTarget);
             }
             for (int i = units.Count - 1; i >= 0; i--)
                 if (units[i].Unit.Shield >= units[i].Unit.ShieldMax / 2)

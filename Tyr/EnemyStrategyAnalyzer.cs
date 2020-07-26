@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tyr.Agents;
-using Tyr.StrategyAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr
+namespace SC2Sharp
 {
     public class EnemyStrategyAnalyzer
     {
@@ -46,10 +46,10 @@ namespace Tyr
             FileUtil.Register(name);
         }
 
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
             EnemyCounts = new Dictionary<uint, int>();
-            foreach (Unit unit in tyr.Enemies())
+            foreach (Unit unit in bot.Enemies())
             {
                 if (!CountedEnemies.ContainsKey(unit.Tag) || CountedEnemies[unit.Tag] != unit.UnitType)
                 {
@@ -74,19 +74,19 @@ namespace Tyr
                 strategy.OnFrame();
 
             if (!NoProxyTerranConfirmed
-                && tyr.EnemyRace == Race.Terran
+                && bot.EnemyRace == Race.Terran
                 && Expanded.Get().Detected)
             {
                 NoProxyTerranConfirmed = true;
             }
 
             if (!NoProxyTerranConfirmed
-                    && tyr.EnemyRace == Race.Terran)
+                    && bot.EnemyRace == Race.Terran)
             {
-                foreach (Unit unit in tyr.Enemies())
+                foreach (Unit unit in bot.Enemies())
                 {
                     if (unit.UnitType == UnitTypes.BARRACKS
-                        && SC2Util.DistanceSq(tyr.MapAnalyzer.StartLocation, unit.Pos) >= 40 * 40)
+                        && SC2Util.DistanceSq(bot.MapAnalyzer.StartLocation, unit.Pos) >= 40 * 40)
                     {
                         NoProxyTerranConfirmed = true;
                         break;
@@ -95,19 +95,19 @@ namespace Tyr
             }
 
             if (!NoProxyGatewayConfirmed
-                && tyr.EnemyRace == Race.Protoss
+                && bot.EnemyRace == Race.Protoss
                 && Expanded.Get().Detected)
             {
                 NoProxyGatewayConfirmed = true;
             }
 
             if (!NoProxyGatewayConfirmed
-                    && tyr.EnemyRace == Race.Protoss)
+                    && bot.EnemyRace == Race.Protoss)
             {
-                foreach (Unit unit in tyr.Enemies())
+                foreach (Unit unit in bot.Enemies())
                 {
                     if (unit.UnitType == UnitTypes.GATEWAY
-                        && SC2Util.DistanceSq(tyr.MapAnalyzer.StartLocation, unit.Pos) >= 40 * 40)
+                        && SC2Util.DistanceSq(bot.MapAnalyzer.StartLocation, unit.Pos) >= 40 * 40)
                     {
                         NoProxyGatewayConfirmed = true;
                         break;

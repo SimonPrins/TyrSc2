@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class SentryWarpInTask : Task
     {
@@ -52,7 +52,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             DetermineDropTarget();
 
@@ -69,8 +69,8 @@ namespace Tyr.Tasks
             if (DropPos == null || warpPrism == null)
                 return;
 
-            tyr.DrawSphere(new Point() { X = DropPos.X, Y = DropPos.Y, Z = warpPrism.Unit.Pos.Z });
-            tyr.DrawText("SentryWarpInTask size: " + Units.Count);
+            bot.DrawSphere(new Point() { X = DropPos.X, Y = DropPos.Y, Z = warpPrism.Unit.Pos.Z });
+            bot.DrawText("SentryWarpInTask size: " + Units.Count);
 
             foreach (PassengerUnit passenger in warpPrism.Unit.Passengers)
                 DroppedUnits.Add(passenger.Tag);
@@ -82,7 +82,7 @@ namespace Tyr.Tasks
                         && agent.DistanceSq(warpPrism) >= 5 * 5)
                         agent.Order(Abilities.MOVE, warpPrism.Unit.Tag);
                     else if (DroppedUnits.Contains(agent.Unit.Tag))
-                        Attack(agent, tyr.TargetManager.AttackTarget);
+                        Attack(agent, bot.TargetManager.AttackTarget);
                     continue;
                 }
                 if (!PassedWayPoint.Contains(agent.Unit.Tag)
@@ -102,23 +102,23 @@ namespace Tyr.Tasks
                 if (!PassedWayPoint.Contains(agent.Unit.Tag))
                 {
                     agent.Order(Abilities.MOVE, WayPoint);
-                    tyr.DrawText("WaypointDistance: " + Math.Sqrt(agent.DistanceSq(WayPoint)));
-                    tyr.DrawSphere(new Point() { X = WayPoint.X, Y = WayPoint.Y, Z = agent.Unit.Pos.Z } );
+                    bot.DrawText("WaypointDistance: " + Math.Sqrt(agent.DistanceSq(WayPoint)));
+                    bot.DrawSphere(new Point() { X = WayPoint.X, Y = WayPoint.Y, Z = agent.Unit.Pos.Z } );
                     if (agent.DistanceSq(WayPoint) <= 10 * 10)
                         PassedWayPoint.Add(agent.Unit.Tag);
                 }
                 else if (agent.DistanceSq(DropPos) <= 2)
                 {
-                    tyr.DrawText("Dropping.");
+                    bot.DrawText("Dropping.");
                     //agent.Order(1528);
                     agent.Order(913, DropPos);
-                    tyr.DrawLine(agent, DropPos);
+                    bot.DrawLine(agent, DropPos);
                 }
                 else
                 {
-                    tyr.DrawText("Moving to drop.");
+                    bot.DrawText("Moving to drop.");
                     agent.Order(Abilities.MOVE, DropPos);
-                    tyr.DrawLine(agent, DropPos);
+                    bot.DrawLine(agent, DropPos);
                 }
             }
         }

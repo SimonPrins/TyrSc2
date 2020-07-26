@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class UnitManager : Manager
     {
@@ -18,12 +18,12 @@ namespace Tyr.Managers
         public Dictionary<ulong, Agent> DisappearedUnits = new Dictionary<ulong, Agent>();
         public HashSet<uint> ActiveOrders = new HashSet<uint>();
 
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
             Counts = new Dictionary<uint, int>();
             CompletedCounts = new Dictionary<uint, int>();
             HashSet<ulong> existingUnits = new HashSet<ulong>();
-            foreach (Base b in tyr.BaseManager.Bases)
+            foreach (Base b in bot.BaseManager.Bases)
             {
                 b.BuildingCounts = new Dictionary<uint, int>();
                 b.BuildingsCompleted = new Dictionary<uint, int>();
@@ -34,9 +34,9 @@ namespace Tyr.Managers
             int abilityCountNexus = 0;
             FoodExpected = 0;
             // Update our unit set.
-            foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
+            foreach (Unit unit in bot.Observation.Observation.RawData.Units)
             {
-                if (unit.Owner != tyr.PlayerId)
+                if (unit.Owner != bot.PlayerId)
                 {
                     Agents.Remove(unit.Tag);
                     continue;
@@ -118,7 +118,7 @@ namespace Tyr.Managers
                     {
                         Agent agent = new Agent(unit);
                         Agents.Add(unit.Tag, agent);
-                        tyr.TaskManager.NewAgent(agent);
+                        bot.TaskManager.NewAgent(agent);
                     }
                 }
 
@@ -144,13 +144,13 @@ namespace Tyr.Managers
                     || request.worker.Unit.Orders.Count == 0
                     || request.worker.Unit.Orders[0].AbilityId != BuildingType.LookUp[request.Type].Ability)
                 {
-                    tyr.ReservedMinerals += BuildingType.LookUp[request.Type].Minerals;
-                    tyr.ReservedGas += BuildingType.LookUp[request.Type].Gas;
+                    bot.ReservedMinerals += BuildingType.LookUp[request.Type].Minerals;
+                    bot.ReservedGas += BuildingType.LookUp[request.Type].Gas;
                     string workerAbility = "";
                     if (request.worker.Unit.Orders != null
                         && request.worker.Unit.Orders.Count > 0)
                         workerAbility = " Ability: " + request.worker.Unit.Orders[0].AbilityId;
-                    tyr.DrawText("Reserving: " + BuildingType.LookUp[request.Type].Name + workerAbility);
+                    bot.DrawText("Reserving: " + BuildingType.LookUp[request.Type].Name + workerAbility);
                 }
             }
 
@@ -164,18 +164,18 @@ namespace Tyr.Managers
                 if (request.Base != null)
                     CollectionUtil.Increment(request.Base.BuildingCounts, request.Type);
 
-                tyr.ReservedMinerals += BuildingType.LookUp[request.Type].Minerals;
-                tyr.ReservedGas += BuildingType.LookUp[request.Type].Gas;
-                tyr.DrawText("Reserving: " + BuildingType.LookUp[request.Type].Name);
+                bot.ReservedMinerals += BuildingType.LookUp[request.Type].Minerals;
+                bot.ReservedGas += BuildingType.LookUp[request.Type].Gas;
+                bot.DrawText("Reserving: " + BuildingType.LookUp[request.Type].Name);
             }
 
             // Remove dead units.
-            if (tyr.Observation != null
-                && tyr.Observation.Observation != null
-                && tyr.Observation.Observation.RawData != null
-                && tyr.Observation.Observation.RawData.Event != null
-                && tyr.Observation.Observation.RawData.Event.DeadUnits != null)
-                foreach (ulong deadUnit in tyr.Observation.Observation.RawData.Event.DeadUnits)
+            if (bot.Observation != null
+                && bot.Observation.Observation != null
+                && bot.Observation.Observation.RawData != null
+                && bot.Observation.Observation.RawData.Event != null
+                && bot.Observation.Observation.RawData.Event.DeadUnits != null)
+                foreach (ulong deadUnit in bot.Observation.Observation.RawData.Event.DeadUnits)
                     Agents.Remove(deadUnit);
 
             Bot.Main.DrawText("Direct nexus count: " + directCountNexus);

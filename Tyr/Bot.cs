@@ -3,19 +3,19 @@ using System.Diagnostics;
 using System.Linq;
 using SC2API_CSharp;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.BuildingPlacement;
-using Tyr.Builds;
-using Tyr.Builds.Protoss;
-using Tyr.buildSelection;
-using Tyr.BuildSelection;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Plugins;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.BuildingPlacement;
+using SC2Sharp.Builds;
+using SC2Sharp.Builds.Protoss;
+using SC2Sharp.buildSelection;
+using SC2Sharp.BuildSelection;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Plugins;
+using SC2Sharp.Util;
 
-namespace Tyr
+namespace SC2Sharp
 {
     public class Bot : SC2API_CSharp.Bot
     {

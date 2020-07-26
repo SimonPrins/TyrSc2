@@ -1,13 +1,13 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Zerg
+namespace SC2Sharp.Builds.Zerg
 {
     public class MacroHydra : Build
     {
@@ -45,7 +45,7 @@ namespace Tyr.Builds.Zerg
             MechDestroyExpandsTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new CorruptorController());
             MicroControllers.Add(new QueenTransfuseController());
@@ -256,9 +256,9 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BATTLECRUISER) > 0)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BATTLECRUISER) > 0)
             {
                 GroupedAttackTask.Task.RequiredSize = 40;
                 GroupedAttackTask.Task.RetreatSize = 10;
@@ -269,10 +269,10 @@ namespace Tyr.Builds.Zerg
                 GroupedAttackTask.Task.RetreatSize = 20;
             }
 
-            if (!CannonDefenseDetected && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOTON_CANNON) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.FORGE) >= 0 && tyr.Frame < 22.4 * 60 * 4)
+            if (!CannonDefenseDetected && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOTON_CANNON) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.FORGE) >= 0 && bot.Frame < 22.4 * 60 * 4)
                 CannonDefenseDetected = true;
 
-            if (!TempestDetected && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) > 0)
+            if (!TempestDetected && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) > 0)
                 TempestDetected = true;
 
             MechDestroyExpandsTask.Task.RequiredSize = 10;
@@ -280,19 +280,19 @@ namespace Tyr.Builds.Zerg
             MechDestroyExpandsTask.Task.RetreatSize = 4;
             MechDestroyExpandsTask.Task.UnitType = UnitTypes.ZERGLING;
             MechDestroyExpandsTask.Task.Stopped = !CannonDefenseDetected
-                || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER) 
-                + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZEALOT) 
-                + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.IMMORTAL) 
-                + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOENIX) 
-                + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.VOID_RAY) 
-                + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ORACLE) 
-                + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.CARRIER) > 0 
-                || tyr.Frame <= 22.4 * 60 * 4.5;
+                || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER) 
+                + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZEALOT) 
+                + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.IMMORTAL) 
+                + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOENIX) 
+                + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.VOID_RAY) 
+                + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ORACLE) 
+                + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.CARRIER) > 0 
+                || bot.Frame <= 22.4 * 60 * 4.5;
 
             if (SuspectBanshees)
             {
-                if (tyr.Frame % 22 == 0)
-                    foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                if (bot.Frame % 22 == 0)
+                    foreach (Agent agent in bot.UnitManager.Agents.Values)
                         if (agent.Unit.UnitType == UnitTypes.OVERLORD || agent.Unit.UnitType == UnitTypes.OVERSEER)
                             agent.Order(1692);
 
@@ -326,17 +326,17 @@ namespace Tyr.Builds.Zerg
             }
 
             if (!SuspectBanshees &&
-                (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.BANSHEE) > 0
-                || (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.STARPORT) + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.STARPORT_TECH_LAB) > 0 && tyr.Frame < 22.4 * 60 * 4)))
+                (bot.EnemyStrategyAnalyzer.Count(UnitTypes.BANSHEE) > 0
+                || (bot.EnemyStrategyAnalyzer.Count(UnitTypes.STARPORT) + bot.EnemyStrategyAnalyzer.Count(UnitTypes.STARPORT_TECH_LAB) > 0 && bot.Frame < 22.4 * 60 * 4)))
                 SuspectBanshees = true;
 
             if (FourRax.Get().Detected)
                 FourRaxSuspected = true;
             if (!FourRaxSuspected)
             {
-                Point2D enemyRamp = tyr.MapAnalyzer.GetEnemyRamp();
+                Point2D enemyRamp = bot.MapAnalyzer.GetEnemyRamp();
                 int enemyBarrackWallCount = 0;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (enemyRamp == null)
                         break;
@@ -374,7 +374,7 @@ namespace Tyr.Builds.Zerg
 
             if (SuspectBanshees)
             {
-                if (Natural.Owner == tyr.PlayerId)
+                if (Natural.Owner == bot.PlayerId)
                     IdleTask.Task.OverrideTarget = Natural.BaseLocation.Pos;
                 else
                     IdleTask.Task.OverrideTarget = Main.BaseLocation.Pos;
@@ -389,18 +389,18 @@ namespace Tyr.Builds.Zerg
                 BalanceGas();
 
             /*
-            if ((ThreeGate.Get().Detected || (Tyr.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) == 0 && tyr.Frame >= 22.4 * 60 * 2))
+            if ((ThreeGate.Get().Detected || (Tyr.Bot.EnemyStrategyAnalyzer.Count(UnitTypes.GATEWAY) == 0 && bot.Frame >= 22.4 * 60 * 2))
                 && !Expanded.Get().Detected
-                && tyr.EnemyRace == Race.Protoss
+                && bot.EnemyRace == Race.Protoss
                 && Tyr.Bot.Frame <= 22.4 * 60 * 3.5)
                 SmellCheese = true;
                 */
 
             if (!ProxyCannons)
             {
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
-                    if (enemy.UnitType == UnitTypes.PHOTON_CANNON && SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation) <= 40 * 40)
+                    if (enemy.UnitType == UnitTypes.PHOTON_CANNON && SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation) <= 40 * 40)
                     {
                         ProxyCannons = true;
                         break;
@@ -410,36 +410,36 @@ namespace Tyr.Builds.Zerg
 
             OverlordScoutTask.Task.ScoutMain = true;
             if (
-                tyr.EnemyStrategyAnalyzer.Count(UnitTypes.MARINE)
-                + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.VIKING_FIGHTER)
-                + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.STALKER) > 0
-                || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) >= 3)
+                bot.EnemyStrategyAnalyzer.Count(UnitTypes.MARINE)
+                + bot.EnemyStrategyAnalyzer.Count(UnitTypes.VIKING_FIGHTER)
+                + bot.EnemyStrategyAnalyzer.Count(UnitTypes.STALKER) > 0
+                || bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) >= 3)
             {
                 OverlordScoutTask.Task.Stopped = true;
                 OverlordScoutTask.Task.Clear();
             }
             else if (SuspectBanshees)
             {
-                OverlordScoutTask.Task.ScoutLocation = tyr.MapAnalyzer.GetEnemyRamp();
+                OverlordScoutTask.Task.ScoutLocation = bot.MapAnalyzer.GetEnemyRamp();
                 if (OverlordScoutTask.Task.ScoutLocation != null)
                 {
                     Unit supplyDepot = null;
                     int distances = 0;
-                    foreach (Unit enemy in tyr.Enemies())
+                    foreach (Unit enemy in bot.Enemies())
                     {
                         if (enemy.UnitType != UnitTypes.SUPPLY_DEPOT && enemy.UnitType != UnitTypes.SUPPLY_DEPOT_LOWERED)
                             continue;
                         if (SC2Util.DistanceSq(OverlordScoutTask.Task.ScoutLocation, enemy.Pos) > 5 * 5)
                             continue;
-                        if (tyr.MapAnalyzer.WallDistances[(int)enemy.Pos.X, (int)enemy.Pos.Y] < distances)
+                        if (bot.MapAnalyzer.WallDistances[(int)enemy.Pos.X, (int)enemy.Pos.Y] < distances)
                             continue;
                         supplyDepot = enemy;
-                        distances = tyr.MapAnalyzer.WallDistances[(int)enemy.Pos.X, (int)enemy.Pos.Y];
+                        distances = bot.MapAnalyzer.WallDistances[(int)enemy.Pos.X, (int)enemy.Pos.Y];
                     }
                     if (supplyDepot != null)
                     {
                         OverlordScoutTask.Task.ScoutLocation = SC2Util.To2D(supplyDepot.Pos);
-                        tyr.DrawText("SupplyDepot WallDistance: " + distances);
+                        bot.DrawText("SupplyDepot WallDistance: " + distances);
                     }
                 }
             }

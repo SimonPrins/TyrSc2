@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Zerg
+namespace SC2Sharp.Builds.Zerg
 {
     public class HydraLurker : Build
     {
@@ -36,14 +36,14 @@ namespace Tyr.Builds.Zerg
             return ZergBuildUtil.GetDefenseBuild();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new LurkerController());
             MicroControllers.Add(new TargetFireController(GetPriorities()));
 
             Set += ZergBuildUtil.Overlords();
-            if (tyr.EnemyRace == Race.Protoss)
+            if (bot.EnemyRace == Race.Protoss)
                 Set += Broodlords();
             Set += AntiLifting();
             Set += MainBuild();
@@ -116,9 +116,9 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            if (tyr.EnemyRace == Race.Protoss)
+            if (bot.EnemyRace == Race.Protoss)
             {
                 TimingAttackTask.Task.RequiredSize = 45;
                 TimingAttackTask.Task.RetreatSize = 8;
@@ -129,7 +129,7 @@ namespace Tyr.Builds.Zerg
                 TimingAttackTask.Task.RetreatSize = 20;
             }
 
-            tyr.DrawText("Extractors: " + Count(UnitTypes.EXTRACTOR));
+            bot.DrawText("Extractors: " + Count(UnitTypes.EXTRACTOR));
 
             DefenseTask.GroundDefenseTask.MainDefenseRadius = 20;
             DefenseTask.GroundDefenseTask.ExpandDefenseRadius = 14;
@@ -140,21 +140,21 @@ namespace Tyr.Builds.Zerg
 
             IdleTask.Task.FearEnemies = true;
 
-            GoingBroodlords = tyr.EnemyRace == Race.Protoss && Completed(UnitTypes.HYDRALISK_DEN) > 0 && Completed(UnitTypes.LURKER_DEN) > 0 && Count(UnitTypes.HATCHERY) + Count(UnitTypes.LAIR) + Count(UnitTypes.HIVE) >= 2;
-            if (tyr.EnemyRace != Race.Protoss)
-                tyr.DrawScreen("Wrong race.", 12, 0.65f, 0.18f);
+            GoingBroodlords = bot.EnemyRace == Race.Protoss && Completed(UnitTypes.HYDRALISK_DEN) > 0 && Completed(UnitTypes.LURKER_DEN) > 0 && Count(UnitTypes.HATCHERY) + Count(UnitTypes.LAIR) + Count(UnitTypes.HIVE) >= 2;
+            if (bot.EnemyRace != Race.Protoss)
+                bot.DrawScreen("Wrong race.", 12, 0.65f, 0.18f);
             else if (Completed(UnitTypes.HYDRALISK_DEN) == 0)
-                tyr.DrawScreen("No hydra den", 12, 0.65f, 0.18f);
+                bot.DrawScreen("No hydra den", 12, 0.65f, 0.18f);
             else if (Completed(UnitTypes.LURKER_DEN) == 0)
-                tyr.DrawScreen("No lurker den", 12, 0.65f, 0.18f);
+                bot.DrawScreen("No lurker den", 12, 0.65f, 0.18f);
             else if (Count(UnitTypes.HATCHERY) + Count(UnitTypes.LAIR) + Count(UnitTypes.HIVE) < 2)
-                tyr.DrawScreen("Not enough bases. Hatch: " + Count(UnitTypes.HATCHERY) + " Lair: " + Count(UnitTypes.LAIR) + " Hive: " + Count(UnitTypes.HIVE), 12, 0.65f, 0.18f);
+                bot.DrawScreen("Not enough bases. Hatch: " + Count(UnitTypes.HATCHERY) + " Lair: " + Count(UnitTypes.LAIR) + " Hive: " + Count(UnitTypes.HIVE), 12, 0.65f, 0.18f);
             else if (GoingBroodlords)
-                tyr.DrawScreen("Going broodlords", 12, 0.65f, 0.18f);
+                bot.DrawScreen("Going broodlords", 12, 0.65f, 0.18f);
             else
-                tyr.DrawScreen("Not going broodlords", 12, 0.65f, 0.18f);
+                bot.DrawScreen("Not going broodlords", 12, 0.65f, 0.18f);
 
-            if (tyr.EnemyRace == Race.Protoss)
+            if (bot.EnemyRace == Race.Protoss)
                 RequiredZerglings = 0;
 
             if (Count(UnitTypes.HYDRALISK) - 10 >= (Count(UnitTypes.LURKER) + Count(UnitTypes.LURKER_BURROWED)) * 2)
@@ -191,7 +191,7 @@ namespace Tyr.Builds.Zerg
             
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))
             {
@@ -201,13 +201,13 @@ namespace Tyr.Builds.Zerg
                     && Completed(UnitTypes.SPAWNING_POOL) > 0)
                 {
                     agent.Order(1632);
-                    CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.QUEEN);
+                    CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.QUEEN);
                 }
                 else if (Minerals() >= 100 && Completed(UnitTypes.QUEEN) < 5
                     && Count(UnitTypes.LAIR) > 0)
                 {
                     agent.Order(1632);
-                    CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.QUEEN);
+                    CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.QUEEN);
                 }
                 else if (Count(UnitTypes.SPINE_CRAWLER) > 0
                     && Minerals() >= 150 && Gas() >= 100

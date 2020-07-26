@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class SaveWorkersTask : Task
     {
@@ -44,18 +44,18 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             for (int i = Units.Count - 1; i >= 0; i--)
             {
                 Agent agent = Units[i];
-                if (agent.DistanceSq(tyr.MapAnalyzer.StartLocation) > 15 * 15)
+                if (agent.DistanceSq(bot.MapAnalyzer.StartLocation) > 15 * 15)
                     continue;
                 ClearAt(i);
             }
 
             foreach (Agent agent in units)
-                agent.Order(Abilities.MOVE, SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
+                agent.Order(Abilities.MOVE, SC2Util.To2D(bot.MapAnalyzer.StartLocation));
         }
     }
 }

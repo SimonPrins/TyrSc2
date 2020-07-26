@@ -1,9 +1,9 @@
-﻿using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.Tasks;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvZFakeZealotRush : Build
     {
@@ -27,7 +27,7 @@ namespace Tyr.Builds.Protoss
             WorkerRushDefenseTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new FleeCyclonesController());
             MicroControllers.Add(new SentryController());
@@ -76,7 +76,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.RequiredSize = RequiredSize;
         }

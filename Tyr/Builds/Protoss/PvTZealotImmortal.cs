@@ -1,13 +1,13 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Micro;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvTZealotImmortal : Build
     {
@@ -31,9 +31,9 @@ namespace Tyr.Builds.Protoss
             ArchonMergeTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
+            OverrideDefenseTarget = bot.MapAnalyzer.Walk(NaturalDefensePos, bot.MapAnalyzer.EnemyDistances, 15);
 
             MicroControllers.Add(new GravitonBeamController() { LiftMarauders = true });
             MicroControllers.Add(new FearEnemyController(UnitTypes.PHOENIX, new HashSet<uint>() { UnitTypes.MISSILE_TURRET }, 11));
@@ -132,7 +132,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Completed(UnitTypes.COLOSUS) >= 3)
                 TimingAttackTask.Task.RequiredSize = 20;

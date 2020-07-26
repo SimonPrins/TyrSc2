@@ -1,14 +1,14 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class DoubleRoboProxy : Build
     {
@@ -56,7 +56,7 @@ namespace Tyr.Builds.Protoss
             WarpPrismElevatorTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(StutterController);
             MicroControllers.Add(StalkerAttackNaturalController);
@@ -107,22 +107,22 @@ namespace Tyr.Builds.Protoss
         }
 
         bool printed = false;
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Completed(UnitTypes.WARP_PRISM) == 0
                 && (Count(UnitTypes.WARP_PRISM) == 1 || Count(UnitTypes.IMMORTAL) >= 3))
-                tyr.NexusAbilityManager.PriotitizedAbilities.Remove(TrainingType.LookUp[UnitTypes.IMMORTAL].Ability);
+                bot.NexusAbilityManager.PriotitizedAbilities.Remove(TrainingType.LookUp[UnitTypes.IMMORTAL].Ability);
             else
-                tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.IMMORTAL].Ability);
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.WARP_PRISM].Ability);
+                bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.IMMORTAL].Ability);
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.WARP_PRISM].Ability);
             ProxyTask.Task.UseCloseHideLocation = true;
 
-            tyr.buildingPlacer.BuildCompact = true;
-            tyr.TargetManager.PrefferDistant = false;
-            tyr.TargetManager.TargetAllBuildings = true;
+            bot.buildingPlacer.BuildCompact = true;
+            bot.TargetManager.PrefferDistant = false;
+            bot.TargetManager.TargetAllBuildings = true;
 
             Agent warpPrismPhasing = null;
-            foreach (Agent agent in tyr.Units())
+            foreach (Agent agent in bot.Units())
                 if (agent.Unit.UnitType == UnitTypes.WARP_PRISM_PHASING)
                     warpPrismPhasing = agent;
             if (warpPrismPhasing != null)
@@ -144,11 +144,11 @@ namespace Tyr.Builds.Protoss
 
 
             if (StutterController.Toward == null
-                && tyr.TargetManager.PotentialEnemyStartLocations.Count == 1
+                && bot.TargetManager.PotentialEnemyStartLocations.Count == 1
                 && Completed(UnitTypes.WARP_PRISM) > 0)
             {
-                Point2D enemyBaseCenter = new PotentialHelper(tyr.TargetManager.PotentialEnemyStartLocations[0], 12).To(WarpPrismElevatorTask.Task.StagingArea).Get();
-                StutterController.Toward = new PotentialHelper(enemyBaseCenter, 6).From(tyr.MapAnalyzer.GetEnemyRamp()).Get();
+                Point2D enemyBaseCenter = new PotentialHelper(bot.TargetManager.PotentialEnemyStartLocations[0], 12).To(WarpPrismElevatorTask.Task.StagingArea).Get();
+                StutterController.Toward = new PotentialHelper(enemyBaseCenter, 6).From(bot.MapAnalyzer.GetEnemyRamp()).Get();
             }
 
 
@@ -174,7 +174,7 @@ namespace Tyr.Builds.Protoss
                 {
                     DefendProxyTask.OverrideDefenseLocation = proxyLocation;
                     DefendProxyTask.OverrideIdleLocation = proxyLocation;
-                    foreach (Base b in tyr.BaseManager.Bases)
+                    foreach (Base b in bot.BaseManager.Bases)
                         if (SC2Util.DistanceSq(b.BaseLocation.Pos, proxyLocation) <= 20 * 20)
                             DefendProxyTask.Base = b;
                 }
@@ -182,18 +182,18 @@ namespace Tyr.Builds.Protoss
 
             if (UpgradeType.LookUp[UpgradeType.WarpGate].Progress() >= 0.5
                 && IdleTask.Task.OverrideTarget == null
-                && (tyr.EnemyRace != Race.Protoss || tyr.Frame >= 22.4 * 4 * 60))
+                && (bot.EnemyRace != Race.Protoss || bot.Frame >= 22.4 * 4 * 60))
                 DefendProxyTask.Stopped = false;
             else
                 DefendProxyTask.Stopped = AdeptHarass.Get().DetectedPreviously;
 
-            tyr.DrawText("DefendProxyTask.Stopped: " + DefendProxyTask.Stopped);
+            bot.DrawText("DefendProxyTask.Stopped: " + DefendProxyTask.Stopped);
 
             if (DefendProxyTask.Stopped)
                 DefendProxyTask.Clear();
 
             if (DropInMain &&
-                (Completed(UnitTypes.WARP_PRISM) > 0 || tyr.Frame >= 22.4 * 6 * 60))
+                (Completed(UnitTypes.WARP_PRISM) > 0 || bot.Frame >= 22.4 * 6 * 60))
             {
                 WarpPrismElevatorTask.Task.Stopped = false;
             }
@@ -208,13 +208,13 @@ namespace Tyr.Builds.Protoss
             if (Completed(UnitTypes.OBSERVER) > 0)
                 StalkerAttackNaturalController.Stopped = true;
 
-            if (!DefendReapers && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.REAPER) > 0 && UpgradeType.LookUp[UpgradeType.WarpGate].Done())
+            if (!DefendReapers && bot.EnemyStrategyAnalyzer.Count(UnitTypes.REAPER) > 0 && UpgradeType.LookUp[UpgradeType.WarpGate].Done())
             {
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.REAPER)
                         continue;
-                    if (SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation) <= 30 * 30)
+                    if (SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation) <= 30 * 30)
                     {
                         DefendReapers = true;
                         ReaperDefenseTask.MaxDefenders = 1;

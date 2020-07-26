@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class WorkerRushDefenseTask : Task
     {
@@ -83,7 +83,7 @@ namespace Tyr.Tasks
             return GetWorkerRushHappening();
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (!GetWorkerRushHappening())
             {
@@ -92,15 +92,15 @@ namespace Tyr.Tasks
             }
 
             if (State == GatherDefenders)
-                ExecuteGatherDefenders(tyr);
+                ExecuteGatherDefenders(bot);
             else
-                ExecuteDefend(tyr);
+                ExecuteDefend(bot);
         }
 
-        public void ExecuteGatherDefenders(Bot tyr)
+        public void ExecuteGatherDefenders(Bot bot)
         {
-            if (mineral == null && tyr.BaseManager.Main.BaseLocation.MineralFields.Count > 0)
-                mineral = tyr.BaseManager.Main.BaseLocation.MineralFields[0];
+            if (mineral == null && bot.BaseManager.Main.BaseLocation.MineralFields.Count > 0)
+                mineral = bot.BaseManager.Main.BaseLocation.MineralFields[0];
 
             if (mineral == null)
             {
@@ -111,13 +111,13 @@ namespace Tyr.Tasks
             foreach (Agent agent in Units)
                 agent.Order(Abilities.MOVE, mineral.Tag);
 
-            if (tyr.Frame >= GatherDefendersStartFrame + 112)
+            if (bot.Frame >= GatherDefendersStartFrame + 112)
                 State = Defend;
         }
 
-        public void ExecuteDefend(Bot tyr)
+        public void ExecuteDefend(Bot bot)
         {
-            bool surround = (tyr.Frame - GatherDefendersStartFrame - 110) % 23 < 8;
+            bool surround = (bot.Frame - GatherDefendersStartFrame - 110) % 23 < 8;
 
             int surroundingWorkersCount = 0;
             foreach (Agent agent in units)
@@ -142,9 +142,9 @@ namespace Tyr.Tasks
             Unit closestEnemy = null;
             float distance = Chasing ? 80 * 80 : 70 * 70;
             float hp = 1000;
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
-                float newDist = SC2Util.DistanceSq(tyr.MapAnalyzer.StartLocation, enemy.Pos);
+                float newDist = SC2Util.DistanceSq(bot.MapAnalyzer.StartLocation, enemy.Pos);
                 
                 if (newDist < distance)
                 {
@@ -156,7 +156,7 @@ namespace Tyr.Tasks
             foreach (Agent agent in Units)
             {
                 if (surround && SurroundingWorkers.Contains(agent.Unit.Tag))
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
                 if (closestEnemy != null && agent.Unit.WeaponCooldown <= 6)
                     agent.Order(Abilities.ATTACK, SC2Util.To2D(closestEnemy.Pos));
                 else if (mineral != null)

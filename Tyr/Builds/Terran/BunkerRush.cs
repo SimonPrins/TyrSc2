@@ -1,14 +1,14 @@
 ﻿
 using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Terran
+namespace SC2Sharp.Builds.Terran
 {
     public class BunkerRush : Build
     {
@@ -36,7 +36,7 @@ namespace Tyr.Builds.Terran
             return "BunkerRush";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new YamatoController());
@@ -100,15 +100,15 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            BunkerRushTask.Task.Stopped = tyr.Frame < 22.4 * 10;
+            BunkerRushTask.Task.Stopped = bot.Frame < 22.4 * 10;
             BunkerRushTask.Task.DesiredWorkers = Count(UnitTypes.BARRACKS) >= 2 || Count(UnitTypes.BUNKER) > 0 ? 3 : 2;
 
             bool closeReaper = false;
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
-                if (enemy.UnitType == UnitTypes.REAPER && SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation) <= 20 * 20)
+                if (enemy.UnitType == UnitTypes.REAPER && SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation) <= 20 * 20)
                 {
                     closeReaper = true;
                     break;
@@ -117,7 +117,7 @@ namespace Tyr.Builds.Terran
 
             if (closeReaper && Completed(UnitTypes.MARINE) >= 12)
                 BaseTrade = true;
-            if (tyr.TargetManager.PotentialEnemyStartLocations.Count <= 1)
+            if (bot.TargetManager.PotentialEnemyStartLocations.Count <= 1)
             {
                 WorkerScoutTask.Task.Stopped = true;
                 WorkerScoutTask.Task.Clear();
@@ -130,7 +130,7 @@ namespace Tyr.Builds.Terran
             if (BaseTrade)
                 BunkerDefendersTask.Task.LeaveBunkers = true;
             bool bunkerExists = false;
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType != UnitTypes.BUNKER)
                     continue;
@@ -144,10 +144,10 @@ namespace Tyr.Builds.Terran
             IdleTask.Task.AttackMove = true;
 
             foreach (Task task in WorkerDefenseTask.Tasks)
-                    task.Stopped = tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 10;
+                    task.Stopped = bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 10;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.BARRACKS)
             {
@@ -156,11 +156,11 @@ namespace Tyr.Builds.Terran
             }
             else if (agent.Unit.UnitType == UnitTypes.FACTORY)
             {
-                if (!tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
+                if (!bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
                 {
                     agent.Order(454);
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB)
                 {
                     if (Minerals() >= 150
                         && Gas() >= 125
@@ -176,13 +176,13 @@ namespace Tyr.Builds.Terran
             }
             else if (agent.Unit.UnitType == UnitTypes.STARPORT)
             {
-                if (!tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
+                if (!bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
                 {
                     if (Minerals() >= 50
                         && Gas() >= 50)
                         agent.Order(487);
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_TECH_LAB)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_TECH_LAB)
                 {
                     if (Minerals() > 100
                         && Gas() >= 200

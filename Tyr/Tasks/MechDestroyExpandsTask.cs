@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class MechDestroyExpandsTask : Task
     {
@@ -43,20 +43,20 @@ namespace Tyr.Tasks
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             Bot.Main.DrawText("Mines attacking: " + Units.Count);
             for (int i = Bases.Count - 1; i >= 0; i--)
             {
-                if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 1
-                    && SC2Util.DistanceSq(Bases[i], tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 25 * 25)
+                if (bot.TargetManager.PotentialEnemyStartLocations.Count == 1
+                    && SC2Util.DistanceSq(Bases[i], bot.TargetManager.PotentialEnemyStartLocations[0]) <= 25 * 25)
                 {
                     Bases.RemoveAt(i);
                     continue;
                 }
 
                 bool closeEnemy = false;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (!UnitTypes.BuildingTypes.Contains(enemy.UnitType))
                         continue;
@@ -70,7 +70,7 @@ namespace Tyr.Tasks
                     continue;
 
                 bool closeAlly = false;
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.DistanceSq(Bases[i]) <= 4 * 4)
                     {
                         closeAlly = true;
@@ -81,7 +81,7 @@ namespace Tyr.Tasks
             }
 
             if (Bases.Count == 0)
-                foreach (BaseLocation b in tyr.MapAnalyzer.BaseLocations)
+                foreach (BaseLocation b in bot.MapAnalyzer.BaseLocations)
                     Bases.Add(b.Pos);
             
             if (units.Count <= RetreatSize)
@@ -92,10 +92,10 @@ namespace Tyr.Tasks
 
             float distance = 1000000;
             Point2D target = null;
-            foreach (BuildingLocation building in tyr.EnemyManager.EnemyBuildings.Values)
+            foreach (BuildingLocation building in bot.EnemyManager.EnemyBuildings.Values)
             {
-                if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 1
-                       && SC2Util.DistanceSq(building.Pos, tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 30 * 30)
+                if (bot.TargetManager.PotentialEnemyStartLocations.Count == 1
+                       && SC2Util.DistanceSq(building.Pos, bot.TargetManager.PotentialEnemyStartLocations[0]) <= 30 * 30)
                     continue;
 
                 foreach (Agent agent in units)
@@ -123,7 +123,7 @@ namespace Tyr.Tasks
             }
 
             foreach (Agent agent in units)
-                tyr.MicroController.Attack(agent, target);
+                bot.MicroController.Attack(agent, target);
         }
     }
 }

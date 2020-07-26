@@ -1,7 +1,7 @@
-﻿namespace Tyr.Managers
+﻿namespace SC2Sharp.Managers
 {
     public interface Manager
     {
-        void OnFrame(Bot tyr);
+        void OnFrame(Bot bot);
     }
 }

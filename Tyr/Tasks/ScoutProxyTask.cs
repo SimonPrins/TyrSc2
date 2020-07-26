@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class ScoutProxyTask : Task
     {
@@ -47,15 +47,15 @@ namespace Tyr.Tasks
             return Bot.Main.Frame >= StartFrame;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (NeedsScouting == null)
-                NeedsScouting = (ArrayBoolGrid)tyr.MapAnalyzer.MainAndPocketArea.GetAnd(tyr.MapAnalyzer.StartArea.Invert());
+                NeedsScouting = (ArrayBoolGrid)bot.MapAnalyzer.MainAndPocketArea.GetAnd(bot.MapAnalyzer.StartArea.Invert());
             
             if (units.Count > 0 && SC2Util.DistanceSq(units[0].Unit.Pos, Target) <= 6 * 6)
             {
                 Target = GetTarget(units[0].Unit.Pos);
-                if (Target == null || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.REAPER) > 0)
+                if (Target == null || bot.EnemyStrategyAnalyzer.Count(UnitTypes.REAPER) > 0)
                 {
                     Done = true;
                     Clear();

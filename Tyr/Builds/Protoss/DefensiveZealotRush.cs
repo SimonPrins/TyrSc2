@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class DefensiveZealotRush : Build
     {
@@ -27,11 +27,11 @@ namespace Tyr.Builds.Protoss
             ArmyObserverTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new FleeCyclonesController());
 
-            DefensePoint = new PotentialHelper(MainDefensePos, 5).To(tyr.MapAnalyzer.GetMainRamp()).Get();
+            DefensePoint = new PotentialHelper(MainDefensePos, 5).To(bot.MapAnalyzer.GetMainRamp()).Get();
 
             Set += ProtossBuildUtil.Pylons();
             Set += Units();
@@ -78,14 +78,14 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.RequiredSize = 30;
 
-            //tyr.buildingPlacer.BuildCompact = true;
+            //bot.buildingPlacer.BuildCompact = true;
 
             DefenseTask.GroundDefenseTask.MainDefenseRadius = 20;
-            Expand = tyr.Frame >= 22.4 * 60 * 9 && Completed(UnitTypes.OBSERVER) > 0;
+            Expand = bot.Frame >= 22.4 * 60 * 9 && Completed(UnitTypes.OBSERVER) > 0;
         }
     }
 }

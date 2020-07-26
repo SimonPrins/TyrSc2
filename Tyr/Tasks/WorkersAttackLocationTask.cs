@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class WorkersAttackLocationTask : Task
     {
@@ -37,7 +37,7 @@ namespace Tyr.Tasks
             return AttackTarget != null;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (AttackTarget == null)
             {

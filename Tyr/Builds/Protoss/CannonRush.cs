@@ -1,8 +1,8 @@
-﻿using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Tasks;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class CannonRush : Build
     {
@@ -19,7 +19,7 @@ namespace Tyr.Builds.Protoss
             TimingAttackTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             Set += ProtossBuildUtil.Pylons(() => Count(UnitTypes.PYLON) > 0 && (Count(UnitTypes.PHOTON_CANNON) >= 2 || Bot.Main.Frame >= 22.4 * 60 * 2));
             Set += MainBuild();
@@ -37,7 +37,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.RequiredSize = 6;
 
@@ -45,7 +45,7 @@ namespace Tyr.Builds.Protoss
                 CannonRushTask.Task.Stopped = true;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class WorkerTask : Task
     {
@@ -32,12 +32,12 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (baseWorkers == null)
             {
                 baseWorkers = new List<BaseWorkers>();
-                foreach (Base b in tyr.BaseManager.Bases)
+                foreach (Base b in bot.BaseManager.Bases)
                     baseWorkers.Add(new BaseWorkers() { Base = b });
             }
 
@@ -96,7 +96,7 @@ namespace Tyr.Tasks
             }
 
             foreach (BaseWorkers workers in myBases)
-                workers.OnFrame(tyr);
+                workers.OnFrame(bot);
         }
 
         private void TransferWorkers(List<BaseWorkers> myBases)

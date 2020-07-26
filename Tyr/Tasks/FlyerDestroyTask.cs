@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class FlyerDestroyTask : Task
     {
@@ -35,12 +35,12 @@ namespace Tyr.Tasks
             return Bot.Main.UnitManager.Completed(UnitTypes.VOID_RAY) + Bot.Main.UnitManager.Completed(UnitTypes.CARRIER) >= RequiredSize;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             Point2D targetLocation = GetTarget();
             bool starportsRemain = false;
             /*
-            foreach (Unit unit in tyr.Enemies())
+            foreach (Unit unit in bot.Enemies())
                 if (unit.UnitType == UnitTypes.STARPORT)
                 {
                     starportsRemain = true;
@@ -48,8 +48,8 @@ namespace Tyr.Tasks
                     break;
                 }
             */
-            tyr.DrawText("Search: " + Search);
-            tyr.DrawSphere(targetLocation);
+            bot.DrawText("Search: " + Search);
+            bot.DrawSphere(targetLocation);
             foreach (Agent agent in units)
             {
                 Unit target = Targetting.GetTarget(agent);
@@ -59,7 +59,7 @@ namespace Tyr.Tasks
                         (UnitTypes.AirAttackTypes.Contains(target.UnitType) && agent.DistanceSq(target) <= 15 * 15)))
                     {
                         agent.Order(Abilities.ATTACK, target.Tag);
-                        tyr.DrawLine(agent.Unit.Pos, target.Pos);
+                        bot.DrawLine(agent.Unit.Pos, target.Pos);
                     }
                     else
                         agent.Order(Abilities.MOVE, targetLocation);
@@ -72,7 +72,7 @@ namespace Tyr.Tasks
                     if (target != null)
                     {
                         agent.Order(Abilities.ATTACK, target.Tag);
-                        tyr.DrawLine(agent.Unit.Pos, target.Pos);
+                        bot.DrawLine(agent.Unit.Pos, target.Pos);
                     }
                     else
                         agent.Order(Abilities.ATTACK, targetLocation);

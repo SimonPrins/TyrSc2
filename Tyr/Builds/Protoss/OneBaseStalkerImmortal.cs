@@ -1,13 +1,13 @@
 ﻿using SC2APIProtocol;
 using System;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class OneBaseStalkerImmortal : Build
     {
@@ -67,7 +67,7 @@ namespace Tyr.Builds.Protoss
             WorkerRushDefenseTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             if (ExpandCondition == null)
                 ExpandCondition = WillExpand;
@@ -162,7 +162,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             GasWorkerTask.WorkersPerGas = 3;
 
@@ -182,7 +182,7 @@ namespace Tyr.Builds.Protoss
             else if (Completed(UnitTypes.IMMORTAL) == 0)
                 FearCannonsController.Range = 10;
 
-            tyr.buildingPlacer.BuildCompact = true;
+            bot.buildingPlacer.BuildCompact = true;
 
             TimingAttackTask.Task.DefendOtherAgents = false;
             if (StartExpanding)
@@ -193,14 +193,14 @@ namespace Tyr.Builds.Protoss
                 TimingAttackTask.Task.RequiredSize = RequiredSize;
 
             if (!ImmortalNearEnemy)
-                foreach (Agent agent in tyr.Units())
-                    if (agent.Unit.UnitType == UnitTypes.IMMORTAL && agent.DistanceSq(tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 20 * 20)
+                foreach (Agent agent in bot.Units())
+                    if (agent.Unit.UnitType == UnitTypes.IMMORTAL && agent.DistanceSq(bot.TargetManager.PotentialEnemyStartLocations[0]) <= 20 * 20)
                         ImmortalNearEnemy = true;
 
-            tyr.DrawText("Immortal near enemey: " + ImmortalNearEnemy);
+            bot.DrawText("Immortal near enemey: " + ImmortalNearEnemy);
 
             if (AggressiveMicro 
-                && (ImmortalNearEnemy || tyr.Frame >= 22.4 * 60 * 5)
+                && (ImmortalNearEnemy || bot.Frame >= 22.4 * 60 * 5)
                 && EnemyCount(UnitTypes.ZEALOT) == 0
                 && EnemyCount(UnitTypes.PHOTON_CANNON) == 0)
             {
@@ -216,26 +216,26 @@ namespace Tyr.Builds.Protoss
             KillImmortals.Stopped = EnemyCount(UnitTypes.ZEALOT) >= 0;
             KillStalkers.Stopped = EnemyCount(UnitTypes.ZEALOT) >= 0;
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY
                     && agent.Unit.UnitType != UnitTypes.ROBOTICS_FACILITY)
                     continue;
 
-                agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
 
             ScoutTask.Task.ScoutType = UnitTypes.PHOENIX;
-            ScoutTask.Task.Target = tyr.TargetManager.PotentialEnemyStartLocations[0];
+            ScoutTask.Task.Target = bot.TargetManager.PotentialEnemyStartLocations[0];
 
             if (Count(UnitTypes.PHOENIX) > 0)
                 PhoenixScoutSent = true;
 
-            if (!PhoenixScoutSent && tyr.EnemyRace != SC2APIProtocol.Race.Zerg && UsePhoenixScout)
+            if (!PhoenixScoutSent && bot.EnemyRace != SC2APIProtocol.Race.Zerg && UsePhoenixScout)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.SENTRY)
                         continue;

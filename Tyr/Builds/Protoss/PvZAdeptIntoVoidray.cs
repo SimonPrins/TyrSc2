@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvZAdeptIntoVoidray : Build
     {
@@ -16,14 +16,14 @@ namespace Tyr.Builds.Protoss
             return "PvZAdeptIntoVoidray";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            tyr.TaskManager.Add(new DefenseTask());
-            tyr.TaskManager.Add(attackTask);
+            bot.TaskManager.Add(new DefenseTask());
+            bot.TaskManager.Add(attackTask);
 
             BlockExpandTask.Enable();
-            if (tyr.BaseManager.Pocket != null)
-                tyr.TaskManager.Add(new ScoutProxyTask(tyr.BaseManager.Pocket.BaseLocation.Pos));
+            if (bot.BaseManager.Pocket != null)
+                bot.TaskManager.Add(new ScoutProxyTask(bot.BaseManager.Pocket.BaseLocation.Pos));
 
             MicroControllers.Add(FearSpinesController);
             MicroControllers.Add(new StutterController());
@@ -66,7 +66,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         { }
     }
 }

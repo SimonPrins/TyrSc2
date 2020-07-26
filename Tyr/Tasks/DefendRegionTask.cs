@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class DefendRegionTask : Task
     {
@@ -65,7 +65,7 @@ namespace Tyr.Tasks
             return Target != null;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Stopped || !UnderAttack())
             {
@@ -75,7 +75,7 @@ namespace Tyr.Tasks
             foreach (Agent agent in units)
             {
                 bool enemyClose = false;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                         continue;
@@ -88,7 +88,7 @@ namespace Tyr.Tasks
                     && !enemyClose)
                     agent.Order(Abilities.MOVE, SC2Util.To2D(Target.Pos));
                 else
-                    tyr.MicroController.Attack(agent, SC2Util.To2D(Target.Pos));
+                    bot.MicroController.Attack(agent, SC2Util.To2D(Target.Pos));
             }
         }
     }

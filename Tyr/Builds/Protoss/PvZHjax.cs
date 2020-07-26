@@ -1,17 +1,17 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.BuildingPlacement;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.BuildingPlacement;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvZHjax : Build
     {
@@ -73,9 +73,9 @@ namespace Tyr.Builds.Protoss
             }
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
+            OverrideDefenseTarget = bot.MapAnalyzer.Walk(NaturalDefensePos, bot.MapAnalyzer.EnemyDistances, 15);
 
             MicroControllers.Add(FearSpinesController);
             MicroControllers.Add(new HTController());
@@ -107,7 +107,7 @@ namespace Tyr.Builds.Protoss
 
             Base third = null;
             float dist = 1000000;
-            foreach (Base b in tyr.BaseManager.Bases)
+            foreach (Base b in bot.BaseManager.Bases)
             {
                 if (b == Main
                     || b == Natural)
@@ -118,7 +118,7 @@ namespace Tyr.Builds.Protoss
                 dist = newDist;
                 third = b;
             }
-            NydusPos = new PotentialHelper(tyr.MapAnalyzer.StartLocation, 18).To(third.BaseLocation.Pos).Get();
+            NydusPos = new PotentialHelper(bot.MapAnalyzer.StartLocation, 18).To(third.BaseLocation.Pos).Get();
 
             Set += ProtossBuildUtil.Pylons(() => Completed(UnitTypes.PYLON) > 0
                 && (Count(UnitTypes.CYBERNETICS_CORE) > 0 || EarlyPool.Get().Detected)
@@ -306,15 +306,15 @@ namespace Tyr.Builds.Protoss
             return null;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             /*
-            if (tyr.Frame == 0)
+            if (bot.Frame == 0)
             {
-                FileUtil.WriteToFile("ArmyAnalysis.txt", "Started game against " + tyr.OpponentID + " on map " + tyr.GameInfo.MapName, false);
+                FileUtil.WriteToFile("ArmyAnalysis.txt", "Started game against " + bot.OpponentID + " on map " + bot.GameInfo.MapName, false);
                 FileUtil.WriteToFile("ArmyAnalysis.txt", "", false);
             }
-            if (tyr.Frame % 224 == 0)
+            if (bot.Frame % 224 == 0)
             {
                 List<uint> myUnitTypes = new List<uint>() { UnitTypes.ZEALOT, UnitTypes.ADEPT, UnitTypes.STALKER, UnitTypes.ARCHON, UnitTypes.IMMORTAL, UnitTypes.COLOSUS };
                 List<uint> enemyUnitTypes = new List<uint>() { UnitTypes.ZERGLING, UnitTypes.QUEEN, UnitTypes.BANELING, UnitTypes.ROACH, UnitTypes.RAVAGER, UnitTypes.HYDRALISK, UnitTypes.MUTALISK, UnitTypes.CORRUPTOR, UnitTypes.BROOD_LORD, UnitTypes.LURKER};
@@ -337,10 +337,10 @@ namespace Tyr.Builds.Protoss
                 }
 
 
-                FileUtil.WriteToFile("ArmyAnalysis.txt", "State at: " + (int)((tyr.Frame / 22.4) / 60) + ":" + (int)(tyr.Frame / 22.4) % 60, false);
+                FileUtil.WriteToFile("ArmyAnalysis.txt", "State at: " + (int)((bot.Frame / 22.4) / 60) + ":" + (int)(bot.Frame / 22.4) % 60, false);
                 FileUtil.WriteToFile("ArmyAnalysis.txt", "MyUnits: {" + string.Join(", ", myUnitResults) + "}", false);
                 FileUtil.WriteToFile("ArmyAnalysis.txt", "EnemyUnits: {" + string.Join(", ", enemyUnitResults) + "}", false);
-                FileUtil.WriteToFile("ArmyAnalysis.txt", "SimulationResult me: " + tyr.TaskManager.CombatSimulation.MyStartResources + "-> " + tyr.TaskManager.CombatSimulation.MyFinalResources + " his: " + tyr.TaskManager.CombatSimulation.EnemyStartResources + "-> " + tyr.TaskManager.CombatSimulation.EnemyFinalResources, false);
+                FileUtil.WriteToFile("ArmyAnalysis.txt", "SimulationResult me: " + bot.TaskManager.CombatSimulation.MyStartResources + "-> " + bot.TaskManager.CombatSimulation.MyFinalResources + " his: " + bot.TaskManager.CombatSimulation.EnemyStartResources + "-> " + bot.TaskManager.CombatSimulation.EnemyFinalResources, false);
                 FileUtil.WriteToFile("ArmyAnalysis.txt", "", false);
 
             }
@@ -350,12 +350,12 @@ namespace Tyr.Builds.Protoss
                 && (EarlyPool.Get().Detected || RoachRushDetected))
             {
                 int enemyCount = 0;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.ZERGLING
                         && enemy.UnitType != UnitTypes.ROACH)
                         continue;
-                    if (SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation) <= 60 * 60)
+                    if (SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation) <= 60 * 60)
                         enemyCount += enemy.UnitType == UnitTypes.ZERGLING ? 1 : 3;
                 }
                 if (enemyCount > 6)
@@ -365,11 +365,11 @@ namespace Tyr.Builds.Protoss
             FearSpinesController.Stopped = Completed(UnitTypes.IMMORTAL) >= 2;
 
             ScoutTask.Task.ScoutType = UnitTypes.PHOENIX;
-            ScoutTask.Task.Target = tyr.TargetManager.PotentialEnemyStartLocations[0];
+            ScoutTask.Task.Target = bot.TargetManager.PotentialEnemyStartLocations[0];
 
             if (!TimingAttackTask.Task.AttackSent)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.SENTRY)
                         continue;
@@ -380,7 +380,7 @@ namespace Tyr.Builds.Protoss
                 }
             }
 
-            tyr.DrawText("early pool detected: " + EarlyPool.Get().Detected);
+            bot.DrawText("early pool detected: " + EarlyPool.Get().Detected);
             if (EarlyPool.Get().Detected)
                 AdeptHarassMainTask.Task.Sent = true;
 
@@ -415,7 +415,7 @@ namespace Tyr.Builds.Protoss
                 else if (Bot.Main.Frame < 22.4 * 60 * 5
                     && EnemyCount(UnitTypes.ROACH_WARREN) > 0)
                 {
-                    foreach (Unit enemy in tyr.Enemies())
+                    foreach (Unit enemy in bot.Enemies())
                     {
                         if (enemy.UnitType == UnitTypes.ROACH_WARREN
                             && enemy.BuildProgress > 0.99)
@@ -428,7 +428,7 @@ namespace Tyr.Builds.Protoss
             }
 
             RoboArmy = RoachRushDetected || TotalEnemyCount(UnitTypes.ROACH) + TotalEnemyCount(UnitTypes.RAVAGER) + TotalEnemyCount(UnitTypes.HYDRALISK) >= 15;
-            tyr.DrawText("RoboArmy: " + RoboArmy);
+            bot.DrawText("RoboArmy: " + RoboArmy);
 
             if (!WarpPrismTask.Task.WarpInObjectiveSet()
                 && TimingAttackTask.Task.Units.Count > 0
@@ -539,7 +539,7 @@ namespace Tyr.Builds.Protoss
                     wallDone++;
                     continue;
                 }
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                 {
                     if (agent.DistanceSq(building.Pos) <= 1 * 1)
                     {
@@ -579,9 +579,9 @@ namespace Tyr.Builds.Protoss
                 HodorTask.Task.Clear();
             }
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
@@ -591,41 +591,41 @@ namespace Tyr.Builds.Protoss
                     && (Count(UnitTypes.ADEPT) < 2 || AdeptHarassMainTask.Task.Sent))
                     agent.Order(Abilities.MOVE, Natural.BaseLocation.Pos);
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
 
             if (!MassZerglings
                 && !EarlyPool.Get().Detected
-                && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 60
-                && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ROACH) == 0
-                && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.HYDRALISK) == 0)
+                && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 60
+                && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ROACH) == 0
+                && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.HYDRALISK) == 0)
             {
                 MassZerglings = true;
                 //TimingAttackTask.Task.Clear();
             }
-            tyr.DrawText("Zergling count: " + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING));
+            bot.DrawText("Zergling count: " + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING));
 
             ObserverScoutTask.Task.Priority = 6;
 
             if (EarlyPool.Get().Detected)
             {
-                tyr.NexusAbilityManager.Stopped = Count(UnitTypes.ZEALOT) == 0;
-                tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.ZEALOT].Ability);
+                bot.NexusAbilityManager.Stopped = Count(UnitTypes.ZEALOT) == 0;
+                bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.ZEALOT].Ability);
             }
             else
             {
-                tyr.NexusAbilityManager.OnlyChronoPrioritizedUnits = Count(UnitTypes.CYBERNETICS_CORE) > 0 && !AdeptHarassMainTask.Task.Sent;
-                tyr.NexusAbilityManager.Stopped = Count(UnitTypes.ADEPT) + Count(UnitTypes.ZEALOT) + Count(UnitTypes.IMMORTAL) + Count(UnitTypes.ARCHON) == 0
+                bot.NexusAbilityManager.OnlyChronoPrioritizedUnits = Count(UnitTypes.CYBERNETICS_CORE) > 0 && !AdeptHarassMainTask.Task.Sent;
+                bot.NexusAbilityManager.Stopped = Count(UnitTypes.ADEPT) + Count(UnitTypes.ZEALOT) + Count(UnitTypes.IMMORTAL) + Count(UnitTypes.ARCHON) == 0
                    && Count(UnitTypes.CYBERNETICS_CORE) > 0;
-                tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.ADEPT].Ability);
+                bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.ADEPT].Ability);
             }
 
-            tyr.DrawText("TimingAttackTask: " + TimingAttackTask.Task.Units.Count + "/" + TimingAttackTask.Task.RequiredSize);
-            tyr.DrawText("GroundDefense: " + DefenseTask.GroundDefenseTask.Units.Count);
+            bot.DrawText("TimingAttackTask: " + TimingAttackTask.Task.Units.Count + "/" + TimingAttackTask.Task.RequiredSize);
+            bot.DrawText("GroundDefense: " + DefenseTask.GroundDefenseTask.Units.Count);
 
 
-            tyr.DrawText("Roach rush: " + RoachRushDetected);
-            tyr.DrawText("InitialRoachCounterDone : " + InitialRoachCounterDone);
+            bot.DrawText("Roach rush: " + RoachRushDetected);
+            bot.DrawText("InitialRoachCounterDone : " + InitialRoachCounterDone);
             if (RoachRushDetected)
             {
                 if (InitialRoachCounterDone)
@@ -648,8 +648,8 @@ namespace Tyr.Builds.Protoss
                 task.Stopped = Completed(UnitTypes.ZEALOT) + Completed(UnitTypes.IMMORTAL) + Completed(UnitTypes.ADEPT) >= 2;
 
 
-            if (tyr.Frame >= 22.4 * 60 * 2.75
-                && tyr.Frame <= 22.4 * 60 * 4.75
+            if (bot.Frame >= 22.4 * 60 * 2.75
+                && bot.Frame <= 22.4 * 60 * 4.75
                 && !EnemyAttackPerformed
                 && (EarlyPool.Get().Detected || RoachRushDetected)
                 && DefendNydus)

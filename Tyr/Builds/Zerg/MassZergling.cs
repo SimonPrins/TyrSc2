@@ -1,13 +1,13 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Zerg
+namespace SC2Sharp.Builds.Zerg
 {
     public class MassZergling : Build
     {
@@ -80,7 +80,7 @@ namespace Tyr.Builds.Zerg
                 return null;
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new ZerglingController());
             MicroControllers.Add(new StutterController());
@@ -226,13 +226,13 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            tyr.DrawText("HydraTransitionFrame: " + HydraTransitionFrame);
+            bot.DrawText("HydraTransitionFrame: " + HydraTransitionFrame);
             int enemyNaturalWorkerCount = 0;
-            BaseLocation enemyNatural = tyr.MapAnalyzer.GetEnemyNatural();
+            BaseLocation enemyNatural = bot.MapAnalyzer.GetEnemyNatural();
             bool enemyNaturalRemains = enemyNatural == null;
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
                 if (enemyNatural == null)
                     break;
@@ -249,27 +249,27 @@ namespace Tyr.Builds.Zerg
             }
 
             bool zerglingInEnemyNatural = false;
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
                 if (agent.Unit.UnitType == UnitTypes.ZERGLING && agent.DistanceSq(enemyNatural.Pos) <= 10 * 10)
                     zerglingInEnemyNatural = true;
 
-            if (AllowHydraTransition && HydraTransitionFrame >= 1000000000 && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOTON_CANNON) >= 3)
-                HydraTransitionFrame = tyr.Frame;
-            if (AllowHydraTransition && HydraTransitionFrame >= 1000000000 && tyr.Frame >= 22.4 * 60 * 5.5)
-                HydraTransitionFrame = tyr.Frame;
+            if (AllowHydraTransition && HydraTransitionFrame >= 1000000000 && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOTON_CANNON) >= 3)
+                HydraTransitionFrame = bot.Frame;
+            if (AllowHydraTransition && HydraTransitionFrame >= 1000000000 && bot.Frame >= 22.4 * 60 * 5.5)
+                HydraTransitionFrame = bot.Frame;
             if (AllowHydraTransition && HydraTransitionFrame >= 1000000000 && Count(UnitTypes.ZERGLING) >= 25 && zerglingInEnemyNatural && enemyNaturalWorkerCount == 0 && !enemyNaturalRemains)
-                HydraTransitionFrame = (int)(tyr.Frame + 22.4 * 10);
-            if (AllowHydraTransition && HydraTransitionFrame >= 1000000000 && Count(UnitTypes.ZERGLING) >= 25 && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2)
-                HydraTransitionFrame = (int)(tyr.Frame + 22.4 * 10);
+                HydraTransitionFrame = (int)(bot.Frame + 22.4 * 10);
+            if (AllowHydraTransition && HydraTransitionFrame >= 1000000000 && Count(UnitTypes.ZERGLING) >= 25 && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2)
+                HydraTransitionFrame = (int)(bot.Frame + 22.4 * 10);
 
             if (DefendEnemyNaturalTask != null)
             {
-                DefendEnemyNaturalTask.Stopped = tyr.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) < 3 || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS) > 0;
+                DefendEnemyNaturalTask.Stopped = bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) < 3 || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS) > 0;
                 if (DefendEnemyNaturalTask.Stopped)
                     DefendEnemyNaturalTask.Clear();
             }
 
-            if (HydraTransitionFrame < 1000000000 || tyr.EnemyRace != Race.Terran)
+            if (HydraTransitionFrame < 1000000000 || bot.EnemyRace != Race.Terran)
             {
                 OverlordSuicideTask.Task.Stopped = true;
                 OverlordSuicideTask.Task.Clear();
@@ -279,12 +279,12 @@ namespace Tyr.Builds.Zerg
 
             if (TimingAttackTask.Task.AttackSent && !OverlordSuicideTask.Task.Suicide)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
-                    if (agent.Unit.UnitType == UnitTypes.ZERGLING && agent.DistanceSq(tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 80 * 80)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
+                    if (agent.Unit.UnitType == UnitTypes.ZERGLING && agent.DistanceSq(bot.TargetManager.PotentialEnemyStartLocations[0]) <= 80 * 80)
                 OverlordSuicideTask.Task.Suicide = true;
             }
 
-            if (tyr.TargetManager.PotentialEnemyStartLocations.Count <= 1)
+            if (bot.TargetManager.PotentialEnemyStartLocations.Count <= 1)
                 WorkerScoutTask.Task.Stopped = true;
 
             if (UpgradeType.LookUp[UpgradeType.MetabolicBoost].Done())
@@ -324,12 +324,12 @@ namespace Tyr.Builds.Zerg
                 else if (Gas() >= 100)
                     GasWorkerTask.WorkersPerGas = 0;
             }
-            else if (TimingAttackTask.Task.AttackSent || tyr.Frame >= HydraTransitionFrame)
+            else if (TimingAttackTask.Task.AttackSent || bot.Frame >= HydraTransitionFrame)
                 GasWorkerTask.WorkersPerGas = 3;
             else
                 GasWorkerTask.WorkersPerGas = 0;
 
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) >= 3 && Completed(UnitTypes.HYDRALISK) < 20 && Completed(UnitTypes.ZERGLING) >= 40)
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) >= 3 && Completed(UnitTypes.HYDRALISK) < 20 && Completed(UnitTypes.ZERGLING) >= 40)
             {
                 TimingAttackTask.Task.Clear();
                 TimingAttackTask.Task.Stopped = true;
@@ -337,22 +337,22 @@ namespace Tyr.Builds.Zerg
             else
                 TimingAttackTask.Task.Stopped = false;
 
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) >= 3 && Completed(UnitTypes.ZERGLING) >= 40)
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) >= 3 && Completed(UnitTypes.ZERGLING) >= 40)
             {
                 TimingAttackTask.Task.RequiredSize = 70;
                 TimingAttackTask.Task.RetreatSize = 5;
             }
-            else if (tyr.Frame >= HydraTransitionFrame && Count(UnitTypes.HYDRALISK) < 20 && !UpgradeType.LookUp[UpgradeType.MetabolicBoost].Done())
+            else if (bot.Frame >= HydraTransitionFrame && Count(UnitTypes.HYDRALISK) < 20 && !UpgradeType.LookUp[UpgradeType.MetabolicBoost].Done())
             {
                 TimingAttackTask.Task.RequiredSize = 50;
                 TimingAttackTask.Task.RetreatSize = 5;
             }
-            else if (tyr.Frame >= HydraTransitionFrame && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS) > 0)
+            else if (bot.Frame >= HydraTransitionFrame && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COLOSUS) > 0)
             {
                 TimingAttackTask.Task.RequiredSize = 40;
                 TimingAttackTask.Task.RetreatSize = 8;
             }
-            else if (tyr.Frame >= HydraTransitionFrame)
+            else if (bot.Frame >= HydraTransitionFrame)
             {
                 TimingAttackTask.Task.RequiredSize = 30;
                 TimingAttackTask.Task.RetreatSize = 5;
@@ -376,7 +376,7 @@ namespace Tyr.Builds.Zerg
             DefenseTask.AirDefenseTask.MaxDefenseRadius = 55;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))
             {
@@ -406,7 +406,7 @@ namespace Tyr.Builds.Zerg
             }
             else if (agent.Unit.UnitType == UnitTypes.EVOLUTION_CHAMBER)
             {
-                if (HydraTransitionFrame < tyr.Frame)
+                if (HydraTransitionFrame < bot.Frame)
                     return;
                 if (!Bot.Main.Observation.Observation.RawData.Player.UpgradeIds.Contains(53)
                     && !Bot.Main.UnitManager.ActiveOrders.Contains(1186))

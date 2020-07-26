@@ -1,15 +1,15 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.BuildingPlacement;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.BuildingPlacement;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class TurtleRays : Build
     {
@@ -33,7 +33,7 @@ namespace Tyr.Builds.Protoss
                 ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.OnlyDefendInsideMain = true;
@@ -47,7 +47,7 @@ namespace Tyr.Builds.Protoss
 
             Base third = null;
             float dist = 1000000;
-            foreach (Base b in tyr.BaseManager.Bases)
+            foreach (Base b in bot.BaseManager.Bases)
             {
                 if (b == Main
                     || b == Natural)
@@ -58,7 +58,7 @@ namespace Tyr.Builds.Protoss
                 dist = newDist;
                 third = b;
             }
-            CannonPos = new PotentialHelper(tyr.MapAnalyzer.StartLocation, 18).To(third.BaseLocation.Pos).Get();
+            CannonPos = new PotentialHelper(bot.MapAnalyzer.StartLocation, 18).To(third.BaseLocation.Pos).Get();
             
             Set += ProtossBuildUtil.Pylons(() => Completed(UnitTypes.PYLON) >= 2);
             Set += Units();
@@ -96,14 +96,14 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(1568);
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(1568);
             ProxyTask.Task.EvadeEnemies = true;
             
-            tyr.buildingPlacer.BuildCompact = true;
-            tyr.TargetManager.PrefferDistant = false;
-            tyr.TargetManager.TargetAllBuildings = true;
+            bot.buildingPlacer.BuildCompact = true;
+            bot.TargetManager.PrefferDistant = false;
+            bot.TargetManager.TargetAllBuildings = true;
 
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.Stopped = true;

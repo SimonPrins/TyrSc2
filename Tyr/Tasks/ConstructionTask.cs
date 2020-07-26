@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class ConstructionTask : Task
     {
@@ -88,7 +88,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (NaturalProbe != null)
             {
@@ -158,8 +158,8 @@ namespace Tyr.Tasks
                 }
                 if (!alreadyAssigned
                     && NaturalProbe != null
-                    && NaturalProbe.DistanceSq(tyr.BaseManager.Natural.OppositeMineralLinePos) >= 4 * 4)
-                    NaturalProbe.Order(Abilities.MOVE, tyr.BaseManager.Natural.OppositeMineralLinePos);
+                    && NaturalProbe.DistanceSq(bot.BaseManager.Natural.OppositeMineralLinePos) >= 4 * 4)
+                    NaturalProbe.Order(Abilities.MOVE, bot.BaseManager.Natural.OppositeMineralLinePos);
             }
 
             while (unassignedAgents.Count > 0 && UnassignedRequests.Count > 0)
@@ -229,7 +229,7 @@ namespace Tyr.Tasks
                         }
                     }
                 }
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                 {
                     if ((agent.Unit.UnitType == buildRequest.Type || (UnitTypes.GasGeysers.Contains(agent.Unit.UnitType) && UnitTypes.GasGeysers.Contains(buildRequest.Type)))
                         && SC2Util.DistanceSq(agent.Unit.Pos, buildRequest.Pos) <= 1)
@@ -251,7 +251,7 @@ namespace Tyr.Tasks
                         units.Remove(buildRequest.worker);
                     }
                 }
-                else if (!tyr.UnitManager.Agents.ContainsKey(buildRequest.worker.Unit.Tag))
+                else if (!bot.UnitManager.Agents.ContainsKey(buildRequest.worker.Unit.Tag))
                 {
                     buildRequest.worker = null;
                     UnassignedRequests.Add(buildRequest);
@@ -278,11 +278,11 @@ namespace Tyr.Tasks
                     Bot.Main.ReservedGas += BuildingType.LookUp[buildRequest.Type].Gas;
 
                     if (buildRequest is BuildRequestGas)
-                        tyr.DrawLine(buildRequest.worker, ((BuildRequestGas)buildRequest).Gas.Pos);
+                        bot.DrawLine(buildRequest.worker, ((BuildRequestGas)buildRequest).Gas.Pos);
                     else
-                        tyr.DrawLine(buildRequest.worker, SC2Util.Point(buildRequest.Pos.X, buildRequest.Pos.Y, buildRequest.worker.Unit.Pos.Z));
-                    if (tyr.Observation.Observation.PlayerCommon.Minerals < BuildingType.LookUp[buildRequest.Type].Minerals
-                         || tyr.Observation.Observation.PlayerCommon.Vespene < BuildingType.LookUp[buildRequest.Type].Gas
+                        bot.DrawLine(buildRequest.worker, SC2Util.Point(buildRequest.Pos.X, buildRequest.Pos.Y, buildRequest.worker.Unit.Pos.Z));
+                    if (bot.Observation.Observation.PlayerCommon.Minerals < BuildingType.LookUp[buildRequest.Type].Minerals
+                         || bot.Observation.Observation.PlayerCommon.Vespene < BuildingType.LookUp[buildRequest.Type].Gas
                          || buildRequest.worker.DistanceSq(buildRequest.Pos) >= 5)
                     {
                         Point2D target = buildRequest is BuildRequestGas ? SC2Util.To2D(((BuildRequestGas)buildRequest).Gas.Pos) : buildRequest.Pos;
@@ -296,7 +296,7 @@ namespace Tyr.Tasks
                     if (buildRequest is BuildRequestGas)
                     {
                         Unit gas = ((BuildRequestGas)buildRequest).Gas.Unit;
-                        foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
+                        foreach (Unit unit in bot.Observation.Observation.RawData.Units)
                         {
                             if (SC2Util.DistanceSq(unit.Pos, ((BuildRequestGas)buildRequest).Gas.Pos) > 2 * 2)
                                 continue;

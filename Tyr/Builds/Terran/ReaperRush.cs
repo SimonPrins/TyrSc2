@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Terran
+namespace SC2Sharp.Builds.Terran
 {
     public class ReaperRush : Build
     {
@@ -29,7 +29,7 @@ namespace Tyr.Builds.Terran
             return "ReaperRush";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new ReaperHarassController());
@@ -100,13 +100,13 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.RequiredSize = 1;
             TimingAttackTask.Task.RetreatSize = 0;
 
-            tyr.Surrendered = true;
-            tyr.SurrenderedFrame = tyr.Frame + 1000000;
+            bot.Surrendered = true;
+            bot.SurrenderedFrame = bot.Frame + 1000000;
 
             foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
                 if (agent.Unit.UnitType == UnitTypes.FACTORY)
@@ -114,11 +114,11 @@ namespace Tyr.Builds.Terran
 
 
             foreach (Agent agent in Bot.Main.UnitManager.Agents.Values)
-                if (agent.Unit.UnitType == UnitTypes.FACTORY_FLYING && tyr.Frame % 22 == 0)
+                if (agent.Unit.UnitType == UnitTypes.FACTORY_FLYING && bot.Frame % 22 == 0)
                 {
                     Point2D a = SC2Util.Point(10, 10);
-                    Point2D b = SC2Util.Point(tyr.GameInfo.StartRaw.MapSize.X - 10, tyr.GameInfo.StartRaw.MapSize.Y - 10);
-                    if (SC2Util.DistanceSq(a, tyr.TargetManager.PotentialEnemyStartLocations[0]) < SC2Util.DistanceSq(b, tyr.TargetManager.PotentialEnemyStartLocations[0]))
+                    Point2D b = SC2Util.Point(bot.GameInfo.StartRaw.MapSize.X - 10, bot.GameInfo.StartRaw.MapSize.Y - 10);
+                    if (SC2Util.DistanceSq(a, bot.TargetManager.PotentialEnemyStartLocations[0]) < SC2Util.DistanceSq(b, bot.TargetManager.PotentialEnemyStartLocations[0]))
                         agent.Order(Abilities.MOVE, b);
                     else
                         agent.Order(Abilities.MOVE, a);

@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class SafeZerglingsFromReapersTask : Task
     {
@@ -47,9 +47,9 @@ namespace Tyr.Tasks
             return Bot.Main.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) > 0;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            Point2D target = tyr.BaseManager.Main.MineralLinePos;
+            Point2D target = bot.BaseManager.Main.MineralLinePos;
             foreach (Agent agent in units)
                 if (SC2Util.DistanceSq(agent.Unit.Pos, target) >= 2 * 2)
                     agent.Order(Abilities.MOVE, target);

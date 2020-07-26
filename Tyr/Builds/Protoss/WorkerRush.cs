@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
 using System;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class WorkerRush : Build
     {
@@ -35,7 +35,7 @@ namespace Tyr.Builds.Protoss
             DefenseTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             Set += ProtossBuildUtil.Pylons();
             Set += BuildPylonForPower();
@@ -71,7 +71,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Count(UnitTypes.STALKER) > 0)
                 BalanceGas();
@@ -87,7 +87,7 @@ namespace Tyr.Builds.Protoss
             if (Lifting.Get().Detected)
             {
                 int surfaceEnemies = 0;
-                foreach (Unit unit in tyr.Enemies())
+                foreach (Unit unit in bot.Enemies())
                     if (!unit.IsFlying)
                         surfaceEnemies++;
 
@@ -99,24 +99,24 @@ namespace Tyr.Builds.Protoss
             }
 
             if (!MessageSent)
-                    if (tyr.Enemies().Count > 0)
+                    if (bot.Enemies().Count > 0)
                     {
                         MessageSent = true;
-                        tyr.Chat("Prepare to be TICKLED! :D");
+                        bot.Chat("Prepare to be TICKLED! :D");
                     }
 
-            if (tyr.Frame - LastReinforcementsFrame >= 100
+            if (bot.Frame - LastReinforcementsFrame >= 100
                 && WorkerTask.Task.Units.Count >= (Lifting.Get().Detected ? 22 : 12)
                 && !Lifting.Get().Detected
-                && (!CounterWorkerRush.Get().Detected || tyr.Frame >= 22.4 * 120)
+                && (!CounterWorkerRush.Get().Detected || bot.Frame >= 22.4 * 120)
                 && (!CounterWorkerRush.Get().Detected || !BuildStalkers))
             {
-                LastReinforcementsFrame = tyr.Frame;
+                LastReinforcementsFrame = bot.Frame;
                 WorkerRushTask.TakeWorkers += 6;
             }
             if (UseRecall())
             {
-                RecallTask.Task.Location = new PotentialHelper(tyr.TargetManager.PotentialEnemyStartLocations[0], 8).To(Main.BaseLocation.Pos).Get();
+                RecallTask.Task.Location = new PotentialHelper(bot.TargetManager.PotentialEnemyStartLocations[0], 8).To(Main.BaseLocation.Pos).Get();
                 Recalled = true;
             }
         }
@@ -149,7 +149,7 @@ namespace Tyr.Builds.Protoss
 
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

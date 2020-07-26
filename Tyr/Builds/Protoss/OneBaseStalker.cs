@@ -1,14 +1,14 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class OneBaseStalker : Build
     {
@@ -56,7 +56,7 @@ namespace Tyr.Builds.Protoss
             HuntProxyTask.Task.StartFrame = (int)(22.4 * 15);
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new FleeCyclonesController());
             MicroControllers.Add(new BlinkForwardController());
@@ -73,7 +73,7 @@ namespace Tyr.Builds.Protoss
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.OnlyDefendInsideMain = true;
 
-            tyr.TargetManager.PrefferDistant = false;
+            bot.TargetManager.PrefferDistant = false;
 
 
             if (Bot.Main.EnemyRace == Race.Terran)
@@ -94,8 +94,8 @@ namespace Tyr.Builds.Protoss
                 string[] debugLines = Util.FileUtil.ReadDebugFile();
                 List<Point2D> fromCurrentStart = new List<Point2D>();
                 List<Point2D> fromOtherStart = new List<Point2D>();
-                string mapName = tyr.GameInfo.MapName;
-                string mapStartString = mapName + "(" + tyr.MapAnalyzer.StartLocation.X + ", " + tyr.MapAnalyzer.StartLocation.Y + "):";
+                string mapName = bot.GameInfo.MapName;
+                string mapStartString = mapName + "(" + bot.MapAnalyzer.StartLocation.X + ", " + bot.MapAnalyzer.StartLocation.Y + "):";
 
                 foreach (string line in scoutingLocations)
                 {
@@ -209,7 +209,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.DefendOtherAgents = false;
             TimingAttackTask.Task.RequiredSize = RequiredSize;
@@ -218,17 +218,17 @@ namespace Tyr.Builds.Protoss
             DefenseTask.GroundDefenseTask.MainDefenseRadius = 20;
 
             if (!PylonPlaced)
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
-                    if (agent.Unit.UnitType == UnitTypes.PYLON && SC2Util.DistanceSq(agent.Unit.Pos, tyr.MapAnalyzer.StartLocation) >= 40 * 40)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
+                    if (agent.Unit.UnitType == UnitTypes.PYLON && SC2Util.DistanceSq(agent.Unit.Pos, bot.MapAnalyzer.StartLocation) >= 40 * 40)
                     {
                         PylonPlaced = true;
                         PlacePylonTask.Task.Clear();
                         PlacePylonTask.Task.Stopped = true;
                     }
 
-            Point2D enemyRamp = tyr.MapAnalyzer.GetEnemyRamp();
+            Point2D enemyRamp = bot.MapAnalyzer.GetEnemyRamp();
             int rampDepots = 0;
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.SUPPLY_DEPOT)
                     continue;
@@ -244,9 +244,9 @@ namespace Tyr.Builds.Protoss
                 KillCycloneController.Stopped = true;
             }
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
@@ -254,30 +254,30 @@ namespace Tyr.Builds.Protoss
                 if (Count(UnitTypes.NEXUS) < 2 && TimingAttackTask.Task.Units.Count == 0)
                     agent.Order(Abilities.MOVE, Main.BaseLocation.Pos);
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
 
-            tyr.NexusAbilityManager.Stopped = Count(UnitTypes.STALKER) == 0;
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.STALKER].Ability);
+            bot.NexusAbilityManager.Stopped = Count(UnitTypes.STALKER) == 0;
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.STALKER].Ability);
 
-            foreach (Agent agent in tyr.Units())
+            foreach (Agent agent in bot.Units())
             {
                 if (agent.Unit.UnitType != UnitTypes.PHOENIX)
                     continue;
                 if (EnemyThird != null && agent.DistanceSq(EnemyThird) <= 8 * 8)
                     ThirdScouted = true;
-                if (agent.DistanceSq(tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 8 * 8)
+                if (agent.DistanceSq(bot.TargetManager.PotentialEnemyStartLocations[0]) <= 8 * 8)
                     MainScouted = true;
             }
             ScoutTask.Task.ScoutType = UnitTypes.PHOENIX;
             if (EnemyNatural == null)
-                EnemyNatural = tyr.MapAnalyzer.GetEnemyNatural().Pos;
+                EnemyNatural = bot.MapAnalyzer.GetEnemyNatural().Pos;
             if (EnemyThird == null)
-                EnemyThird = tyr.MapAnalyzer.GetEnemyThird().Pos;
+                EnemyThird = bot.MapAnalyzer.GetEnemyThird().Pos;
             if (!ThirdScouted)
                 ScoutTask.Task.Target = EnemyThird;
             else if (!MainScouted)
-                ScoutTask.Task.Target = tyr.TargetManager.PotentialEnemyStartLocations[0];
+                ScoutTask.Task.Target = bot.TargetManager.PotentialEnemyStartLocations[0];
             else
             ScoutTask.Task.Target = EnemyNatural;
 
@@ -286,7 +286,7 @@ namespace Tyr.Builds.Protoss
 
             if (!PhoenixScoutSent)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.SENTRY)
                         continue;

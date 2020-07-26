@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class HideBaseTask : Task
     {
@@ -46,14 +46,14 @@ namespace Tyr.Tasks
             return HideLocation != null && !NexusComplete;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (units.Count > 0)
                 ProbeSent = true;
             
             bool nexusBuilt = false;
             NexusComplete = false;
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
                 if (agent.Unit.UnitType == UnitTypes.NEXUS
                     && agent.DistanceSq(HideLocation.BaseLocation.Pos) <= 3 * 3)
                 {
@@ -72,12 +72,12 @@ namespace Tyr.Tasks
             {
                 if (GoScout)
                 {
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
-                    if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BARRACKS) >= 3
-                        || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REFINERY) > 0
-                        || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARINE) > 0
-                        || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) > 0
-                        || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COMMAND_CENTER) >= 2)
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
+                    if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BARRACKS) >= 3
+                        || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REFINERY) > 0
+                        || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARINE) > 0
+                        || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) > 0
+                        || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.COMMAND_CENTER) >= 2)
                         GoScout = false;
                 }
                 else if (NexusComplete)

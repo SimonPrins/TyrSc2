@@ -1,16 +1,16 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class ZealotImmortalArchon : Build
     {
@@ -36,16 +36,16 @@ namespace Tyr.Builds.Protoss
             return "ZealotImmortalArchon";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             DefenseTask.Enable();
-            tyr.TaskManager.Add(attackTask);
-            tyr.TaskManager.Add(WorkerScoutTask);
+            bot.TaskManager.Add(attackTask);
+            bot.TaskManager.Add(WorkerScoutTask);
             ArmyObserverTask.Enable();
-            tyr.TaskManager.Add(new ObserverScoutTask() { Priority = 6 });
-            tyr.TaskManager.Add(new AdeptScoutTask());
-            if (tyr.BaseManager.Pocket != null)
-                tyr.TaskManager.Add(new ScoutProxyTask(tyr.BaseManager.Pocket.BaseLocation.Pos));
+            bot.TaskManager.Add(new ObserverScoutTask() { Priority = 6 });
+            bot.TaskManager.Add(new AdeptScoutTask());
+            if (bot.BaseManager.Pocket != null)
+                bot.TaskManager.Add(new ScoutProxyTask(bot.BaseManager.Pocket.BaseLocation.Pos));
             ArchonMergeTask.Enable();
 
             if (StalkerDefenseSquads == null)
@@ -55,7 +55,7 @@ namespace Tyr.Builds.Protoss
                     Bot.Main.TaskManager.Add(task);
             DefenseSquadTask.Enable(StalkerDefenseSquads, true, true);
 
-            OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
+            OverrideDefenseTarget = bot.MapAnalyzer.Walk(NaturalDefensePos, bot.MapAnalyzer.EnemyDistances, 15);
 
             MicroControllers.Add(new SpreadOutController() { SpreadTypes = new HashSet<uint>() { UnitTypes.IMMORTAL, UnitTypes.ARCHON, UnitTypes.STALKER } });
             MicroControllers.Add(FearSpinesController);
@@ -226,32 +226,32 @@ namespace Tyr.Builds.Protoss
             return result;
         }
         
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             BalanceGas();
 
-            if (tyr.Observation.ActionErrors != null && tyr.Observation.ActionErrors.Count > 0)
+            if (bot.Observation.ActionErrors != null && bot.Observation.ActionErrors.Count > 0)
             {
-                FileUtil.Debug("Errors for frame: " + tyr.Frame);
-                foreach (ActionError error in tyr.Observation.ActionErrors)
+                FileUtil.Debug("Errors for frame: " + bot.Frame);
+                foreach (ActionError error in bot.Observation.ActionErrors)
                 {
                     FileUtil.Debug(error.Result + " ability: " + error.AbilityId);
                 }
                 FileUtil.Debug("");
             }
 
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(917);
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(917);
 
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.BATTLECRUISER) > 0)
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.BATTLECRUISER) > 0)
                 BattlecruisersDetected = true;
 
             if (FourRax.Get().Detected)
                 FourRaxSuspected = true;
             if (!FourRaxSuspected)
             {
-                Point2D enemyRamp = tyr.MapAnalyzer.GetEnemyRamp();
+                Point2D enemyRamp = bot.MapAnalyzer.GetEnemyRamp();
                 int enemyBarrackWallCount = 0;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (enemyRamp == null)
                         break;
@@ -268,7 +268,7 @@ namespace Tyr.Builds.Protoss
 
             /*
             if (BattlecruisersDetected || 
-                (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE) >= 12 && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARINE) < 80))
+                (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE) >= 12 && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARINE) < 80))
             {
                 attackTask.RequiredSize = 30;
                 attackTask.RetreatSize = 8;
@@ -295,28 +295,28 @@ namespace Tyr.Builds.Protoss
 
             foreach (DefenseSquadTask task in StalkerDefenseSquads)
             {
-                task.Stopped = (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) < 3 && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) == 0 || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARINE) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARAUDER) >= 10);
+                task.Stopped = (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) < 3 && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) == 0 || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARINE) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARAUDER) >= 10);
                 task.MaxDefenders = Math.Min(5, Completed(UnitTypes.STALKER) / Math.Max(1, Count(UnitTypes.NEXUS)));
                 task.Priority = 10;
             }
 
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 3 || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 3 || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) > 0)
             {
                 DefenseTask.AirDefenseTask.IgnoreEnemyTypes.Add(UnitTypes.VIKING_FIGHTER);
                 DefenseTask.GroundDefenseTask.IgnoreEnemyTypes.Add(UnitTypes.REAPER);
-                tyr.buildingPlacer.SpreadCannons = true;
+                bot.buildingPlacer.SpreadCannons = true;
                 attackTask.DefendOtherAgents = false;
             }
 
             FearSpinesController.Stopped = !SpinePushDetected;
 
-            if (tyr.EnemyRace == Race.Zerg)
+            if (bot.EnemyRace == Race.Zerg)
             {
-                if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK)
-                    + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BROOD_LORD)
-                    + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.CORRUPTOR)
-                    + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.SPIRE)
-                    + tyr.EnemyStrategyAnalyzer.Count(UnitTypes.GREATER_SPIRE) > 0)
+                if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MUTALISK)
+                    + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BROOD_LORD)
+                    + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.CORRUPTOR)
+                    + bot.EnemyStrategyAnalyzer.Count(UnitTypes.SPIRE)
+                    + bot.EnemyStrategyAnalyzer.Count(UnitTypes.GREATER_SPIRE) > 0)
                     DesiredStalkers = 15;
                 else
                     DesiredStalkers = 2;
@@ -339,14 +339,14 @@ namespace Tyr.Builds.Protoss
 
             if (EarlyPool.Get().Detected && !Expanded.Get().Detected && Completed(UnitTypes.ZEALOT) < 2)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.NEXUS
                         && agent.Unit.BuildProgress < 0.99)
                         agent.Order(Abilities.CANCEL);
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (Count(UnitTypes.PROBE) >= 24
                 && Count(UnitTypes.NEXUS) < 2

@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class ZealotRushProxy : Build
     {
@@ -28,7 +28,7 @@ namespace Tyr.Builds.Protoss
             ProxyTwoGateTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new StutterController());
 
@@ -51,7 +51,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.RequiredSize = RequiredSize;
             TimingAttackTask.Task.RetreatSize = 0;
@@ -59,21 +59,21 @@ namespace Tyr.Builds.Protoss
             if (ProxyFourGateTask.Task.Stopped)
                 ProxyFourGateTask.Task.Clear();
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
 
-                agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
 
-            IdleTask.Task.OverrideTarget = tyr.MapAnalyzer.Walk(ProxyFourGateTask.Task.GetHideLocation(), tyr.MapAnalyzer.EnemyDistances, 10);
-            IdleTask.Task.AttackMove = tyr.Frame <= 22.4 * 60 * 4.5;
+            IdleTask.Task.OverrideTarget = bot.MapAnalyzer.Walk(ProxyFourGateTask.Task.GetHideLocation(), bot.MapAnalyzer.EnemyDistances, 10);
+            IdleTask.Task.AttackMove = bot.Frame <= 22.4 * 60 * 4.5;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

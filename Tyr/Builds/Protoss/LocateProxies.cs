@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class LocateProxies : Build
     {
@@ -18,7 +18,7 @@ namespace Tyr.Builds.Protoss
         {
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             DetermineProxyLocations();
         }
@@ -86,15 +86,15 @@ namespace Tyr.Builds.Protoss
             }
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            if (tyr.Frame >= 22.4 * 100)
-                tyr.GameConnection.RequestLeaveGame().Wait();
+            if (bot.Frame >= 22.4 * 100)
+                bot.GameConnection.RequestLeaveGame().Wait();
 
-            if (tyr.Frame == (int)(22.4 * 40))
+            if (bot.Frame == (int)(22.4 * 40))
             {
                 List<Base> bases = new List<Base>();
-                foreach (Base b in tyr.BaseManager.Bases)
+                foreach (Base b in bot.BaseManager.Bases)
                 {
                     if (b == Natural || b == Main)
                         continue;
@@ -103,7 +103,7 @@ namespace Tyr.Builds.Protoss
 
                 bases.Sort((a, b) => System.Math.Sign(SC2Util.DistanceSq(a.BaseLocation.Pos, Main.BaseLocation.Pos) - SC2Util.DistanceSq(b.BaseLocation.Pos, Main.BaseLocation.Pos)));
                 int basePos = 0;
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.PROBE)
                         continue;
@@ -116,18 +116,18 @@ namespace Tyr.Builds.Protoss
                 }
             }
 
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
                 if (enemy.UnitType != UnitTypes.BARRACKS)
                     continue;
                 if (enemy.IsFlying)
                     continue;
-                if (Util.SC2Util.DistanceSq(enemy.Pos, tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 40 * 40)
+                if (Util.SC2Util.DistanceSq(enemy.Pos, bot.TargetManager.PotentialEnemyStartLocations[0]) <= 40 * 40)
                     continue;
 
                 float dist = 1000000;
                 Point2D pos = null;
-                foreach (Base b in tyr.BaseManager.Bases)
+                foreach (Base b in bot.BaseManager.Bases)
                 {
                     float newDist = SC2Util.DistanceSq(b.BaseLocation.Pos, enemy.Pos);
                     if (newDist >= dist)
@@ -148,12 +148,12 @@ namespace Tyr.Builds.Protoss
                     }
                     if (!alreadyRegisterd)
                     {
-                        string mapStartString = tyr.GameInfo.MapName + "(" + Bot.Main.MapAnalyzer.StartLocation.X + ", " + Bot.Main.MapAnalyzer.StartLocation.Y + "):";
+                        string mapStartString = bot.GameInfo.MapName + "(" + Bot.Main.MapAnalyzer.StartLocation.X + ", " + Bot.Main.MapAnalyzer.StartLocation.Y + "):";
                         string locationString = mapStartString + "(" + pos.X + "," + pos.Y + ")";
                         ScoutLocations.Add(pos);
                         FileUtil.WriteScoutLocation(locationString);
                     }
-                    tyr.GameConnection.RequestLeaveGame().Wait();
+                    bot.GameConnection.RequestLeaveGame().Wait();
                 }
             }
         }

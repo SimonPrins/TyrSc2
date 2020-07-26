@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class SCVRushTask : Task
     {
@@ -55,11 +55,11 @@ namespace Tyr.Tasks
             TakeWorkers--;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             ulong mineral = 0;
-            if (tyr.BaseManager.Main.BaseLocation.MineralFields.Count > 0)
-                mineral = tyr.BaseManager.Main.BaseLocation.MineralFields[0].Tag;
+            if (bot.BaseManager.Main.BaseLocation.MineralFields.Count > 0)
+                mineral = bot.BaseManager.Main.BaseLocation.MineralFields[0].Tag;
 
             foreach (Agent agent in units)
             {
@@ -71,7 +71,7 @@ namespace Tyr.Tasks
                 if (regenerating.Contains(agent.Unit.Tag))
                 {
                     bool flee = false;
-                    foreach (Unit enemy in tyr.Observation.Observation.RawData.Units)
+                    foreach (Unit enemy in bot.Observation.Observation.RawData.Units)
                     {
                         if (enemy.Alliance != Alliance.Enemy)
                             continue;
@@ -88,12 +88,12 @@ namespace Tyr.Tasks
                     if (flee)
                     {
                         if (mineral == 0)
-                            agent.Order(Abilities.MOVE, SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
+                            agent.Order(Abilities.MOVE, SC2Util.To2D(bot.MapAnalyzer.StartLocation));
                         else
                             agent.Order(Abilities.MOVE, mineral);
                     }
                     else
-                        agent.Order(Abilities.ATTACK, tyr.TargetManager.AttackTarget);
+                        agent.Order(Abilities.ATTACK, bot.TargetManager.AttackTarget);
                 }
                 else
                 {
@@ -101,7 +101,7 @@ namespace Tyr.Tasks
                     if (broodling != null)
                     {
                         if (mineral == 0)
-                            agent.Order(Abilities.MOVE, SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
+                            agent.Order(Abilities.MOVE, SC2Util.To2D(bot.MapAnalyzer.StartLocation));
                         else
                             agent.Order(Abilities.MOVE, mineral);
                         continue;
@@ -121,7 +121,7 @@ namespace Tyr.Tasks
                         continue;
                     }
                     if (agent.Unit.WeaponCooldown <= 3 || mineral == 0)
-                        agent.Order(Abilities.ATTACK, tyr.TargetManager.AttackTarget);
+                        agent.Order(Abilities.ATTACK, bot.TargetManager.AttackTarget);
                     else
                         agent.Order(Abilities.MOVE, mineral);
                 }

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class QueenTumorTask : Task
     {
@@ -40,20 +40,20 @@ namespace Tyr.Tasks
             return descriptors;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType != UnitTypes.CREEP_TUMOR_BURROWED)
                     continue;
                 if (!BurrowFrames.ContainsKey(agent.Unit.Tag))
-                    BurrowFrames.Add(agent.Unit.Tag, tyr.Frame);
+                    BurrowFrames.Add(agent.Unit.Tag, bot.Frame);
 
-               if (tyr.Frame - BurrowFrames[agent.Unit.Tag] < 336
-                    && tyr.Frame - BurrowFrames[agent.Unit.Tag] >= 224)
+               if (bot.Frame - BurrowFrames[agent.Unit.Tag] < 336
+                    && bot.Frame - BurrowFrames[agent.Unit.Tag] >= 224)
                {
-                    Point2D aroundLoc = tyr.MapAnalyzer.Walk(SC2Util.To2D(agent.Unit.Pos), tyr.MapAnalyzer.EnemyDistances, 9);
-                    Point2D finalLoc = tyr.buildingPlacer.FindPlacementLocal(aroundLoc, SC2Util.Point(1, 1), UnitTypes.CREEP_TUMOR, 10, SC2Util.To2D(agent.Unit.Pos), 9);
+                    Point2D aroundLoc = bot.MapAnalyzer.Walk(SC2Util.To2D(agent.Unit.Pos), bot.MapAnalyzer.EnemyDistances, 9);
+                    Point2D finalLoc = bot.buildingPlacer.FindPlacementLocal(aroundLoc, SC2Util.Point(1, 1), UnitTypes.CREEP_TUMOR, 10, SC2Util.To2D(agent.Unit.Pos), 9);
                     if (finalLoc != null)
                         agent.Order(1733, finalLoc);
                 }
@@ -66,7 +66,7 @@ namespace Tyr.Tasks
                 return;
 
             int bases = 0;
-            foreach (Base b in tyr.BaseManager.Bases)
+            foreach (Base b in bot.BaseManager.Bases)
                 if (b.ResourceCenter != null)
                     bases++;
 
@@ -74,10 +74,10 @@ namespace Tyr.Tasks
             Point2D tumorTarget;
             if (PlaceTumorsInMain)
             {
-                Point2D main = tyr.BaseManager.Main.BaseLocation.Pos;
-                Point2D natural = tyr.BaseManager.Natural.BaseLocation.Pos;
+                Point2D main = bot.BaseManager.Main.BaseLocation.Pos;
+                Point2D natural = bot.BaseManager.Natural.BaseLocation.Pos;
                 Point2D halfway = SC2Util.Point((main.X + natural.X) / 2, (main.Y + natural.Y) / 2);
-                tumorTarget = tyr.buildingPlacer.FindPlacement(halfway, SC2Util.Point(1, 1), UnitTypes.CREEP_TUMOR); ;
+                tumorTarget = bot.buildingPlacer.FindPlacement(halfway, SC2Util.Point(1, 1), UnitTypes.CREEP_TUMOR); ;
             }
             else
             {
@@ -85,22 +85,22 @@ namespace Tyr.Tasks
                 Base defendBase = null;
                 if (bases >= 2)
                 {
-                    target = tyr.BaseManager.NaturalDefensePos;
-                    defendBase = tyr.BaseManager.Natural;
+                    target = bot.BaseManager.NaturalDefensePos;
+                    defendBase = bot.BaseManager.Natural;
                 }
                 else
                 {
-                    target = tyr.BaseManager.MainDefensePos;
-                    defendBase = tyr.BaseManager.Main;
+                    target = bot.BaseManager.MainDefensePos;
+                    defendBase = bot.BaseManager.Main;
                 }
-                tumorTarget = tyr.buildingPlacer.FindPlacement(tyr.MapAnalyzer.Walk(target, tyr.MapAnalyzer.EnemyDistances, 4), SC2Util.Point(1, 1), UnitTypes.CREEP_TUMOR); ;
+                tumorTarget = bot.buildingPlacer.FindPlacement(bot.MapAnalyzer.Walk(target, bot.MapAnalyzer.EnemyDistances, 4), SC2Util.Point(1, 1), UnitTypes.CREEP_TUMOR); ;
             }
 
             foreach (Agent queen in units)
             {
                 if (queen.Unit.Energy >= 75)
                 {
-                    tyr.DrawSphere(SC2Util.Point(tumorTarget.X, tumorTarget.Y, 0));
+                    bot.DrawSphere(SC2Util.Point(tumorTarget.X, tumorTarget.Y, 0));
                     queen.Order(1694, tumorTarget);
                 }
             }

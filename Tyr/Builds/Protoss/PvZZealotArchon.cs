@@ -1,17 +1,17 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.BuildingPlacement;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.BuildingPlacement;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvZZealotArchon : Build
     {
@@ -48,9 +48,9 @@ namespace Tyr.Builds.Protoss
                 BlockExpandTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
+            OverrideDefenseTarget = bot.MapAnalyzer.Walk(NaturalDefensePos, bot.MapAnalyzer.EnemyDistances, 15);
 
             MicroControllers.Add(StutterForwardController);
             MicroControllers.Add(FallBackController);
@@ -192,7 +192,7 @@ namespace Tyr.Builds.Protoss
             return null;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             BalanceGas();
             
@@ -202,23 +202,23 @@ namespace Tyr.Builds.Protoss
             StutterForwardController.Stopped = Count(UnitTypes.NEXUS) >= 3 || TimingAttackTask.Task.Units.Count > 0 || Completed(UnitTypes.ZEALOT) > 0;
 
 
-            if (!AggressiveZerglings && tyr.Frame <= 22.4 * 60 * 7)
+            if (!AggressiveZerglings && bot.Frame <= 22.4 * 60 * 7)
             {
                 int closeEnemyZerglingCount = 0;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (enemy.UnitType != UnitTypes.ZERGLING)
                         continue;
-                    if (SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation) <= 50 * 50)
+                    if (SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation) <= 50 * 50)
                         closeEnemyZerglingCount++;
                 }
                 if (AggressiveZerglings)
-                    tyr.DrawText("Close zerglings: " + closeEnemyZerglingCount);
+                    bot.DrawText("Close zerglings: " + closeEnemyZerglingCount);
                 if (closeEnemyZerglingCount >= 20)
                     AggressiveZerglings = true;
             }
             if (AggressiveZerglings)
-                tyr.DrawText("Aggressive zerglings.");
+                bot.DrawText("Aggressive zerglings.");
 
             int wallDone = 0;
             foreach (WallBuilding building in WallIn.Wall)
@@ -228,7 +228,7 @@ namespace Tyr.Builds.Protoss
                     wallDone++;
                     continue;
                 }
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                 {
                     if (agent.DistanceSq(building.Pos) <= 1 * 1)
                     {
@@ -237,7 +237,7 @@ namespace Tyr.Builds.Protoss
                     }
                 }
             }
-            tyr.DrawText("Wall count: " + wallDone);
+            bot.DrawText("Wall count: " + wallDone);
             HodorTask.Task.Stopped = Count(UnitTypes.NEXUS) >= 3 
                 || TimingAttackTask.Task.Units.Count > 0 
                 || (EarlyPool.Get().Detected && Completed(UnitTypes.ZEALOT) >= 2)
@@ -245,7 +245,7 @@ namespace Tyr.Builds.Protoss
             if (HodorTask.Task.Stopped)
                 HodorTask.Task.Clear();
 
-            if (EarlyPool.Get().Detected || tyr.Frame >= 1800)
+            if (EarlyPool.Get().Detected || bot.Frame >= 1800)
             {
                 WorkerScoutTask.Task.Stopped = true;
                 WorkerScoutTask.Task.Clear();
@@ -259,9 +259,9 @@ namespace Tyr.Builds.Protoss
                 HodorTask.Task.Clear();
             }
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
@@ -269,19 +269,19 @@ namespace Tyr.Builds.Protoss
                 if (Count(UnitTypes.NEXUS) < 3 && TimingAttackTask.Task.Units.Count == 0)
                     agent.Order(Abilities.MOVE, Natural.BaseLocation.Pos);
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
 
             if (!MassZerglings
                 && !EarlyPool.Get().Detected
-                && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 60
-                && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ROACH) == 0
-                && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.HYDRALISK) == 0)
+                && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 60
+                && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ROACH) == 0
+                && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.HYDRALISK) == 0)
             {
                 MassZerglings = true;
                 TimingAttackTask.Task.Clear();
             }
-            tyr.DrawText("Zergling count: " + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING));
+            bot.DrawText("Zergling count: " + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING));
 
             //WorkerScoutTask.Task.StartFrame = 600;
             ObserverScoutTask.Task.Priority = 6;
@@ -294,10 +294,10 @@ namespace Tyr.Builds.Protoss
 
             if (EarlyPool.Get().Detected)
             {
-                tyr.NexusAbilityManager.Stopped = Count(UnitTypes.ZEALOT) == 0;
-                tyr.NexusAbilityManager.PriotitizedAbilities.Add(916);
+                bot.NexusAbilityManager.Stopped = Count(UnitTypes.ZEALOT) == 0;
+                bot.NexusAbilityManager.PriotitizedAbilities.Add(916);
             }
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(917);
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(917);
             
             if (UpgradeType.LookUp[UpgradeType.ProtossGroundWeapons1].Done())
                 TimingAttackTask.Task.RequiredSize = 24;
@@ -325,7 +325,7 @@ namespace Tyr.Builds.Protoss
             DefenseTask.AirDefenseTask.DrawDefenderRadius = 80;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (Count(UnitTypes.PROBE) >= 24
                 && Count(UnitTypes.NEXUS) < 2

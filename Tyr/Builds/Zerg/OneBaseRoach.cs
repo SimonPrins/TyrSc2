@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Zerg
+namespace SC2Sharp.Builds.Zerg
 {
     public class OneBaseRoach : Build
     {
@@ -33,14 +33,14 @@ namespace Tyr.Builds.Zerg
             return priorities;
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new StutterController());
             //MicroControllers.Add(new TargetFireController(GetPriorities()));
-            tyr.TaskManager.Add(TimingAttackTask);
-            if (tyr.EnemyRace != Race.Protoss)
-                tyr.TaskManager.Add(new WorkerScoutTask());
-            tyr.TaskManager.Add(new QueenInjectTask(Main));
+            bot.TaskManager.Add(TimingAttackTask);
+            if (bot.EnemyRace != Race.Protoss)
+                bot.TaskManager.Add(new WorkerScoutTask());
+            bot.TaskManager.Add(new QueenInjectTask(Main));
             Set += MainBuild();
             Set += AntiLifting();
         }
@@ -65,17 +65,17 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             /*
             if (FourRax.Get().Detected
-                || (tyr.Frame >= 22.4 * 85 && !tyr.EnemyStrategyAnalyzer.NoProxyTerranConfirmed && tyr.TargetManager.PotentialEnemyStartLocations.Count == 1)
+                || (bot.Frame >= 22.4 * 85 && !bot.EnemyStrategyAnalyzer.NoProxyTerranConfirmed && bot.TargetManager.PotentialEnemyStartLocations.Count == 1)
                 || ReaperRush.Get().Detected)
             {
                 SmellCheese = true;
             }
 
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) >= 8
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) >= 8
                 || FourRax.Get().Detected
                 || SmellCheese)
             {
@@ -90,7 +90,7 @@ namespace Tyr.Builds.Zerg
                 GasWorkerTask.WorkersPerGas = 2;
 
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType == UnitTypes.LARVA)
                 {
@@ -102,7 +102,7 @@ namespace Tyr.Builds.Zerg
                         && (Count(UnitTypes.DRONE) < 14 || Completed(UnitTypes.ROACH) >= 11))
                     {
                         agent.Order(1342);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.DRONE);
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.DRONE);
                     }
                     else if (Completed(UnitTypes.SPIRE) + Completed(UnitTypes.GREATER_SPIRE) > 0
                         && Minerals() >= 100
@@ -110,7 +110,7 @@ namespace Tyr.Builds.Zerg
                         && ExpectedAvailableFood() > FoodUsed() + 4)
                     {
                         agent.Order(1346);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.MUTALISK);
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.MUTALISK);
                     }
                     else if (Lifting.Get().Detected
                         && Count(UnitTypes.ROACH) >= 35)
@@ -118,19 +118,19 @@ namespace Tyr.Builds.Zerg
                     else if (Minerals() >= 75 && Gas() >= 25 && ExpectedAvailableFood() > FoodUsed() + 6)
                     {
                         agent.Order(1351);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.ROACH);
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.ROACH);
                     }
                     else if (Minerals() >= 100)
                     {
                         agent.Order(1344);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.OVERLORD);
-                        tyr.UnitManager.FoodExpected += 8;
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.OVERLORD);
+                        bot.UnitManager.FoodExpected += 8;
                     }
                 }
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))
             {

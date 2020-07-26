@@ -1,10 +1,10 @@
-﻿using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvPAdeptAllIn : Build
     {
@@ -27,7 +27,7 @@ namespace Tyr.Builds.Protoss
             ForwardProbeTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(AdeptPhaseEnemyMainController);
             MicroControllers.Add(new AdeptKillWorkersController());
@@ -60,20 +60,20 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (!ChatMessageSent)
             {
                 if (Completed(UnitTypes.ADEPT_PHASE_SHIFT) > 0)
                 {
-                    tyr.Chat("As requested by AndyMan, we're doing some Adept harass!");
+                    bot.Chat("As requested by AndyMan, we're doing some Adept harass!");
                     ChatMessageSent = true;
                 }
             }
-            AdeptPhaseEnemyMainController.Stopped = tyr.Frame >= 22.4 * 60 * 6 && TotalEnemyCount(UnitTypes.IMMORTAL) == 0;
+            AdeptPhaseEnemyMainController.Stopped = bot.Frame >= 22.4 * 60 * 6 && TotalEnemyCount(UnitTypes.IMMORTAL) == 0;
             ForwardProbeTask.Task.EnemyBaseRange = 80;
 
-            ForwardProbeTask.Task.Stopped = tyr.Frame < 22.4 * 165 || SkippedNatural.Get().Detected;
+            ForwardProbeTask.Task.Stopped = bot.Frame < 22.4 * 165 || SkippedNatural.Get().Detected;
             if (ForwardProbeTask.Task.Stopped)
                 ForwardProbeTask.Task.Clear();
         }

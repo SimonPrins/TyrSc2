@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class MassSentriesTask : Task
     {
@@ -62,7 +62,7 @@ namespace Tyr.Tasks
             return false;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (units.Count <= RetreatSize && Units.Count > 0)
             {
@@ -70,26 +70,26 @@ namespace Tyr.Tasks
                 return;
             }
 
-            tyr.DrawText("Army size: " + Units.Count);
+            bot.DrawText("Army size: " + Units.Count);
 
             if (Units.Count > 0)
             {
-                if (LastAttackingFrame >= Bot.Main.Frame - 1 && tyr.Frame - LastStretchFrame >= 22.3 * 60)
+                if (LastAttackingFrame >= Bot.Main.Frame - 1 && bot.Frame - LastStretchFrame >= 22.3 * 60)
                 {
-                    LastStretchFrame = tyr.Frame;
+                    LastStretchFrame = bot.Frame;
                     StretchGoal = Math.Max(Math.Min(Units.Count, StretchGoal + 5), StretchGoal);
                 }
-                LastAttackingFrame = tyr.Frame;
+                LastAttackingFrame = bot.Frame;
             }
             ForceFieldUtil.DetermineForceFieldPlacement(Units);
 
 
             List<Unit> threatenedForceFields = new List<Unit>();
-            foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
+            foreach (Unit unit in bot.Observation.Observation.RawData.Units)
             {
                 if (unit.UnitType != UnitTypes.FORCE_FIELD)
                     continue;
-                if (SC2Util.DistanceSq(unit.Pos, tyr.MapAnalyzer.StartLocation) <= 30 * 30)
+                if (SC2Util.DistanceSq(unit.Pos, bot.MapAnalyzer.StartLocation) <= 30 * 30)
                     continue;
                 bool closeMeleeEnemy = false;
                 bool closeRangedEnemy = false;
@@ -152,7 +152,7 @@ namespace Tyr.Tasks
                 }
 
 
-                Attack(agent, tyr.TargetManager.AttackTarget);
+                Attack(agent, bot.TargetManager.AttackTarget);
             }
         }
     }

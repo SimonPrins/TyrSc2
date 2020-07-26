@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Terran
+namespace SC2Sharp.Builds.Terran
 {
     public class ReaperCyclone : Build
     {
@@ -31,7 +31,7 @@ namespace Tyr.Builds.Terran
             return "ReaperCyclone";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new YamatoController());
             MicroControllers.Add(new TankController());
@@ -125,15 +125,15 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            tyr.OrbitalAbilityManager.SaveEnergy = 200;
+            bot.OrbitalAbilityManager.SaveEnergy = 200;
 
-            if (tyr.Frame % 448 == 0)
+            if (bot.Frame % 448 == 0)
             {
-                if (tyr.OrbitalAbilityManager.ScanCommands.Count == 0)
+                if (bot.OrbitalAbilityManager.ScanCommands.Count == 0)
                 {
-                    foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                    foreach (Agent agent in bot.UnitManager.Agents.Values)
                     {
                         if (agent.Unit.UnitType != UnitTypes.REAPER
                             && agent.Unit.UnitType != UnitTypes.CYCLONE)
@@ -152,16 +152,16 @@ namespace Tyr.Builds.Terran
                         }
                         if (scanTarget != null)
                         {
-                            tyr.OrbitalAbilityManager.ScanCommands.Add(new Managers.ScanCommand() { FromFrame = tyr.Frame, Pos = SC2Util.To2D(scanTarget.Pos) });
+                            bot.OrbitalAbilityManager.ScanCommands.Add(new Managers.ScanCommand() { FromFrame = bot.Frame, Pos = SC2Util.To2D(scanTarget.Pos) });
                             break;
                         }
                     }
                 }
             }
-            if (tyr.Frame % 448 == 20)
-                tyr.OrbitalAbilityManager.ScanCommands.Clear();
+            if (bot.Frame % 448 == 20)
+                bot.OrbitalAbilityManager.ScanCommands.Clear();
 
-            if (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2 && RetreatAgainstReapers)
+            if (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.REAPER) >= 2 && RetreatAgainstReapers)
             {
                 TimingAttackTask.Task.RequiredSize = 10;
                 TimingAttackTask.Task.RetreatSize = 5;

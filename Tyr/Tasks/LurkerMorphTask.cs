@@ -1,8 +1,8 @@
-﻿using Tyr.Agents;
-using Tyr.Util;
-using static Tyr.Builds.BuildLists.ConditionalStep;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Util;
+using static SC2Sharp.Builds.BuildLists.ConditionalStep;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class LurkerMorphTask : Task
     {
@@ -22,7 +22,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             foreach (Agent agent in units)
                 agent.Order(Abilities.MORPH_LURKER);

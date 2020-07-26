@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class BaseManager : Manager
     {
@@ -17,12 +17,12 @@ namespace Tyr.Managers
         public Base Natural { get; private set; }
         public Base Pocket { get; private set; }
 
-        public void OnStart(Bot tyr)
+        public void OnStart(Bot bot)
         {
-            int[,] distances = tyr.MapAnalyzer.Distances(SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
+            int[,] distances = bot.MapAnalyzer.Distances(SC2Util.To2D(bot.MapAnalyzer.StartLocation));
             BaseLocation natural = null;
             int dist = 1000000000;
-            foreach (BaseLocation loc in tyr.MapAnalyzer.BaseLocations)
+            foreach (BaseLocation loc in bot.MapAnalyzer.BaseLocations)
             {
                 int distanceToMain = distances[(int)loc.Pos.X, (int)loc.Pos.Y];
                 Base newBase = new Base() { BaseLocation = loc, DistanceToMain = distanceToMain };
@@ -32,7 +32,7 @@ namespace Tyr.Managers
                 {
                     Main = newBase;
                 }
-                else if (tyr.MapAnalyzer.MainAndPocketArea[loc.Pos])
+                else if (bot.MapAnalyzer.MainAndPocketArea[loc.Pos])
                 {
                     Pocket = newBase;
                     DebugUtil.WriteLine("Found pocket base at: " + Pocket.BaseLocation.Pos);
@@ -104,35 +104,35 @@ namespace Tyr.Managers
                 newBase.MineralSide2 = new Point2D() { X = (newBase.MineralSide2.X + newBase.BaseLocation.Pos.X) / 2f, Y = (newBase.MineralSide2.Y + newBase.BaseLocation.Pos.Y) / 2f };
             }
 
-            NaturalDefensePos = tyr.MapAnalyzer.Walk(natural.Pos, tyr.MapAnalyzer.EnemyDistances, 10);
-            int distToEnemy = tyr.MapAnalyzer.EnemyDistances[(int)NaturalDefensePos.X, (int)NaturalDefensePos.Y];
-            int wallDist = tyr.MapAnalyzer.WallDistances[(int)NaturalDefensePos.X, (int)NaturalDefensePos.Y];
+            NaturalDefensePos = bot.MapAnalyzer.Walk(natural.Pos, bot.MapAnalyzer.EnemyDistances, 10);
+            int distToEnemy = bot.MapAnalyzer.EnemyDistances[(int)NaturalDefensePos.X, (int)NaturalDefensePos.Y];
+            int wallDist = bot.MapAnalyzer.WallDistances[(int)NaturalDefensePos.X, (int)NaturalDefensePos.Y];
             for (int x = (int)NaturalDefensePos.X - 5; x <= NaturalDefensePos.X + 5; x++)
                 for (int y = (int)NaturalDefensePos.Y - 5; y <= NaturalDefensePos.Y + 5; y++)
                 {
                     if (SC2Util.DistanceSq(SC2Util.Point(x, y), natural.Pos) <= 7 * 7
                         || SC2Util.DistanceSq(SC2Util.Point(x, y), natural.Pos) >= 10 * 10)
                         continue;
-                    if (tyr.MapAnalyzer.EnemyDistances[x, y] > distToEnemy)
+                    if (bot.MapAnalyzer.EnemyDistances[x, y] > distToEnemy)
                         continue;
-                    int newDist = tyr.MapAnalyzer.WallDistances[x, y];
+                    int newDist = bot.MapAnalyzer.WallDistances[x, y];
                     if (newDist > wallDist)
                     {
                         wallDist = newDist;
                         NaturalDefensePos = SC2Util.Point(x, y);
                     }
                 }
-            MainDefensePos = tyr.MapAnalyzer.Walk(SC2Util.To2D(tyr.MapAnalyzer.StartLocation), tyr.MapAnalyzer.EnemyDistances, 10);
+            MainDefensePos = bot.MapAnalyzer.Walk(SC2Util.To2D(bot.MapAnalyzer.StartLocation), bot.MapAnalyzer.EnemyDistances, 10);
 
         }
 
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
-            tyr.DrawSphere(SC2Util.Point(NaturalDefensePos.X, NaturalDefensePos.Y, 10));
+            bot.DrawSphere(SC2Util.Point(NaturalDefensePos.X, NaturalDefensePos.Y, 10));
             AvailableGasses = 0;
             foreach (Base b in Bases)
             {
-                if (b.ResourceCenter != null && !tyr.UnitManager.Agents.ContainsKey(b.ResourceCenter.Unit.Tag))
+                if (b.ResourceCenter != null && !bot.UnitManager.Agents.ContainsKey(b.ResourceCenter.Unit.Tag))
                 {
                     b.ResourceCenter = null;
                     b.Owner = -1;
@@ -140,7 +140,7 @@ namespace Tyr.Managers
 
                 if (b.ResourceCenter == null)
                 {
-                    foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                    foreach (Agent agent in bot.UnitManager.Agents.Values)
                     {
                         if (!agent.IsResourceCenter)
                             continue;
@@ -157,20 +157,20 @@ namespace Tyr.Managers
                 
                 if (b.ResourceCenter == null)
                 {
-                    if (b.Owner == (int)tyr.PlayerId)
+                    if (b.Owner == (int)bot.PlayerId)
                         b.Owner = -1;
                     foreach (BuildRequest request in ConstructionTask.Task.BuildRequests)
                         if (UnitTypes.ResourceCenters.Contains(request.Type) && SC2Util.DistanceSq(b.BaseLocation.Pos, request.Pos) <= 2 * 2)
                         {
-                            b.Owner = (int)tyr.PlayerId;
+                            b.Owner = (int)bot.PlayerId;
                             break;
                         }
                 }
 
-                if (b.Owner != tyr.PlayerId)
+                if (b.Owner != bot.PlayerId)
                 {
                     b.Owner = -1;
-                    foreach (Unit unit in tyr.Enemies())
+                    foreach (Unit unit in bot.Enemies())
                     {
                         // If an enemy has built near this base we set it as its owner.
                         if (UnitTypes.BuildingTypes.Contains(unit.UnitType) 
@@ -181,7 +181,7 @@ namespace Tyr.Managers
 
                 b.BaseLocation.MineralFields = new List<MineralField>();
                 b.BaseLocation.Gasses = new List<Gas>();
-                foreach (Unit unit in tyr.Observation.Observation.RawData.Units)
+                foreach (Unit unit in bot.Observation.Observation.RawData.Units)
                 {
                     if (UnitTypes.MineralFields.Contains(unit.UnitType)
                         && SC2Util.DistanceSq(unit.Pos, b.BaseLocation.Pos) <= 10 * 10)
@@ -218,7 +218,7 @@ namespace Tyr.Managers
                 b.UnderAttack = false;
                 b.Evacuate = false;
                 int attackerCount = 0;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                         continue;
@@ -242,7 +242,7 @@ namespace Tyr.Managers
                 if (b.ResourceCenter == null || b.ResourceCenter.Unit.BuildProgress < 0.99)
                     b.ResourceCenterFinishedFrame = -1;
                 else if (b.ResourceCenterFinishedFrame == -1)
-                    b.ResourceCenterFinishedFrame = tyr.Frame;
+                    b.ResourceCenterFinishedFrame = bot.Frame;
 
             }
 

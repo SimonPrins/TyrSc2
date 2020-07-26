@@ -1,6 +1,6 @@
-﻿using Tyr.Agents;
+﻿using SC2Sharp.Agents;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class Expand : Build
     {
@@ -9,17 +9,17 @@ namespace Tyr.Builds.Protoss
             return "Expand";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             Construct(UnitTypes.ASSIMILATOR);
             Construct(UnitTypes.NEXUS);
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

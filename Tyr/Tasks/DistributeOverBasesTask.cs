@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class DistributeOverBasesTask : Task
     {
@@ -25,7 +25,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Stopped)
             {
@@ -34,8 +34,8 @@ namespace Tyr.Tasks
             }
 
             HashSet<Base> bases = new HashSet<Base>();
-            foreach (Base b in tyr.BaseManager.Bases)
-                if (b.Owner == tyr.PlayerId && (b != tyr.BaseManager.Main || !ExcludeMain))
+            foreach (Base b in bot.BaseManager.Bases)
+                if (b.Owner == bot.PlayerId && (b != bot.BaseManager.Main || !ExcludeMain))
                     bases.Add(b);
             if (bases.Count == 0)
             {
@@ -56,7 +56,7 @@ namespace Tyr.Tasks
                 }
             }
 
-            tyr.DrawText("Distribute bases count: " + bases.Count);
+            bot.DrawText("Distribute bases count: " + bases.Count);
 
             int maxDefenders;
             if (bases.Count > 0)
@@ -102,8 +102,8 @@ namespace Tyr.Tasks
             {
                 Base target = AssignedBases[agent.Unit.Tag];
                 if (agent.DistanceSq(target.BaseLocation.Pos) >= 6 * 6
-                    && (agent.Unit.Orders == null || agent.Unit.Orders.Count == 0 || tyr.Frame % 10 == 0))
-                    tyr.MicroController.Attack(agent, target.BaseLocation.Pos);
+                    && (agent.Unit.Orders == null || agent.Unit.Orders.Count == 0 || bot.Frame % 10 == 0))
+                    bot.MicroController.Attack(agent, target.BaseLocation.Pos);
             }
 
         }

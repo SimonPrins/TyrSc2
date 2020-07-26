@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class MassOracle : Build
     {
@@ -32,7 +32,7 @@ namespace Tyr.Builds.Protoss
                 ScoutProxyTask.Enable(Bot.Main.BaseManager.Pocket.BaseLocation.Pos);
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new OracleController());
             MicroControllers.Add(new StutterController());
@@ -92,24 +92,24 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.RequiredSize = RequiredSize;
 
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.ORACLE].Ability);
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.ORACLE].Ability);
 
             HideUnitsTask.Task.UnitType = UnitTypes.ORACLE;
-            if (Completed(UnitTypes.ORACLE) >= 6 || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 10)
+            if (Completed(UnitTypes.ORACLE) >= 6 || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) >= 10)
             {
                 HideUnitsTask.Task.Stopped = true;
                 HideUnitsTask.Task.Clear();
             }
             if (Completed(UnitTypes.ORACLE) >= 6)
                 OraclesDone = true;
-            HideUnitsTask.Task.Target = SC2Util.To2D(tyr.MapAnalyzer.StartLocation);
+            HideUnitsTask.Task.Target = SC2Util.To2D(bot.MapAnalyzer.StartLocation);
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

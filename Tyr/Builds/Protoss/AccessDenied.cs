@@ -1,13 +1,13 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class AccessDenied : Build
     {
@@ -37,7 +37,7 @@ namespace Tyr.Builds.Protoss
             WorkersAttackLocationTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(SoftLeash);
             MicroControllers.Add(new FleeCyclonesController());
@@ -91,7 +91,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             bool enemyHasArmy = TotalEnemyCount(UnitTypes.ZEALOT) + TotalEnemyCount(UnitTypes.STALKER) + TotalEnemyCount(UnitTypes.SENTRY) + TotalEnemyCount(UnitTypes.IMMORTAL) + TotalEnemyCount(UnitTypes.ADEPT) > 0;
             
@@ -114,7 +114,7 @@ namespace Tyr.Builds.Protoss
             }
 
             SoftLeash.Stopped = Completed(UnitTypes.IMMORTAL) == 0;
-            tyr.buildingPlacer.BuildCompact = true;
+            bot.buildingPlacer.BuildCompact = true;
             TimingAttackTask.Task.DefendOtherAgents = false;
             if (ProxyDetected)
                 TimingAttackTask.Task.RequiredSize = 5;
@@ -126,11 +126,11 @@ namespace Tyr.Builds.Protoss
             DefenseTask.GroundDefenseTask.MainDefenseRadius = 20;
 
             float proxyDist = 100 * 100;
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
                 if (enemy.UnitType == UnitTypes.PYLON)
                 {
-                    float dist = SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation);
+                    float dist = SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation);
                     if (dist < proxyDist)
                     {
                         ProxyDetected = true;
@@ -139,12 +139,12 @@ namespace Tyr.Builds.Protoss
                         DenyScoutTask.Task.StartFrame = 0;
                     }
                 }
-                if (enemy.UnitType == UnitTypes.PROBE && SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation) <= 50 * 50)
+                if (enemy.UnitType == UnitTypes.PROBE && SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation) <= 50 * 50)
                     ScoutDetected = true;
             }
 
 
-            tyr.DrawText("ScoutDetected: " + ScoutDetected);
+            bot.DrawText("ScoutDetected: " + ScoutDetected);
 
             DenyScoutTask.Task.Stopped = enemyHasArmy || ProxyDetected || (!ProxyDetected && !ScoutDetected);
             if (DenyScoutTask.Task.Stopped)

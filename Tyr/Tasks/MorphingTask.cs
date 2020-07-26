@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class MorphingTask : Task
     {
@@ -68,14 +68,14 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             for (int i = units.Count - 1; i >= 0; i--)
             {
                 Agent agent = units[i];
                 MorphingType morphingType = MorphingType.LookUpToType[MorphingUnits[agent.Unit.Tag]];
-                if (tyr.Observation.Observation.PlayerCommon.Minerals < morphingType.Minerals
-                    || tyr.Observation.Observation.PlayerCommon.Vespene < morphingType.Gas)
+                if (bot.Observation.Observation.PlayerCommon.Minerals < morphingType.Minerals
+                    || bot.Observation.Observation.PlayerCommon.Vespene < morphingType.Gas)
                     continue;
                 if (agent.Unit.UnitType != morphingType.FromType
                     || agent.CurrentAbility() == morphingType.Ability)

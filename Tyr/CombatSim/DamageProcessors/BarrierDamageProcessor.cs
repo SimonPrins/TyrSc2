@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
-using Tyr.CombatSim.Buffs;
+using SC2Sharp.CombatSim.Buffs;
 
-namespace Tyr.CombatSim.DamageProcessors
+namespace SC2Sharp.CombatSim.DamageProcessors
 {
     [JsonObject(MemberSerialization.Fields)]
     public class BarrierDamageProcessor : DamageProcessor

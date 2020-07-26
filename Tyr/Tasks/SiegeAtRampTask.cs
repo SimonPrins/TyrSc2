@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class SiegeAtRampTask : Task
     {
@@ -38,7 +38,7 @@ namespace Tyr.Tasks
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Stopped)
             {
@@ -46,10 +46,10 @@ namespace Tyr.Tasks
                 return;
             }
             if (IdleLocation == null)
-                IdleLocation = tyr.MapAnalyzer.GetMainRamp();
+                IdleLocation = bot.MapAnalyzer.GetMainRamp();
 
             Agent bunker = null;
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
                 if (agent.Unit.UnitType == UnitTypes.BUNKER)
                 {
                     bunker = agent;
@@ -66,8 +66,8 @@ namespace Tyr.Tasks
                     agent.Order(Abilities.UNSIEGE);
                 else if (agent.DistanceSq(IdleLocation) < 5 * 5)
                 {
-                    if (agent.DistanceSq(tyr.MapAnalyzer.GetMainRamp()) < agent.DistanceSq(bunker))
-                        agent.Order(Abilities.MOVE, SC2Util.To2D(tyr.MapAnalyzer.StartLocation));
+                    if (agent.DistanceSq(bot.MapAnalyzer.GetMainRamp()) < agent.DistanceSq(bunker))
+                        agent.Order(Abilities.MOVE, SC2Util.To2D(bot.MapAnalyzer.StartLocation));
                     else
                     {
                         PotentialHelper potential = new PotentialHelper(agent.Unit.Pos);

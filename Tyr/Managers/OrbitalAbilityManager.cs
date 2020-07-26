@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class OrbitalAbilityManager : Manager
     {
@@ -10,11 +10,11 @@ namespace Tyr.Managers
 
         public int SaveEnergy = 0;
 
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
-            if (tyr.GameInfo.PlayerInfo[(int)tyr.PlayerId - 1].RaceActual != Race.Terran)
+            if (bot.GameInfo.PlayerInfo[(int)bot.PlayerId - 1].RaceActual != Race.Terran)
                 return;
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
                 if (agent.Unit.UnitType == UnitTypes.ORBITAL_COMMAND)
                     FindTarget(agent);
         }

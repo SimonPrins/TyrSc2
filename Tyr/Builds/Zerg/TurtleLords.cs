@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Zerg
+namespace SC2Sharp.Builds.Zerg
 {
     public class TurtleLords : Build
     {
@@ -37,7 +37,7 @@ namespace Tyr.Builds.Zerg
             return ZergBuildUtil.GetDefenseBuild();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new CorruptorController());
             MicroControllers.Add(new QueenTransfuseController());
@@ -97,7 +97,7 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.RequiredSize = 32;
             TimingAttackTask.Task.RetreatSize = 10;
@@ -109,9 +109,9 @@ namespace Tyr.Builds.Zerg
             DefenseTask.AirDefenseTask.ExpandDefenseRadius = 20;
             DefenseTask.AirDefenseTask.MaxDefenseRadius = 55;
             /*
-            if ((!SmellCheese && tyr.Frame >= 22.4 * 60 * 1.5
-                && !tyr.EnemyStrategyAnalyzer.NoProxyGatewayConfirmed)
-                || (!SmellCheese && tyr.Frame < 22.4 * 60 * 1.5 && ThreeGate.Get().Detected))
+            if ((!SmellCheese && bot.Frame >= 22.4 * 60 * 1.5
+                && !bot.EnemyStrategyAnalyzer.NoProxyGatewayConfirmed)
+                || (!SmellCheese && bot.Frame < 22.4 * 60 * 1.5 && ThreeGate.Get().Detected))
             {
                 SmellCheese = true;
                 TimingAttackTask.RequiredSize = 18;
@@ -120,10 +120,10 @@ namespace Tyr.Builds.Zerg
             */
 
 
-            if (tyr.Frame < 22.4 * 60 * 1.5 && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.FORGE) > 0)
+            if (bot.Frame < 22.4 * 60 * 1.5 && bot.EnemyStrategyAnalyzer.Count(UnitTypes.FORGE) > 0)
                 CannonRush = true;
 
-            if (tyr.Frame < 22.4 * 60 * 2 && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.CYBERNETICS_CORE) > 0
+            if (bot.Frame < 22.4 * 60 * 2 && bot.EnemyStrategyAnalyzer.Count(UnitTypes.CYBERNETICS_CORE) > 0
                 && ThreeGate.Get().Detected)
             {
                 StalkerDefense = true;
@@ -141,7 +141,7 @@ namespace Tyr.Builds.Zerg
             /*
             if (SmellCheese)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                 {
                     if (Count(UnitTypes.HATCHERY) >= 2 && agent.Unit.UnitType == UnitTypes.HATCHERY
                         && agent.Unit.BuildProgress < 0.99)
@@ -156,7 +156,7 @@ namespace Tyr.Builds.Zerg
                             && Completed(UnitTypes.ROACH_WARREN) > 0)
                         {
                             agent.Order(1351);
-                            CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.ROACH);
+                            CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.ROACH);
                         }
                         else if (Minerals() >= 50
                             && ExpectedAvailableFood() > FoodUsed() + 2
@@ -164,7 +164,7 @@ namespace Tyr.Builds.Zerg
                             && Count(UnitTypes.DRONE) < 22 - Completed(UnitTypes.EXTRACTOR))
                         {
                             agent.Order(1342);
-                            CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.DRONE);
+                            CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.DRONE);
                         }
                         else if (Minerals() >= 100 && FoodUsed()
                             + Tyr.Bot.UnitManager.Count(UnitTypes.HATCHERY) * 2
@@ -173,8 +173,8 @@ namespace Tyr.Builds.Zerg
                             >= ExpectedAvailableFood() - 2)
                         {
                             agent.Order(1344);
-                            CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.OVERLORD);
-                            tyr.UnitManager.FoodExpected += 8;
+                            CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.OVERLORD);
+                            bot.UnitManager.FoodExpected += 8;
                         }
                     }
                 }
@@ -194,7 +194,7 @@ namespace Tyr.Builds.Zerg
                 MorphingTask.Task.Morph(UnitTypes.OVERSEER);
 
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType == UnitTypes.LARVA)
                 {
@@ -207,15 +207,15 @@ namespace Tyr.Builds.Zerg
                         && (Count(UnitTypes.SPINE_CRAWLER) >= 2 || Minerals() >= 200))
                     {
                         agent.Order(1343);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.ZERGLING);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.ZERGLING);
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.ZERGLING);
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.ZERGLING);
                     }
                     if (Minerals() >= 75 && Gas() >= 25 && ExpectedAvailableFood() > FoodUsed() + 6
                         && Count(UnitTypes.ROACH) < 8
                         && Completed(UnitTypes.ROACH_WARREN) > 0)
                     {
                         agent.Order(1351);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.ROACH);
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.ROACH);
                     }
                     else if (Minerals() >= 50
                         && ExpectedAvailableFood() > FoodUsed() + 2
@@ -223,7 +223,7 @@ namespace Tyr.Builds.Zerg
                         && (Count(UnitTypes.ROACH) >= 8 || Count(UnitTypes.DRONE) <= 24))
                     {
                         agent.Order(1342);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.DRONE);
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.DRONE);
                     }
                     else if (Minerals() >= 150
                         && Gas() >= 100
@@ -233,7 +233,7 @@ namespace Tyr.Builds.Zerg
                         && ExpectedAvailableFood() > FoodUsed() + 4)
                     {
                         agent.Order(1353);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.CORRUPTOR);
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.CORRUPTOR);
                     }
                     else if (Minerals() >= 100 && FoodUsed()
                         + Bot.Main.UnitManager.Count(UnitTypes.HATCHERY) * 2
@@ -242,14 +242,14 @@ namespace Tyr.Builds.Zerg
                         >= ExpectedAvailableFood() - 2)
                     {
                         agent.Order(1344);
-                        CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.OVERLORD);
-                        tyr.UnitManager.FoodExpected += 8;
+                        CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.OVERLORD);
+                        bot.UnitManager.FoodExpected += 8;
                     }
                 }
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))
             {
@@ -257,35 +257,35 @@ namespace Tyr.Builds.Zerg
                     && Completed(UnitTypes.SPAWNING_POOL) > 0)
                 {
                     agent.Order(1632);
-                    CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.QUEEN);
+                    CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.QUEEN);
                 }
                 else if (Minerals() >= 100
                     && Completed(UnitTypes.QUEEN) < 3
                     && (Count(UnitTypes.LAIR) > 0))
                 {
                     agent.Order(1632);
-                    CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.QUEEN);
+                    CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.QUEEN);
                 }
                 else if (Minerals() >= 150
                     && Completed(UnitTypes.QUEEN) < 6
                     && StalkerDefense)
                 {
                     agent.Order(1632);
-                    CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.QUEEN);
+                    CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.QUEEN);
                 }
                 else if (Completed(UnitTypes.QUEEN) < 5
                     && Count(UnitTypes.CORRUPTOR) >= 10
                     && Minerals() >= 400)
                 {
                     agent.Order(1632);
-                    CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.QUEEN);
+                    CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.QUEEN);
                 }
                 else if (Count(UnitTypes.CORRUPTOR) >= 8
                     && Count(UnitTypes.HIVE) > 0
                     && Minerals() >= 600)
                 {
                     agent.Order(1632);
-                    CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.QUEEN);
+                    CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.QUEEN);
                 }
                 else if (Count(UnitTypes.SPINE_CRAWLER) > 0
                     && Minerals() >= 150 && Gas() >= 100

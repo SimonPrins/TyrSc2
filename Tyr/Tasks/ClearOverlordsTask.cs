@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ClearOverlordsTask : Task
     {
@@ -31,7 +31,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             float distance;
             if (Target == null)
@@ -41,7 +41,7 @@ namespace Tyr.Tasks
                 if (units.Count > 0 && SC2Util.DistanceSq(units[0].Unit.Pos, Target) <= 5 * 5)
                 {
                     bool dead = true;
-                    foreach (Unit enemy in tyr.Observation.Observation.RawData.Units)
+                    foreach (Unit enemy in bot.Observation.Observation.RawData.Units)
                         if (enemy.Tag == TargetTag)
                         {
                             dead = false;
@@ -55,12 +55,12 @@ namespace Tyr.Tasks
                         TargetTag = 0;
                     }
                     else
-                        distance = SC2Util.DistanceSq(tyr.MapAnalyzer.StartLocation, Target) * 0.8f;
+                        distance = SC2Util.DistanceSq(bot.MapAnalyzer.StartLocation, Target) * 0.8f;
                 }
                 else
-                    distance = SC2Util.DistanceSq(tyr.MapAnalyzer.StartLocation, Target) * 0.8f;
+                    distance = SC2Util.DistanceSq(bot.MapAnalyzer.StartLocation, Target) * 0.8f;
             }
-            foreach (Unit enemy in tyr.Observation.Observation.RawData.Units)
+            foreach (Unit enemy in bot.Observation.Observation.RawData.Units)
             {
                 if (enemy.Alliance != Alliance.Enemy)
                     continue;
@@ -81,7 +81,7 @@ namespace Tyr.Tasks
                 if (units.Count > 0 && SC2Util.DistanceSq(units[0].Unit.Pos, pair.Value) <= 5 * 5)
                 {
                     bool dead = true;
-                    foreach (Unit enemy in tyr.Observation.Observation.RawData.Units)
+                    foreach (Unit enemy in bot.Observation.Observation.RawData.Units)
                         if (enemy.Tag == pair.Key)
                         {
                             dead = false;
@@ -94,7 +94,7 @@ namespace Tyr.Tasks
                         continue;
                     }
                 }
-                foreach (BuildingLocation loc in tyr.EnemyManager.EnemyBuildings.Values)
+                foreach (BuildingLocation loc in bot.EnemyManager.EnemyBuildings.Values)
                 {
                     if (SC2Util.DistanceSq(loc.Pos, pair.Value) <= 8 * 8)
                     {
@@ -108,7 +108,7 @@ namespace Tyr.Tasks
                     continue;
                 }
 
-                float newDist = SC2Util.DistanceSq(pair.Value, tyr.MapAnalyzer.StartLocation);
+                float newDist = SC2Util.DistanceSq(pair.Value, bot.MapAnalyzer.StartLocation);
                 if (newDist < distance)
                 {
                     distance = newDist;
@@ -124,7 +124,7 @@ namespace Tyr.Tasks
                 Clear();
             else
                 foreach (Agent agent in units)
-                    tyr.MicroController.Attack(agent, Target);
+                    bot.MicroController.Attack(agent, Target);
         }
     }
 }

@@ -1,15 +1,15 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvPRushDefense : Build
     {
@@ -49,11 +49,11 @@ namespace Tyr.Builds.Protoss
             ForceFieldRampTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
-            OverrideMainDefenseTarget = new PotentialHelper(tyr.MapAnalyzer.GetMainRamp(), 6).
-                To(tyr.MapAnalyzer.StartLocation)
+            OverrideDefenseTarget = bot.MapAnalyzer.Walk(NaturalDefensePos, bot.MapAnalyzer.EnemyDistances, 15);
+            OverrideMainDefenseTarget = new PotentialHelper(bot.MapAnalyzer.GetMainRamp(), 6).
+                To(bot.MapAnalyzer.StartLocation)
                 .Get();
 
             MicroControllers.Add(FallBackController);
@@ -173,13 +173,13 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             WorkerTask.Task.EvacuateThreatenedBases = true;
 
             if ((FourGateDetected || DoubleRoboAllIn) && Completed(UnitTypes.IMMORTAL) < 2)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.NEXUS)
                         continue;
@@ -193,9 +193,9 @@ namespace Tyr.Builds.Protoss
                 && TotalEnemyCount(UnitTypes.ROBOTICS_BAY) + TotalEnemyCount(UnitTypes.ROBOTICS_FACILITY) > 0)
                 DoubleRoboAllIn = true;
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
@@ -203,7 +203,7 @@ namespace Tyr.Builds.Protoss
                 if (Count(UnitTypes.NEXUS) < 2 && TimingAttackTask.Task.Units.Count == 0)
                     agent.Order(Abilities.MOVE, Main.BaseLocation.Pos);
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
             
             if (EnemyCount(UnitTypes.PHOENIX) <= 3)
@@ -228,7 +228,7 @@ namespace Tyr.Builds.Protoss
                 );
 
             ScoutTask.Task.ScoutType = UnitTypes.PHOENIX;
-            ScoutTask.Task.Target = tyr.TargetManager.PotentialEnemyStartLocations[0];
+            ScoutTask.Task.Target = bot.TargetManager.PotentialEnemyStartLocations[0];
 
             if (TotalEnemyCount(UnitTypes.STARGATE) 
                 + TotalEnemyCount(UnitTypes.DARK_SHRINE)
@@ -238,7 +238,7 @@ namespace Tyr.Builds.Protoss
                 == 0
                 && !SecondRobo)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.SENTRY)
                         continue;
@@ -252,7 +252,7 @@ namespace Tyr.Builds.Protoss
             if (StrategyAnalysis.WorkerRush.Get().Detected
                 && Count(UnitTypes.ZEALOT) < 2)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.ASSIMILATOR
                         && agent.Unit.BuildProgress < 0.99)
                         agent.Order(Abilities.CANCEL);
@@ -260,12 +260,12 @@ namespace Tyr.Builds.Protoss
 
             if (!FourGateDetected
                 && EnemyCount(UnitTypes.GATEWAY) + EnemyCount(UnitTypes.WARP_GATE) >= 3
-                && tyr.Frame < 22.4 * 60 * 4)
+                && bot.Frame < 22.4 * 60 * 4)
                 FourGateDetected = true;
             if (TotalEnemyCount(UnitTypes.VOID_RAY) + TotalEnemyCount(UnitTypes.STARGATE) + TotalEnemyCount(UnitTypes.ORACLE) > 0)
                 FourGateDetected = false;
 
-            tyr.TargetManager.TargetCannons = true;
+            bot.TargetManager.TargetCannons = true;
 
             if (WorkerScoutTask.Task.BaseCircled())
             {
@@ -276,12 +276,12 @@ namespace Tyr.Builds.Protoss
             WorkerScoutTask.Task.StartFrame = 600;
             ObserverScoutTask.Task.Priority = 6;
 
-            tyr.NexusAbilityManager.Stopped = Count(UnitTypes.STALKER) == 0 && tyr.Frame >= 120 * 22.4;
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(917);
+            bot.NexusAbilityManager.Stopped = Count(UnitTypes.STALKER) == 0 && bot.Frame >= 120 * 22.4;
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(917);
 
             if (EnemyExpandFrame >= 1000000
                 && Expanded.Get().Detected)
-                EnemyExpandFrame = tyr.Frame;
+                EnemyExpandFrame = bot.Frame;
             
             if ((DoubleRoboAllIn || FourGateDetected)
                 && Completed(UnitTypes.IMMORTAL) >= 4)
@@ -328,7 +328,7 @@ namespace Tyr.Builds.Protoss
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (Count(UnitTypes.PROBE) >= 24
                 && Count(UnitTypes.NEXUS) < 2

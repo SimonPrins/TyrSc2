@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class TrippleScoutTask : Task
     {
@@ -24,9 +24,9 @@ namespace Tyr.Tasks
             return !done;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 0)
+            if (bot.TargetManager.PotentialEnemyStartLocations.Count == 0)
             {
                 done = true;
                 Clear();
@@ -34,14 +34,14 @@ namespace Tyr.Tasks
             }
 
             List<Point2D> remaining = new List<Point2D>();
-            foreach (Point2D loc in tyr.TargetManager.PotentialEnemyStartLocations)
+            foreach (Point2D loc in bot.TargetManager.PotentialEnemyStartLocations)
                 remaining.Add(loc);
 
             foreach (Agent agent in Units)
             {
                 if (!Targets.ContainsKey(agent.Unit.Tag))
                     Targets.Add(agent.Unit.Tag, null);
-                else if (Targets[agent.Unit.Tag] != null && !tyr.TargetManager.PotentialEnemyStartLocations.Contains(Targets[agent.Unit.Tag]))
+                else if (Targets[agent.Unit.Tag] != null && !bot.TargetManager.PotentialEnemyStartLocations.Contains(Targets[agent.Unit.Tag]))
                     Targets[agent.Unit.Tag] = null;
 
                 if (Targets[agent.Unit.Tag] != null)

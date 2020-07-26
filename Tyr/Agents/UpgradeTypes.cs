@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Tyr.Agents
+namespace SC2Sharp.Agents
 {
     public class UpgradeType
     {

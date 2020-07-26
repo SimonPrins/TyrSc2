@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class OverlordAtNaturalTask : Task
     {
@@ -38,13 +38,13 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             Point2D target;
-            if (tyr.BaseManager.Natural.Owner == tyr.PlayerId)
-                target = tyr.BaseManager.NaturalDefensePos;
+            if (bot.BaseManager.Natural.Owner == bot.PlayerId)
+                target = bot.BaseManager.NaturalDefensePos;
             else
-                target = tyr.BaseManager.MainDefensePos;
+                target = bot.BaseManager.MainDefensePos;
 
             foreach (Agent agent in units)
                 if (SC2Util.DistanceSq(agent.Unit.Pos, target) >= 3 * 3)

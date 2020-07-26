@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class HuntProxyTask : Task
     {
@@ -51,9 +51,9 @@ namespace Tyr.Tasks
             return Bot.Main.Frame >= StartFrame && !Done;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            foreach (RecentlyDeceased deceased in tyr.EnemyManager.RecentlyDeceased)
+            foreach (RecentlyDeceased deceased in bot.EnemyManager.RecentlyDeceased)
                 if (deceased.UnitType == UnitTypes.PYLON)
                     Done = true;
 
@@ -65,19 +65,19 @@ namespace Tyr.Tasks
             if (ScoutBases == null)
             {
                 ScoutBases = new List<Point2D>();
-                foreach (Base b in tyr.BaseManager.Bases)
+                foreach (Base b in bot.BaseManager.Bases)
                 {
-                    float mainDist = SC2Util.DistanceSq(b.BaseLocation.Pos, tyr.MapAnalyzer.StartLocation);
+                    float mainDist = SC2Util.DistanceSq(b.BaseLocation.Pos, bot.MapAnalyzer.StartLocation);
                     if (mainDist >= 60 * 60 || mainDist <= 8 * 8)
                         continue;
                     ScoutBases.Add(b.BaseLocation.Pos);
                 }
                 if (CloseBasesFirst)
-                    ScoutBases.Sort((Point2D a, Point2D b) => tyr.MapAnalyzer.MainDistances[(int)a.X, (int)a.Y] - tyr.MapAnalyzer.MainDistances[(int)b.X, (int)b.Y]);
+                    ScoutBases.Sort((Point2D a, Point2D b) => bot.MapAnalyzer.MainDistances[(int)a.X, (int)a.Y] - bot.MapAnalyzer.MainDistances[(int)b.X, (int)b.Y]);
                 else
-                    ScoutBases.Sort((Point2D a, Point2D b) => tyr.MapAnalyzer.EnemyDistances[(int)a.X, (int)a.Y] - tyr.MapAnalyzer.EnemyDistances[(int)b.X, (int)b.Y]);
+                    ScoutBases.Sort((Point2D a, Point2D b) => bot.MapAnalyzer.EnemyDistances[(int)a.X, (int)a.Y] - bot.MapAnalyzer.EnemyDistances[(int)b.X, (int)b.Y]);
                 if (AddMidwayPoint)
-                    ScoutBases.Insert(0, new PotentialHelper(tyr.MapAnalyzer.StartLocation, 60).To(tyr.TargetManager.PotentialEnemyStartLocations[0]).Get());
+                    ScoutBases.Insert(0, new PotentialHelper(bot.MapAnalyzer.StartLocation, 60).To(bot.TargetManager.PotentialEnemyStartLocations[0]).Get());
             }
 
             if (ScoutBases.Count == 0)
@@ -98,11 +98,11 @@ namespace Tyr.Tasks
             float pylonDist = 100 * 100;
             Unit enemyWorker = null;
             float dist = 10000;
-            if (EnemyTag != 0 && tyr.Frame - EnemyFrame >= 10)
+            if (EnemyTag != 0 && bot.Frame - EnemyFrame >= 10)
                 EnemyTag = 0;
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
-                float newDist = SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation);
+                float newDist = SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation);
                 if (enemy.UnitType == UnitTypes.PYLON && newDist < pylonDist)
                 {
                     proxyPylon = enemy;
@@ -119,7 +119,7 @@ namespace Tyr.Tasks
                 if (newDist > dist)
                     continue;
                 bool proxyClose = false;
-                foreach (Unit proxy in tyr.Enemies())
+                foreach (Unit proxy in bot.Enemies())
                 {
                     if (proxy.UnitType != UnitTypes.BARRACKS
                         && proxy.UnitType != UnitTypes.FACTORY)
@@ -139,7 +139,7 @@ namespace Tyr.Tasks
 
                 dist = newDist;
                 enemyWorker = enemy;
-                EnemyFrame = tyr.Frame;
+                EnemyFrame = bot.Frame;
                 if (Units.Count > 0)
                     Enemy = new PotentialHelper(enemyWorker.Pos, 2).From(Units[0].Unit.Pos).Get();
                 else
@@ -157,7 +157,7 @@ namespace Tyr.Tasks
                     //else
                         agent.Order(Abilities.ATTACK, enemyWorker.Tag);
                 }
-                else if (tyr.Frame - EnemyFrame <= 45 && Enemy != null)
+                else if (bot.Frame - EnemyFrame <= 45 && Enemy != null)
                     agent.Order(Abilities.MOVE, Enemy);
                 else if (proxyPylon != null)
                     agent.Order(Abilities.ATTACK, proxyPylon.Tag);

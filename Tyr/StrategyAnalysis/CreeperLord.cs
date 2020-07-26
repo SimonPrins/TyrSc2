@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.StrategyAnalysis
+namespace SC2Sharp.StrategyAnalysis
 {
     public class CreeperLord : Strategy
     {

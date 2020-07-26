@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class DelayedWorkerRush : Build
     {
@@ -28,19 +28,19 @@ namespace Tyr.Builds.Protoss
             Bot.Main.TaskManager.Add(WorkerRushTask);
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new FearEnemyController(UnitTypes.ZEALOT, UnitTypes.BROODLING, 11) { MoveToMain = true });
             MicroControllers.Add(MoveWhenSafeController);
 
-            if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 1)
+            if (bot.TargetManager.PotentialEnemyStartLocations.Count == 1)
             {
-                tyr.EnemyManager.EnemyBuildings.Add(ulong.MaxValue, new Managers.BuildingLocation()
+                bot.EnemyManager.EnemyBuildings.Add(ulong.MaxValue, new Managers.BuildingLocation()
                 {
                     LastSeen = 0,
-                    Pos = new Point() { X = tyr.TargetManager.PotentialEnemyStartLocations[0].X, Y = tyr.TargetManager.PotentialEnemyStartLocations[0].Y, Z = 0 },
+                    Pos = new Point() { X = bot.TargetManager.PotentialEnemyStartLocations[0].X, Y = bot.TargetManager.PotentialEnemyStartLocations[0].Y, Z = 0 },
                     Tag = ulong.MaxValue,
-                    Type = tyr.EnemyRace == SC2APIProtocol.Race.Zerg ? UnitTypes.HATCHERY : (tyr.EnemyRace == SC2APIProtocol.Race.Protoss ? UnitTypes.NEXUS : UnitTypes.COMMAND_CENTER)
+                    Type = bot.EnemyRace == SC2APIProtocol.Race.Zerg ? UnitTypes.HATCHERY : (bot.EnemyRace == SC2APIProtocol.Race.Protoss ? UnitTypes.NEXUS : UnitTypes.COMMAND_CENTER)
                 });
             }
 
@@ -75,14 +75,14 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            tyr.TargetManager.PrefferDistant = false;
+            bot.TargetManager.PrefferDistant = false;
             if (!MessageSent)
-                    if (tyr.Enemies().Count > 0)
+                    if (bot.Enemies().Count > 0)
                     {
                         MessageSent = true;
-                        tyr.Chat("Prepare to be TICKLED! :D");
+                        bot.Chat("Prepare to be TICKLED! :D");
                     }
 
             TimingAttackTask.Task.RequiredSize = 1;
@@ -92,12 +92,12 @@ namespace Tyr.Builds.Protoss
             
             /*
             if (!EnemyMainInvaded)
-                foreach (Agent unit in tyr.Units())
-                    if (tyr.TargetManager.PotentialEnemyStartLocations.Count > 0
-                        && unit.DistanceSq(tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 10 * 10)
+                foreach (Agent unit in bot.Units())
+                    if (bot.TargetManager.PotentialEnemyStartLocations.Count > 0
+                        && unit.DistanceSq(bot.TargetManager.PotentialEnemyStartLocations[0]) <= 10 * 10)
                         EnemyMainInvaded = true;
 
-            tyr.DrawText("Enemy main invaded: " + EnemyMainInvaded);
+            bot.DrawText("Enemy main invaded: " + EnemyMainInvaded);
 
             WorkerRushTask.MoveCommandWhenSafe = !EnemyMainInvaded;
             MoveWhenSafeController.Stopped = EnemyMainInvaded;

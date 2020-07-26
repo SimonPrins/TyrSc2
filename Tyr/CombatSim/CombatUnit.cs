@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Tyr.CombatSim.ActionProcessors;
-using Tyr.CombatSim.Actions;
-using Tyr.CombatSim.Buffs;
-using Tyr.CombatSim.DamageProcessors;
+using SC2Sharp.CombatSim.ActionProcessors;
+using SC2Sharp.CombatSim.Actions;
+using SC2Sharp.CombatSim.Buffs;
+using SC2Sharp.CombatSim.DamageProcessors;
 
-namespace Tyr.CombatSim
+namespace SC2Sharp.CombatSim
 {
     public class CombatUnit
     {

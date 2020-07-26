@@ -1,14 +1,14 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvZMothershipSiege : Build
     {
@@ -39,7 +39,7 @@ namespace Tyr.Builds.Protoss
             PhoenixScoutTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             TimingAttackTask.Task.BeforeControllers.Add(new SoftLeashController(new HashSet<uint> { UnitTypes.TEMPEST, UnitTypes.CARRIER, UnitTypes.STALKER, UnitTypes.IMMORTAL, UnitTypes.ZEALOT }, UnitTypes.MOTHERSHIP, 6));
             MicroControllers.Add(new DTController());
@@ -60,7 +60,7 @@ namespace Tyr.Builds.Protoss
                 task.OnlyDefendInsideMain = true;
 
             Set += ProtossBuildUtil.Pylons(() =>
-            (Count(UnitTypes.PYLON) > 0 && Count(UnitTypes.CYBERNETICS_CORE) > 0 && Count(UnitTypes.ZEALOT) > 0) && Count(UnitTypes.PYLON) < 3 || tyr.Frame >= 22.4 * 60 * 3.5);
+            (Count(UnitTypes.PYLON) > 0 && Count(UnitTypes.CYBERNETICS_CORE) > 0 && Count(UnitTypes.ZEALOT) > 0) && Count(UnitTypes.PYLON) < 3 || bot.Frame >= 22.4 * 60 * 3.5);
             Set += ExpandBuildings();
             Set += ExtraAssimilators();
             Set += Units();
@@ -172,7 +172,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             BalanceGas();
 
@@ -187,11 +187,11 @@ namespace Tyr.Builds.Protoss
                 || TotalEnemyCount(UnitTypes.CORRUPTOR) + TotalEnemyCount(UnitTypes.MUTALISK) > 0)
                 BuildZealots = false;
 
-            tyr.NexusAbilityManager.Stopped = Completed(UnitTypes.PYLON) == 0;
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(1006);
+            bot.NexusAbilityManager.Stopped = Completed(UnitTypes.PYLON) == 0;
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(1006);
 
 
-            SaveWorkersTask.Task.Stopped = tyr.Frame >= 22.4 * 60 * 7 || EnemyCount(UnitTypes.CYCLONE) == 0 || !Natural.UnderAttack;
+            SaveWorkersTask.Task.Stopped = bot.Frame >= 22.4 * 60 * 7 || EnemyCount(UnitTypes.CYCLONE) == 0 || !Natural.UnderAttack;
             if (SaveWorkersTask.Task.Stopped)
                 SaveWorkersTask.Task.Clear();
 

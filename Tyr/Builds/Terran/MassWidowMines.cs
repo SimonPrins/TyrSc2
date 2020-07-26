@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Terran
+namespace SC2Sharp.Builds.Terran
 {
     public class MassWidowMines : Build
     {
@@ -30,7 +30,7 @@ namespace Tyr.Builds.Terran
             return "MassWidowMines";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new MineController());
             MicroControllers.Add(new StutterController());
@@ -97,7 +97,7 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.RequiredSize = 10;
             TimingAttackTask.Task.RetreatSize = 0;
@@ -108,7 +108,7 @@ namespace Tyr.Builds.Terran
                 TimingAttackTask.Task.UnitType = 0;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.COMMAND_CENTER
                 && Completed(UnitTypes.BARRACKS) > 0
@@ -144,7 +144,7 @@ namespace Tyr.Builds.Terran
             }
             else if (agent.Unit.UnitType == UnitTypes.FACTORY)
             {
-                if (!tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
+                if (!bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
                 {
                     if (Count(UnitTypes.FACTORY_TECH_LAB) <= Count(UnitTypes.FACTORY_REACTOR))
                         agent.Order(454);
@@ -160,7 +160,7 @@ namespace Tyr.Builds.Terran
                         agent.Order(614);
                     else if (Count(UnitTypes.WIDOW_MINE) >= 10)
                     {
-                        if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB)
+                        if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.FACTORY_TECH_LAB)
                         {
                             if (Completed(UnitTypes.ARMORY) > 0
                                 && Minerals() >= 300
@@ -173,7 +173,7 @@ namespace Tyr.Builds.Terran
             }
             else if (agent.Unit.UnitType == UnitTypes.STARPORT)
             {
-                if (!tyr.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
+                if (!bot.UnitManager.Agents.ContainsKey(agent.Unit.AddOnTag))
                 {
                     if (Count(UnitTypes.VIKING_FIGHTER) > 0)
                     {
@@ -192,7 +192,7 @@ namespace Tyr.Builds.Terran
                         && FoodLeft() >= 2)
                         agent.Order(624);
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_REACTOR)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_REACTOR)
                 {
                     if (Minerals() > 150
                         && Gas() >= 75
@@ -200,7 +200,7 @@ namespace Tyr.Builds.Terran
                         && Count(UnitTypes.VIKING_FIGHTER) < 10)
                         agent.Order(624);
                 }
-                else if (tyr.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_TECH_LAB)
+                else if (bot.UnitManager.Agents[agent.Unit.AddOnTag].Unit.UnitType == UnitTypes.STARPORT_TECH_LAB)
                 {
                     if (Minerals() > 100
                         && Gas() >= 200

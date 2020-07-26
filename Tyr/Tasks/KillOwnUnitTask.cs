@@ -1,6 +1,6 @@
-﻿using Tyr.Agents;
+﻿using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class KillOwnUnitTask : Task
     {
@@ -25,7 +25,7 @@ namespace Tyr.Tasks
             return Bot.Main.UnitManager.Agents.ContainsKey(TargetTag);
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (!Bot.Main.UnitManager.Agents.ContainsKey(TargetTag))
             {

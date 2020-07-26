@@ -1,9 +1,9 @@
-﻿using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.Tasks;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class GreedySentries : Build
     {
@@ -29,7 +29,7 @@ namespace Tyr.Builds.Protoss
             WorkerRushDefenseTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new StayByCannonsController());
             MicroControllers.Add(new FleeCyclonesController());
@@ -39,7 +39,7 @@ namespace Tyr.Builds.Protoss
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.OnlyDefendInsideMain = true;
 
-            tyr.TargetManager.PrefferDistant = false;
+            bot.TargetManager.PrefferDistant = false;
 
 
             Set += ProtossBuildUtil.Pylons(() => Count(UnitTypes.PYLON) > 0 && Count(UnitTypes.CYBERNETICS_CORE) > 0);
@@ -104,9 +104,9 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            tyr.TaskManager.CombatSimulation.SimulationLength = 0;
+            bot.TaskManager.CombatSimulation.SimulationLength = 0;
             MassSentriesTask.Task.RequiredSize = RequiredSize;
             MassSentriesTask.Task.RetreatSize = 6;
 
@@ -117,19 +117,19 @@ namespace Tyr.Builds.Protoss
             if (!TyckleFightChatSent && StrategyAnalysis.WorkerRush.Get().Detected)
             {
                 TyckleFightChatSent = true;
-                tyr.Chat("TICKLE FIGHT! :D");
+                bot.Chat("TICKLE FIGHT! :D");
             }
 
             if (!MessageSent)
                 if (MassSentriesTask.Task.AttackSent)
                 {
                     MessageSent = true;
-                    tyr.Chat("Prepare to be TICKLED! :D");
+                    bot.Chat("Prepare to be TICKLED! :D");
                 }
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
@@ -137,7 +137,7 @@ namespace Tyr.Builds.Protoss
                 if (Count(UnitTypes.NEXUS) < 2 && TimingAttackTask.Task.Units.Count == 0)
                     agent.Order(Abilities.MOVE, Main.BaseLocation.Pos);
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
         }
     }

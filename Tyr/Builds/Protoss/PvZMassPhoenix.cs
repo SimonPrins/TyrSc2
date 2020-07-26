@@ -1,13 +1,13 @@
 ﻿using SC2APIProtocol;
 using System;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvZMassPhoenix : Build
     {
@@ -37,11 +37,11 @@ namespace Tyr.Builds.Protoss
             PhoenixHuntOverlordsTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
-            OverrideMainDefenseTarget = new PotentialHelper(tyr.MapAnalyzer.GetMainRamp(), 6).
-                To(tyr.MapAnalyzer.StartLocation)
+            OverrideDefenseTarget = bot.MapAnalyzer.Walk(NaturalDefensePos, bot.MapAnalyzer.EnemyDistances, 15);
+            OverrideMainDefenseTarget = new PotentialHelper(bot.MapAnalyzer.GetMainRamp(), 6).
+                To(bot.MapAnalyzer.StartLocation)
                 .Get();
             
             MicroControllers.Add(new GravitonBeamController() { Delay = 22.4f * 4 });
@@ -122,13 +122,13 @@ namespace Tyr.Builds.Protoss
             return result;
         }
         
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Bot.Main.Frame == (int)(45 * 22.4))
-                tyr.Chat("This build was requested by Infy!");
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                bot.Chat("This build was requested by Infy!");
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
@@ -136,13 +136,13 @@ namespace Tyr.Builds.Protoss
                 if (Count(UnitTypes.NEXUS) < 2 && TimingAttackTask.Task.Units.Count == 0)
                     agent.Order(Abilities.MOVE, Main.BaseLocation.Pos);
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
 
             BalanceGas();
 
 
-            tyr.TargetManager.TargetCannons = true;
+            bot.TargetManager.TargetCannons = true;
 
 
             if (WorkerScoutTask.Task.BaseCircled())
@@ -155,8 +155,8 @@ namespace Tyr.Builds.Protoss
             WorkerScoutTask.Task.StartFrame = 600;
             ObserverScoutTask.Task.Priority = 6;
 
-            tyr.NexusAbilityManager.Stopped = Count(UnitTypes.STALKER) == 0 && tyr.Frame >= 120 * 22.4;
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(917);
+            bot.NexusAbilityManager.Stopped = Count(UnitTypes.STALKER) == 0 && bot.Frame >= 120 * 22.4;
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(917);
             
             TimingAttackTask.Task.RequiredSize = 25;
 
@@ -185,7 +185,7 @@ namespace Tyr.Builds.Protoss
 
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (Count(UnitTypes.PROBE) >= 24
                 && Count(UnitTypes.NEXUS) < 2

@@ -1,25 +1,25 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class EnemyTankManager : Manager
     {
         public List<UnitLocation> Tanks = new List<UnitLocation>();
         public Dictionary<ulong, int> SiegeFrame = new Dictionary<ulong, int>();
         
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
-            Cleanup(tyr);
-            Update(tyr);
+            Cleanup(bot);
+            Update(bot);
         }
 
-        private void Cleanup(Bot tyr)
+        private void Cleanup(Bot bot)
         {
             HashSet<ulong> unsiegedTanks = new HashSet<ulong>();
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
                 if (enemy.UnitType == UnitTypes.SIEGE_TANK)
                     unsiegedTanks.Add(enemy.Tag);
 
@@ -32,7 +32,7 @@ namespace Tyr.Managers
                     continue;
                 }
                 bool removed = false;
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                 {
                     float sightRange = UnitTypes.LookUp[agent.Unit.UnitType].SightRange;
                     if (agent.DistanceSq(tank.Pos) <= sightRange * sightRange - 4)
@@ -53,7 +53,7 @@ namespace Tyr.Managers
             Tanks.RemoveAt(Tanks.Count - 1);
         }
 
-        public void Update(Bot tyr)
+        public void Update(Bot bot)
         {
             Dictionary<ulong, UnitLocation> existingTanks = new Dictionary<ulong, UnitLocation>();
             foreach (UnitLocation tank in Tanks)
@@ -61,21 +61,21 @@ namespace Tyr.Managers
 
             HashSet<ulong> removeTanks = new HashSet<ulong>();
 
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
                 if (enemy.UnitType == UnitTypes.SIEGE_TANK)
                 {
                     if (SiegeFrame.ContainsKey(enemy.Tag))
-                        SiegeFrame[enemy.Tag] = tyr.Frame;
+                        SiegeFrame[enemy.Tag] = bot.Frame;
                     else
-                        SiegeFrame.Add(enemy.Tag, tyr.Frame);
+                        SiegeFrame.Add(enemy.Tag, bot.Frame);
                 }
                 if (existingTanks.ContainsKey(enemy.Tag))
                 {
                     if (enemy.UnitType == UnitTypes.SIEGE_TANK_SIEGED)
                     {
                         existingTanks[enemy.Tag].Pos = enemy.Pos;
-                        existingTanks[enemy.Tag].LastSeenFrame = tyr.Frame;
+                        existingTanks[enemy.Tag].LastSeenFrame = bot.Frame;
                     }
                     else
                         removeTanks.Add(enemy.Tag);
@@ -85,7 +85,7 @@ namespace Tyr.Managers
                 if (enemy.UnitType != UnitTypes.SIEGE_TANK_SIEGED)
                     continue;
 
-                Tanks.Add(new UnitLocation() { Tag = enemy.Tag, UnitType = enemy.UnitType, LastSeenFrame = tyr.Frame, Pos = enemy.Pos });
+                Tanks.Add(new UnitLocation() { Tag = enemy.Tag, UnitType = enemy.UnitType, LastSeenFrame = bot.Frame, Pos = enemy.Pos });
             }
 
             for (int i = Tanks.Count - 1; i >= 0; i--)

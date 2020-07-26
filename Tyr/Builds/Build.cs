@@ -1,22 +1,22 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
 using System.IO;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds
+namespace SC2Sharp.Builds
 {
     public abstract class Build
     {
         public abstract string Name();
-        public abstract void OnStart(Bot tyr);
-        public abstract void OnFrame(Bot tyr);
-        public virtual void Produce(Bot tyr, Agent agent) { }
+        public abstract void OnStart(Bot bot);
+        public abstract void OnFrame(Bot bot);
+        public virtual void Produce(Bot bot, Agent agent) { }
         private Build PreviousOverrideBuild = null;
 
         protected List<CustomController> MicroControllers = new List<CustomController>();
@@ -30,15 +30,15 @@ namespace Tyr.Builds
             return MicroControllers;
         }
 
-        public void ProduceOverride(Bot tyr, Agent agent)
+        public void ProduceOverride(Bot bot, Agent agent)
         {
             if (PreviousOverrideBuild != null)
-                PreviousOverrideBuild.Produce(tyr, agent);
+                PreviousOverrideBuild.Produce(bot, agent);
             else
-                Produce(tyr, agent);
+                Produce(bot, agent);
         }
 
-        public void OnFrameBase(Bot tyr)
+        public void OnFrameBase(Bot bot)
         {
             Bot.Main.DrawText("Executing Build: " + Name());
             Build actualBuild = null;
@@ -51,11 +51,11 @@ namespace Tyr.Builds
 
             if (PreviousOverrideBuild != null && PreviousOverrideBuild != actualBuild)
             {
-                tyr.TaskManager.StopAll();
+                bot.TaskManager.StopAll();
                 actualBuild.InitializeTasks();
-                tyr.TaskManager.ClearStopped();
+                bot.TaskManager.ClearStopped();
             }
-            actualBuild.OnFrame(tyr);
+            actualBuild.OnFrame(bot);
             actualBuild.Set.OnFrame();
             PreviousOverrideBuild = actualBuild;
         }

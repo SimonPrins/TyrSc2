@@ -1,6 +1,6 @@
 ﻿using SC2APIProtocol;
 
-namespace Tyr.BuildingPlacement
+namespace SC2Sharp.BuildingPlacement
 {
     public class ReservedBuilding
     {

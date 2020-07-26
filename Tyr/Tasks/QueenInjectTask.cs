@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class QueenInjectTask : Task
     {
@@ -50,7 +50,7 @@ namespace Tyr.Tasks
             return b.Owner == Bot.Main.PlayerId;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (b.ResourceCenter == null)
             {
@@ -61,7 +61,7 @@ namespace Tyr.Tasks
             {
                 Unit defendEnemy = null;
                 float dist = DefenseRadius * DefenseRadius;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     float newDist = SC2Util.DistanceSq(b.BaseLocation.Pos, enemy.Pos);
                     if (newDist < dist)

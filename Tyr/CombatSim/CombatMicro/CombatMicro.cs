@@ -1,6 +1,6 @@
-﻿using Tyr.CombatSim.Actions;
+﻿using SC2Sharp.CombatSim.Actions;
 
-namespace Tyr.CombatSim.CombatMicro
+namespace SC2Sharp.CombatSim.CombatMicro
 {
     public interface CombatMicro
     {

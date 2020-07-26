@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.BuildingPlacement;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.BuildingPlacement;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ProxyTask : Task
     {
@@ -102,13 +102,13 @@ namespace Tyr.Tasks
             return HideLocation;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             Point2D hideLocation = GetHideLocation();
             if (hideLocation == null)
                 return;
             UnitCounts = new Dictionary<uint, int>();
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
                 if (agent.DistanceSq(HideLocation) > 20 * 20)
                     continue;
@@ -137,7 +137,7 @@ namespace Tyr.Tasks
                     doneRequests.Add(request);
                     continue;
                 }
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                 {
                     if (agent.Unit.UnitType == request.Type
                         && agent.DistanceSq(request.Pos) < 4)
@@ -183,7 +183,7 @@ namespace Tyr.Tasks
                     if (request.worker == null || request.worker.Unit.Tag != agent.Unit.Tag)
                         continue;
                     
-                    foreach (Unit enemy in tyr.Enemies())
+                    foreach (Unit enemy in bot.Enemies())
                     {
                         if (!enemy.IsFlying && SC2Util.DistanceGrid(request.Pos, enemy.Pos) <= (UnitTypes.WorkerTypes.Contains(enemy.UnitType) ? 3 : 1))
                         {

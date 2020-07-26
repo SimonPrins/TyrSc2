@@ -2,16 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvZ6GateAdepts : Build
     {
@@ -36,9 +36,9 @@ namespace Tyr.Builds.Protoss
             WarpPrismTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
+            OverrideDefenseTarget = bot.MapAnalyzer.Walk(NaturalDefensePos, bot.MapAnalyzer.EnemyDistances, 15);
 
             MicroControllers.Add(new HTController());
             MicroControllers.Add(new AdeptPhaseEnemyMainController());
@@ -65,7 +65,7 @@ namespace Tyr.Builds.Protoss
 
             Base third = null;
             float dist = 1000000;
-            foreach (Base b in tyr.BaseManager.Bases)
+            foreach (Base b in bot.BaseManager.Bases)
             {
                 if (b == Main
                     || b == Natural)
@@ -174,16 +174,16 @@ namespace Tyr.Builds.Protoss
             return null;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             WarpPrismTask.Task.ArmyUnitTypes.Add(UnitTypes.ADEPT);
 
-            if (tyr.Frame == (int)(22.4 * 60 * 3))
-                tyr.Chat("Use your stalker to clear the scouting overlord from the third if it is there.");
+            if (bot.Frame == (int)(22.4 * 60 * 3))
+                bot.Chat("Use your stalker to clear the scouting overlord from the third if it is there.");
             if (!AttackMessageSent && Completed(UnitTypes.WARP_PRISM) > 0)
             {
                 AttackMessageSent = true;
-                tyr.Chat("Send your adepts straight to the enemy base.");
+                bot.Chat("Send your adepts straight to the enemy base.");
             }
 
             if (!WarpPrismTask.Task.WarpInObjectiveSet()
@@ -192,10 +192,10 @@ namespace Tyr.Builds.Protoss
             {
                 int warpInsReady = 0;
                 RequestQuery query = new RequestQuery();
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                     if (agent.Unit.UnitType == UnitTypes.WARP_GATE)
                         query.Abilities.Add(new RequestQueryAvailableAbilities() { UnitTag = agent.Unit.Tag });
-                Task<ResponseQuery> task = tyr.GameConnection.SendQuery(query);
+                Task<ResponseQuery> task = bot.GameConnection.SendQuery(query);
                 task.Wait();
                 ResponseQuery response = task.Result;
                 foreach (ResponseQueryAvailableAbilities availableAbilities in response.Abilities)
@@ -266,7 +266,7 @@ namespace Tyr.Builds.Protoss
                     wallDone++;
                     continue;
                 }
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                 {
                     if (agent.DistanceSq(building.Pos) <= 1 * 1)
                     {
@@ -296,9 +296,9 @@ namespace Tyr.Builds.Protoss
                 HodorTask.Task.Clear();
             }
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
@@ -307,19 +307,19 @@ namespace Tyr.Builds.Protoss
                     && TimingAttackTask.Task.Units.Count == 0)
                     agent.Order(Abilities.MOVE, Natural.BaseLocation.Pos);
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
             if (EarlyPool.Get().Detected)
             {
-                tyr.NexusAbilityManager.Stopped = Count(UnitTypes.ZEALOT) == 0;
-                tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.ZEALOT].Ability);
+                bot.NexusAbilityManager.Stopped = Count(UnitTypes.ZEALOT) == 0;
+                bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.ZEALOT].Ability);
             }
             else
             {
-                tyr.NexusAbilityManager.OnlyChronoPrioritizedUnits = Completed(UnitTypes.WARP_PRISM) == 0;
-                tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.WARP_PRISM].Ability);
-                tyr.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.STALKER].Ability);
-                tyr.NexusAbilityManager.PriotitizedAbilities.Add(UpgradeType.LookUp[UpgradeType.ResonatingGlaives].Ability);
+                bot.NexusAbilityManager.OnlyChronoPrioritizedUnits = Completed(UnitTypes.WARP_PRISM) == 0;
+                bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.WARP_PRISM].Ability);
+                bot.NexusAbilityManager.PriotitizedAbilities.Add(TrainingType.LookUp[UnitTypes.STALKER].Ability);
+                bot.NexusAbilityManager.PriotitizedAbilities.Add(UpgradeType.LookUp[UpgradeType.ResonatingGlaives].Ability);
             }
 
             if (Completed(UnitTypes.WARP_PRISM) > 0)

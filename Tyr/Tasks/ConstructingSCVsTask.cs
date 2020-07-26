@@ -1,6 +1,6 @@
-﻿using Tyr.Agents;
+﻿using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ConstructingSCVsTask : Task
     {
@@ -26,7 +26,7 @@ namespace Tyr.Tasks
             return true;
         }
         
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             for (int i = units.Count - 1; i >= 0; i--)
             {

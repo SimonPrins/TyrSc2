@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class AdeptScoutTask : Task
     {
@@ -23,27 +23,27 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            if (tyr.Frame % (22) == 0)
-                foreach(Agent agent in tyr.UnitManager.Agents.Values)
+            if (bot.Frame % (22) == 0)
+                foreach(Agent agent in bot.UnitManager.Agents.Values)
                 {
                     if (agent.Unit.UnitType == UnitTypes.ADEPT
-                        && SC2Util.DistanceSq(agent.Unit.Pos, tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 55 * 55)
-                        agent.Order(2544, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                        && SC2Util.DistanceSq(agent.Unit.Pos, bot.TargetManager.PotentialEnemyStartLocations[0]) <= 55 * 55)
+                        agent.Order(2544, bot.TargetManager.PotentialEnemyStartLocations[0]);
                 }
 
             foreach (Agent agent in units)
             {
                 if (!SpawnedFrame.ContainsKey(agent.Unit.Tag))
-                    SpawnedFrame.Add(agent.Unit.Tag, tyr.Frame);
+                    SpawnedFrame.Add(agent.Unit.Tag, bot.Frame);
 
-                if (tyr.Frame - SpawnedFrame[agent.Unit.Tag] >= 154)
+                if (bot.Frame - SpawnedFrame[agent.Unit.Tag] >= 154)
                     agent.Order(3659);
                 else
                 {
                     Unit enemyTarget = null;
-                    foreach (Unit enemy in tyr.Observation.Observation.RawData.Units)
+                    foreach (Unit enemy in bot.Observation.Observation.RawData.Units)
                     {
                         if (enemy.Alliance != Alliance.Enemy)
                             continue;
@@ -59,7 +59,7 @@ namespace Tyr.Tasks
                     if (enemyTarget != null)
                         agent.Order(Abilities.ATTACK, SC2Util.To2D(enemyTarget.Pos));
                     else
-                        agent.Order(Abilities.ATTACK, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                        agent.Order(Abilities.ATTACK, bot.TargetManager.PotentialEnemyStartLocations[0]);
                 }
             }
         }

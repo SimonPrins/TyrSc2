@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class BaseWorkers
     {
@@ -20,11 +20,11 @@ namespace Tyr.Tasks
             }
         }
 
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
             // Remove dead workers.
             for (int i = Count - 1; i >= 0; i--)
-                if (!tyr.UnitManager.Agents.ContainsKey(MineralWorkers[i].Unit.Tag))
+                if (!bot.UnitManager.Agents.ContainsKey(MineralWorkers[i].Unit.Tag))
                 {
                     MineralWorkers[i] = MineralWorkers[Count - 1];
                     MineralWorkers.RemoveAt(Count - 1);

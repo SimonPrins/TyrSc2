@@ -1,15 +1,15 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class MassVoidray : Build
     {
@@ -54,11 +54,11 @@ namespace Tyr.Builds.Protoss
                 ProxySpotterTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             if (BuildDefenses == null)
                 BuildDefenses = () => !SkipDefenses;
-            tyr.Monday = true;
+            bot.Monday = true;
 
             MicroControllers.Add(FearVikingsController);
             MicroControllers.Add(new VoidrayController());
@@ -71,7 +71,7 @@ namespace Tyr.Builds.Protoss
                 WallIn.CreateFullNatural(new List<uint>() { UnitTypes.GATEWAY, UnitTypes.GATEWAY, UnitTypes.PYLON, UnitTypes.GATEWAY });
                 WallIn.ReserveSpace();
                 if (NaturalWall)
-                    tyr.buildingPlacer.BuildInsideWall(WallIn);
+                    bot.buildingPlacer.BuildInsideWall(WallIn);
             }
 
             Set += NaturalDefenses();
@@ -228,11 +228,11 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(948);
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(950);
-            tyr.buildingPlacer.BuildCompact = true;
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(948);
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(950);
+            bot.buildingPlacer.BuildCompact = true;
 
             if (WorkerScoutTask.Task.BaseCircled())
             {
@@ -258,57 +258,57 @@ namespace Tyr.Builds.Protoss
             else
                 GasWorkerTask.WorkersPerGas = 3;
 
-            if (tyr.EnemyRace == Race.Zerg)
-                Beyond2Cannons = tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) > 0 || Count(UnitTypes.STARGATE) >= 3;
+            if (bot.EnemyRace == Race.Zerg)
+                Beyond2Cannons = bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.ZERGLING) > 0 || Count(UnitTypes.STARGATE) >= 3;
 
-            if (tyr.Frame == 118)
-                tyr.Chat("Time for some monobattles!");
-            if (tyr.Frame == 163)
+            if (bot.Frame == 118)
+                bot.Chat("Time for some monobattles!");
+            if (bot.Frame == 163)
             {
                 if (BuildCarriers)
-                    tyr.Chat("I choose Carriers! :D");
+                    bot.Chat("I choose Carriers! :D");
                 else
-                    tyr.Chat("I choose Skillrays! :D");
+                    bot.Chat("I choose Skillrays! :D");
             }
 
             if (!LiftingDetected)
-                foreach (Unit unit in tyr.Enemies())
+                foreach (Unit unit in bot.Enemies())
                     if (unit.IsFlying && UnitTypes.BuildingTypes.Contains(unit.UnitType))
                         LiftingDetected = true;
 
-            if(LiftingDetected && tyr.EnemyManager.EnemyBuildings.Count == 0 && !ChasingLiftedBuildings)
+            if(LiftingDetected && bot.EnemyManager.EnemyBuildings.Count == 0 && !ChasingLiftedBuildings)
             {
                 ChasingLiftedBuildings = true;
-                tyr.TaskManager.Add(new ElevatorChaserTask());
+                bot.TaskManager.Add(new ElevatorChaserTask());
             }
                 
 
-            if (!DefendRush && tyr.Frame <= 4800 && Bot.Main.EnemyRace != Race.Zerg)
+            if (!DefendRush && bot.Frame <= 4800 && Bot.Main.EnemyRace != Race.Zerg)
             {
                 int enemyCount = 0;
-                foreach (Unit enemy in tyr.Enemies())
-                    if (SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation) <= 40 * 40)
+                foreach (Unit enemy in bot.Enemies())
+                    if (SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation) <= 40 * 40)
                         enemyCount++;
 
                 if (enemyCount >= 3)
                     DefendRush = true;
             }
             
-            if ((tyr.EnemyRace == Race.Terran)
+            if ((bot.EnemyRace == Race.Terran)
                 && ReaperDefenseCannonStep != null
                 && ReaperDefenseCannonStep.DesiredPos == null
                 && BuildDefenses())
             {
-                foreach (Unit unit in tyr.Enemies())
+                foreach (Unit unit in bot.Enemies())
                 {
                     if (unit.UnitType == UnitTypes.REAPER
                         && Bot.Main.MapAnalyzer.StartArea[(int)System.Math.Round(unit.Pos.X), (int)System.Math.Round(unit.Pos.Y)])
                     {
-                        Point2D dir = SC2Util.Point(unit.Pos.X - tyr.MapAnalyzer.StartLocation.X, unit.Pos.Y - tyr.MapAnalyzer.StartLocation.Y);
+                        Point2D dir = SC2Util.Point(unit.Pos.X - bot.MapAnalyzer.StartLocation.X, unit.Pos.Y - bot.MapAnalyzer.StartLocation.Y);
                         float length = (float)System.Math.Sqrt(dir.X * dir.X + dir.Y * dir.Y);
                         dir = SC2Util.Point(dir.X / length, dir.Y / length);
 
-                        ReaperDefenseCannonStep.DesiredPos = SC2Util.Point(tyr.MapAnalyzer.StartLocation.X + dir.X * 4f, tyr.MapAnalyzer.StartLocation.Y + dir.Y * 4f);
+                        ReaperDefenseCannonStep.DesiredPos = SC2Util.Point(bot.MapAnalyzer.StartLocation.X + dir.X * 4f, bot.MapAnalyzer.StartLocation.Y + dir.Y * 4f);
                         break;
                     }
                 }
@@ -320,11 +320,11 @@ namespace Tyr.Builds.Protoss
                 && TimingAttackTask.Task.Units.Count >= 6)
             {
                 int enemyAttackingUnits = 0;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (!UnitTypes.CombatUnitTypes.Contains(enemy.UnitType))
                         continue;
-                    if (SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation) >= 60 * 60)
+                    if (SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation) >= 60 * 60)
                         continue;
                     enemyAttackingUnits++;
                 }
@@ -356,7 +356,7 @@ namespace Tyr.Builds.Protoss
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50
@@ -394,17 +394,17 @@ namespace Tyr.Builds.Protoss
             {
                 if (Count(UnitTypes.VOID_RAY) + Count(UnitTypes.CARRIER) >= 4)
                 {
-                    if (!tyr.Observation.Observation.RawData.Player.UpgradeIds.Contains(78))
+                    if (!bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(78))
                         agent.Order(1562);
-                    else if (!tyr.Observation.Observation.RawData.Player.UpgradeIds.Contains(81))
+                    else if (!bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(81))
                         agent.Order(1565);
-                    else if (!tyr.Observation.Observation.RawData.Player.UpgradeIds.Contains(79))
+                    else if (!bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(79))
                         agent.Order(1563);
-                    else if (!tyr.Observation.Observation.RawData.Player.UpgradeIds.Contains(82))
+                    else if (!bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(82))
                         agent.Order(1566);
-                    else if (!tyr.Observation.Observation.RawData.Player.UpgradeIds.Contains(80))
+                    else if (!bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(80))
                         agent.Order(1564);
-                    else if (!tyr.Observation.Observation.RawData.Player.UpgradeIds.Contains(83))
+                    else if (!bot.Observation.Observation.RawData.Player.UpgradeIds.Contains(83))
                         agent.Order(1567);
                 }
             }

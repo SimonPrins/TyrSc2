@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class SCVRush : Build
     {
@@ -24,7 +24,7 @@ namespace Tyr.Builds.Protoss
             WorkerRushTask.Stopped = false;
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             Set += SupplyDepots();
         }
@@ -46,25 +46,25 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (!MessageSent)
-                    if (tyr.Enemies().Count > 0)
+                    if (bot.Enemies().Count > 0)
                     {
                         MessageSent = true;
-                        tyr.Chat("Prepare to be TICKLED! :D");
+                        bot.Chat("Prepare to be TICKLED! :D");
                     }
 
-            if (tyr.Frame - LastReinforcementsFrame >= 100
+            if (bot.Frame - LastReinforcementsFrame >= 100
                 && WorkerTask.Task.Units.Count >= (Lifting.Get().Detected ? 22 : 12)
                 && !Lifting.Get().Detected)
             {
-                LastReinforcementsFrame = tyr.Frame;
+                LastReinforcementsFrame = bot.Frame;
                 WorkerRushTask.TakeWorkers += 6;
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.COMMAND_CENTER
                 && Minerals() >= 50

@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class RunbyTask : Task
     {
@@ -60,7 +60,7 @@ namespace Tyr.Tasks
             return count >= RequiredSize || Done;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (units.Count >= RequiredSize)
                 Done = true;
@@ -69,8 +69,8 @@ namespace Tyr.Tasks
 
             foreach (Agent agent in units)
             {
-                agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
-                if (agent.DistanceSq(tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 8 * 8)
+                agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
+                if (agent.DistanceSq(bot.TargetManager.PotentialEnemyStartLocations[0]) <= 8 * 8)
                     DoneUnits.Add(agent.Unit.Tag);
             }
 

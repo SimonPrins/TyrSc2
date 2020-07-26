@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.BuildingPlacement;
-using Tyr.Builds;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.BuildingPlacement;
+using SC2Sharp.Builds;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class WarpPrismTask : Task
     {
@@ -50,7 +50,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             UpdateWarpingInUnits();
 
@@ -62,7 +62,7 @@ namespace Tyr.Tasks
             if (armyLocation != null)
             {
                 if (Units.Count >= 1)
-                    tyr.DrawSphere(new Point() { X = armyLocation.X, Y = armyLocation.Y, Z = Units[0].Unit.Pos.Z });
+                    bot.DrawSphere(new Point() { X = armyLocation.X, Y = armyLocation.Y, Z = Units[0].Unit.Pos.Z });
                 DeterminePickupTargets(armyLocation);
             }
 
@@ -113,7 +113,7 @@ namespace Tyr.Tasks
                 }
                 if (armyLocation == null)
                 {
-                    agent.Order(Abilities.MOVE, tyr.BaseManager.NaturalDefensePos);
+                    agent.Order(Abilities.MOVE, bot.BaseManager.NaturalDefensePos);
                     continue;
                 }
 
@@ -135,7 +135,7 @@ namespace Tyr.Tasks
                 */
                 if (agent.Unit.UnitType == UnitTypes.WARP_PRISM && WarpInObjectiveSet())
                 {
-                    WarpInStartFrane = tyr.Frame;
+                    WarpInStartFrane = bot.Frame;
                     agent.Order(Abilities.WarpPrismPhasingMode);
                     continue;
                 }

@@ -1,15 +1,15 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvPMothershipSiege : Build
     {
@@ -56,7 +56,7 @@ namespace Tyr.Builds.Protoss
             }
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new TargetObserversController());
             TimingAttackTask.Task.BeforeControllers.Add(new SoftLeashController(new HashSet<uint> { UnitTypes.TEMPEST, UnitTypes.STALKER, UnitTypes.IMMORTAL }, UnitTypes.MOTHERSHIP, 6));
@@ -81,7 +81,7 @@ namespace Tyr.Builds.Protoss
                 (Completed(UnitTypes.PYLON) >= (ProxyDetected ? 1 : 2) 
                 && Count(UnitTypes.CYBERNETICS_CORE) > 0
                 && Count(UnitTypes.STALKER) > 0) 
-                && Count(UnitTypes.PYLON) < 3 || tyr.Frame >= 22.4 * 60 * 3.5);
+                && Count(UnitTypes.PYLON) < 3 || bot.Frame >= 22.4 * 60 * 3.5);
             Set += ExpandBuildings();
             Set += ExtraAssimilators();
             Set += Units();
@@ -218,7 +218,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             BalanceGas();
 
@@ -231,15 +231,15 @@ namespace Tyr.Builds.Protoss
 
             IdleTask.Task.AttackMove = true;
 
-            tyr.TargetManager.CloseTo = null;
-            tyr.TargetManager.PrefferDistant = true;
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            bot.TargetManager.CloseTo = null;
+            bot.TargetManager.PrefferDistant = true;
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
                 if (agent.Unit.UnitType == UnitTypes.MOTHERSHIP)
                 {
-                    tyr.TargetManager.CloseTo = SC2Util.To2D(agent.Unit.Pos);
-                    tyr.TargetManager.PrefferDistant = false;
-                    tyr.TargetManager.IncludeAllEnemies = true;
+                    bot.TargetManager.CloseTo = SC2Util.To2D(agent.Unit.Pos);
+                    bot.TargetManager.PrefferDistant = false;
+                    bot.TargetManager.IncludeAllEnemies = true;
                     break;
                 }
             }
@@ -254,11 +254,11 @@ namespace Tyr.Builds.Protoss
             if (!ProxyDetected && Defensive)
             {
                 float proxyDist = 100 * 100;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (enemy.UnitType == UnitTypes.PYLON)
                     {
-                        float dist = SC2Util.DistanceSq(enemy.Pos, tyr.MapAnalyzer.StartLocation);
+                        float dist = SC2Util.DistanceSq(enemy.Pos, bot.MapAnalyzer.StartLocation);
                         if (dist < proxyDist)
                             ProxyDetected = true;
                     }
@@ -277,7 +277,7 @@ namespace Tyr.Builds.Protoss
 
             if ((ProxyDetected) && Completed(UnitTypes.STALKER) < 15)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.NEXUS)
                         continue;
@@ -298,7 +298,7 @@ namespace Tyr.Builds.Protoss
 
             if (!StalkerAggressionSuspected
                 && Defensive
-                && tyr.Frame >= 22.4 * 60 * 4.5
+                && bot.Frame >= 22.4 * 60 * 4.5
                 && Expanded.Get().Detected
                 && TotalEnemyCount(UnitTypes.STARGATE) + TotalEnemyCount(UnitTypes.ROBOTICS_FACILITY) + TotalEnemyCount(UnitTypes.ROBOTICS_BAY) + TotalEnemyCount(UnitTypes.IMMORTAL) + TotalEnemyCount(UnitTypes.FLEET_BEACON) + +TotalEnemyCount(UnitTypes.VOID_RAY) +TotalEnemyCount(UnitTypes.TEMPEST) == 0)
                 StalkerAggressionSuspected = true;
@@ -309,7 +309,7 @@ namespace Tyr.Builds.Protoss
                 && Defensive 
                 && TotalEnemyCount(UnitTypes.ROBOTICS_FACILITY) + TotalEnemyCount(UnitTypes.ROBOTICS_BAY) == 0
                 && TotalEnemyCount(UnitTypes.STARGATE) + TotalEnemyCount(UnitTypes.VOID_RAY) + TotalEnemyCount(UnitTypes.FLEET_BEACON) + TotalEnemyCount(UnitTypes.TEMPEST) > 0
-                && tyr.Frame <= 22.4 * 60 * 4.5)
+                && bot.Frame <= 22.4 * 60 * 4.5)
             {
                 EnemyStargateOpener = true;
             }
@@ -333,7 +333,7 @@ namespace Tyr.Builds.Protoss
             if (TotalEnemyCount(UnitTypes.STARGATE) + TotalEnemyCount(UnitTypes.DARK_SHRINE) + TotalEnemyCount(UnitTypes.ROBOTICS_FACILITY) + TotalEnemyCount(UnitTypes.VOID_RAY) == 0
                 && !ProxyDetected)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.SENTRY)
                         continue;
@@ -346,26 +346,26 @@ namespace Tyr.Builds.Protoss
             
             ScoutTask.Task.ScoutType = UnitTypes.PHOENIX;
             if (Completed(UnitTypes.PHOENIX) == 0)
-                ScoutTask.Task.Target = tyr.TargetManager.PotentialEnemyStartLocations[0];
+                ScoutTask.Task.Target = bot.TargetManager.PotentialEnemyStartLocations[0];
             else
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                 {
                     if (agent.Unit.UnitType != UnitTypes.PHOENIX)
                         continue;
-                    if (tyr.TargetManager.PotentialEnemyStartLocations.Count == 0 || agent.DistanceSq(tyr.TargetManager.PotentialEnemyStartLocations[0]) >= 10 * 10)
+                    if (bot.TargetManager.PotentialEnemyStartLocations.Count == 0 || agent.DistanceSq(bot.TargetManager.PotentialEnemyStartLocations[0]) >= 10 * 10)
                         continue;
 
-                    ScoutTask.Task.Target = tyr.MapAnalyzer.GetEnemyNatural().Pos;
+                    ScoutTask.Task.Target = bot.MapAnalyzer.GetEnemyNatural().Pos;
                     break;
                 }
             }
 
-            tyr.NexusAbilityManager.Stopped = Completed(UnitTypes.PYLON) == 0;
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(1006);
+            bot.NexusAbilityManager.Stopped = Completed(UnitTypes.PYLON) == 0;
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(1006);
 
 
-            SaveWorkersTask.Task.Stopped = tyr.Frame >= 22.4 * 60 * 7 || EnemyCount(UnitTypes.CYCLONE) == 0 || !Natural.UnderAttack;
+            SaveWorkersTask.Task.Stopped = bot.Frame >= 22.4 * 60 * 7 || EnemyCount(UnitTypes.CYCLONE) == 0 || !Natural.UnderAttack;
             if (SaveWorkersTask.Task.Stopped)
                 SaveWorkersTask.Task.Clear();
 

@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
+using SC2Sharp.Agents;
+using SC2Sharp.MapAnalysis;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class Base
     {

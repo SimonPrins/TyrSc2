@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.StrategyAnalysis
+namespace SC2Sharp.StrategyAnalysis
 {
     public class CounterWorkerRush : Strategy
     {

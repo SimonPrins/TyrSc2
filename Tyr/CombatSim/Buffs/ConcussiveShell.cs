@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Tyr.CombatSim.Buffs
+namespace SC2Sharp.CombatSim.Buffs
 {
     [JsonObject(MemberSerialization.Fields)]
     public class ConcussiveShell : Buff

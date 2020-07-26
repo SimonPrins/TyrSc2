@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tyr.Util
+namespace SC2Sharp.Util
 {
     public class DebugUtil
     {

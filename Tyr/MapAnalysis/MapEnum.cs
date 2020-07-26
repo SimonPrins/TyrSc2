@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Tyr.MapAnalysis
+namespace SC2Sharp.MapAnalysis
 {
     public enum MapEnum
     {

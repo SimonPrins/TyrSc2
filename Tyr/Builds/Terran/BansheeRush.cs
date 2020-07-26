@@ -1,9 +1,9 @@
-﻿using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.Tasks;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Terran
+namespace SC2Sharp.Builds.Terran
 {
     public class BansheeRush : Build
     {
@@ -25,7 +25,7 @@ namespace Tyr.Builds.Terran
             return "BansheeRush";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new TankController());
             MicroControllers.Add(new BansheeController());
@@ -104,7 +104,7 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.ExcludeUnitTypes.Add(UnitTypes.HELLION);
             if (Completed(UnitTypes.MARINE) >= 20)

@@ -1,16 +1,16 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class VoidrayPvP : Build
     {
@@ -32,22 +32,22 @@ namespace Tyr.Builds.Protoss
             return "VoidrayPvP";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             WorkerScoutTask.StartFrame = 1200;
 
             DefenseTask.Enable();
-            tyr.TaskManager.Add(AttackTask);
-            tyr.TaskManager.Add(WorkerScoutTask);
+            bot.TaskManager.Add(AttackTask);
+            bot.TaskManager.Add(WorkerScoutTask);
             ArmyObserverTask.Enable();
-            tyr.TaskManager.Add(new ObserverScoutTask() { Priority = 6 });
-            tyr.TaskManager.Add(new AdeptScoutTask());
-            if (tyr.BaseManager.Pocket != null)
-                tyr.TaskManager.Add(new ScoutProxyTask(tyr.BaseManager.Pocket.BaseLocation.Pos));
+            bot.TaskManager.Add(new ObserverScoutTask() { Priority = 6 });
+            bot.TaskManager.Add(new AdeptScoutTask());
+            if (bot.BaseManager.Pocket != null)
+                bot.TaskManager.Add(new ScoutProxyTask(bot.BaseManager.Pocket.BaseLocation.Pos));
             ArchonMergeTask.Enable();
             MechDestroyExpandsTask.Enable();
 
-            OverrideDefenseTarget = tyr.MapAnalyzer.Walk(NaturalDefensePos, tyr.MapAnalyzer.EnemyDistances, 15);
+            OverrideDefenseTarget = bot.MapAnalyzer.Walk(NaturalDefensePos, bot.MapAnalyzer.EnemyDistances, 15);
 
             MicroControllers.Add(new VoidrayController());
             MicroControllers.Add(new StalkerController());
@@ -150,7 +150,7 @@ namespace Tyr.Builds.Protoss
             return total - alreadyBuilt >= robos;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Count(UnitTypes.PROBE) <= 10)
                 GasWorkerTask.WorkersPerGas = 0;
@@ -158,10 +158,10 @@ namespace Tyr.Builds.Protoss
                 GasWorkerTask.WorkersPerGas = 2;
             else BalanceGas();
 
-            if (!CannonDefenseDetected && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOTON_CANNON) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.FORGE) >= 0 && tyr.Frame < 22.4 * 60 * 4)
+            if (!CannonDefenseDetected && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOTON_CANNON) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.FORGE) >= 0 && bot.Frame < 22.4 * 60 * 4)
                 CannonDefenseDetected = true;
 
-            if (!TempestDetected && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) > 0)
+            if (!TempestDetected && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.TEMPEST) > 0)
                 TempestDetected = true;
 
             MechDestroyExpandsTask.Task.MaxSize = 3;
@@ -170,9 +170,9 @@ namespace Tyr.Builds.Protoss
             MechDestroyExpandsTask.Task.UnitType = UnitTypes.ZEALOT;
             MechDestroyExpandsTask.Task.Stopped = !CannonDefenseDetected;
 
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(917);
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(917);
 
-            if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.BATTLECRUISER) > 0)
+            if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.BATTLECRUISER) > 0)
                 BattlecruisersDetected = true;
 
             if (TempestDetected)
@@ -190,7 +190,7 @@ namespace Tyr.Builds.Protoss
                 Attacking = true;
 
             foreach (WallBuilding building in WallIn.Wall)
-                tyr.DrawSphere(new Point() { X = building.Pos.X, Y = building.Pos.Y, Z = tyr.MapAnalyzer.StartLocation.Z });
+                bot.DrawSphere(new Point() { X = building.Pos.X, Y = building.Pos.Y, Z = bot.MapAnalyzer.StartLocation.Z });
 
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.Stopped = Completed(UnitTypes.ZEALOT) >= 5;
@@ -200,8 +200,8 @@ namespace Tyr.Builds.Protoss
             else if (SmellCheese)
                 AttackTask.RequiredSize = 30;
             
-            if (Natural.Owner == tyr.PlayerId && Count(UnitTypes.NEXUS) < 3 && Completed(UnitTypes.STALKER) < 15)
-                IdleTask.Task.OverrideTarget = SC2Util.Point((tyr.MapAnalyzer.GetMainRamp().X + Natural.BaseLocation.Pos.X) / 2f, (tyr.MapAnalyzer.GetMainRamp().Y + Natural.BaseLocation.Pos.Y) / 2f);
+            if (Natural.Owner == bot.PlayerId && Count(UnitTypes.NEXUS) < 3 && Completed(UnitTypes.STALKER) < 15)
+                IdleTask.Task.OverrideTarget = SC2Util.Point((bot.MapAnalyzer.GetMainRamp().X + Natural.BaseLocation.Pos.X) / 2f, (bot.MapAnalyzer.GetMainRamp().Y + Natural.BaseLocation.Pos.Y) / 2f);
             else if (Count(UnitTypes.NEXUS) >= 4)
                 IdleTask.Task.OverrideTarget = OverrideDefenseTarget;
             else
@@ -230,14 +230,14 @@ namespace Tyr.Builds.Protoss
 
             if (EarlyPool.Get().Detected && !Expanded.Get().Detected && Completed(UnitTypes.ZEALOT) < 2)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.NEXUS
                         && agent.Unit.BuildProgress < 0.99)
                         agent.Order(Abilities.CANCEL);
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (Count(UnitTypes.PROBE) >= 24
                 && Count(UnitTypes.NEXUS) < 2
@@ -263,11 +263,11 @@ namespace Tyr.Builds.Protoss
                     && FoodLeft() >= 2
                     && CannonDefenseDetected
                     && Count(UnitTypes.ZEALOT) < 3
-                    && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) < 4
-                    && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.IMMORTAL) == 0
-                    && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER) == 0
-                    && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.VOID_RAY) == 0
-                    && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOENIX) == 0
+                    && bot.EnemyStrategyAnalyzer.Count(UnitTypes.PHOTON_CANNON) < 4
+                    && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.IMMORTAL) == 0
+                    && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.STALKER) == 0
+                    && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.VOID_RAY) == 0
+                    && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.PHOENIX) == 0
                     && Count(UnitTypes.STALKER) + Count(UnitTypes.IMMORTAL) >= 3)
                     agent.Order(916);
                 else if (Gas() >= 50
@@ -275,7 +275,7 @@ namespace Tyr.Builds.Protoss
                     && FoodLeft() >= 2
                     && Completed(UnitTypes.CYBERNETICS_CORE) > 0
                     && ((Minerals() >= 300 && Gas() >= 250) || Completed(UnitTypes.STARGATE) == 0 || Completed(UnitTypes.FLEET_BEACON) == 0 || Count(UnitTypes.TEMPEST) > Completed(UnitTypes.TEMPEST))
-                    && (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) >= 5 || (Minerals() >= 300 && Gas() >= 250) || Completed(UnitTypes.ROBOTICS_FACILITY) == 0 || Count(UnitTypes.DISRUPTOR) + Count(UnitTypes.IMMORTAL) + Count(UnitTypes.OBSERVER) + Count(UnitTypes.COLOSUS) > Completed(UnitTypes.DISRUPTOR) + Completed(UnitTypes.IMMORTAL) + Completed(UnitTypes.OBSERVER) + Completed(UnitTypes.COLOSUS)))
+                    && (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) >= 5 || (Minerals() >= 300 && Gas() >= 250) || Completed(UnitTypes.ROBOTICS_FACILITY) == 0 || Count(UnitTypes.DISRUPTOR) + Count(UnitTypes.IMMORTAL) + Count(UnitTypes.OBSERVER) + Count(UnitTypes.COLOSUS) > Completed(UnitTypes.DISRUPTOR) + Completed(UnitTypes.IMMORTAL) + Completed(UnitTypes.OBSERVER) + Completed(UnitTypes.COLOSUS)))
                     agent.Order(917);
 
             }
@@ -312,8 +312,8 @@ namespace Tyr.Builds.Protoss
                     && Count(UnitTypes.DISRUPTOR) < 4
                     && !TempestDetected
                     && FoodLeft() >= 3
-                    && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BATTLECRUISER) == 0
-                    && (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE) < 10 || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARAUDER) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARINE) > tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE) * 2))
+                    && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BATTLECRUISER) == 0
+                    && (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE) < 10 || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARAUDER) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARINE) > bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE) * 2))
                 {
                     agent.Order(994);
                 }
@@ -322,8 +322,8 @@ namespace Tyr.Builds.Protoss
                     && !TempestDetected
                     && (Count(UnitTypes.DISRUPTOR) >= 4 || Completed(UnitTypes.ROBOTICS_BAY) == 0 || Count(UnitTypes.IMMORTAL) < 6)
                     && Count(UnitTypes.IMMORTAL) < DesiredImmortals
-                    && (tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE) < 10 || tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARAUDER) + tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARINE) > tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE) * 2 || Count(UnitTypes.IMMORTAL) < 6)
-                    && tyr.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) < 5
+                    && (bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE) < 10 || bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARAUDER) + bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.MARINE) > bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.WIDOW_MINE) * 2 || Count(UnitTypes.IMMORTAL) < 6)
+                    && bot.EnemyStrategyAnalyzer.TotalCount(UnitTypes.BANSHEE) < 5
                     && FoodLeft() >= 4)
                 {
                     agent.Order(979);

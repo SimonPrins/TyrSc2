@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Tyr.Util
+namespace SC2Sharp.Util
 {
     public class FileUtil
     {

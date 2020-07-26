@@ -1,49 +1,49 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Builds;
-using Tyr.Builds.Protoss;
-using Tyr.Builds.Terran;
-using Tyr.Builds.Zerg;
-using Tyr.Tasks;
+using SC2Sharp.Builds;
+using SC2Sharp.Builds.Protoss;
+using SC2Sharp.Builds.Terran;
+using SC2Sharp.Builds.Zerg;
+using SC2Sharp.Tasks;
 
-namespace Tyr.buildSelection
+namespace SC2Sharp.buildSelection
 {
     class VersusHumanBuildsProvider : BuildsProvider
     {
         private string[] Lines;
-        public List<Build> GetBuilds(Bot tyr, string[] lines)
+        public List<Build> GetBuilds(Bot bot, string[] lines)
         {
             List<Build> options;
 
             Lines = lines;
 
-            if (tyr.MyRace == Race.Protoss)
-                options = ProtossBuilds(tyr);
-            else if (tyr.MyRace == Race.Zerg)
-                options = ZergBuilds(tyr);
-            else if (tyr.MyRace == Race.Terran)
-                options = TerranBuilds(tyr);
+            if (bot.MyRace == Race.Protoss)
+                options = ProtossBuilds(bot);
+            else if (bot.MyRace == Race.Zerg)
+                options = ZergBuilds(bot);
+            else if (bot.MyRace == Race.Terran)
+                options = TerranBuilds(bot);
             else
                 options = null;
 
             return options;
         }
 
-        public List<Build> ZergBuilds(Bot tyr)
+        public List<Build> ZergBuilds(Bot bot)
         {
             List<Build> options = new List<Build>();
 
-            if (tyr.EnemyRace == Race.Protoss)
+            if (bot.EnemyRace == Race.Protoss)
             {
                 options.Add(new MassZergling() { AllowHydraTransition = true });
                 options.Add(new MacroHydra());
             }
-            else if (tyr.EnemyRace == Race.Terran)
+            else if (bot.EnemyRace == Race.Terran)
             {
                 options.Add(new MassZergling() { AllowHydraTransition = true });
                 options.Add(new MacroHydra());
             }
-            else if (tyr.EnemyRace == Race.Zerg)
+            else if (bot.EnemyRace == Race.Zerg)
             {
                 options.Add(new RoachRavager());
                 options.Add(new MacroHydra());
@@ -57,20 +57,20 @@ namespace Tyr.buildSelection
             return options;
         }
 
-        public List<Build> ProtossBuilds(Bot tyr)
+        public List<Build> ProtossBuilds(Bot bot)
         {
             List<Build> options = new List<Build>();
-            if (tyr.EnemyRace == Race.Terran)
+            if (bot.EnemyRace == Race.Terran)
             {
                 options.Add(new PvTStalkerImmortal() { BuildReaperWall = true, ProxyPylon = false, DelayObserver = true });
                 options.Add(new DoubleRoboProxy());
             }
-            else if (tyr.EnemyRace == Race.Zerg)
+            else if (bot.EnemyRace == Race.Zerg)
             {
                 options.Add(new PvZStalkerImmortal() { BlockExpand = false });
                 options.Add(new OneBaseStalkerImmortal() { StartZealots = true, ExpandCondition = () => Bot.Main.Frame >= 22.4 * 60 * 5, Scouting = false });
             }
-            else if (tyr.EnemyRace == Race.Protoss)
+            else if (bot.EnemyRace == Race.Protoss)
             {
                 options.Add(new PvPStalkerImmortal());
                 options.Add(new OneBaseTempest() { DefendingStalker = true });
@@ -79,23 +79,23 @@ namespace Tyr.buildSelection
             return options;
         }
 
-        public List<Build> TerranBuilds(Bot tyr)
+        public List<Build> TerranBuilds(Bot bot)
         {
             List<Build> options = new List<Build>();
 
-            if (tyr.EnemyRace == Race.Terran)
+            if (bot.EnemyRace == Race.Terran)
             {
                 options.Add(new BunkerRush());
                 options.Add(new TankPushProbots());
                 options.Add(new MarineRush());
             }
-            else if (tyr.EnemyRace == Race.Zerg)
+            else if (bot.EnemyRace == Race.Zerg)
             {
                 options.Add(new BunkerRush());
                 options.Add(new MechTvZ());
                 options.Add(new MarineRush());
             }
-            else if (tyr.EnemyRace == Race.Protoss)
+            else if (bot.EnemyRace == Race.Protoss)
             {
                 options.Add(new BunkerRush());
                 options.Add(new TankPushTvPProbots());

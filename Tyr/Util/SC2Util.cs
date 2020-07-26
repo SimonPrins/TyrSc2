@@ -1,7 +1,7 @@
 ﻿using System;
 using SC2APIProtocol;
 
-namespace Tyr.Util
+namespace SC2Sharp.Util
 {
     /*
      * Util class for performing common operations for the SC2API.

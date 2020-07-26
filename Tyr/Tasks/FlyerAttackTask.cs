@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class FlyerAttackTask : Task
     {
@@ -29,7 +29,7 @@ namespace Tyr.Tasks
             return Bot.Main.UnitManager.Completed(UnitTypes.VOID_RAY) + Bot.Main.UnitManager.Completed(UnitTypes.CARRIER) + Bot.Main.UnitManager.Completed(UnitTypes.TEMPEST) >= RequiredSize;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             Dictionary<ulong, Unit> targets = new Dictionary<ulong, Unit>();
             bool attacking = false;
@@ -39,7 +39,7 @@ namespace Tyr.Tasks
                 Unit target = null;
                 float health = 10000;
                 ulong tag = 0;
-                foreach (Unit enemy in tyr.Observation.Observation.RawData.Units)
+                foreach (Unit enemy in bot.Observation.Observation.RawData.Units)
                 {
                     if (enemy.Alliance != Alliance.Enemy)
                         continue;
@@ -73,7 +73,7 @@ namespace Tyr.Tasks
                 else if (attacking && agent.DistanceSq(defendTarget) <= 15 * 15)
                     agent.Order(Abilities.MOVE, defendTarget);
                 else
-                    tyr.MicroController.Attack(agent, tyr.TargetManager.AttackTarget);
+                    bot.MicroController.Attack(agent, bot.TargetManager.AttackTarget);
 
             }
         }

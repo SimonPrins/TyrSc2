@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.CombatSim;
+using SC2Sharp.Agents;
+using SC2Sharp.CombatSim;
 
-namespace Tyr.Micro
+namespace SC2Sharp.Micro
 {
     public class FallBackController : CustomController
     {

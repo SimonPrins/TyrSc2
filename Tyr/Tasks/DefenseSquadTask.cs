@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class DefenseSquadTask : Task
     {
@@ -94,7 +94,7 @@ namespace Tyr.Tasks
             return Base.Owner == Bot.Main.PlayerId || AlwaysNeeded;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Stopped || (Base.Owner != Bot.Main.PlayerId && !AlwaysNeeded))
             {
@@ -107,7 +107,7 @@ namespace Tyr.Tasks
             if (OverrideIdleLocation != null)
                 IdleLocation = OverrideIdleLocation;
             else if (IdleLocation == null)
-                IdleLocation = tyr.MapAnalyzer.Walk(Base.BaseLocation.Pos, tyr.MapAnalyzer.EnemyDistances, 8);
+                IdleLocation = bot.MapAnalyzer.Walk(Base.BaseLocation.Pos, bot.MapAnalyzer.EnemyDistances, 8);
 
             float distance = DefendRange * DefendRange;
             Unit target = null;
@@ -143,7 +143,7 @@ namespace Tyr.Tasks
                         if (RetreatMoveCommand)
                             agent.Order(Abilities.MOVE, IdleLocation);
                         else
-                            tyr.MicroController.Attack(agent, IdleLocation);
+                            bot.MicroController.Attack(agent, IdleLocation);
                     }
                     else if (agent.Unit.UnitType == UnitTypes.SIEGE_TANK)
                         agent.Order(Abilities.SIEGE);
@@ -156,7 +156,7 @@ namespace Tyr.Tasks
                     if (agent.Unit.UnitType == UnitTypes.SIEGE_TANK_SIEGED
                         && agent.DistanceSq(IdleLocation) <= 3 * 3)
                         continue;
-                    tyr.MicroController.Attack(agent, SC2Util.To2D(target.Pos));
+                    bot.MicroController.Attack(agent, SC2Util.To2D(target.Pos));
                 }
             }
         }

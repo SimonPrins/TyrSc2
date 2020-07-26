@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ForceFieldRampTask : Task
     {
@@ -37,18 +37,18 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             for (int i = Units.Count - 1; i >= 0; i--)
                 if (Units[i].Unit.Energy < 50)
                     ClearAt(i);
 
             if (IdlePos == null)
-                IdlePos = new PotentialHelper(tyr.MapAnalyzer.GetMainRamp(), 6)
-                    .To(tyr.MapAnalyzer.StartLocation)
+                IdlePos = new PotentialHelper(bot.MapAnalyzer.GetMainRamp(), 6)
+                    .To(bot.MapAnalyzer.StartLocation)
                     .Get();
 
-            Point2D ramp = tyr.MapAnalyzer.GetMainRamp();
+            Point2D ramp = bot.MapAnalyzer.GetMainRamp();
             if (ramp == null)
                 return;
             int enemyCount = 0;
@@ -86,12 +86,12 @@ namespace Tyr.Tasks
                 }
                 return;
             }
-            if (tyr.Frame - PreviousForceFieldFrame < 22.4 * 10)
+            if (bot.Frame - PreviousForceFieldFrame < 22.4 * 10)
                 return;
             foreach (Agent agent in units)
             {
                 agent.Order(1526, ramp);
-                PreviousForceFieldFrame = tyr.Frame;
+                PreviousForceFieldFrame = bot.Frame;
             }
         }
     }

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class TaskManager : Manager
     {
@@ -10,10 +10,10 @@ namespace Tyr.Managers
 
         public CombatSimulation CombatSimulation = new CombatSimulation();
 
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
             foreach (Task task in Tasks)
-                task.Cleanup(tyr);
+                task.Cleanup(bot);
 
             List<Task> orderedTasks = Tasks.FindAll((task) => { return task.IsNeeded(); });
             orderedTasks.Sort((a, b) => { return a.Priority.CompareTo(b.Priority); });
@@ -84,10 +84,10 @@ namespace Tyr.Managers
                 }
             }
 
-            CombatSimulation.OnFrame(tyr);
+            CombatSimulation.OnFrame(bot);
 
             foreach (Task task in Tasks)
-                task.OnFrame(tyr);
+                task.OnFrame(bot);
         }
 
         public void StopAll()

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Tyr.Util
+namespace SC2Sharp.Util
 {
     public class CollectionUtil
     {

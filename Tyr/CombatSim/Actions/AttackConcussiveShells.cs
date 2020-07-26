@@ -1,6 +1,6 @@
-﻿using Tyr.CombatSim.Buffs;
+﻿using SC2Sharp.CombatSim.Buffs;
 
-namespace Tyr.CombatSim.Actions
+namespace SC2Sharp.CombatSim.Actions
 {
     public class AttackConcussiveShells : Attack
     {

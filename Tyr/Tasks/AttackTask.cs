@@ -1,6 +1,6 @@
-﻿using Tyr.Agents;
+﻿using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class AttackTask : Task
     {
@@ -40,10 +40,10 @@ namespace Tyr.Tasks
             return false;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             foreach (Agent agent in units)
-                Attack(agent, tyr.TargetManager.AttackTarget);
+                Attack(agent, bot.TargetManager.AttackTarget);
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class WorkerSafetyTask : Task
     {
@@ -90,7 +90,7 @@ namespace Tyr.Tasks
             return Bot.Main.Build.Completed(UnitTypes.PHOTON_CANNON) > 0;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             for (int i = units.Count - 1; i >= 0; i--)
             {
@@ -103,7 +103,7 @@ namespace Tyr.Tasks
                 }
 
                 Agent safetyCannon = null;
-                if (!SafetyTarget.ContainsKey(agent.Unit.Tag) || !tyr.UnitManager.Agents.ContainsKey(SafetyTarget[agent.Unit.Tag]))
+                if (!SafetyTarget.ContainsKey(agent.Unit.Tag) || !bot.UnitManager.Agents.ContainsKey(SafetyTarget[agent.Unit.Tag]))
                 {
                     safetyCannon = GetSafetyCannon(agent);
                     if (safetyCannon == null)
@@ -114,7 +114,7 @@ namespace Tyr.Tasks
                     }
                     Safe(agent, safetyCannon);
                 }
-                safetyCannon = tyr.UnitManager.Agents[SafetyTarget[agent.Unit.Tag]];
+                safetyCannon = bot.UnitManager.Agents[SafetyTarget[agent.Unit.Tag]];
 
                 agent.Order(Abilities.MOVE, SC2Util.To2D(safetyCannon.Unit.Pos));
             }

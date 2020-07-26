@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
 using System;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class TwoBaseRobo : Build
     {
@@ -23,17 +23,17 @@ namespace Tyr.Builds.Protoss
             return "TwoBaseRobo";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            tyr.TaskManager.Add(new DefenseTask() { ExpandDefenseRadius = 18 });
-            tyr.TaskManager.Add(attackTask);
-            if (tyr.EnemyRace == Race.Zerg)
-                tyr.TaskManager.Add(PokeTask);
-            tyr.TaskManager.Add(WorkerScoutTask);
-            tyr.TaskManager.Add(new ObserverScoutTask());
-            tyr.TaskManager.Add(new AdeptScoutTask());
-            if (tyr.BaseManager.Pocket != null)
-                tyr.TaskManager.Add(new ScoutProxyTask(tyr.BaseManager.Pocket.BaseLocation.Pos));
+            bot.TaskManager.Add(new DefenseTask() { ExpandDefenseRadius = 18 });
+            bot.TaskManager.Add(attackTask);
+            if (bot.EnemyRace == Race.Zerg)
+                bot.TaskManager.Add(PokeTask);
+            bot.TaskManager.Add(WorkerScoutTask);
+            bot.TaskManager.Add(new ObserverScoutTask());
+            bot.TaskManager.Add(new AdeptScoutTask());
+            if (bot.BaseManager.Pocket != null)
+                bot.TaskManager.Add(new ScoutProxyTask(bot.BaseManager.Pocket.BaseLocation.Pos));
             MicroControllers.Add(new StalkerController());
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new HTController());
@@ -101,7 +101,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Count(UnitTypes.ZEALOT) + Count(UnitTypes.ADEPT) + Count(UnitTypes.STALKER) + Count(UnitTypes.COLOSUS) + Count(UnitTypes.IMMORTAL) >= attackTask.RequiredSize)
                 Attacking = true;
@@ -109,11 +109,11 @@ namespace Tyr.Builds.Protoss
             if (StrategyAnalysis.CannonRush.Get().Detected)
                 attackTask.RequiredSize = 5;
 
-            if (tyr.EnemyRace == Race.Zerg && !PokeTask.Stopped)
+            if (bot.EnemyRace == Race.Zerg && !PokeTask.Stopped)
             {
-                if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) >= 10
-                    || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.SPINE_CRAWLER) >= 2
-                    || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ROACH) >= 5)
+                if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) >= 10
+                    || bot.EnemyStrategyAnalyzer.Count(UnitTypes.SPINE_CRAWLER) >= 2
+                    || bot.EnemyStrategyAnalyzer.Count(UnitTypes.ROACH) >= 5)
                 {
                     PokeTask.Stopped = true;
                     PokeTask.Clear();
@@ -122,7 +122,7 @@ namespace Tyr.Builds.Protoss
 
             if (EarlyPool.Get().Detected && !Expanded.Get().Detected && Completed(UnitTypes.ZEALOT) < 2)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.NEXUS
                         && agent.Unit.BuildProgress < 0.99)
                         agent.Order(Abilities.CANCEL);
@@ -138,24 +138,24 @@ namespace Tyr.Builds.Protoss
                 UseStalkers = true;
                 UseImmortals = true;
             }
-            else if (tyr.EnemyStrategyAnalyzer.EncounteredEnemies.Contains(UnitTypes.HYDRALISK) || tyr.EnemyStrategyAnalyzer.EncounteredEnemies.Contains(UnitTypes.HYDRALISK_DEN))
+            else if (bot.EnemyStrategyAnalyzer.EncounteredEnemies.Contains(UnitTypes.HYDRALISK) || bot.EnemyStrategyAnalyzer.EncounteredEnemies.Contains(UnitTypes.HYDRALISK_DEN))
             {
                 UseStalkers = false;
                 UseImmortals = false;
             }
-            else if (tyr.EnemyStrategyAnalyzer.EncounteredEnemies.Contains(UnitTypes.ROACH) || tyr.EnemyStrategyAnalyzer.EncounteredEnemies.Contains(UnitTypes.ROACH_WARREN))
+            else if (bot.EnemyStrategyAnalyzer.EncounteredEnemies.Contains(UnitTypes.ROACH) || bot.EnemyStrategyAnalyzer.EncounteredEnemies.Contains(UnitTypes.ROACH_WARREN))
             {
                 UseStalkers = true;
                 UseImmortals = true;
             }
             else
             {
-                UseStalkers = tyr.EnemyRace == Race.Protoss || (MassRoach.Get().DetectedPreviously && !MassHydra.Get().DetectedPreviously);
+                UseStalkers = bot.EnemyRace == Race.Protoss || (MassRoach.Get().DetectedPreviously && !MassHydra.Get().DetectedPreviously);
                 UseImmortals = (MassRoach.Get().DetectedPreviously && !MassHydra.Get().DetectedPreviously);
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (Count(UnitTypes.PROBE) >= 24
                 && Count(UnitTypes.NEXUS) < 2

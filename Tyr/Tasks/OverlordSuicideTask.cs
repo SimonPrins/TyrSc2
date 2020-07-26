@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class OverlordSuicideTask : Task
     {
@@ -39,10 +39,10 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             Point2D target;
-            Point2D enemyNatural = tyr.MapAnalyzer.GetEnemyNatural().Pos;
+            Point2D enemyNatural = bot.MapAnalyzer.GetEnemyNatural().Pos;
             if (enemyNatural == null)
                 return;
 
@@ -51,24 +51,24 @@ namespace Tyr.Tasks
             {
                 PotentialHelper potential = new PotentialHelper(enemyNatural);
                 potential.Magnitude = 5;
-                potential.From(tyr.MapAnalyzer.StartLocation, 1);
+                potential.From(bot.MapAnalyzer.StartLocation, 1);
                 target = potential.Get();
             }
             else
             {
                 PotentialHelper potential = new PotentialHelper(enemyNatural);
                 potential.Magnitude = 20;
-                potential.From(tyr.TargetManager.PotentialEnemyStartLocations[0], 1);
+                potential.From(bot.TargetManager.PotentialEnemyStartLocations[0], 1);
                 target = potential.Get();
             }
             */
             if (Suicide)
             {
-                target = tyr.TargetManager.PotentialEnemyStartLocations[0];
+                target = bot.TargetManager.PotentialEnemyStartLocations[0];
             }
             else
             {
-                PotentialHelper potential = new PotentialHelper(tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                PotentialHelper potential = new PotentialHelper(bot.TargetManager.PotentialEnemyStartLocations[0]);
                 potential.Magnitude = 20;
                 potential.From(enemyNatural, 1);
                 target = potential.Get();
@@ -77,7 +77,7 @@ namespace Tyr.Tasks
             foreach (Agent agent in units)
             {
                 bool closeEnemy = false;
-                foreach (Unit enemy in tyr.Enemies())
+                foreach (Unit enemy in bot.Enemies())
                 {
                     if (Suicide && !UnitTypes.AirAttackTypes.Contains(enemy.UnitType))
                         continue;
@@ -95,12 +95,12 @@ namespace Tyr.Tasks
                 {
                     if (!Suicide)
                     {
-                        float dist = agent.DistanceSq(tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                        float dist = agent.DistanceSq(bot.TargetManager.PotentialEnemyStartLocations[0]);
                         if (dist <= 40 * 40 && dist >= 6 * 6)
                         {
                             PotentialHelper helper = new PotentialHelper(agent.Unit.Pos, 4);
                             helper.To(target, 2);
-                            helper.From(tyr.TargetManager.PotentialEnemyStartLocations[0], 1);
+                            helper.From(bot.TargetManager.PotentialEnemyStartLocations[0], 1);
                             agent.Order(Abilities.MOVE, helper.Get());
                             continue;
                         }

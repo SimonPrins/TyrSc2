@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class EffectManager : Manager
     {
         public List<Effect> Effects = new List<Effect>();
         
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
-            Update(tyr);
+            Update(bot);
 
             for (int i = Effects.Count - 1; i >= 0; i--)
             {
                 Effect effect = Effects[i];
-                if (tyr.Frame - effect.LastSeenFrame >= 23)
+                if (bot.Frame - effect.LastSeenFrame >= 23)
                 {
                     Effects[i] = Effects[Effects.Count - 1];
                     Effects.RemoveAt(Effects.Count - 1);
@@ -21,7 +21,7 @@ namespace Tyr.Managers
             }
         }
 
-        public void Update(Bot tyr)
+        public void Update(Bot bot)
         {
             if (Bot.Main.Observation.Observation.RawData.Effects == null)
                 return;
@@ -36,7 +36,7 @@ namespace Tyr.Managers
                             && effect.Pos[0].X == previous.Pos.X
                             && effect.Pos[0].Y == previous.Pos.Y)
                         {
-                            previous.LastSeenFrame = tyr.Frame;
+                            previous.LastSeenFrame = bot.Frame;
                             found = true;
                             break;
                         }
@@ -44,7 +44,7 @@ namespace Tyr.Managers
                     }
 
                     if (!found)
-                        Effects.Add(new Effect() { Pos = effect.Pos[0], EffectId = effect.EffectId, LastSeenFrame = tyr.Frame, FirstSeenFrame = tyr.Frame });
+                        Effects.Add(new Effect() { Pos = effect.Pos[0], EffectId = effect.EffectId, LastSeenFrame = bot.Frame, FirstSeenFrame = bot.Frame });
                 }
         }
     }

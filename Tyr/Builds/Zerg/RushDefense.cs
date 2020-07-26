@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Zerg
+namespace SC2Sharp.Builds.Zerg
 {
     public class RushDefense : Build
     {
@@ -31,7 +31,7 @@ namespace Tyr.Builds.Zerg
             //WorkerRushDefenseTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new RavagerController());
             MicroControllers.Add(new DodgeBallController());
@@ -134,9 +134,9 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            WorkerScoutTask.Task.Stopped = tyr.Frame >= 40 * 22.4 || StrategyAnalysis.WorkerRush.Get().Detected;
+            WorkerScoutTask.Task.Stopped = bot.Frame >= 40 * 22.4 || StrategyAnalysis.WorkerRush.Get().Detected;
             if (WorkerScoutTask.Task.Stopped)
                 WorkerScoutTask.Task.Clear();
 
@@ -169,14 +169,14 @@ namespace Tyr.Builds.Zerg
 
             if (!TakeExpand)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.HATCHERY
                         && agent.Unit.BuildProgress < 0.99)
                         agent.Order(Abilities.CANCEL);
             }
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (UnitTypes.ResourceCenters.Contains(agent.Unit.UnitType))
             {
@@ -184,7 +184,7 @@ namespace Tyr.Builds.Zerg
                     && Completed(UnitTypes.SPAWNING_POOL) > 0)
                 {
                     agent.Order(1632);
-                    CollectionUtil.Increment(tyr.UnitManager.Counts, UnitTypes.QUEEN);
+                    CollectionUtil.Increment(bot.UnitManager.Counts, UnitTypes.QUEEN);
                 }
                 else if (Count(UnitTypes.SPINE_CRAWLER) > 0
                     && Minerals() >= 150 && Gas() >= 100

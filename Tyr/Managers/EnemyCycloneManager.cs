@@ -1,17 +1,17 @@
 ﻿using SC2APIProtocol;
 using System;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class EnemyCycloneManager : Manager
     {
         private Dictionary<ulong, int> LastHitFrame = new Dictionary<ulong, int>();
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
-            foreach (Agent agent in tyr.Units())
+            foreach (Agent agent in bot.Units())
             {
                 if (agent.PreviousUnit == null)
                     continue;
@@ -32,7 +32,7 @@ namespace Tyr.Managers
                 }
 
                 if (cycloneClose && enemiesClose < 8)
-                    CollectionUtil.Set(LastHitFrame, agent.Unit.Tag, tyr.Frame);
+                    CollectionUtil.Set(LastHitFrame, agent.Unit.Tag, bot.Frame);
             }
         }
 

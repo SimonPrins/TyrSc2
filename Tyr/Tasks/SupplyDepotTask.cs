@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class SupplyDepotTask : Task
     {
@@ -29,7 +29,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             foreach (Agent agent in units)
             {
@@ -44,7 +44,7 @@ namespace Tyr.Tasks
 
                 if (!closeEnemy)
                 {
-                    foreach (Unit enemy in tyr.Enemies())
+                    foreach (Unit enemy in bot.Enemies())
                         if (agent.DistanceSq(enemy) <= 10 * 10
                             && !enemy.IsFlying
                             && enemy.UnitType != UnitTypes.REAPER

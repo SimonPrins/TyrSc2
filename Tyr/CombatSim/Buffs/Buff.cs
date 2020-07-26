@@ -1,4 +1,4 @@
-﻿namespace Tyr.CombatSim.Buffs
+﻿namespace SC2Sharp.CombatSim.Buffs
 {
     public abstract class Buff
     {

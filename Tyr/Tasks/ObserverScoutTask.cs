@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ObserverScoutTask : Task
     {
@@ -36,13 +36,13 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (units.Count == 0)
                 return;
 
             if (Target != null)
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (SC2Util.DistanceSq(agent.Unit.Pos, Target.BaseLocation.Pos) <= 3 * 3)
                     {
                         Bases.RemoveAt(Bases.Count - 1);
@@ -50,7 +50,7 @@ namespace Tyr.Tasks
                         break;
                     }
             if (Target != null)
-                foreach (BuildingLocation building in tyr.EnemyManager.EnemyBuildings.Values)
+                foreach (BuildingLocation building in bot.EnemyManager.EnemyBuildings.Values)
                     if (SC2Util.DistanceSq(building.Pos, Target.BaseLocation.Pos) <= 6 * 6)
                     {
                         Bases.RemoveAt(Bases.Count - 1);
@@ -60,7 +60,7 @@ namespace Tyr.Tasks
 
 
             if (Bases.Count == 0)
-                foreach (Base b in tyr.BaseManager.Bases)
+                foreach (Base b in bot.BaseManager.Bases)
                     Bases.Add(b);
 
             if (Target == null)

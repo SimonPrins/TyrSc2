@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class GroupedAttackTask : Task
     {
@@ -80,7 +80,7 @@ namespace Tyr.Tasks
             return false;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (units.Count <= RetreatSize)
             {
@@ -100,7 +100,7 @@ namespace Tyr.Tasks
             }
 
             CombatGroup.Units = Units;
-            CombatGroup.AttackAt(tyr.TargetManager.AttackTarget, this);
+            CombatGroup.AttackAt(bot.TargetManager.AttackTarget, this);
         }
     }
 }

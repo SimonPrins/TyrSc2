@@ -1,15 +1,15 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvTStalkerImmortal : Build
     {
@@ -68,7 +68,7 @@ namespace Tyr.Builds.Protoss
             }
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new FleeCyclonesController());
             MicroControllers.Add(FearTanksController);
@@ -96,7 +96,7 @@ namespace Tyr.Builds.Protoss
             GetScoutingPylonPos();
 
             Set += ProtossBuildUtil.Pylons(() => 
-            (Count(UnitTypes.PYLON) > 0 && Count(UnitTypes.CYBERNETICS_CORE) > 0 && Count(UnitTypes.STALKER) > 0) && Count(UnitTypes.PYLON) < 3 || tyr.Frame >= 22.4 * 60 * 3.5);
+            (Count(UnitTypes.PYLON) > 0 && Count(UnitTypes.CYBERNETICS_CORE) > 0 && Count(UnitTypes.STALKER) > 0) && Count(UnitTypes.PYLON) < 3 || bot.Frame >= 22.4 * 60 * 3.5);
             Set += BaseCannons();
             Set += ExpandBuildings();
             Set += ExtraAssimilators();
@@ -287,23 +287,23 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             BalanceGas();
 
             MassTanksDetected = MassTank.Get().Detected;
             FearTanksController.Stopped = !MassTanksDetected;
 
-            if (tyr.Frame == (int)(22.4 * 60) && LogLabel.FoundMM)
-                tyr.Chat("The hardest choices require the strongest wills.");
+            if (bot.Frame == (int)(22.4 * 60) && LogLabel.FoundMM)
+                bot.Chat("The hardest choices require the strongest wills.");
 
             if (!FourRaxSuspected
-                && tyr.Frame <= 22.4 * 60 * 3
+                && bot.Frame <= 22.4 * 60 * 3
                 && SendScout)
             {
                 if (EnemyCount(UnitTypes.BARRACKS) >= 3)
                     FourRaxSuspected = true;
-                if (tyr.Frame >= 22.4 * 90
+                if (bot.Frame >= 22.4 * 90
                     && EnemyCount(UnitTypes.BARRACKS) >= 2
                     && EnemyCount(UnitTypes.REFINERY) == 0
                     && EnemyCount(UnitTypes.COMMAND_CENTER) < 2)
@@ -314,7 +314,7 @@ namespace Tyr.Builds.Protoss
             if (ForceFieldRampTask.Task.Stopped)
                 ForceFieldRampTask.Task.Clear();
 
-            if (ProxyPylon && ProxyTask.Task.Stopped && tyr.Frame >= 400)
+            if (ProxyPylon && ProxyTask.Task.Stopped && bot.Frame >= 400)
                 ProxyTask.Task.Stopped = false;
 
             if (ProxyPylon && ProxyTask.Task.UnitCounts.ContainsKey(UnitTypes.PYLON) && ProxyTask.Task.UnitCounts[UnitTypes.PYLON] > 0)
@@ -331,9 +331,9 @@ namespace Tyr.Builds.Protoss
             }
             
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
@@ -341,11 +341,11 @@ namespace Tyr.Builds.Protoss
                 if (Count(UnitTypes.NEXUS) < 3 && TimingAttackTask.Task.Units.Count == 0)
                     agent.Order(Abilities.MOVE, Main.BaseLocation.Pos);
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
 
-            tyr.NexusAbilityManager.Stopped = Completed(UnitTypes.PYLON) == 0;
-            tyr.NexusAbilityManager.PriotitizedAbilities.Add(1006);
+            bot.NexusAbilityManager.Stopped = Completed(UnitTypes.PYLON) == 0;
+            bot.NexusAbilityManager.PriotitizedAbilities.Add(1006);
 
             if (TotalEnemyCount(UnitTypes.BANSHEE) > 0)
             {
@@ -358,7 +358,7 @@ namespace Tyr.Builds.Protoss
                 StutterController.Stopped = false;
             }
 
-            SaveWorkersTask.Task.Stopped = tyr.Frame >= 22.4 * 60 * 7 || EnemyCount(UnitTypes.CYCLONE) == 0 || !Natural.UnderAttack;
+            SaveWorkersTask.Task.Stopped = bot.Frame >= 22.4 * 60 * 7 || EnemyCount(UnitTypes.CYCLONE) == 0 || !Natural.UnderAttack;
             if (SaveWorkersTask.Task.Stopped)
                 SaveWorkersTask.Task.Clear();
 
@@ -366,12 +366,12 @@ namespace Tyr.Builds.Protoss
             if (!MedivacsSpotted && EnemyCount(UnitTypes.MEDIVAC) > 0)
             {
                 MedivacsSpotted = true;
-                MedivacsSpottedFrame = tyr.Frame;
+                MedivacsSpottedFrame = bot.Frame;
             }
 
             DefenseTask.GroundDefenseTask.IncludePhoenixes = EnemyCount(UnitTypes.CYCLONE) > 0;
 
-            if (MedivacsSpotted && tyr.Frame - MedivacsSpottedFrame <= 22.4 * 30 && InterceptMedivacs)
+            if (MedivacsSpotted && bot.Frame - MedivacsSpottedFrame <= 22.4 * 30 && InterceptMedivacs)
             {
                 IdleTask.Task.OverrideTarget = DefendDropsPos;
                 DefenseTask.AirDefenseTask.IgnoreEnemyTypes.Add(UnitTypes.MEDIVAC);
@@ -391,8 +391,8 @@ namespace Tyr.Builds.Protoss
             }
 
             if (!BansheesDetected
-                && tyr.Frame >= 22.4 * 60 * 6
-                && tyr.Frame < 22.4 * 60 * 9.5
+                && bot.Frame >= 22.4 * 60 * 6
+                && bot.Frame < 22.4 * 60 * 9.5
                 && !MedivacsSpotted
                 && InterceptMedivacs)
             {
@@ -401,13 +401,13 @@ namespace Tyr.Builds.Protoss
             }
             else
             {
-                if (Bot.Main.Frame - tyr.EnemyBansheesManager.BansheeSeenFrame <= 22.4 * 10
-                    && tyr.EnemyBansheesManager.BansheeLocation != null)
-                    TimedObserverTask.Task.Target = tyr.EnemyBansheesManager.BansheeLocation;
-                else if (Bot.Main.Frame - tyr.EnemyBansheesManager.LastHitFrame <= 22.4 * 20)
-                    TimedObserverTask.Task.Target = tyr.EnemyBansheesManager.LastHitLocation;
+                if (Bot.Main.Frame - bot.EnemyBansheesManager.BansheeSeenFrame <= 22.4 * 10
+                    && bot.EnemyBansheesManager.BansheeLocation != null)
+                    TimedObserverTask.Task.Target = bot.EnemyBansheesManager.BansheeLocation;
+                else if (Bot.Main.Frame - bot.EnemyBansheesManager.LastHitFrame <= 22.4 * 20)
+                    TimedObserverTask.Task.Target = bot.EnemyBansheesManager.LastHitLocation;
                 else
-                    TimedObserverTask.Task.Target = SC2Util.To2D(tyr.MapAnalyzer.StartLocation);
+                    TimedObserverTask.Task.Target = SC2Util.To2D(bot.MapAnalyzer.StartLocation);
                 TimedObserverTask.Task.Priority = 3;
             }
 
@@ -433,7 +433,7 @@ namespace Tyr.Builds.Protoss
                 BansheesDetected = true;
             if (!BansheesDetected
                 && TotalEnemyCount(UnitTypes.STARPORT_TECH_LAB) + TotalEnemyCount(UnitTypes.STARPORT) > 0
-                && tyr.Frame < 22.4 * 60 * 5)
+                && bot.Frame < 22.4 * 60 * 5)
                 BansheesDetected = true;
             
             DefenseTask.GroundDefenseTask.ExpandDefenseRadius = 20;
@@ -449,7 +449,7 @@ namespace Tyr.Builds.Protoss
             //if (BansheesDetected && EnemyCount(UnitTypes.VIKING_ASSUALT) + EnemyCount(UnitTypes.VIKING_FIGHTER) >= 3)
                 BuildTempest = true;
 
-            tyr.TargetManager.SkipPlanetaries = true;
+            bot.TargetManager.SkipPlanetaries = true;
         }
     }
 }

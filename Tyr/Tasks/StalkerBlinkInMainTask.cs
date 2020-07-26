@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tyr.Agents;
-using Tyr.MapAnalysis;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class StalkerBlinkInMainTask : Task
     {
@@ -50,7 +50,7 @@ namespace Tyr.Tasks
             return EnemyThird != null && UpgradeType.LookUp[UpgradeType.Blink].Progress() >= 0.8;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Sentry != null)
             {
@@ -75,13 +75,13 @@ namespace Tyr.Tasks
                         ClearAt(i);
                 }
 
-            if (EnemyThird == null && tyr.TargetManager.PotentialEnemyStartLocations.Count == 1)
+            if (EnemyThird == null && bot.TargetManager.PotentialEnemyStartLocations.Count == 1)
             {
-                Point2D enemyNatural = tyr.MapAnalyzer.GetEnemyNatural().Pos;
-                Point2D enemyMain = tyr.TargetManager.PotentialEnemyStartLocations[0];
-                Point2D enemyRamp = tyr.MapAnalyzer.GetEnemyRamp();
+                Point2D enemyNatural = bot.MapAnalyzer.GetEnemyNatural().Pos;
+                Point2D enemyMain = bot.TargetManager.PotentialEnemyStartLocations[0];
+                Point2D enemyRamp = bot.MapAnalyzer.GetEnemyRamp();
                 float dist = 1000000;
-                foreach (BaseLocation loc in tyr.MapAnalyzer.BaseLocations)
+                foreach (BaseLocation loc in bot.MapAnalyzer.BaseLocations)
                 {
                     if (SC2Util.DistanceSq(loc.Pos, enemyNatural) <= 2 * 2)
                         continue;
@@ -98,10 +98,10 @@ namespace Tyr.Tasks
                 }
                 PotentialHelper potential;
                 dist = 25 * 25;
-                for (int x = 0; x < tyr.MapAnalyzer.EnemyDistances.GetLength(0); x++)
-                    for (int y = 0; y < tyr.MapAnalyzer.EnemyDistances.GetLength(1); y++)
+                for (int x = 0; x < bot.MapAnalyzer.EnemyDistances.GetLength(0); x++)
+                    for (int y = 0; y < bot.MapAnalyzer.EnemyDistances.GetLength(1); y++)
                     {
-                        if (tyr.MapAnalyzer.EnemyDistances[x, y] > 30)
+                        if (bot.MapAnalyzer.EnemyDistances[x, y] > 30)
                             continue;
 
                         Point2D point = new Point2D() { X = x, Y = y };
@@ -111,17 +111,17 @@ namespace Tyr.Tasks
                         dist = newDist;
                         
                         StagingArea = new PotentialHelper(point, 1)
-                            .To(tyr.TargetManager.PotentialEnemyStartLocations[0])
+                            .To(bot.TargetManager.PotentialEnemyStartLocations[0])
                             .Get();
                     }
                 
                 potential = new PotentialHelper(StagingArea, 7f);
-                potential.From(tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                potential.From(bot.TargetManager.PotentialEnemyStartLocations[0]);
                 LoadArea = potential.Get();
             }
 
             if (StagingArea != null)
-                tyr.DrawSphere(new Point() { X = StagingArea.X, Y = StagingArea.Y, Z = tyr.MapAnalyzer.StartLocation.Z });
+                bot.DrawSphere(new Point() { X = StagingArea.X, Y = StagingArea.Y, Z = bot.MapAnalyzer.StartLocation.Z });
 
             if (units.Count == 0)
                 return;
@@ -160,8 +160,8 @@ namespace Tyr.Tasks
 
                 if (agent.Unit.UnitType == UnitTypes.COLOSUS)
                     agent.Order(Abilities.MOVE, StagingArea);
-                else if (BlinkedStalkers.Contains(agent.Unit.Tag) || tyr.Frame >= 22.4 * 60 * 7.5)
-                    Attack(agent, tyr.TargetManager.AttackTarget);
+                else if (BlinkedStalkers.Contains(agent.Unit.Tag) || bot.Frame >= 22.4 * 60 * 7.5)
+                    Attack(agent, bot.TargetManager.AttackTarget);
                 else if (agent.DistanceSq(LoadArea) <= 2 * 2 && highGroundVision)
                     agent.Order(Abilities.BLINK, StagingArea);
                 else if (agent.DistanceSq(EnemyThird) <= 10 * 10 && colosusExists)

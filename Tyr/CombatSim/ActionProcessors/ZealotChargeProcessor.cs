@@ -1,7 +1,7 @@
-﻿using Tyr.CombatSim.Actions;
-using Tyr.CombatSim.Buffs;
+﻿using SC2Sharp.CombatSim.Actions;
+using SC2Sharp.CombatSim.Buffs;
 
-namespace Tyr.CombatSim.ActionProcessors
+namespace SC2Sharp.CombatSim.ActionProcessors
 {
     public class ZealotChargeProcessor : ActionProcessor
     {

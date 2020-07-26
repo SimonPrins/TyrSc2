@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Terran
+namespace SC2Sharp.Builds.Terran
 {
     public class HellbatRush : Build
     {
@@ -31,7 +31,7 @@ namespace Tyr.Builds.Terran
             return "HellbatRush";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new DodgeBallController());
@@ -114,7 +114,7 @@ namespace Tyr.Builds.Terran
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TransformTask.Task.HellionsToHellbats();
             if (RoachDefense)
@@ -139,11 +139,11 @@ namespace Tyr.Builds.Terran
 
             RepairTask.Task.WallIn = WallIn;
 
-            if (!LingRush && tyr.Frame <= 22.4 * 150
-                && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) >= 5)
+            if (!LingRush && bot.Frame <= 22.4 * 150
+                && bot.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) >= 5)
                 LingRush = true;
 
-            if (!RoachDefense && tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ROACH) > 6)
+            if (!RoachDefense && bot.EnemyStrategyAnalyzer.Count(UnitTypes.ROACH) > 6)
                 RoachDefense = true;
         }
     }

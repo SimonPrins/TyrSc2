@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class PvZCannonRush : Build
     {
@@ -23,7 +23,7 @@ namespace Tyr.Builds.Protoss
             TimingAttackTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new StutterController());
 
@@ -52,7 +52,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (ProxyTask.Task.UnitCounts.ContainsKey(UnitTypes.PHOTON_CANNON) && ProxyTask.Task.UnitCounts[UnitTypes.PHOTON_CANNON] > 0)
             {
@@ -63,7 +63,7 @@ namespace Tyr.Builds.Protoss
             TimingAttackTask.Task.RequiredSize = 16;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (agent.Unit.UnitType == UnitTypes.NEXUS
                 && Minerals() >= 50

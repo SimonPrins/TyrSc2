@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
+using SC2Sharp.Agents;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     /**
      * Hold the door!
@@ -39,11 +39,11 @@ namespace Tyr.Tasks
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             foreach (Agent agent in units)
             {
-                tyr.DrawText("Hodor dist: " + System.Math.Sqrt(agent.DistanceSq(Target)));
+                bot.DrawText("Hodor dist: " + System.Math.Sqrt(agent.DistanceSq(Target)));
                 if (agent.DistanceSq(Target) <= 0.1)
                 {
                     if (Bot.Main.Frame % 23 == 0)

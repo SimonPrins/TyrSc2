@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using SC2APIProtocol;
-using Tyr.Util;
+using SC2Sharp.Util;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class WallInManager : Manager
     {
@@ -10,13 +10,13 @@ namespace Tyr.Managers
         public int AvailableGasses { get; internal set; }
         public Point2D NaturalDefensePos { get; private set; }
 
-        public void OnStart(Bot tyr)
+        public void OnStart(Bot bot)
         {
             float dist = 0;
             Point2D crossSpawn = null;
-            foreach (Point2D enemy in tyr.TargetManager.PotentialEnemyStartLocations)
+            foreach (Point2D enemy in bot.TargetManager.PotentialEnemyStartLocations)
             {
-                int enemyDist = (int)SC2Util.DistanceSq(enemy, tyr.MapAnalyzer.StartLocation);
+                int enemyDist = (int)SC2Util.DistanceSq(enemy, bot.MapAnalyzer.StartLocation);
                 if (enemyDist > dist)
                 {
                     crossSpawn = enemy;
@@ -24,11 +24,11 @@ namespace Tyr.Managers
                 }
             }
 
-            int[,] enemyDistances = tyr.MapAnalyzer.Distances(crossSpawn);
+            int[,] enemyDistances = bot.MapAnalyzer.Distances(crossSpawn);
             
         }
 
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
         }
     }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Tyr.Plugins
+namespace SC2Sharp.Plugins
 {
     public interface Plugin
     {

@@ -1,16 +1,16 @@
 ﻿
 using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.MapAnalysis;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.MapAnalysis;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class MassSentries : Build
     {
@@ -61,7 +61,7 @@ namespace Tyr.Builds.Protoss
             SentryWarpInTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new StayByCannonsController());
             MicroControllers.Add(new FleeCyclonesController());
@@ -73,7 +73,7 @@ namespace Tyr.Builds.Protoss
             MicroControllers.Add(new KillTargetController(UnitTypes.SCV, true));
 
             if (SkipNatural)
-                foreach (Base b in tyr.BaseManager.Bases)
+                foreach (Base b in bot.BaseManager.Bases)
                 {
                     if (b == Main)
                         continue;
@@ -82,15 +82,15 @@ namespace Tyr.Builds.Protoss
                     BuildingPlacement.ReservedBuilding reservedExpand = new BuildingPlacement.ReservedBuilding();
                     reservedExpand.Pos = b.BaseLocation.Pos;
                     reservedExpand.Type = UnitTypes.NEXUS;
-                    tyr.buildingPlacer.ReservedLocation.Add(reservedExpand);
+                    bot.buildingPlacer.ReservedLocation.Add(reservedExpand);
                 }
 
             foreach (WorkerDefenseTask task in WorkerDefenseTask.Tasks)
                 task.OnlyDefendInsideMain = true;
 
-            tyr.TargetManager.PrefferDistant = false;
+            bot.TargetManager.PrefferDistant = false;
 
-            RampDefensePos = new PotentialHelper(MainDefensePos, 4).To(tyr.MapAnalyzer.GetMainRamp()).Get();
+            RampDefensePos = new PotentialHelper(MainDefensePos, 4).To(bot.MapAnalyzer.GetMainRamp()).Get();
 
             if (Bot.Main.EnemyRace == Race.Terran)
             {
@@ -107,8 +107,8 @@ namespace Tyr.Builds.Protoss
                 
                 if (NaturalWall.Wall.Count >= 4)
                 {
-                    if (tyr.Map == MapEnum.Acropolis
-                        || tyr.Map == MapEnum.Thunderbird)
+                    if (bot.Map == MapEnum.Acropolis
+                        || bot.Map == MapEnum.Thunderbird)
                     {
                         WallBuilding temp = NaturalWall.Wall[3];
                         NaturalWall.Wall[3] = NaturalWall.Wall[0];
@@ -253,24 +253,24 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
-            tyr.TaskManager.CombatSimulation.SimulationLength = 0;
+            bot.TaskManager.CombatSimulation.SimulationLength = 0;
 
             if (Completed(UnitTypes.WARP_PRISM) > 0)
                 StopWarpPrisms = true;
             if (ProxySuspected)
             {
-                tyr.TargetManager.TargetAllBuildings = true;
+                bot.TargetManager.TargetAllBuildings = true;
                 MassSentriesTask.Task.RequiredSize = 15;
                 MassSentriesTask.Task.RetreatSize = 6;
             }
-            else if (tyr.EnemyRace == Race.Protoss && !Stalker.Get().DetectedPreviously)
+            else if (bot.EnemyRace == Race.Protoss && !Stalker.Get().DetectedPreviously)
             {
                 MassSentriesTask.Task.RequiredSize = 50;
                 MassSentriesTask.Task.RetreatSize = 10;
             }
-            else if (tyr.EnemyRace == Race.Terran && SiegeTank.Get().DetectedPreviously)
+            else if (bot.EnemyRace == Race.Terran && SiegeTank.Get().DetectedPreviously)
             {
                 MassSentriesTask.Task.RequiredSize = 50;
                 MassSentriesTask.Task.RetreatSize = 10;
@@ -293,7 +293,7 @@ namespace Tyr.Builds.Protoss
             TrainStep.WarpInLocation = null;
             if (Completed(UnitTypes.WARP_PRISM_PHASING) > 0)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.WARP_PRISM_PHASING)
                         continue;
@@ -307,7 +307,7 @@ namespace Tyr.Builds.Protoss
             else if (MassSentriesTask.Task.AttackSent)
                 SentryWarpInTask.Task.Stopped = false;
 
-            tyr.DrawText("SentryWarpInTask Stopped: " + SentryWarpInTask.Task.Stopped);
+            bot.DrawText("SentryWarpInTask Stopped: " + SentryWarpInTask.Task.Stopped);
 
             DefenseTask.GroundDefenseTask.UseForceFields = true;
 
@@ -324,32 +324,32 @@ namespace Tyr.Builds.Protoss
                 IdleTask.Task.OverrideTarget = null;
             }
 
-            if (WorkerScoutTask.Task.BaseCircled() && (tyr.EnemyRace != Race.Zerg || !DefenseMode))
+            if (WorkerScoutTask.Task.BaseCircled() && (bot.EnemyRace != Race.Zerg || !DefenseMode))
             {
                 WorkerScoutTask.Task.Stopped = true;
                 WorkerScoutTask.Task.Clear();
             }
 
             if (!DefenseMode && TotalEnemyCount(UnitTypes.ROACH_WARREN) > 0
-                && tyr.Frame <= 22.4 * 90
+                && bot.Frame <= 22.4 * 90
                 && !Expanded.Get().Detected)
                 DefenseMode = true;
 
             if (!DefenseMode && TotalEnemyCount(UnitTypes.BARRACKS) == 0
-                && tyr.Frame >= 22.4 * 90
-                && tyr.Frame <= 22.4 * 120
-                && tyr.EnemyRace == Race.Terran
+                && bot.Frame >= 22.4 * 90
+                && bot.Frame <= 22.4 * 120
+                && bot.EnemyRace == Race.Terran
                 && !Expanded.Get().Detected)
             {
                 DefenseMode = true;
                 ProxySuspected = true;
             }
             if (!DefenseMode 
-                && FourRax.Get().Detected && tyr.Frame <= 22.4 * 90
+                && FourRax.Get().Detected && bot.Frame <= 22.4 * 90
                 && !Expanded.Get().Detected)
                 DefenseMode = true;
             if (!DefenseMode && TotalEnemyCount(UnitTypes.SPAWNING_POOL) > 0 
-                && tyr.Frame <= 22.4 * 80
+                && bot.Frame <= 22.4 * 80
                 && !Expanded.Get().Detected)
                 DefenseMode = true;
             if (Expanded.Get().Detected)
@@ -360,7 +360,7 @@ namespace Tyr.Builds.Protoss
                 && Completed(UnitTypes.SENTRY) >= 18
                 && NaturalWall.Wall.Count >= 4)
             {
-                foreach (Agent agent in tyr.Units())
+                foreach (Agent agent in bot.Units())
                 {
                     if (agent.Unit.UnitType != UnitTypes.FORGE)
                         continue;
@@ -376,9 +376,9 @@ namespace Tyr.Builds.Protoss
             {
                 if (Count(Main, UnitTypes.FORGE) > 0
                     && Completed(UnitTypes.SENTRY) >= 18)
-                    tyr.buildingPlacer.LimitBuildArea = null;
+                    bot.buildingPlacer.LimitBuildArea = null;
                 else
-                    tyr.buildingPlacer.LimitBuildArea = MainAndNatural;
+                    bot.buildingPlacer.LimitBuildArea = MainAndNatural;
             }
 
             if (Completed(UnitTypes.SENTRY) >= 15)
@@ -391,19 +391,19 @@ namespace Tyr.Builds.Protoss
             if (!TyckleFightChatSent && StrategyAnalysis.WorkerRush.Get().Detected)
             {
                 TyckleFightChatSent = true;
-                tyr.Chat("TICKLE FIGHT! :D");
+                bot.Chat("TICKLE FIGHT! :D");
             }
 
             if (!MessageSent)
                 if (MassSentriesTask.Task.AttackSent)
                 {
                     MessageSent = true;
-                    tyr.Chat("Prepare to be TICKLED! :D");
+                    bot.Chat("Prepare to be TICKLED! :D");
                 }
 
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
-                if (tyr.Frame % 224 != 0)
+                if (bot.Frame % 224 != 0)
                     break;
                 if (agent.Unit.UnitType != UnitTypes.GATEWAY)
                     continue;
@@ -411,7 +411,7 @@ namespace Tyr.Builds.Protoss
                 if (MassSentriesTask.Task.Units.Count == 0)
                     agent.Order(Abilities.MOVE, Main.BaseLocation.Pos);
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
             }
         }
     }

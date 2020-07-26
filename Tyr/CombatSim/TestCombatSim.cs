@@ -1,13 +1,13 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Tyr.Agents;
-using Tyr.CombatSim.ActionProcessors;
-using Tyr.CombatSim.Buffs;
-using Tyr.CombatSim.CombatMicro;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.CombatSim.ActionProcessors;
+using SC2Sharp.CombatSim.Buffs;
+using SC2Sharp.CombatSim.CombatMicro;
+using SC2Sharp.Util;
 
-namespace Tyr.CombatSim
+namespace SC2Sharp.CombatSim
 {
     public class TestCombatSim
     {

@@ -1,8 +1,8 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class PhoenixHuntOverlordsTask : Task
     {
@@ -29,7 +29,7 @@ namespace Tyr.Tasks
             return KillOverlord != null;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             DetermineTarget();
             if (KillOverlord == null)

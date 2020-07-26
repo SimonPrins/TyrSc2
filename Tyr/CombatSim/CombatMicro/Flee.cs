@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using Tyr.CombatSim.Actions;
+using SC2Sharp.CombatSim.Actions;
 
-namespace Tyr.CombatSim.CombatMicro
+namespace SC2Sharp.CombatSim.CombatMicro
 {
     [JsonObject(MemberSerialization.Fields)]
     public class Flee : CombatMicro

@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class OracleHarassTask : Task
     {
@@ -33,7 +33,7 @@ namespace Tyr.Tasks
             return Bot.Main.UnitManager.Completed(UnitTypes.ORACLE)  >= RequiredSize;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             Dictionary<ulong, Unit> targets = new Dictionary<ulong, Unit>();
             bool attacking = false;
@@ -47,7 +47,7 @@ namespace Tyr.Tasks
                 Unit target = null;
                 float health = 10000;
                 ulong tag = 0;
-                foreach (Unit enemy in tyr.Observation.Observation.RawData.Units)
+                foreach (Unit enemy in bot.Observation.Observation.RawData.Units)
                 {
                     if (enemy.Alliance != Alliance.Enemy)
                         continue;
@@ -91,9 +91,9 @@ namespace Tyr.Tasks
                 
                 Unit target = targets[agent.Unit.Tag];
 
-                if ((attacking || enemyWorker != null) && (tyr.Frame - PulsarFrame >= 400 || tyr.Frame == PulsarFrame))
+                if ((attacking || enemyWorker != null) && (bot.Frame - PulsarFrame >= 400 || bot.Frame == PulsarFrame))
                 {
-                    PulsarFrame = tyr.Frame;
+                    PulsarFrame = bot.Frame;
                     agent.Order(2375);
                 }
                 else if (target != null)
@@ -102,10 +102,10 @@ namespace Tyr.Tasks
                     agent.Order(Abilities.MOVE, defendTarget);
                 else if (enemyWorker != null)
                     agent.Order(Abilities.ATTACK, enemyWorker.Tag);
-                else if (IdleAboveEnemyMinerals && tyr.TargetManager.PotentialEnemyStartLocations.Count >= 0)
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.PotentialEnemyStartLocations[0]);
+                else if (IdleAboveEnemyMinerals && bot.TargetManager.PotentialEnemyStartLocations.Count >= 0)
+                    agent.Order(Abilities.MOVE, bot.TargetManager.PotentialEnemyStartLocations[0]);
                 else
-                    agent.Order(Abilities.MOVE, tyr.TargetManager.AttackTarget);
+                    agent.Order(Abilities.MOVE, bot.TargetManager.AttackTarget);
             }
         }
     }

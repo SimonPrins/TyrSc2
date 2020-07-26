@@ -1,11 +1,11 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.Tasks;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
+using SC2Sharp.Util;
 
-namespace Tyr.Builds.Zerg
+namespace SC2Sharp.Builds.Zerg
 {
     public class Muukzor : Build
     {
@@ -26,7 +26,7 @@ namespace Tyr.Builds.Zerg
             ArmyOverseerTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new FleeCyclonesController());
             MicroControllers.Add(new FearEnemyController(UnitTypes.MUTALISK, UnitTypes.MISSILE_TURRET, 10) { CourageCount = 20 });
@@ -68,10 +68,10 @@ namespace Tyr.Builds.Zerg
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             ArmyOverseerTask.Task.IgnoreUnitTypes.Add(UnitTypes.ZERGLING);
-            if (tyr.Frame < 10)
+            if (bot.Frame < 10)
             {
                 TimingAttackTask.Task.ExcludeUnitTypes.Add(UnitTypes.MUTALISK);
                 TimingAttackTask.Task.ExcludeUnitTypes.Add(UnitTypes.HYDRALISK);
@@ -88,7 +88,7 @@ namespace Tyr.Builds.Zerg
             else
                 TimingAttackTask.Task.RequiredSize = 30;
 
-            tyr.TargetManager.IgnoreFlyingBuildings = Completed(UnitTypes.MUTALISK) + Completed(UnitTypes.HYDRALISK) < 8;
+            bot.TargetManager.IgnoreFlyingBuildings = Completed(UnitTypes.MUTALISK) + Completed(UnitTypes.HYDRALISK) < 8;
 
             DefenseTask.GroundDefenseTask.MainDefenseRadius = 20;
             DefenseTask.GroundDefenseTask.ExpandDefenseRadius = 15;

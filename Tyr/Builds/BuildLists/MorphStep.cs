@@ -1,9 +1,9 @@
 ﻿using System;
-using Tyr.Agents;
-using Tyr.Tasks;
-using static Tyr.Builds.BuildLists.ConditionalStep;
+using SC2Sharp.Agents;
+using SC2Sharp.Tasks;
+using static SC2Sharp.Builds.BuildLists.ConditionalStep;
 
-namespace Tyr.Builds.BuildLists
+namespace SC2Sharp.Builds.BuildLists
 {
     public class MorphStep : BuildStep
     {

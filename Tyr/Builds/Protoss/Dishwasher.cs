@@ -1,9 +1,9 @@
-﻿using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Micro;
-using Tyr.Tasks;
+﻿using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Micro;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class Dishwasher : Build
     {
@@ -44,7 +44,7 @@ namespace Tyr.Builds.Protoss
             WorkerRushDefenseTask.Enable();
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
             MicroControllers.Add(new FleeCyclonesController());
             MicroControllers.Add(new SentryController());
@@ -105,7 +105,7 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             TimingAttackTask.Task.DefendOtherAgents = false;
             if (TotalEnemyCount(UnitTypes.PHOENIX) > 0 && Completed(UnitTypes.IMMORTAL) >= 3) 
@@ -114,13 +114,13 @@ namespace Tyr.Builds.Protoss
                 TimingAttackTask.Task.RequiredSize = 20;
 
             if (!ImmortalNearEnemy)
-                foreach (Agent agent in tyr.Units())
-                    if (agent.Unit.UnitType == UnitTypes.IMMORTAL && agent.DistanceSq(tyr.TargetManager.PotentialEnemyStartLocations[0]) <= 20 * 20)
+                foreach (Agent agent in bot.Units())
+                    if (agent.Unit.UnitType == UnitTypes.IMMORTAL && agent.DistanceSq(bot.TargetManager.PotentialEnemyStartLocations[0]) <= 20 * 20)
                         ImmortalNearEnemy = true;
 
-            tyr.DrawText("Immortal near enemey: " + ImmortalNearEnemy);
+            bot.DrawText("Immortal near enemey: " + ImmortalNearEnemy);
 
-            if (AggressiveMicro && (ImmortalNearEnemy || tyr.Frame >= 22.4 * 60 * 5) && EnemyCount(UnitTypes.ZEALOT) == 0)
+            if (AggressiveMicro && (ImmortalNearEnemy || bot.Frame >= 22.4 * 60 * 5) && EnemyCount(UnitTypes.ZEALOT) == 0)
             {
                 StutterForwardController.Stopped = false;
                 StutterController.Stopped = true;

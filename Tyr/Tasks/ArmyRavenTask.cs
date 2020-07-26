@@ -1,10 +1,10 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
-using Tyr.Util;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
+using SC2Sharp.Util;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     class ArmyRavenTask : Task
     {
@@ -35,7 +35,7 @@ namespace Tyr.Tasks
             return true;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (units.Count == 0)
                 return;
@@ -44,7 +44,7 @@ namespace Tyr.Tasks
 
             Unit fleeEnemy = null;
             float dist = 10 * 10;
-            foreach (Unit enemy in tyr.Enemies())
+            foreach (Unit enemy in bot.Enemies())
             {
                 if (!UnitTypes.AirAttackTypes.Contains(enemy.UnitType))
                     continue;
@@ -59,18 +59,18 @@ namespace Tyr.Tasks
             if (fleeEnemy != null)
             {
                 raven.Order(Abilities.MOVE, raven.From(fleeEnemy, 4));
-                tyr.DrawText("Raven fleeing!");
+                bot.DrawText("Raven fleeing!");
                 return;
             }
 
-            if (tyr.Frame % 5 == 0)
+            if (bot.Frame % 5 == 0)
                 return;
 
-            Point2D target = tyr.TargetManager.AttackTarget;
+            Point2D target = bot.TargetManager.AttackTarget;
             
             Agent closest = null;
             dist = 1000000;
-            foreach (Agent agent in tyr.UnitManager.Agents.Values)
+            foreach (Agent agent in bot.UnitManager.Agents.Values)
             {
                 if (agent.Unit.Tag == raven.Unit.Tag)
                     continue;
@@ -94,25 +94,25 @@ namespace Tyr.Tasks
             }
 
             int bases = 0;
-            foreach (Base b in tyr.BaseManager.Bases)
+            foreach (Base b in bot.BaseManager.Bases)
                 if (b.ResourceCenter != null)
                     bases++;
 
             Point2D defenseLocation;
             if (bases >= 2)
-                defenseLocation = tyr.BaseManager.NaturalDefensePos;
-            else defenseLocation = tyr.BaseManager.MainDefensePos;
+                defenseLocation = bot.BaseManager.NaturalDefensePos;
+            else defenseLocation = bot.BaseManager.MainDefensePos;
 
             foreach (Agent agent in units)
             {
                 if (closest == null)
                 {
-                    tyr.DrawText("Raven returning!");
+                    bot.DrawText("Raven returning!");
                     agent.Order(Abilities.MOVE, defenseLocation);
                 }
                 else
                 {
-                    tyr.DrawText("Raven moving out!");
+                    bot.DrawText("Raven moving out!");
                     agent.Order(Abilities.MOVE, SC2Util.To2D(closest.Unit.Pos));
                 }
             }

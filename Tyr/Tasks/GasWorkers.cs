@@ -1,9 +1,9 @@
 ﻿using SC2APIProtocol;
 using System.Collections.Generic;
-using Tyr.Agents;
-using Tyr.Managers;
+using SC2Sharp.Agents;
+using SC2Sharp.Managers;
 
-namespace Tyr.Tasks
+namespace SC2Sharp.Tasks
 {
     public class GasWorkers
     {
@@ -20,25 +20,25 @@ namespace Tyr.Tasks
             }
         }
 
-        public void OnFrame(Bot tyr)
+        public void OnFrame(Bot bot)
         {
             // Remove dead workers.
             for (int i = Workers.Count - 1; i >= 0; i--)
             {
                 if (!LastSeen.ContainsKey(Workers[i].Unit.Tag))
-                    LastSeen.Add(Workers[i].Unit.Tag, tyr.Frame);
-                if (tyr.UnitManager.Agents.ContainsKey(Workers[i].Unit.Tag))
-                    LastSeen[Workers[i].Unit.Tag] = tyr.Frame;
-                if (tyr.Frame - LastSeen[Workers[i].Unit.Tag] >= 200)
+                    LastSeen.Add(Workers[i].Unit.Tag, bot.Frame);
+                if (bot.UnitManager.Agents.ContainsKey(Workers[i].Unit.Tag))
+                    LastSeen[Workers[i].Unit.Tag] = bot.Frame;
+                if (bot.Frame - LastSeen[Workers[i].Unit.Tag] >= 200)
                 {
-                    tyr.UnitManager.DisappearedUnits.Remove(Workers[i].Unit.Tag);
+                    bot.UnitManager.DisappearedUnits.Remove(Workers[i].Unit.Tag);
                     Workers[i] = Workers[Workers.Count - 1];
                     Workers.RemoveAt(Workers.Count - 1);
                 }
             }
 
             foreach (Agent worker in Workers)
-                if (tyr.UnitManager.Agents.ContainsKey(worker.Unit.Tag) && 
+                if (bot.UnitManager.Agents.ContainsKey(worker.Unit.Tag) && 
                     (worker.Unit.Orders.Count == 0 || MiningWrongGas(worker)))
                     worker.Order(Abilities.MOVE, Gas.Tag);
         }

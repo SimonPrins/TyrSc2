@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Tyr.Builds;
+using SC2Sharp.Builds;
 
-namespace Tyr.BuildSelection
+namespace SC2Sharp.BuildSelection
 {
     public class RotateSelector : BuildSelector
     {

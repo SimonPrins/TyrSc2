@@ -1,6 +1,6 @@
 ﻿using SC2APIProtocol;
 
-namespace Tyr.Managers
+namespace SC2Sharp.Managers
 {
     public class ScanCommand
     {

@@ -1,6 +1,6 @@
-﻿using Tyr.Agents;
+﻿using SC2Sharp.Agents;
 
-namespace Tyr.StrategyAnalysis
+namespace SC2Sharp.StrategyAnalysis
 {
     public class Changeling : Strategy
     {

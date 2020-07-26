@@ -1,12 +1,12 @@
 ﻿using SC2APIProtocol;
-using Tyr.Agents;
-using Tyr.Builds.BuildLists;
-using Tyr.Managers;
-using Tyr.Micro;
-using Tyr.StrategyAnalysis;
-using Tyr.Tasks;
+using SC2Sharp.Agents;
+using SC2Sharp.Builds.BuildLists;
+using SC2Sharp.Managers;
+using SC2Sharp.Micro;
+using SC2Sharp.StrategyAnalysis;
+using SC2Sharp.Tasks;
 
-namespace Tyr.Builds.Protoss
+namespace SC2Sharp.Builds.Protoss
 {
     public class TwoBaseRoboPvT : Build
     {
@@ -23,16 +23,16 @@ namespace Tyr.Builds.Protoss
             return "TwoBaseRobo";
         }
 
-        public override void OnStart(Bot tyr)
+        public override void OnStart(Bot bot)
         {
-            tyr.TaskManager.Add(defenseTask);
-            tyr.TaskManager.Add(attackTask);
-            tyr.TaskManager.Add(WorkerScoutTask);
-            tyr.TaskManager.Add(new ObserverScoutTask());
-            if (tyr.BaseManager.Pocket != null)
-                tyr.TaskManager.Add(new ScoutProxyTask(tyr.BaseManager.Pocket.BaseLocation.Pos));
-            tyr.TaskManager.Add(new AdeptKillSquadTask());
-            tyr.TaskManager.Add(new ElevatorChaserTask());
+            bot.TaskManager.Add(defenseTask);
+            bot.TaskManager.Add(attackTask);
+            bot.TaskManager.Add(WorkerScoutTask);
+            bot.TaskManager.Add(new ObserverScoutTask());
+            if (bot.BaseManager.Pocket != null)
+                bot.TaskManager.Add(new ScoutProxyTask(bot.BaseManager.Pocket.BaseLocation.Pos));
+            bot.TaskManager.Add(new AdeptKillSquadTask());
+            bot.TaskManager.Add(new ElevatorChaserTask());
             MicroControllers.Add(new StalkerController());
             MicroControllers.Add(new StutterController());
             MicroControllers.Add(new ColloxenController());
@@ -41,7 +41,7 @@ namespace Tyr.Builds.Protoss
             Set += NaturalDefenses();
             Set += BuildStargatesAgainstLifters();
             Set += Nexii();
-            foreach (Base b in tyr.BaseManager.Bases)
+            foreach (Base b in bot.BaseManager.Bases)
                 if (b != Main && b != Natural)
                     Set += ExpansionDefenses(b);
             Set += MainBuild();
@@ -133,13 +133,13 @@ namespace Tyr.Builds.Protoss
             return result;
         }
 
-        public override void OnFrame(Bot tyr)
+        public override void OnFrame(Bot bot)
         {
             if (Count(UnitTypes.ZEALOT) + Count(UnitTypes.ADEPT) + Count(UnitTypes.STALKER) + Count(UnitTypes.COLOSUS) + Count(UnitTypes.IMMORTAL) >= attackTask.RequiredSize)
                 Attacking = true;
 
             if (FourRax.Get().Detected
-                || (tyr.Frame >= 22.4 * 85 && !tyr.EnemyStrategyAnalyzer.NoProxyTerranConfirmed && tyr.TargetManager.PotentialEnemyStartLocations.Count == 1)
+                || (bot.Frame >= 22.4 * 85 && !bot.EnemyStrategyAnalyzer.NoProxyTerranConfirmed && bot.TargetManager.PotentialEnemyStartLocations.Count == 1)
                 || ReaperRush.Get().Detected)
             {
                 SmellCheese = true;
@@ -150,11 +150,11 @@ namespace Tyr.Builds.Protoss
                 && (ReaperRush.Get().DetectedPreviously || FourRax.Get().DetectedPreviously))
                 SmellCheese = true;
 
-            if (tyr.EnemyRace == Race.Zerg && !PokeTask.Stopped)
+            if (bot.EnemyRace == Race.Zerg && !PokeTask.Stopped)
             {
-                if (tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) >= 10
-                    || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.SPINE_CRAWLER) >= 2
-                    || tyr.EnemyStrategyAnalyzer.Count(UnitTypes.ROACH) >= 5)
+                if (bot.EnemyStrategyAnalyzer.Count(UnitTypes.ZERGLING) >= 10
+                    || bot.EnemyStrategyAnalyzer.Count(UnitTypes.SPINE_CRAWLER) >= 2
+                    || bot.EnemyStrategyAnalyzer.Count(UnitTypes.ROACH) >= 5)
                 {
                     PokeTask.Stopped = true;
                     PokeTask.Clear();
@@ -169,7 +169,7 @@ namespace Tyr.Builds.Protoss
 
             if (SmellCheese && Completed(UnitTypes.ADEPT) < 8)
             {
-                foreach (Agent agent in tyr.UnitManager.Agents.Values)
+                foreach (Agent agent in bot.UnitManager.Agents.Values)
                     if (agent.Unit.UnitType == UnitTypes.NEXUS
                         && agent.Unit.BuildProgress < 0.99)
                         agent.Order(Abilities.CANCEL);
@@ -186,7 +186,7 @@ namespace Tyr.Builds.Protoss
             else DefendMech = false;
         }
 
-        public override void Produce(Bot tyr, Agent agent)
+        public override void Produce(Bot bot, Agent agent)
         {
             if (Count(UnitTypes.PROBE) >= 24
                 && Count(UnitTypes.NEXUS) < 2
