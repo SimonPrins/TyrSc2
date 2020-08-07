@@ -294,9 +294,6 @@ namespace SC2Sharp.Builds.Protoss
             MassTanksDetected = MassTank.Get().Detected;
             FearTanksController.Stopped = !MassTanksDetected;
 
-            if (bot.Frame == (int)(22.4 * 60) && LogLabel.FoundMM)
-                bot.Chat("The hardest choices require the strongest wills.");
-
             if (!FourRaxSuspected
                 && bot.Frame <= 22.4 * 60 * 3
                 && SendScout)
