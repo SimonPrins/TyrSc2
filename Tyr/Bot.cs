@@ -467,7 +467,10 @@ namespace SC2Sharp
             OpponentID = opponentID;
 
             MyRace = GameInfo.PlayerInfo[(int)Observation.Observation.PlayerCommon.PlayerId - 1].RaceActual;
-            EnemyRace = GameInfo.PlayerInfo[2 - (int)Observation.Observation.PlayerCommon.PlayerId].RaceActual;
+            if (GameInfo.PlayerInfo[2 - (int)Observation.Observation.PlayerCommon.PlayerId].RaceActual == Race.NoRace)
+                EnemyRace = GameInfo.PlayerInfo[2 - (int)Observation.Observation.PlayerCommon.PlayerId].RaceRequested;
+            else
+                EnemyRace = GameInfo.PlayerInfo[2 - (int)Observation.Observation.PlayerCommon.PlayerId].RaceActual;
             DebugUtil.WriteLine("MyRace: " + MyRace);
             DebugUtil.WriteLine("EnemyRace: " + EnemyRace);
             DebugUtil.WriteLine("Game started on map: " + GameInfo.MapName);
