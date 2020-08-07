@@ -84,9 +84,6 @@ namespace SC2Sharp.Builds.Protoss
         {
             bot.NexusAbilityManager.PriotitizedAbilities.Add(1568);
 
-            if (bot.Frame == (int)(22.4 * (LogLabel.FoundStrelok ? 60 : 30)))
-                bot.Chat(LogLabel.FoundMechSweep ? "Fun isn't something one considers when balancing the universe" : "I am inevitable.");
-
             bot.buildingPlacer.BuildCompact = true;
             bot.TargetManager.PrefferDistant = false;
             bot.TargetManager.TargetAllBuildings = true;

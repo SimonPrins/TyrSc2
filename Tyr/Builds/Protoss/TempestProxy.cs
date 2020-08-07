@@ -19,7 +19,6 @@ namespace SC2Sharp.Builds.Protoss
         private int DepoweredStargates = 0;
         private TempestController TempestController = new TempestController();
         private Point2D HideLocation;
-        private bool ChatMessageSent = false;
 
         public override string Name()
         {
@@ -111,17 +110,6 @@ namespace SC2Sharp.Builds.Protoss
 
         public override void OnFrame(Bot bot)
         {
-            if (bot.Frame == (int)(22.4 * 60) && LogLabel.FoundMM)
-                bot.Chat("These Tempests are perfectly balanced. As all things should be.");
-            if (!ChatMessageSent)
-            {
-                if (Completed(UnitTypes.TEMPEST) > 0 && !LogLabel.FoundMM)
-                {
-                    bot.Chat("This build is dedicated to Andyman!");
-                    ChatMessageSent = true;
-                }
-            }
-
             if (HideLocation == null)
                 HideLocation = ProxyTask.Task.GetHideLocation();
             if (HideLocation != null)

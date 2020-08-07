@@ -152,7 +152,7 @@ namespace SC2Sharp.Builds.Protoss
 
         public override void OnFrame(Bot bot)
         {
-            if (bot.Frame >= 22.4 * (LogLabel.FoundJensii ? 60 : 30) && !IntroductionSent)
+            if (bot.Frame >= 22.4 * 60 && !IntroductionSent)
             {
                 IntroductionSent = true;
                 bot.Chat("This is ThreeWayLover. GLHF!");

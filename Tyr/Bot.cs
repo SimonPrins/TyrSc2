@@ -92,7 +92,7 @@ namespace SC2Sharp
 
         List<long> Times = new List<long>();
 
-        public BuildsProvider BuildsProvider = new ProbotsBuildsProvider();
+        public BuildsProvider BuildsProvider = new LadderBuildsProvider();
         public BuildSelector BuildSelector = new RotateSelector();
 
         public int VersionNumber = 1;
