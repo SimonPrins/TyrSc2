@@ -308,6 +308,23 @@ namespace SC2Sharp
             }
         }
 
+        public void CreateUnitCommand()
+        {
+            Request createUnitRequest = new Request() { Debug = new RequestDebug() };
+            createUnitRequest.Debug.Debug.Add(new DebugCommand()
+            {
+                CreateUnit = new DebugCreateUnit()
+                {
+                    Owner = (int)Bot.Main.PlayerId,
+                    Pos = SC2Util.To2D(Bot.Main.MapAnalyzer.StartLocation),
+                    Quantity = 10,
+                    UnitType = UnitTypes.MOTHERSHIP
+                }
+            });
+
+            Bot.Main.GameConnection.SendRequest(createUnitRequest).Wait();
+        }
+
         private void TrySenDay9()
         {
             if (!Monday || Day9Sent)
